@@ -132,6 +132,8 @@ export interface GameContext {
 
   /** Geheime Einstellung lesen (siehe manifest.secrets) – nur auf dem Server */
   secret(id: string): string | undefined;
+  /** Geheime Einstellung speichern (z. B. wenn Spieler den Schlüssel im Spiel eingeben) */
+  setSecret(id: string, value: string): void;
 
   log(...args: unknown[]): void;
 }
@@ -145,6 +147,8 @@ export interface GameServer {
   onPlayerRejoin?(playerId: string): void;
   /** Neues Publikum ist dazugekommen */
   onAudienceJoin?(playerId: string): void;
+  /** Eine geheime Einstellung dieses Spiels wurde geändert (z. B. API-Schlüssel eingetragen) */
+  onSecretChanged?(id: string): void;
   /**
    * Für Testspieler (Bots): Welche Aktion würde ein Bot bei dieser Ansicht ausführen?
    * null = nichts tun.
@@ -187,6 +191,8 @@ export interface HostViewProps<V = any> {
   t: Translate;
   /** Spielerinfos per id nachschlagen */
   player: (id: string) => PlayerInfo | undefined;
+  /** Geheime Einstellung des Spiels direkt vom TV aus speichern (z. B. API-Schlüssel) */
+  setSecret: (id: string, value: string) => Promise<boolean>;
 }
 
 export interface ControllerViewProps<V = any> {

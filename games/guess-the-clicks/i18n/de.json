@@ -38,5 +38,14 @@
   "lookAtTv": "Schau auf den Fernseher.",
   "unit.k": "Tsd.",
   "unit.m": "Mio.",
-  "unit.b": "Mrd."
+  "unit.b": "Mrd.",
+  "setup.step4tv": "Den Schlüssel rechts einfügen – oder bequemer am Handy: dort gibt es dasselbe Eingabefeld.",
+  "setup.step4phone": "Den Schlüssel unten einfügen und speichern.",
+  "setup.phoneHint": "Tipp: Am Handy geht das Kopieren und Einfügen meist am einfachsten.",
+  "setup.scan": "QR-Code scannen, um die Google-Seite zu öffnen",
+  "setup.keyLabel": "API-Schlüssel",
+  "setup.save": "Speichern und los",
+  "setup.open": "Google-Seite öffnen",
+  "sound.on": "Ton einschalten",
+  "error.network": "Keine Verbindung zu YouTube. Ist der Rechner online?"
 }

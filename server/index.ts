@@ -196,8 +196,7 @@ function handle(ws: WebSocket, msg: any) {
       const game = getGame(String(msg.gameId));
       if (!room || !isHost || !game?.manifest.secrets?.some((x) => x.id === msg.id)) return;
       setSecret(game.manifest.id, String(msg.id), String(msg.value ?? ''));
-      room.touch();
-      for (const r of allRooms().values()) r.touch();
+      for (const r of allRooms().values()) r.secretChanged(game.manifest.id, String(msg.id));
       return reply(ws, msg, { ok: true });
     }
     case 'kick':

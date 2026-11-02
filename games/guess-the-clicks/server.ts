@@ -4,7 +4,7 @@
  */
 
 import { Scores, type GameContext, type GameServerModule } from '@up/sdk';
-import { YouTubeError, fakeVideo, randomVideo, type Video } from './youtube';
+import { YouTubeError, checkKey, fakeVideo, randomVideo, type Video } from './youtube';
 
 const ROUNDS = 8;
 const GUESS_TIME = 40;
@@ -18,7 +18,7 @@ export default {
     const videos: Video[] = [];
     let round = -1;
     let guesses = new Map<string, number>();
-    let phase: 'loading' | 'guess' | 'reveal' | 'other' = 'loading';
+    let phase: 'setup' | 'loading' | 'guess' | 'reveal' | 'other' = 'loading';
     let timer: { cancel(): void; deadline: number; duration: number } | null = null;
     let roundStart = scores.snapshot();
     let disposed = false;
@@ -29,14 +29,29 @@ export default {
     const isPlayer = (id: string) => ids.includes(id);
     const fake = process.env.UP_FAKE_YOUTUBE === '1';
 
+    function setup(error: string | null = null) {
+      phase = 'setup';
+      ctx.setHostView({ screen: 'setup', error });
+      ctx.setAllPlayerViews(() => ({ screen: 'setup', error }));
+    }
+
     async function load() {
+      if (phase !== 'setup' && phase !== 'loading') return;
       const key = ctx.secret('youtubeApiKey');
-      if (!key && !fake) {
-        ctx.setHostView({ screen: 'setup' });
-        ctx.setAllPlayerViews(() => ({ screen: 'setup' }));
-        return;
-      }
+      if (!key && !fake) return setup();
+      phase = 'loading';
       ctx.setHostView({ screen: 'loading' });
+      if (!fake) {
+        try {
+          await checkKey(key!);
+        } catch (e) {
+          if (disposed) return;
+          const err = e as YouTubeError;
+          if (err.kind === 'key') return setup('key');
+          if (err.kind === 'quota') return setup('quota');
+          return setup('network');
+        }
+      }
       ctx.setAllPlayerViews(() => ({ screen: 'intro' }));
       const topics = ctx.content<{ query: string }>().map((c) => c.query);
       const seen = new Set<string>();
@@ -63,6 +78,7 @@ export default {
         }
       } catch (e) {
         const err = e as YouTubeError;
+        if (err.kind === 'key' || err.kind === 'quota') return setup(err.kind);
         ctx.setHostView({ screen: 'error', kind: err.kind ?? 'network', message: String(err.message ?? '') });
         ctx.setAllPlayerViews(() => ({ screen: 'lookAtTv' }));
         return;
@@ -157,7 +173,15 @@ export default {
       start() {
         void load();
       },
+      onSecretChanged() {
+        if (phase === 'setup') void load();
+      },
       onAction(id, action) {
+        if (phase === 'setup' && action?.type === 'setKey' && typeof action.key === 'string' && action.key.trim().length > 10) {
+          ctx.setSecret('youtubeApiKey', action.key.trim());
+          void load();
+          return;
+        }
         if (phase !== 'guess' || action?.type !== 'guess') return;
         const n = Math.round(Number(action.value));
         if (!Number.isFinite(n) || n < 0 || n > MAX_GUESS) return;

@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ControllerViewProps, GameClientModule, HostViewProps, PlayerInfo, Translate } from '@up/sdk';
-import { Avatar, Confetti, Crown, HostHeader, HostTimer, PhoneTimer, PhoneWait, Podium, Scoreboard, vibrate } from '@up/ui';
+import { Avatar, Confetti, Crown, HostHeader, HostTimer, PhoneTimer, PhoneWait, Podium, QrCode, Scoreboard, TextAnswer, vibrate } from '@up/ui';
 
 const RED = '#FF5A4E';
 
@@ -49,18 +49,7 @@ function Host(props: HostViewProps) {
   const lang = room.lang;
   switch (view.screen) {
     case 'setup':
-      return (
-        <>
-          <HostHeader title={t('title')} color={RED} />
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 20, maxWidth: 980 }}>
-            <h1 style={{ fontSize: 48 }}>{t('setup.title')}</h1>
-            <p style={{ fontSize: 24 }}>{t('setup.text')}</p>
-            <ol style={{ fontSize: 22, lineHeight: 1.6, paddingLeft: 28, margin: 0 }}>
-              <li>{t('setup.step1')}</li><li>{t('setup.step2')}</li><li>{t('setup.step3')}</li><li>{t('setup.step4')}</li>
-            </ol>
-          </div>
-        </>
-      );
+      return <HostSetup {...props} />;
     case 'loading':
       return (
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 24 }}>
@@ -92,10 +81,7 @@ function Host(props: HostViewProps) {
         <>
           <HostHeader title={t('title')} color={RED} info={t('video', { n: view.n, total: view.total })} right={<HostTimer deadline={view.deadline} duration={view.duration} />} />
           <div style={{ flex: 1, display: 'flex', gap: 32, alignItems: 'center', minHeight: 0 }}>
-            <div style={{ width: 720, aspectRatio: '16 / 9', borderRadius: 24, overflow: 'hidden', background: '#000', boxShadow: '0 10px 0 #0A0716', flex: 'none' }}>
-              <iframe key={v.id} title={v.title} width="720" height="405" style={{ border: 0, width: '100%', height: '100%' }} allow="autoplay; encrypted-media"
-                src={`https://www.youtube-nocookie.com/embed/${v.id}?autoplay=1&mute=1&controls=0&loop=1&playlist=${v.id}&modestbranding=1&rel=0&playsinline=1`} />
-            </div>
+            <VideoPlayer id={v.id} t={t} />
             <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 16 }}>
               <h1 style={{ fontSize: 30, lineHeight: 1.2, overflowWrap: 'anywhere' }}>{v.title}</h1>
               <p className="muted" style={{ fontSize: 19 }}>{v.channel}</p>
@@ -128,6 +114,125 @@ function Host(props: HostViewProps) {
       );
   }
   return null;
+}
+
+const KEY_URL = 'https://console.cloud.google.com/apis/library/youtube.googleapis.com';
+
+function HostSetup({ view, t, setSecret }: HostViewProps) {
+  const [key, setKey] = useState('');
+  const [busy, setBusy] = useState(false);
+  const save = async () => {
+    setBusy(true);
+    await setSecret('youtubeApiKey', key.trim());
+    setBusy(false);
+  };
+  const error = view.error === 'key' ? t('error.key') : view.error === 'quota' ? t('error.quota') : view.error ? t('error.network') : null;
+  return (
+    <>
+      <HostHeader title={t('title')} color={RED} info={t('setup.title')} />
+      <div style={{ flex: 1, display: 'flex', gap: 40, alignItems: 'center' }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <h1 style={{ fontSize: 40 }}>{t('setup.title')}</h1>
+          <p style={{ fontSize: 21 }}>{t('setup.text')}</p>
+          <ol style={{ fontSize: 19, lineHeight: 1.55, paddingLeft: 26, margin: 0 }}>
+            <li>{t('setup.step1')}</li><li>{t('setup.step2')}</li><li>{t('setup.step3')}</li><li>{t('setup.step4tv')}</li>
+          </ol>
+          <p className="muted" style={{ fontSize: 16 }}>{t('setup.phoneHint')}</p>
+        </div>
+        <div className="up-card" style={{ width: 460, padding: 28, display: 'flex', flexDirection: 'column', gap: 14, borderRadius: 28 }}>
+          <QrCode text={KEY_URL} size={150} />
+          <p className="muted" style={{ fontSize: 15 }}>{t('setup.scan')}</p>
+          <form onSubmit={(e) => { e.preventDefault(); if (key.trim()) void save(); }} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <label className="up-label" htmlFor="ytkey">{t('setup.keyLabel')}</label>
+            <input id="ytkey" className="up-input" autoComplete="off" spellCheck={false} placeholder="AIza…" value={key} onChange={(e) => setKey(e.target.value)} style={{ fontSize: 18 }} />
+            {error && <p className="up-error" style={{ fontSize: 15 }}>{error}</p>}
+            <button className="up-btn" disabled={!key.trim() || busy}>{busy ? '…' : t('setup.save')}</button>
+          </form>
+        </div>
+      </div>
+    </>
+  );
+}
+
+/** YouTube-Player mit Ton. Blockiert der Browser Autoplay mit Ton, läuft das Video stumm und ein Klick schaltet den Ton ein. */
+let ytApi: Promise<any> | null = null;
+function loadYouTubeApi(): Promise<any> {
+  const w = window as any;
+  if (w.YT?.Player) return Promise.resolve(w.YT);
+  if (!ytApi) {
+    ytApi = new Promise((resolve) => {
+      const prev = w.onYouTubeIframeAPIReady;
+      w.onYouTubeIframeAPIReady = () => { prev?.(); resolve(w.YT); };
+      const s = document.createElement('script');
+      s.src = 'https://www.youtube.com/iframe_api';
+      document.head.appendChild(s);
+    });
+  }
+  return ytApi;
+}
+
+function VideoPlayer({ id, t }: { id: string; t: Translate }) {
+  const box = useRef<HTMLDivElement>(null);
+  const player = useRef<any>(null);
+  const [muted, setMuted] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    void loadYouTubeApi().then((YT) => {
+      if (cancelled || !box.current) return;
+      const el = document.createElement('div');
+      box.current.innerHTML = '';
+      box.current.appendChild(el);
+      player.current = new YT.Player(el, {
+        videoId: id, width: '100%', height: '100%', host: 'https://www.youtube-nocookie.com',
+        playerVars: { autoplay: 1, controls: 0, loop: 1, playlist: id, modestbranding: 1, rel: 0, playsinline: 1, iv_load_policy: 3 },
+        events: {
+          onReady: (e: any) => {
+            e.target.setVolume(70);
+            e.target.unMute();
+            e.target.playVideo();
+            // Prüfen, ob der Browser Ton erlaubt hat – sonst stumm weiterspielen
+            setTimeout(() => {
+              if (cancelled) return;
+              const state = e.target.getPlayerState?.();
+              if (state !== 1 || e.target.isMuted?.()) {
+                e.target.mute();
+                e.target.playVideo();
+                setMuted(true);
+              }
+            }, 1500);
+          },
+        },
+      });
+    });
+    return () => {
+      cancelled = true;
+      try { player.current?.destroy?.(); } catch { /* egal */ }
+    };
+  }, [id]);
+  useEffect(() => {
+    if (!muted) return;
+    const unmute = () => {
+      player.current?.unMute?.();
+      player.current?.playVideo?.();
+      setMuted(false);
+    };
+    window.addEventListener('pointerdown', unmute, { once: true });
+    window.addEventListener('keydown', unmute, { once: true });
+    return () => {
+      window.removeEventListener('pointerdown', unmute);
+      window.removeEventListener('keydown', unmute);
+    };
+  }, [muted]);
+  return (
+    <div style={{ position: 'relative', width: 720, aspectRatio: '16 / 9', borderRadius: 24, overflow: 'hidden', background: '#000', boxShadow: '0 10px 0 #0A0716', flex: 'none' }}>
+      <div ref={box} style={{ width: '100%', height: '100%' }} />
+      {muted && (
+        <button onClick={() => { player.current?.unMute?.(); setMuted(false); }} className="up-btn small" style={{ position: 'absolute', left: 16, bottom: 16 }}>
+          {t('sound.on')}
+        </button>
+      )}
+    </div>
+  );
 }
 
 function HostReveal({ view, t, player, room }: HostViewProps) {
@@ -210,7 +315,18 @@ function Controller({ view, t, send, me, room }: ControllerViewProps) {
   const lang = room.lang;
   switch (view.screen) {
     case 'setup':
-      return <PhoneWait title={t('setup.title')} text={t('setup.phone')} />;
+      return (
+        <>
+          <h1 style={{ fontSize: 26 }}>{t('setup.title')}</h1>
+          <p className="muted" style={{ fontSize: 15 }}>{t('setup.text')}</p>
+          <ol style={{ fontSize: 15, lineHeight: 1.5, paddingLeft: 22, margin: 0 }}>
+            <li>{t('setup.step1')}</li><li>{t('setup.step2')}</li><li>{t('setup.step3')}</li><li>{t('setup.step4phone')}</li>
+          </ol>
+          <a className="up-btn ghost full" href={KEY_URL} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>{t('setup.open')}</a>
+          {view.error && <p className="up-error" style={{ fontSize: 14 }}>{view.error === 'key' ? t('error.key') : view.error === 'quota' ? t('error.quota') : t('error.network')}</p>}
+          <TextAnswer button={t('setup.save')} placeholder="AIza…" maxLength={200} autoFocus={false} onSubmit={(key) => send({ type: 'setKey', key })} />
+        </>
+      );
     case 'intro':
       return <PhoneWait title={t('title')} text={t('lookAtTv')} emoji={<Avatar player={me} size={96} />} />;
     case 'guess':

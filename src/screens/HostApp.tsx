@@ -62,7 +62,7 @@ export function HostApp() {
     return (
       <Stage>
         {s.status !== 'open' && <ConnectionBanner text={t('status.reconnecting')} />}
-        {Host && s.host.view ? <Host view={s.host.view} room={room} t={t} player={player} /> : <div className="muted">…</div>}
+        {Host && s.host.view ? <Host view={s.host.view} room={room} t={t} player={player} setSecret={async (id: string, value: string) => !!(await net.request('secret', { gameId: room.gameId, id, value })).ok} /> : <div className="muted">…</div>}
         <GameMenu finished={room.finished} vip={room.vipId ? player(room.vipId) : undefined} />
       </Stage>
     );

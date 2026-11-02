@@ -9,7 +9,7 @@ import {
 import { shuffle } from '../sdk/util';
 import { allGames, getGame, type LoadedGame } from './registry';
 import { DEV, QUIET, TIME_SCALE } from './config';
-import { getSecret, secretStatus } from './secrets';
+import { getSecret, secretStatus, setSecret } from './secrets';
 
 export const PALETTE = [
   '#E8336F', '#36D6F5', '#FFD447', '#9B7BFF', '#4BE3A1', '#FF9F43',
@@ -314,6 +314,13 @@ export class Room {
     this.touch();
   }
 
+  /** Geheime Einstellung wurde vom Host geändert → laufendes Spiel informieren */
+  secretChanged(gameId: string, id: string) {
+    const g = this.game;
+    if (g?.id === gameId && g.server?.onSecretChanged) this.safe(() => g.server?.onSecretChanged?.(id));
+    this.touch();
+  }
+
   action(playerId: string, action: unknown) {
     const g = this.game;
     if (!g || !g.server || !g.memberIds.has(playerId)) return;
@@ -417,6 +424,11 @@ export class Room {
         room.touch();
       },
       secret: (id) => getSecret(g.id, id),
+      setSecret: (id, value) => {
+        if (!g.loaded.manifest.secrets?.some((x) => x.id === id)) return;
+        setSecret(g.id, id, value);
+        room.touch();
+      },
       log: (...args) => {
         if (!QUIET) console.log(`[${g.id}]`, ...args);
       },

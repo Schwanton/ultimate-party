@@ -38,5 +38,14 @@
   "lookAtTv": "Look at the TV.",
   "unit.k": "K",
   "unit.m": "M",
-  "unit.b": "B"
+  "unit.b": "B",
+  "setup.step4tv": "Paste the key on the right – or more comfortably on your phone, which has the same field.",
+  "setup.step4phone": "Paste the key below and save.",
+  "setup.phoneHint": "Tip: copy and paste is usually easiest on a phone.",
+  "setup.scan": "Scan the QR code to open the Google page",
+  "setup.keyLabel": "API key",
+  "setup.save": "Save and start",
+  "setup.open": "Open Google page",
+  "sound.on": "Turn sound on",
+  "error.network": "Can't reach YouTube. Is the computer online?"
 }

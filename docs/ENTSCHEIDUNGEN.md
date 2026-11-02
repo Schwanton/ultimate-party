@@ -49,7 +49,9 @@ React bleibt wie besprochen. Ein Umstieg auf Vite/Tailwind wäre später möglic
 **Guess the Clicks!**
 - 8 Videos, 40 s zum Tippen, Zwischenstand nach Video 4. Wenn alle getippt haben: noch 5 s zum Umentscheiden.
 - Wer mit der absoluten Differenz am nächsten dran ist, bekommt 1 Punkt; bei Gleichstand alle Gleichnahen. Publikum darf mittippen, bekommt aber keine Punkte.
-- Zufällige Videos: Suche über die YouTube Data API v3 mit einem zufälligen Thema aus dem Content-Pack (eigene Themen möglich) oder einem Kamera-Dateinamen wie „IMG 4821“ (führt zu fast unbekannten Videos). Nur einbettbare Videos, SafeSearch „streng“, keine Livestreams.
+- Zufällige Videos: Ein gleichverteiltes Zufallsvideo gibt die YouTube-API nicht her. Pro Runde wird zufällig eine von vier Strategien gewählt: (1) zufälliges 5-Zeichen-Präfix aus dem Video-ID-Alphabet, angelehnt an die Methode „Dialing for Videos“ (UMass Amherst, 2023) – echte Präfix-Treffer werden bevorzugt; (2) Alltagswort + zufälliges 30-Tage-Fenster zwischen 2006 und heute; (3) Kamera-Dateiname („IMG 4821“) + zufälliges Jahr; (4) Thema aus dem Content-Pack. Außerdem wird eine Ziel-Größenordnung (10 bis 1 Mrd. Aufrufe, gleichverteilt auf der Log-Skala) gewürfelt und ein Video nahe daran gewählt. Nur öffentliche, einbettbare Videos ab 5 s, SafeSearch „streng“, keine Livestreams.
+- Ton: Videos laufen mit Ton (Lautstärke 70 %). Blockiert der Browser das (Autoplay-Regel), läuft das Video stumm weiter und ein Klick oder Tastendruck auf dem TV schaltet den Ton ein.
+- Fehlt der API-Schlüssel oder ist er ungültig, zeigt der TV eine Anleitung mit Eingabefeld und QR-Code zur Google-Seite; dasselbe Feld gibt es auf allen Handys. Nach dem Speichern wird der Schlüssel geprüft und das Spiel startet direkt.
 - Kontingent: ca. 101 von 10.000 Einheiten pro Video → rund 12 Spiele pro Tag mit einem kostenlosen Schlüssel.
 - Neu in der Plattform: Spiele können im Manifest „secrets“ (z. B. API-Schlüssel) anfordern. Der Host trägt sie in den Einstellungen ein; gespeichert in `.up-data/secrets.json`, nur der Server liest sie (`ctx.secret()`).
 
