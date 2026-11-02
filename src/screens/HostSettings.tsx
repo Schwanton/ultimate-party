@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { net, useNet } from '../net';
 import { useT } from '../i18n';
 import { Avatar } from '../ui';
@@ -58,6 +59,16 @@ export function HostSettings({ onClose }: { onClose: () => void }) {
             </div>
           </div>
 
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+          {host.games.filter((g) => g.secrets?.length).map((g) => (
+            <div key={g.id} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div className="up-label">{g.name[room.lang] ?? g.name.en}</div>
+              {g.secrets!.map((sec) => (
+                <SecretField key={sec.id} gameId={g.id} id={sec.id} isSet={!!g.secretsSet?.[sec.id]}
+                  label={sec.label[room.lang] ?? sec.label.en} help={sec.help?.[room.lang] ?? sec.help?.en} url={sec.url} t={t} />
+              ))}
+            </div>
+          ))}
           <div>
             <div className="up-label" style={{ marginBottom: 8 }}>{t('settings.players')}</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -70,7 +81,29 @@ export function HostSettings({ onClose }: { onClose: () => void }) {
               ))}
             </div>
           </div>
+          </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function SecretField({ gameId, id, isSet, label, help, url, t }: { gameId: string; id: string; isSet: boolean; label: string; help?: string; url?: string; t: (k: string) => string }) {
+  const [value, setValue] = useState('');
+  const [saved, setSaved] = useState(false);
+  const save = async (v: string) => {
+    await net.request('secret', { gameId, id, value: v });
+    setValue('');
+    setSaved(true);
+  };
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <span style={{ fontWeight: 700 }}>{label} {isSet ? <span style={{ color: 'var(--green)' }}>✓ {t('settings.secretSet')}</span> : <span style={{ color: 'var(--orange)' }}>{t('settings.secretMissing')}</span>}</span>
+      {help && <span className="muted" style={{ fontSize: 14 }}>{help}{url ? ' ' : ''}{url && <a href={url} target="_blank" rel="noreferrer">{t('settings.howTo')}</a>}</span>}
+      <div style={{ display: 'flex', gap: 8 }}>
+        <input className="up-input" type="password" autoComplete="off" placeholder={isSet ? '••••••••' : label} value={value} onChange={(e) => { setValue(e.target.value); setSaved(false); }} style={{ fontSize: 16, minHeight: 48 }} />
+        <button className="up-btn small" disabled={!value.trim()} onClick={() => save(value)}>{saved ? '✓' : t('settings.save')}</button>
+        {isSet && <button className="up-btn ghost small" onClick={() => save('')}>{t('settings.remove')}</button>}
       </div>
     </div>
   );

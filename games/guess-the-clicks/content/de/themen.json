@@ -1,0 +1,128 @@
+{
+ "name": "Themen",
+ "author": "UP!",
+ "version": "1.0.0",
+ "description": "Suchbegriffe für zufällige Videos – eigene Themen einfach hinzufügen",
+ "items": [
+  {
+   "query": "Katzenvideo"
+  },
+  {
+   "query": "Hund lustig"
+  },
+  {
+   "query": "Kochrezept"
+  },
+  {
+   "query": "Unboxing"
+  },
+  {
+   "query": "Tutorial"
+  },
+  {
+   "query": "Vlog"
+  },
+  {
+   "query": "Gaming"
+  },
+  {
+   "query": "Musik live"
+  },
+  {
+   "query": "Fail Compilation"
+  },
+  {
+   "query": "DIY"
+  },
+  {
+   "query": "Schulprojekt"
+  },
+  {
+   "query": "Geburtstag"
+  },
+  {
+   "query": "Urlaub"
+  },
+  {
+   "query": "Hochzeit"
+  },
+  {
+   "query": "Fußball Tor"
+  },
+  {
+   "query": "Skateboard"
+  },
+  {
+   "query": "Gitarre Cover"
+  },
+  {
+   "query": "Klavier"
+  },
+  {
+   "query": "Zaubertrick"
+  },
+  {
+   "query": "Lego"
+  },
+  {
+   "query": "Garten"
+  },
+  {
+   "query": "Auto Test"
+  },
+  {
+   "query": "Fahrrad"
+  },
+  {
+   "query": "Angeln"
+  },
+  {
+   "query": "Backen"
+  },
+  {
+   "query": "Wohnung Tour"
+  },
+  {
+   "query": "Reaktion"
+  },
+  {
+   "query": "Kinderlied"
+  },
+  {
+   "query": "Tanz"
+  },
+  {
+   "query": "Experiment"
+  },
+  {
+   "query": "Bastelanleitung"
+  },
+  {
+   "query": "Wandern"
+  },
+  {
+   "query": "Konzert"
+  },
+  {
+   "query": "Trailer"
+  },
+  {
+   "query": "Podcast"
+  },
+  {
+   "query": "Interview"
+  },
+  {
+   "query": "Tierpark"
+  },
+  {
+   "query": "Wetter"
+  },
+  {
+   "query": "Zug"
+  },
+  {
+   "query": "Flugzeug Landung"
+  }
+ ]
+}

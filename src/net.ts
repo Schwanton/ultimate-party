@@ -14,7 +14,7 @@ export interface PackInfo {
 }
 
 export interface HostData {
-  games: (GameManifest & { warning?: string })[];
+  games: (GameManifest & { warning?: string; secretsSet?: Record<string, boolean> })[];
   packs: PackInfo[];
   notice: string | null;
   results: { gameId: string; ranking: { playerId: string; score: number }[] }[];

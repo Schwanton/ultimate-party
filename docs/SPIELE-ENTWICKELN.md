@@ -102,6 +102,7 @@ export default {
 | `ctx.setAudienceView(view)` | Ansicht fürs Publikum |
 | `ctx.timer(sek, fn)` | Countdown; liefert `deadline`/`duration` für die Anzeige. Berücksichtigt die Einstellung „mehr Zeit“. |
 | `ctx.after(sek, fn)` | kurze Pause, z. B. für Animationen |
+| `ctx.secret(id)` | geheime Einstellung lesen, z. B. einen API-Schlüssel (im Manifest unter `secrets` deklarieren; der Host trägt ihn in den Einstellungen ein) |
 | `ctx.finish(ranking)` | Spiel beendet; Rangliste wird gemeldet (später für den Olympia-Modus) |
 
 Eigenschaften in Ansichten mit Sonderbedeutung: `input: true` lässt das Handy kurz vibrieren (neue Aufgabe).

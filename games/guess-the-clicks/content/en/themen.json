@@ -1,0 +1,128 @@
+{
+ "name": "Topics",
+ "author": "UP!",
+ "version": "1.0.0",
+ "description": "Search terms for random videos – add your own topics",
+ "items": [
+  {
+   "query": "cat video"
+  },
+  {
+   "query": "funny dog"
+  },
+  {
+   "query": "recipe"
+  },
+  {
+   "query": "unboxing"
+  },
+  {
+   "query": "tutorial"
+  },
+  {
+   "query": "vlog"
+  },
+  {
+   "query": "gaming"
+  },
+  {
+   "query": "live music"
+  },
+  {
+   "query": "fail compilation"
+  },
+  {
+   "query": "DIY"
+  },
+  {
+   "query": "school project"
+  },
+  {
+   "query": "birthday"
+  },
+  {
+   "query": "vacation"
+  },
+  {
+   "query": "wedding"
+  },
+  {
+   "query": "football goal"
+  },
+  {
+   "query": "skateboard"
+  },
+  {
+   "query": "guitar cover"
+  },
+  {
+   "query": "piano"
+  },
+  {
+   "query": "magic trick"
+  },
+  {
+   "query": "lego"
+  },
+  {
+   "query": "gardening"
+  },
+  {
+   "query": "car review"
+  },
+  {
+   "query": "bike"
+  },
+  {
+   "query": "fishing"
+  },
+  {
+   "query": "baking"
+  },
+  {
+   "query": "apartment tour"
+  },
+  {
+   "query": "reaction"
+  },
+  {
+   "query": "kids song"
+  },
+  {
+   "query": "dance"
+  },
+  {
+   "query": "experiment"
+  },
+  {
+   "query": "craft"
+  },
+  {
+   "query": "hiking"
+  },
+  {
+   "query": "concert"
+  },
+  {
+   "query": "trailer"
+  },
+  {
+   "query": "podcast"
+  },
+  {
+   "query": "interview"
+  },
+  {
+   "query": "zoo"
+  },
+  {
+   "query": "weather"
+  },
+  {
+   "query": "train"
+  },
+  {
+   "query": "plane landing"
+  }
+ ]
+}

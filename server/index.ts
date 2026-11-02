@@ -7,8 +7,9 @@ import path from 'node:path';
 import { WebSocketServer, type WebSocket } from 'ws';
 import { BUILD_DIR, DEV, PORT, QUIET } from './config';
 import { lanAddress } from './network';
-import { loadGames } from './registry';
-import { createRoom, getRoom, type Room } from './room';
+import { getGame, loadGames } from './registry';
+import { setSecret } from './secrets';
+import { allRooms, createRoom, getRoom, type Room } from './room';
 import { buildClient, watchClient } from './build';
 
 const MIME: Record<string, string> = {
@@ -191,6 +192,14 @@ function handle(ws: WebSocket, msg: any) {
     case 'settings':
       if (room && isHost) room.updateSettings(msg.patch ?? {});
       return;
+    case 'secret': {
+      const game = getGame(String(msg.gameId));
+      if (!room || !isHost || !game?.manifest.secrets?.some((x) => x.id === msg.id)) return;
+      setSecret(game.manifest.id, String(msg.id), String(msg.value ?? ''));
+      room.touch();
+      for (const r of allRooms().values()) r.touch();
+      return reply(ws, msg, { ok: true });
+    }
     case 'kick':
       if (room && isHost) room.kick(String(msg.playerId));
       return;

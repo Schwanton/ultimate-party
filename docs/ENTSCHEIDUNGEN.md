@@ -9,6 +9,7 @@ Dieses Dokument hält fest, was beim Bauen entschieden wurde (ohne Rückfrage) u
 | 1 · Fundament: Server, Räume, QR-Code, Lobby, Wiederverbinden, Sprachen DE/EN, Tier-Avatare und Fotos | fertig |
 | 2 · Game-SDK, UI-Baukasten, Entwicklermodus mit Bots, Spielvorlage, automatische Tests | fertig |
 | 3 · Schlagfertig, Bluff, Kritzelei mit Basis-Packs DE/EN | fertig |
+| Zusatz · Guess the Clicks! (YouTube-Aufrufe schätzen) | fertig |
 | 4 · Olympia-Modus, Teams, Pack-Import per Drag & Drop, Spiele-Import, Sounds | offen |
 | 5 · Fertige `.app` / `.exe`, Online-Modus | offen |
 
@@ -44,6 +45,13 @@ React bleibt wie besprochen. Ein Umstieg auf Vite/Tailwind wäre später möglic
 **Kritzelei**
 - Bis 5 Spieler 2 Runden, sonst 1. 75 s zum Zeichnen; Zwischenstände werden alle 2 s gespeichert, damit bei Zeitablauf nichts verloren geht.
 - Echten Titel finden: 1000, Zeichner: 500 pro Treffer, falscher Titel gewählt: 500.
+
+**Guess the Clicks!**
+- 8 Videos, 40 s zum Tippen, Zwischenstand nach Video 4. Wenn alle getippt haben: noch 5 s zum Umentscheiden.
+- Wer mit der absoluten Differenz am nächsten dran ist, bekommt 1 Punkt; bei Gleichstand alle Gleichnahen. Publikum darf mittippen, bekommt aber keine Punkte.
+- Zufällige Videos: Suche über die YouTube Data API v3 mit einem zufälligen Thema aus dem Content-Pack (eigene Themen möglich) oder einem Kamera-Dateinamen wie „IMG 4821“ (führt zu fast unbekannten Videos). Nur einbettbare Videos, SafeSearch „streng“, keine Livestreams.
+- Kontingent: ca. 101 von 10.000 Einheiten pro Video → rund 12 Spiele pro Tag mit einem kostenlosen Schlüssel.
+- Neu in der Plattform: Spiele können im Manifest „secrets“ (z. B. API-Schlüssel) anfordern. Der Host trägt sie in den Einstellungen ein; gespeichert in `.up-data/secrets.json`, nur der Server liest sie (`ctx.secret()`).
 
 **Allgemein**
 - Zeitdruck: ab 8 s orange, ab 5 s rot mit Pulsieren, Rand-Glühen und Vibration (bei Timern ≤ 12 s: ab 5 / 3 s).

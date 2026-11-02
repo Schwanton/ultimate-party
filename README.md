@@ -9,6 +9,7 @@ Party-Spiele für zu Hause: Ein Bildschirm (Fernseher, Laptop, Beamer) zeigt das
 | **Schlagfertig** | 3–100 | Witzige Antworten auf schräge Fragen schreiben, die anderen stimmen ab. Bis 12 Spieler als Duelle, darüber als Turnier. |
 | **Bluff** | 3–12 (+ Publikum) | Glaubwürdige Lügen zu kuriosen, wahren Fakten erfinden – und die Wahrheit finden. |
 | **Kritzelei** | 3–10 (+ Publikum) | Geheime Begriffe aufs Handy zeichnen, falsche Titel erfinden, den echten finden. |
+| **Guess the Clicks!** | 2–100 | Ein zufälliges YouTube-Video läuft – wie viele Aufrufe hat es? Wer am nächsten dran ist, bekommt den Punkt. Braucht einen kostenlosen YouTube-API-Schlüssel (siehe unten). |
 
 Neue Spiele lassen sich mit wenig Code hinzufügen und teilen – siehe [Spiele entwickeln](docs/SPIELE-ENTWICKELN.md).
 
@@ -33,6 +34,17 @@ Auf GitHub oben auf **Code → Download ZIP** klicken und die ZIP-Datei entpacke
 - **Windows:** Doppelklick auf **`UP starten.bat`**. Bei der Firewall-Frage „Zugriff zulassen“ wählen.
 
 Beim ersten Start werden einmalig die nötigen Bausteine geladen (Internet nötig, ca. 1 Minute). Danach öffnet sich der **TV-Bildschirm** automatisch im Browser.
+
+### Guess the Clicks! einrichten (einmalig)
+
+Für echte, aktuelle Aufrufzahlen nutzt das Spiel die offizielle YouTube-Schnittstelle. Dafür braucht es einen kostenlosen API-Schlüssel:
+
+1. Auf [console.cloud.google.com](https://console.cloud.google.com) mit einem Google-Konto ein Projekt anlegen.
+2. Unter **APIs & Dienste → Bibliothek** die **YouTube Data API v3** suchen und aktivieren.
+3. Unter **Anmeldedaten → Anmeldedaten erstellen → API-Schlüssel** einen Schlüssel erzeugen.
+4. Im UP!-TV auf das **Zahnrad** tippen und den Schlüssel bei „Guess the Clicks!“ einfügen.
+
+Der Schlüssel wird nur auf deinem Rechner gespeichert (`.up-data/secrets.json`) und nie an Handys geschickt. Das kostenlose Kontingent reicht für etwa 12 Spiele pro Tag.
 
 ### 4. Mitspielen
 

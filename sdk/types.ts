@@ -57,6 +57,16 @@ export interface GameManifest {
   hidden?: boolean;
   version?: string;
   author?: string;
+  /** Geheime Einstellungen, die der Host einträgt (z. B. API-Schlüssel) */
+  secrets?: GameSecret[];
+}
+
+export interface GameSecret {
+  id: string;
+  label: Record<string, string>;
+  help?: Record<string, string>;
+  /** Link zu einer Anleitung */
+  url?: string;
 }
 
 export interface ContentItem {
@@ -119,6 +129,9 @@ export interface GameContext {
 
   /** Spiel ist fertig: Rangliste melden (wird für den Olympia-Modus genutzt). */
   finish(ranking: RankingEntry[]): void;
+
+  /** Geheime Einstellung lesen (siehe manifest.secrets) – nur auf dem Server */
+  secret(id: string): string | undefined;
 
   log(...args: unknown[]): void;
 }

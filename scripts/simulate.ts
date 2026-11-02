@@ -25,11 +25,14 @@ const scenarios: { game: string; players: number }[] = [
   { game: 'kritzelei', players: 3 },
   { game: 'kritzelei', players: 6 },
   { game: 'kritzelei', players: 10 },
+  { game: 'guess-the-clicks', players: 2 },
+  { game: 'guess-the-clicks', players: 30 },
+  { game: 'guess-the-clicks', players: 100 },
 ];
 
 const server = spawn(process.execPath, ['--import', 'tsx', path.join(ROOT, 'server/index.ts')], {
   cwd: ROOT,
-  env: { ...process.env, PORT: String(PORT), UP_DEV: '1', UP_NO_CLIENT: '1', UP_TIME_SCALE: '0.02', UP_QUIET: '1' },
+  env: { ...process.env, PORT: String(PORT), UP_DEV: '1', UP_NO_CLIENT: '1', UP_TIME_SCALE: '0.02', UP_QUIET: '1', UP_FAKE_YOUTUBE: '1' },
   stdio: ['ignore', 'pipe', 'pipe'],
 });
 let serverErrors = '';

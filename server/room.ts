@@ -9,6 +9,7 @@ import {
 import { shuffle } from '../sdk/util';
 import { allGames, getGame, type LoadedGame } from './registry';
 import { DEV, QUIET, TIME_SCALE } from './config';
+import { getSecret, secretStatus } from './secrets';
 
 export const PALETTE = [
   '#E8336F', '#36D6F5', '#FFD447', '#9B7BFF', '#4BE3A1', '#FF9F43',
@@ -415,6 +416,7 @@ export class Room {
         room.results.push({ gameId: g.id, ranking });
         room.touch();
       },
+      secret: (id) => getSecret(g.id, id),
       log: (...args) => {
         if (!QUIET) console.log(`[${g.id}]`, ...args);
       },
@@ -469,7 +471,7 @@ export class Room {
 
   hostPayload() {
     return {
-      games: allGames().map((g) => ({ ...g.manifest, warning: g.warning })),
+      games: allGames().map((g) => ({ ...g.manifest, warning: g.warning, secretsSet: secretStatus(g.manifest.id, (g.manifest.secrets ?? []).map((x) => x.id)) })),
       packs: allGames().flatMap((g) => g.packs.map((p) => p.info)),
       notice: this.notice,
       results: this.results,
