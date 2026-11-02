@@ -1,0 +1,11 @@
+{
+  "title": "Schätzfrage",
+  "question": "Frage {n} von {total}",
+  "yourGuess": "Deine Schätzung",
+  "send": "Abschicken",
+  "sent": "Gespeichert! Warte auf die anderen …",
+  "answer": "Richtige Antwort",
+  "closest": "Am nächsten dran",
+  "scores": "Zwischenstand",
+  "final": "Endstand"
+}

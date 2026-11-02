@@ -1,0 +1,11 @@
+{
+  "title": "Estimate",
+  "question": "Question {n} of {total}",
+  "yourGuess": "Your guess",
+  "send": "Submit",
+  "sent": "Saved! Waiting for the others …",
+  "answer": "Correct answer",
+  "closest": "Closest",
+  "scores": "Scores",
+  "final": "Final scores"
+}

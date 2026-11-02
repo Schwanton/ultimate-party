@@ -1,0 +1,10 @@
+{
+  "name": "Basis",
+  "author": "UP!",
+  "items": [
+    { "question": "Wie viele Tasten hat ein klassisches Klavier?", "answer": "88" },
+    { "question": "Wie viele Knochen hat ein erwachsener Mensch?", "answer": "206" },
+    { "question": "Wie viele Minuten hat ein Tag?", "answer": "1440" },
+    { "question": "Wie viele Felder hat ein Schachbrett?", "answer": "64" }
+  ]
+}

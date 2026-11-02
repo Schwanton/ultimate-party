@@ -1,0 +1,33 @@
+{
+  "name": "ultimate-party",
+  "version": "0.1.0",
+  "description": "UP! – Ultimate Party: Party-Spiele, bei denen das Handy der Controller ist",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx server/index.ts",
+    "dev": "tsx watch --clear-screen=false --include \"games/*/server.ts\" server/index.ts --dev",
+    "test": "tsx scripts/simulate.ts",
+    "check-packs": "tsx scripts/check-packs.ts",
+    "new-game": "node scripts/new-game.mjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "esbuild": "^0.28.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "tsx": "^4.20.0",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@types/ws": "^8.18.0",
+    "typescript": "^5.9.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

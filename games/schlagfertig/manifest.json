@@ -1,0 +1,17 @@
+{
+  "id": "schlagfertig",
+  "name": { "de": "Schlagfertig", "en": "Quick Wit" },
+  "description": {
+    "de": "Schreibt die witzigste Antwort auf schräge Fragen – die anderen stimmen ab.",
+    "en": "Write the funniest answer to odd prompts – everyone else votes."
+  },
+  "minPlayers": 3,
+  "maxPlayers": 100,
+  "audience": true,
+  "minutes": 15,
+  "color": "#E8336F",
+  "sdkVersion": 1,
+  "contentFields": ["prompt"],
+  "version": "1.0.0",
+  "author": "UP!"
+}
