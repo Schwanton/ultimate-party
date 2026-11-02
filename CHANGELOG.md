@@ -2,6 +2,11 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.3.1
+
+- Updater: TV und Handys laden nach einem Update automatisch die neue Version
+- Updater: verständlichere Fehlermeldung ohne Internet
+
 ## 0.3.0
 
 - Updater: neue Versionen direkt in der Lobby installieren

@@ -45,6 +45,7 @@ class Net {
   private nextId = 1;
   private retry = 0;
   private started = false;
+  private serverVersion: string | null = null;
   /** wird nach jedem (Wieder-)Verbinden aufgerufen */
   onOpen: (() => void) | null = null;
 
@@ -62,8 +63,14 @@ class Net {
     const ws = new WebSocket(`${proto}://${location.host}/ws`);
     this.ws = ws;
     this.set({ status: 'connecting' });
-    ws.onopen = () => {
+    ws.onopen = async () => {
       this.retry = 0;
+      // Nach einem Update läuft auf dem Server eine neue Version → Seite neu laden, um die neue App zu bekommen
+      try {
+        const info = await (await fetch('/api/info', { cache: 'no-store' })).json();
+        if (this.serverVersion && info.version && info.version !== this.serverVersion) return location.reload();
+        this.serverVersion = info.version ?? this.serverVersion;
+      } catch { /* egal */ }
       this.set({ status: 'open' });
       this.syncClock();
       this.onOpen?.();

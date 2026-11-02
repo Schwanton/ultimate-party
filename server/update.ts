@@ -29,6 +29,9 @@ const CURRENT: string = pkg.version;
 const REPO: string = pkg.upUpdate?.repo ?? 'Schwanton/ultimate-party';
 const BRANCH: string = pkg.upUpdate?.branch ?? 'main';
 const DATA = path.join(ROOT, '.up-data');
+/** Für Tests umstellbar */
+const RAW = process.env.UP_UPDATE_RAW ?? `https://raw.githubusercontent.com/${REPO}/${BRANCH}`;
+const ZIP = process.env.UP_UPDATE_ZIP ?? `https://codeload.github.com/${REPO}/zip/refs/heads/${BRANCH}`;
 /** Ordner, die komplett von UP! verwaltet werden (dort werden alte Dateien auch gelöscht) */
 const MANAGED = ['server', 'src', 'sdk', 'scripts', 'docs'];
 const KEEP = new Set(['.up-data', 'node_modules', '.git', '.up-build']);
@@ -82,11 +85,11 @@ function notesFor(changelog: string, version: string): string[] {
 export async function checkForUpdate() {
   if (['downloading', 'installing', 'restarting'].includes(status.state)) return;
   try {
-    const remote = JSON.parse(await fetchText(`https://raw.githubusercontent.com/${REPO}/${BRANCH}/package.json`));
+    const remote = JSON.parse(await fetchText(`${RAW}/package.json`));
     if (!remote.version || !newer(remote.version, CURRENT)) return set({ state: 'idle', latest: remote.version });
     let notes: string[] = [];
     try {
-      notes = notesFor(await fetchText(`https://raw.githubusercontent.com/${REPO}/${BRANCH}/CHANGELOG.md`), remote.version);
+      notes = notesFor(await fetchText(`${RAW}/CHANGELOG.md`), remote.version);
     } catch { /* ohne Notizen */ }
     set({ state: status.git ? 'manual' : 'available', latest: remote.version, notes, error: undefined });
   } catch {
@@ -137,7 +140,8 @@ function sync(from: string) {
     if (f.endsWith('.command')) fs.chmodSync(target, 0o755);
   }
   // veraltete Dateien entfernen – nur in verwalteten Ordnern und in mitgelieferten Spielen (außer content/)
-  const gamesInUpdate = new Set(files.filter((f) => f.startsWith(`games${path.sep}`)).map((f) => f.split(path.sep)[1]));
+  // nur Spiel-Ordner (games/<id>/…), keine einzelnen Dateien direkt in games/
+  const gamesInUpdate = new Set(files.filter((f) => f.startsWith(`games${path.sep}`) && f.split(path.sep).length > 2).map((f) => f.split(path.sep)[1]));
   const roots = [...MANAGED.map((m) => path.join(ROOT, m)), ...[...gamesInUpdate].map((g) => path.join(ROOT, 'games', g))];
   for (const dir of roots) {
     if (!fs.existsSync(dir)) continue;
@@ -166,7 +170,12 @@ export async function installUpdate(beforeRestart: () => Promise<void>) {
     set({ state: 'downloading', error: undefined });
     fs.rmSync(tmp, { recursive: true, force: true });
     fs.mkdirSync(tmp, { recursive: true });
-    const res = await fetch(`https://codeload.github.com/${REPO}/zip/refs/heads/${BRANCH}`, { signal: AbortSignal.timeout(120_000) });
+    let res: Response;
+    try {
+      res = await fetch(ZIP, { signal: AbortSignal.timeout(120_000) });
+    } catch {
+      throw new Error('Keine Verbindung zu GitHub – ist der Rechner online?');
+    }
     if (!res.ok) throw new Error(`Download fehlgeschlagen (HTTP ${res.status})`);
     const zip = path.join(tmp, 'update.zip');
     fs.writeFileSync(zip, Buffer.from(await res.arrayBuffer()));
@@ -187,6 +196,7 @@ export async function installUpdate(beforeRestart: () => Promise<void>) {
     fs.rmSync(tmp, { recursive: true, force: true });
 
     set({ state: 'restarting', latest: newPkg.version });
+    await new Promise((r) => setTimeout(r, 600)); // Hinweis noch an den TV senden
     await beforeRestart();
     if (process.env.UP_LAUNCHER === '1') {
       // Das Startskript sieht diese Datei und startet UP! neu
