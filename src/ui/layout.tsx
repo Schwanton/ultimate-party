@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { qrPath } from './qr';
+import { sfx } from './sound';
 
 /** Feste 1280×720-Bühne, die sich auf jede Bildschirmgröße skaliert (TV, Laptop, Beamer). */
 export function Stage({ children }: { children: ReactNode }) {
@@ -49,7 +50,10 @@ export function HostPrompt({ label, children, size = 46 }: { label?: ReactNode; 
 
 const CONFETTI_COLORS = ['#FFD447', '#36D6F5', '#FFFFFF', '#4BE3A1', '#9B7BFF', '#E8336F'];
 
-export function Confetti({ pieces = 28, loop = false }: { pieces?: number; loop?: boolean }) {
+export function Confetti({ pieces = 28, loop = false, silent = false }: { pieces?: number; loop?: boolean; silent?: boolean }) {
+  useEffect(() => {
+    if (!silent) sfx.play('cheer');
+  }, [silent]);
   const items = useMemo(() => Array.from({ length: pieces }, (_, i) => ({
     left: (i / pieces) * 100 + Math.random() * (100 / pieces),
     w: 8 + Math.random() * 8, h: 8 + Math.random() * 14, round: Math.random() < 0.35,

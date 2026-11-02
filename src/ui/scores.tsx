@@ -2,12 +2,17 @@ import { useEffect, useState } from 'react';
 import type { PlayerInfo } from '@up/sdk';
 import { Avatar, Crown } from './Avatar';
 import { Confetti } from './layout';
+import { sfx } from './sound';
 
 /**
  * Wer hat wofür gestimmt – passt sich der Gruppengröße an:
  * bis 10 Abstimmende mit Namen, bis 40 nur Avatare, darüber gar nicht (nur Zahlen).
  */
 export function VoterChips({ voters, crowdSize, onDark = true, delay = 0 }: { voters: PlayerInfo[]; crowdSize: number; onDark?: boolean; delay?: number }) {
+  const count = voters.length;
+  useEffect(() => {
+    if (count > 0 && crowdSize <= 40) sfx.play('pop');
+  }, [count, crowdSize]);
   if (crowdSize > 40 || voters.length === 0) return null;
   const named = crowdSize <= 10;
   return (
@@ -37,7 +42,11 @@ export interface ScoreRow {
 export function Scoreboard({ rows, max = 8 }: { rows: ScoreRow[]; max?: number }) {
   const [grown, setGrown] = useState(false);
   useEffect(() => {
-    const t = setTimeout(() => setGrown(true), 700);
+    sfx.play('drumroll');
+    const t = setTimeout(() => {
+      setGrown(true);
+      sfx.play('score');
+    }, 1200);
     return () => clearTimeout(t);
   }, []);
   // Platz = Anzahl der Spieler mit mehr Punkten (Gleichstand = gleicher Platz)
@@ -87,6 +96,11 @@ export function Scoreboard({ rows, max = 8 }: { rows: ScoreRow[]; max?: number }
 
 /** Siegerehrung mit Podest und Konfetti. */
 export function Podium({ ranking, player, pointsLabel }: { ranking: { playerId: string; score: number }[]; player: (id: string) => PlayerInfo | undefined; pointsLabel: string }) {
+  useEffect(() => {
+    sfx.play('drumroll');
+    const t = setTimeout(() => sfx.play('fanfare'), 1700);
+    return () => clearTimeout(t);
+  }, []);
   const top = ranking.slice(0, 3);
   const order = [1, 0, 2].filter((i) => top[i]);
   const heights = [220, 160, 120];
@@ -94,7 +108,7 @@ export function Podium({ ranking, player, pointsLabel }: { ranking: { playerId: 
   const rest = ranking.slice(3, 9);
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', gap: 18 }}>
-      <Confetti pieces={36} loop />
+      <Confetti pieces={36} loop silent />
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: 24 }}>
         {order.map((i) => {
           const e = top[i];

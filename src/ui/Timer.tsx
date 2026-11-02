@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { net } from '../net';
+import { sfx } from './sound';
 
 /** Aktuelle Serverzeit, aktualisiert sich regelmäßig. */
 export function useServerNow(intervalMs = 200): number {
@@ -35,6 +36,17 @@ export function vibrate(pattern: number | number[]) {
 /** Runder Timer für den großen Bildschirm – mit Zeitdruck-Effekten in den letzten Sekunden. */
 export function HostTimer({ deadline, duration, size = 72 }: { deadline?: number; duration?: number; size?: number }) {
   const { seconds, fraction, urgency, active } = useCountdown(deadline, duration);
+  // Ticken in den letzten Sekunden, Signal bei Zeitablauf
+  const lastSec = useRef<number | null>(null);
+  useEffect(() => {
+    if (!deadline) return;
+    if (lastSec.current !== null && seconds !== lastSec.current) {
+      if (active && urgency === 'critical') sfx.play('tickUrgent');
+      else if (active && urgency === 'warn') sfx.play('tick');
+      else if (!active && lastSec.current > 0 && seconds === 0) sfx.play('timeUp');
+    }
+    lastSec.current = seconds;
+  }, [seconds, active, urgency, deadline]);
   if (!deadline) return null;
   const color = COLORS[urgency];
   const r = size / 2 - 6;

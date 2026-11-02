@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import type { Lang, PlayerInfo } from '@up/sdk';
 import { net, useNet, loadSession, saveSession } from '../net';
 import { guessLang, useT } from '../i18n';
 import { clientGame } from '../registry';
-import { Avatar, Crown, Logo, QrCode, Stage, isLight, shade } from '../ui';
+import { Avatar, Crown, Logo, QrCode, Stage, isLight, sfx, shade } from '../ui';
 import { HostSettings } from './HostSettings';
 
 async function connectHost() {
@@ -30,7 +30,9 @@ export function HostApp() {
   useEffect(() => {
     net.onOpen = () => void connectHost();
     net.start();
+    sfx.enableOnThisDevice();
   }, []);
+  useHostSounds();
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setSettingsOpen((o) => !o);
@@ -74,6 +76,42 @@ export function HostApp() {
       <HostLobby onSettings={() => setSettingsOpen(true)} />
       {settingsOpen && <HostSettings onClose={() => setSettingsOpen(false)} />}
     </Stage>
+  );
+}
+
+/** Sounds und Musik auf dem TV: Lobby-Musik, Beitritts-Klang, Übergänge zwischen Bildschirmen. */
+function useHostSounds() {
+  const s = useNet();
+  const room = s.room;
+  const inLobby = room?.phase === 'lobby';
+  const game = room?.phase === 'game' ? clientGame(room.gameId) : undefined;
+  sfx.auto = game?.manifest.autoSounds !== false;
+  useEffect(() => {
+    if (inLobby) sfx.startMusic();
+    else sfx.stopMusic();
+  }, [inLobby]);
+  const count = room?.players.length ?? 0;
+  const lastCount = useRef(count);
+  useEffect(() => {
+    if (inLobby && count > lastCount.current) sfx.play('join');
+    lastCount.current = count;
+  }, [count, inLobby]);
+  const screen = room?.phase === 'game' ? `${room.gameId}:${s.host?.view?.screen ?? ''}` : 'lobby';
+  const lastScreen = useRef(screen);
+  useEffect(() => {
+    if (screen !== lastScreen.current) sfx.play('whoosh');
+    lastScreen.current = screen;
+  }, [screen]);
+}
+
+/** Knopf „Ton an“, solange der Browser noch keinen Ton erlaubt hat */
+function SoundButton({ label }: { label: string }) {
+  const unlocked = useSyncExternalStore(sfx.subscribe, () => sfx.unlocked);
+  if (unlocked) return null;
+  return (
+    <button className="up-btn small" onClick={() => { sfx.unlock(); setTimeout(() => sfx.play('join'), 150); }} style={{ animation: 'upTick 1.4s ease-in-out infinite' }}>
+      {label}
+    </button>
   );
 }
 
@@ -146,6 +184,7 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
           <span className="display muted" style={{ fontSize: 20, fontWeight: 500 }}>{t('app.name')}</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <SoundButton label={t('sound.enable')} />
           {room.dev && (
             <>
               <button className="up-btn ghost small" onClick={() => net.send('bots:add', { count: 1 })}>{t('lobby.addBots')}</button>
@@ -213,15 +252,15 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
           const fits = active.length >= g.minPlayers;
           return (
             <button key={g.id} onClick={() => net.send('select', { gameId: g.id })} style={{
-              border: 0, textAlign: 'left', background: g.color, borderRadius: 22, padding: '18px 22px', color: light ? '#110D24' : '#fff',
+              border: 0, textAlign: 'left', background: g.color, borderRadius: 22, padding: games.length > 4 ? '14px 16px' : '18px 22px', color: light ? '#110D24' : '#fff',
               boxShadow: `0 6px 0 ${shade(g.color)}${sel ? ', 0 0 0 4px #fff' : ''}`, transform: sel ? 'translateY(-6px)' : undefined,
               display: 'flex', flexDirection: 'column', justifyContent: 'space-between', opacity: fits || sel ? 1 : 0.55, transition: 'transform .2s',
             }}>
               <span style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-                <span className="display" style={{ fontSize: 26, fontWeight: 800 }}>{g.name[room.lang] ?? g.name.en}</span>
+                <span className="display" style={{ fontSize: games.length > 4 ? 20 : 26, fontWeight: 800, lineHeight: 1.1 }}>{g.name[room.lang] ?? g.name.en}</span>
                 {sel && <span style={{ background: '#fff', color: shade(g.color, 0.4), fontSize: 13, fontWeight: 700, padding: '4px 10px', borderRadius: 999 }}>{t('lobby.selected')}</span>}
               </span>
-              <span style={{ fontSize: 15, fontWeight: 500 }}>
+              <span style={{ fontSize: games.length > 4 ? 13 : 15, fontWeight: 500 }}>
                 {t('lobby.playersRange', { min: g.minPlayers, max: g.maxPlayers })}{g.audience ? ' +' : ''} · {t('lobby.minutes', { n: g.minutes })}
               </span>
             </button>

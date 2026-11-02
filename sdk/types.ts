@@ -53,6 +53,8 @@ export interface GameManifest {
   sdkVersion: number;
   /** Pflichtfelder (Strings) jedes Content-Eintrags, z. B. ["prompt"] */
   contentFields?: string[];
+  /** false = keine automatischen Plattform-Sounds (Timer-Ticken, Übergänge, Jubel); das Spiel spielt selbst Sounds ab */
+  autoSounds?: boolean;
   /** Nur im Entwicklermodus anzeigen (z. B. Vorlagen) */
   hidden?: boolean;
   version?: string;

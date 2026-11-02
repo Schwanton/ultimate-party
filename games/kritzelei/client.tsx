@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ControllerViewProps, GameClientModule, HostViewProps, PlayerInfo, Translate } from '@up/sdk';
 import {
-  Avatar, ChoiceList, Confetti, DrawCanvas, Drawing, HostHeader, HostTimer, PhoneTimer, PhoneWait, Podium, Scoreboard, TextAnswer, VoterChips, type Stroke,
-} from '@up/ui';
+  Avatar, ChoiceList, Confetti, DrawCanvas, Drawing, HostHeader, HostTimer, PhoneTimer, PhoneWait, Podium, Scoreboard, TextAnswer, VoterChips, type Stroke, sfx } from '@up/ui';
 
 const YELLOW = '#FFD447';
 
@@ -125,7 +124,11 @@ function HostReveal({ view, t, player }: HostViewProps) {
   }, [view.n, view.round]);
   useEffect(() => {
     setStamp(false);
-    const a = setTimeout(() => setStamp(true), 1300);
+    sfx.play('reveal');
+    const a = setTimeout(() => {
+      setStamp(true);
+      sfx.play(items[i]?.kind === 'truth' ? 'ding' : 'stamp');
+    }, 1300);
     const b = setTimeout(() => setI((x) => Math.min(items.length - 1, x + 1)), view.step * 1000);
     return () => { clearTimeout(a); clearTimeout(b); };
   }, [i, items.length, view.step]);

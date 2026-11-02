@@ -1,6 +1,7 @@
+import { useEffect } from 'react';
 import type { ControllerViewProps, GameClientModule, HostViewProps, PlayerInfo, Translate } from '@up/sdk';
 import {
-  Avatar, ChoiceList, Confetti, HostHeader, HostTimer, PhoneTimer, PhoneWait, Podium, Scoreboard, TextAnswer, VoterChips, isLight, shade, useServerNow,
+  Avatar, ChoiceList, Confetti, HostHeader, HostTimer, PhoneTimer, PhoneWait, Podium, Scoreboard, TextAnswer, VoterChips, isLight, sfx, shade, useServerNow,
 } from '@up/ui';
 
 const PURPLE = '#9B7BFF';
@@ -133,6 +134,10 @@ function HostGo({ view, t }: HostViewProps) {
   const now = useServerNow(100);
   const toGo = Math.ceil((view.now - now) / 1000);
   const go = toGo <= 0;
+  useEffect(() => {
+    if (toGo > 0 && toGo <= 3) sfx.play('beep');
+    if (toGo === 0) sfx.play('go');
+  }, [toGo]);
   return (
     <>
       <HostHeader title={t('title')} color={PURPLE} info={info(view, t)} right={go ? <HostTimer deadline={view.deadline} duration={view.deadline - view.now} /> : null} />
@@ -164,10 +169,13 @@ function HostResult({ view, t, player }: HostViewProps) {
     escaped: [t('result.escaped'), t('result.escapedText', { name: faker?.name ?? '' })],
   };
   const [title, text] = titles[view.outcome];
+  useEffect(() => {
+    sfx.play(view.outcome === 'caught' ? 'fanfare' : view.outcome === 'none' ? 'wrong' : 'sneaky');
+  }, [view.outcome, view.round, view.taskNo]);
   const good = view.outcome === 'caught';
   return (
     <>
-      {view.faker && <Confetti pieces={good ? 30 : 16} />}
+      {view.faker && <Confetti pieces={good ? 30 : 16} silent={!good} />}
       <HostHeader title={t('title')} color={PURPLE} info={info(view, t)} />
       <div style={{ flex: 1, display: 'flex', gap: 40, alignItems: 'center' }}>
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 18 }}>

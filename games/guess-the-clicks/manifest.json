@@ -1,6 +1,9 @@
 {
   "id": "guess-the-clicks",
-  "name": { "de": "Guess the Clicks!", "en": "Guess the Clicks!" },
+  "name": {
+    "de": "Guess the Clicks!",
+    "en": "Guess the Clicks!"
+  },
   "description": {
     "de": "Ein zufälliges YouTube-Video – wie oft wurde es angeschaut? Wer am nächsten dran ist, holt den Punkt.",
     "en": "A random YouTube video – how many views does it have? Closest guess takes the point."
@@ -11,13 +14,19 @@
   "minutes": 10,
   "color": "#FF5A4E",
   "sdkVersion": 1,
-  "contentFields": ["query"],
+  "autoSounds": false,
+  "contentFields": [
+    "query"
+  ],
   "version": "1.0.0",
   "author": "UP!",
   "secrets": [
     {
       "id": "youtubeApiKey",
-      "label": { "de": "YouTube-API-Schlüssel", "en": "YouTube API key" },
+      "label": {
+        "de": "YouTube-API-Schlüssel",
+        "en": "YouTube API key"
+      },
       "help": {
         "de": "Kostenlos bei Google: Projekt anlegen, „YouTube Data API v3“ aktivieren, unter „Anmeldedaten“ einen API-Schlüssel erstellen und hier einfügen.",
         "en": "Free from Google: create a project, enable “YouTube Data API v3”, create an API key under “Credentials” and paste it here."

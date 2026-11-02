@@ -1,7 +1,7 @@
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
 import type { ControllerViewProps, GameClientModule, HostViewProps, PlayerInfo } from '@up/sdk';
 import {
-  Avatar, ChoiceList, Confetti, Crown, HostHeader, HostPrompt, HostTimer, PhoneTimer, PhoneWait, Podium, Scoreboard, TextAnswer, VoterChips,
+  Avatar, ChoiceList, Confetti, Crown, HostHeader, HostPrompt, HostTimer, PhoneTimer, PhoneWait, Podium, Scoreboard, TextAnswer, VoterChips, sfx,
 } from '@up/ui';
 
 const PINK = '#E8336F';
@@ -162,6 +162,10 @@ function HostDuel({ view, t }: HostViewProps) {
 
 function HostDuelResult({ view, t, player }: HostViewProps) {
   const step = useSteps([0.5, 2.1, 3.1], `${view.round}-${view.n}`);
+  useEffect(() => {
+    if (step === 2) sfx.play('reveal');
+    if (step === 3) sfx.play(view.sweep ? 'fanfare' : view.winner ? 'stamp' : 'wrong');
+  }, [step, view.sweep, view.winner]);
   const total = Math.max(1, view.a.voters.length + view.b.voters.length + view.a.audience + view.b.audience);
   const pct = (s: any) => Math.round(((s.voters.length + s.audience) / total) * 100);
   const side = (key: 'a' | 'b') => {
@@ -244,6 +248,9 @@ function HostMultiVote({ view, t }: HostViewProps) {
 
 function HostMultiResult({ view, t, player }: HostViewProps) {
   const step = useSteps([0.6, 2.2], `${view.round}-multi`);
+  useEffect(() => {
+    if (step === 2) sfx.play('stamp');
+  }, [step]);
   const rows = view.rows as any[];
   const shown = rows.slice(0, 6);
   return (

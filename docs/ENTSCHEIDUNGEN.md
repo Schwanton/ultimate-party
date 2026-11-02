@@ -11,7 +11,8 @@ Dieses Dokument hält fest, was beim Bauen entschieden wurde (ohne Rückfrage) u
 | 3 · Schlagfertig, Bluff, Kritzelei mit Basis-Packs DE/EN | fertig |
 | Zusatz · Guess the Clicks! (YouTube-Aufrufe schätzen) | fertig |
 | Zusatz · Hochstapler (à la „Fakin' It“) | fertig |
-| 4 · Olympia-Modus, Teams, Pack-Import per Drag & Drop, Spiele-Import, Sounds | offen |
+| 4 · Sounds | fertig |
+| 4 · Olympia-Modus, Teams, Pack-Import per Drag & Drop, Spiele-Import | offen |
 | 5 · Fertige `.app` / `.exe`, Online-Modus | offen |
 
 `npm test` spielt alle Spiele automatisch mit 2 bis 100 Bots durch.
@@ -62,6 +63,14 @@ React bleibt wie besprochen. Ein Umstieg auf Vite/Tailwind wäre später möglic
 - Mehr als die Hälfte auf dieselbe Person = Anklage. Hochstapler erwischt: jeder, der richtig getippt hat, bekommt 1000 / 750 / 500 (Aufgabe 1/2/3), der Hochstapler 250 pro überstandener Aufgabe. Unschuldigen angeklagt oder 3 Aufgaben ohne Mehrheit: Hochstapler +2000.
 - 75 Aufgaben pro Sprache (15 je Kategorie).
 
+**Sounds**
+- Alle Sounds und die Lobby-Musik werden live im Browser erzeugt (Web Audio) – keine Audiodateien, keine Lizenzfragen, funktioniert offline.
+- Nur der TV spielt Sounds; Handys vibrieren nur. Lautstärke für Effekte und Lobby-Musik im Zahnrad-Menü, gespeichert pro Gerät.
+- Automatisch für alle Spiele: Lobby-Musik, Klang bei neuen Spielern, „Wusch“ bei jedem Bildschirmwechsel, Ticken in den letzten 8 Sekunden (schneller und höher in den letzten 5), Signal bei Zeitablauf, Jubel bei Konfetti, Trommelwirbel und Fanfare bei Zwischenstand und Siegerehrung.
+- Pro Spiel: Schlagfertig (Enthüllung, Stempel beim Sieger, Fanfare bei Volltreffer), Bluff & Kritzelei (Aufdecken, „Ding“ bei der Wahrheit, Stempel bei Lügen), Hochstapler (Piepen bei 3-2-1, Signal bei „JETZT!“, Fanfare wenn erwischt, schleichende Melodie wenn entkommen).
+- Guess the Clicks!: keine automatischen Sounds (der Video-Ton läuft), nur ein 3-Sekunden-Countdown mit Piepen vor jeder Runde. Spiele schalten die automatischen Sounds mit `"autoSounds": false` im Manifest ab.
+- Browser erlauben Ton erst nach einem Klick auf die Seite. Solange das nicht passiert ist, zeigt die TV-Lobby einen Knopf „Ton an“.
+
 **Allgemein**
 - Zeitdruck: ab 8 s orange, ab 5 s rot mit Pulsieren, Rand-Glühen und Vibration (bei Timern ≤ 12 s: ab 5 / 3 s).
 - Wer abstimmt, sieht seine eigene Antwort nicht in der Auswahl.
@@ -75,6 +84,5 @@ React bleibt wie besprochen. Ein Umstieg auf Vite/Tailwind wäre später möglic
 1. **Fertige `.app` / `.exe`** (Electron oder Tauri, Schriften lokal, Icon). Für Mac idealerweise per GitHub Actions gebaut.
 2. **Olympia-Modus** mit Disziplinen (fest/zufällig), Teams (Durchschnittswertung) und Siegerehrung – die Spiele melden ihre Rangliste bereits über `ctx.finish()`.
 3. **Import per Drag & Drop**: Content-Packs und Spiele (`.upgame`) direkt in die TV-Ansicht ziehen.
-4. **Sounds** und Hintergrundmusik (abschaltbar).
 5. Gespielte Inhalte dauerhaft merken (nicht nur pro Raum), Tag-Filter (`familie`, `ab18`) in den Einstellungen.
 6. Online-Modus (Docker), direkte KI-Anbindung für neue Inhalte.

@@ -7,3 +7,5 @@ export { VoterChips, Scoreboard, Podium } from './scores';
 export type { ScoreRow } from './scores';
 export { Drawing, DrawCanvas, DRAW_COLORS, DRAW_WIDTHS, ERASER } from './draw';
 export type { Stroke } from './draw';
+export { sfx } from './sound';
+export type { SoundName } from './sound';

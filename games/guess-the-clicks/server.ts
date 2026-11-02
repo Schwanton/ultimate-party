@@ -18,7 +18,7 @@ export default {
     const videos: Video[] = [];
     let round = -1;
     let guesses = new Map<string, number>();
-    let phase: 'setup' | 'loading' | 'guess' | 'reveal' | 'other' = 'loading';
+    let phase: 'setup' | 'loading' | 'countdown' | 'guess' | 'reveal' | 'other' = 'loading';
     let timer: { cancel(): void; deadline: number; duration: number } | null = null;
     let roundStart = scores.snapshot();
     let disposed = false;
@@ -99,6 +99,15 @@ export default {
         return showScores(true);
       }
       if (round === 4 && phase !== 'other') return showScores(false);
+      // 3-Sekunden-Countdown vor jeder Runde
+      phase = 'countdown';
+      ctx.setHostView({ screen: 'countdown', n: round + 1, total: ROUNDS, key: Math.random() });
+      ctx.setAllPlayerViews(() => ({ screen: 'countdown' }));
+      ctx.setAudienceView({ screen: 'countdown' });
+      ctx.after(3, startGuess);
+    }
+
+    function startGuess() {
       phase = 'guess';
       guesses = new Map();
       timer = ctx.timer(GUESS_TIME, reveal);

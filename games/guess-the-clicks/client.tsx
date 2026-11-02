@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ControllerViewProps, GameClientModule, HostViewProps, PlayerInfo, Translate } from '@up/sdk';
-import { Avatar, Confetti, Crown, HostHeader, HostTimer, PhoneTimer, PhoneWait, Podium, QrCode, Scoreboard, TextAnswer, vibrate } from '@up/ui';
+import { Avatar, Confetti, Crown, HostHeader, HostTimer, PhoneTimer, PhoneWait, Podium, QrCode, Scoreboard, TextAnswer, sfx, vibrate } from '@up/ui';
 
 const RED = '#FF5A4E';
 
@@ -93,6 +93,8 @@ function Host(props: HostViewProps) {
         </>
       );
     }
+    case 'countdown':
+      return <HostCountdown key={view.key} n={view.n} total={view.total} t={t} />;
     case 'reveal':
       return <HostReveal {...props} />;
     case 'scores': {
@@ -114,6 +116,32 @@ function Host(props: HostViewProps) {
       );
   }
   return null;
+}
+
+/** 3 – 2 – 1 vor jeder Runde, mit Piepton (der einzige Sound in diesem Spiel) */
+function HostCountdown({ n, total, t }: { n: number; total: number; t: Translate }) {
+  const [left, setLeft] = useState(3);
+  useEffect(() => {
+    sfx.play('beep', { always: true });
+    const id = setInterval(() => {
+      setLeft((x) => {
+        const next = x - 1;
+        if (next > 0) sfx.play('beep', { always: true });
+        else if (next === 0) sfx.play('go', { always: true });
+        return Math.max(0, next);
+      });
+    }, 1000);
+    return () => clearInterval(id);
+  }, []);
+  return (
+    <>
+      <HostHeader title={t('title')} color={RED} info={t('video', { n, total })} />
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
+        <p className="muted" style={{ fontSize: 28 }}>{t('video', { n, total })}</p>
+        <h1 key={left} style={{ fontSize: 220, lineHeight: 1, color: left === 0 ? 'var(--yellow)' : '#fff', animation: 'upPop .45s ease-out both' }}>{left || '▶'}</h1>
+      </div>
+    </>
+  );
 }
 
 const KEY_URL = 'https://console.cloud.google.com/apis/library/youtube.googleapis.com';

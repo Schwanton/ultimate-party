@@ -152,7 +152,8 @@ Der TV ist immer eine **1280 × 720 Bühne**, die automatisch auf jeden Bildschi
 | `PhoneWait` | „Warte …“-Bildschirm |
 | `VoterChips` | Wer hat wofür gestimmt (passt sich der Gruppengröße an) |
 | `Scoreboard`, `Podium` | Zwischenstand mit Balken, Siegerehrung |
-| `Confetti` | Konfetti |
+| `Confetti` | Konfetti (mit Jubel-Sound, `silent` schaltet ihn ab) |
+| `sfx` | Sounds: `sfx.play('ding')` – u. a. `pop`, `whoosh`, `ding`, `wrong`, `stamp`, `fanfare`, `cheer`, `drumroll`, `beep`, `go`, `reveal`, `sneaky`. Timer-Ticken, Übergänge und Jubel kommen automatisch; mit `"autoSounds": false` im Manifest abschalten und eigene Sounds mit `sfx.play(name, { always: true })` spielen. |
 | `DrawCanvas`, `Drawing` | Zeichnen auf dem Handy, Zeichnung anzeigen |
 
 Farben und Schriften kommen aus `src/ui/theme.css` (CSS-Variablen wie `var(--yellow)`). Animationen: Klassen `anim-pop`, `anim-up`, `anim-fade` oder die Keyframes dort.

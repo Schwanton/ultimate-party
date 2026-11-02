@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { net, useNet } from '../net';
 import { useT } from '../i18n';
-import { Avatar } from '../ui';
+import { Avatar, sfx } from '../ui';
 
 export function HostSettings({ onClose }: { onClose: () => void }) {
   const s = useNet();
@@ -33,6 +33,7 @@ export function HostSettings({ onClose }: { onClose: () => void }) {
               <input type="checkbox" checked={room.settings.allowPhotos} onChange={(e) => set({ allowPhotos: e.target.checked })} style={{ width: 26, height: 26, accentColor: '#FFD447' }} />
               {t('settings.photos')}
             </label>
+            <SoundSettings t={t} />
             <div>
               <div className="up-label" style={{ marginBottom: 8 }}>{t('settings.time')}</div>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -105,6 +106,25 @@ function SecretField({ gameId, id, isSet, label, help, url, t }: { gameId: strin
         <button className="up-btn small" disabled={!value.trim()} onClick={() => save(value)}>{saved ? '✓' : t('settings.save')}</button>
         {isSet && <button className="up-btn ghost small" onClick={() => save('')}>{t('settings.remove')}</button>}
       </div>
+    </div>
+  );
+}
+
+function SoundSettings({ t }: { t: (k: string) => string }) {
+  const [fx, setFx] = useState(sfx.fxVolume);
+  const [music, setMusic] = useState(sfx.musicVolume);
+  const row = (label: string, value: number, set: (v: number) => void, apply: (v: number) => void) => (
+    <label style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 16 }}>
+      <span style={{ width: 110 }}>{label}</span>
+      <input type="range" min={0} max={1} step={0.05} value={value} style={{ flex: 1, accentColor: '#FFD447' }}
+        onChange={(e) => { const v = Number(e.target.value); set(v); apply(v); }} />
+    </label>
+  );
+  return (
+    <div>
+      <div className="up-label" style={{ marginBottom: 8 }}>{t('settings.sound')}</div>
+      {row(t('settings.fx'), fx, setFx, (v) => { sfx.setVolumes(v, sfx.musicVolume); sfx.play('ding'); })}
+      {row(t('settings.music'), music, setMusic, (v) => sfx.setVolumes(sfx.fxVolume, v))}
     </div>
   );
 }

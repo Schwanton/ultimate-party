@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { ControllerViewProps, GameClientModule, HostViewProps, PlayerInfo, Translate } from '@up/sdk';
-import { Avatar, ChoiceList, Confetti, HostHeader, HostTimer, PhoneTimer, PhoneWait, Podium, Scoreboard, TextAnswer, VoterChips } from '@up/ui';
+import { Avatar, ChoiceList, Confetti, HostHeader, HostTimer, PhoneTimer, PhoneWait, Podium, Scoreboard, TextAnswer, VoterChips, sfx } from '@up/ui';
 
 const CYAN = '#36D6F5';
 
@@ -107,7 +107,11 @@ function HostReveal({ view, t, player }: HostViewProps) {
   }, [view.n]);
   useEffect(() => {
     setStamp(false);
-    const a = setTimeout(() => setStamp(true), 1300);
+    sfx.play('reveal');
+    const a = setTimeout(() => {
+      setStamp(true);
+      sfx.play(items[i]?.kind === 'truth' ? 'ding' : 'stamp');
+    }, 1300);
     const b = setTimeout(() => setI((x) => Math.min(items.length - 1, x + 1)), view.step * 1000);
     return () => { clearTimeout(a); clearTimeout(b); };
   }, [i, items.length, view.step]);
