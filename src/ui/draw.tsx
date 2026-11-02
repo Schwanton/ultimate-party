@@ -7,7 +7,12 @@ export interface Stroke {
   p: number[];
 }
 
-export const DRAW_COLORS = ['#110D24', '#E8336F', '#1A97B0', '#E8A400'];
+/** Farben (die Reihenfolge nicht ändern – gespeicherte Zeichnungen nutzen die Nummer). Letzte = Radierer. */
+export const DRAW_COLORS = [
+  '#110D24', '#E8336F', '#1A97B0', '#E8A400', '#FF3B4E', '#FF9F43', '#2EB872', '#5B8CFF',
+  '#9B7BFF', '#8A5A2B', '#F2B48A', '#8F88B8', '#FFFDF7',
+];
+export const ERASER = DRAW_COLORS.length - 1;
 export const DRAW_WIDTHS = [7, 18];
 
 function strokePath(s: Stroke): string {
@@ -32,7 +37,10 @@ export function Drawing({ strokes, size = 360, style }: { strokes: Stroke[]; siz
 }
 
 /** Zeichenfläche fürs Handy */
-export function DrawCanvas({ onChange, labels }: { onChange: (strokes: Stroke[]) => void; labels: { undo: string; thin: string; thick: string } }) {
+export function DrawCanvas({ onChange, labels }: {
+  onChange: (strokes: Stroke[]) => void;
+  labels: { undo: string; thin: string; thick: string; clear: string; clearConfirm: string; eraser: string };
+}) {
   const [strokes, setStrokes] = useState<Stroke[]>([]);
   const [color, setColor] = useState(0);
   const [width, setWidth] = useState(0);
@@ -44,19 +52,34 @@ export function DrawCanvas({ onChange, labels }: { onChange: (strokes: Stroke[])
     onChange(strokes);
   }, [strokes, onChange]);
 
+  // iPhone/iPad: Scrollen und Zoomen auf der Zeichenfläche komplett verhindern,
+  // sonst scrollt die Seite bei Strichen nach oben/unten mit.
+  useEffect(() => {
+    const el = svgRef.current;
+    if (!el) return;
+    const stop = (e: TouchEvent) => e.preventDefault();
+    el.addEventListener('touchstart', stop, { passive: false });
+    el.addEventListener('touchmove', stop, { passive: false });
+    return () => {
+      el.removeEventListener('touchstart', stop);
+      el.removeEventListener('touchmove', stop);
+    };
+  }, []);
+
   const point = (e: RPointerEvent) => {
     const r = svgRef.current!.getBoundingClientRect();
     return [Math.round(((e.clientX - r.left) / r.width) * 1000), Math.round(((e.clientY - r.top) / r.height) * 1000)];
   };
   const down = (e: RPointerEvent) => {
     e.preventDefault();
-    (e.target as Element).setPointerCapture?.(e.pointerId);
-    current.current = { c: color, w: width, p: point(e) };
+    (e.currentTarget as Element).setPointerCapture?.(e.pointerId);
+    current.current = { c: color, w: color === ERASER ? 1 : width, p: point(e) };
     force((n) => n + 1);
   };
   const move = (e: RPointerEvent) => {
     const s = current.current;
     if (!s) return;
+    e.preventDefault();
     const [x, y] = point(e);
     const lx = s.p[s.p.length - 2], ly = s.p[s.p.length - 1];
     if (Math.hypot(x - lx, y - ly) < 6) return;
@@ -69,27 +92,46 @@ export function DrawCanvas({ onChange, labels }: { onChange: (strokes: Stroke[])
     current.current = null;
     if (s && strokes.length < 400) setStrokes((list) => [...list, s]);
   };
+  const clear = () => {
+    if (strokes.length && window.confirm(labels.clearConfirm)) setStrokes([]);
+  };
 
   const all = current.current ? [...strokes, current.current] : strokes;
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      <svg ref={svgRef} viewBox="0 0 1000 1000" style={{ width: '100%', aspectRatio: '1', background: '#FFFDF7', borderRadius: 22, touchAction: 'none', display: 'block' }}
-        onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} onPointerLeave={up} aria-label="Zeichenfläche">
+      <svg ref={svgRef} viewBox="0 0 1000 1000"
+        style={{ width: 'min(100%, calc(100dvh - 360px))', minWidth: 220, alignSelf: 'center', aspectRatio: '1', background: '#FFFDF7', borderRadius: 22, touchAction: 'none', display: 'block', userSelect: 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none' } as CSSProperties}
+        onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} aria-label="Zeichenfläche">
         {all.map((s, i) => (
           <path key={i} d={strokePath(s)} fill="none" stroke={DRAW_COLORS[s.c]} strokeWidth={DRAW_WIDTHS[s.w]} strokeLinecap="round" strokeLinejoin="round" />
         ))}
       </svg>
-      <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
         {DRAW_COLORS.map((c, i) => (
-          <button key={c} type="button" aria-label={`Farbe ${i + 1}`} aria-pressed={color === i} onClick={() => setColor(i)}
-            style={{ width: 44, height: 44, borderRadius: '50%', background: c, border: color === i ? '4px solid #fff' : '4px solid transparent', boxShadow: '0 3px 0 #0A0716' }} />
+          <button key={c} type="button" aria-label={i === ERASER ? labels.eraser : `Farbe ${i + 1}`} title={i === ERASER ? labels.eraser : undefined}
+            aria-pressed={color === i} onClick={() => setColor(i)}
+            style={{
+              width: 38, height: 38, borderRadius: '50%', background: c, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              border: color === i ? '4px solid #fff' : '4px solid transparent', boxShadow: color === i ? '0 0 0 2px #110D24 inset' : '0 3px 0 #0A0716',
+              transform: color === i ? 'scale(1.1)' : undefined, transition: 'transform .1s',
+            }}>
+            {i === ERASER && (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#110D24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M20 20H9L4 15a2 2 0 0 1 0-3l9-9a2 2 0 0 1 3 0l5 5a2 2 0 0 1 0 3l-8 8" /><path d="M6 11l7 7" />
+              </svg>
+            )}
+          </button>
         ))}
-        <span style={{ flex: 1 }} />
-        <button type="button" className="up-btn ghost small" aria-pressed={width === 1} onClick={() => setWidth(width ? 0 : 1)}>
+      </div>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <button type="button" className="up-btn ghost small" style={{ flex: 1 }} aria-pressed={width === 1} onClick={() => setWidth(width ? 0 : 1)}>
           {width ? labels.thick : labels.thin}
         </button>
-        <button type="button" className="up-btn ghost small" disabled={!strokes.length} onClick={() => setStrokes((l) => l.slice(0, -1))}>
+        <button type="button" className="up-btn ghost small" style={{ flex: 1 }} disabled={!strokes.length} onClick={() => setStrokes((l) => l.slice(0, -1))}>
           {labels.undo}
+        </button>
+        <button type="button" className="up-btn ghost small" style={{ flex: 1 }} disabled={!strokes.length} onClick={clear}>
+          {labels.clear}
         </button>
       </div>
     </div>

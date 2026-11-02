@@ -13,6 +13,7 @@ interface Prompt {
 }
 
 const DUEL_LIMIT = 12;
+const LAST_CHANCE = 5;
 const MAX_LEN = 60;
 const T = { answerDuel: 80, answerSingle: 55, vote: 20, heat: 25, finalVote: 30 };
 const POINTS = { vote: 100, audience: 25, sweep: 250, champion: 500 };
@@ -45,6 +46,7 @@ export default {
     let promptsById = new Map<string, Prompt>();
     let assigned = new Map<string, string[]>(); // Spieler -> Prompt-IDs
     let phaseTimer: { cancel(): void } | null = null;
+    let voteTimer: { deadline: number } | null = null;
     let votes = new Map<string, string>(); // Wähler -> Option
     let voteOptions: string[] = [];
     let eligibleVoters = new Set<string>();
@@ -162,7 +164,27 @@ export default {
       onVotesComplete = done;
       const t = ctx.timer(seconds, finishVotes);
       phaseTimer = t;
+      voteTimer = t;
       return t;
+    }
+
+    /** Alle haben abgestimmt: Zeit auf wenige Sekunden verkürzen, damit man sich noch umentscheiden kann. */
+    function hurryVotes() {
+      if (!voteTimer || voteTimer.deadline - Date.now() <= LAST_CHANCE * 1200) return;
+      phaseTimer?.cancel();
+      const t = ctx.timer(LAST_CHANCE, finishVotes);
+      phaseTimer = t;
+      voteTimer = t;
+      if (lastHostVote) {
+        lastHostVote = { ...lastHostVote, deadline: t.deadline, duration: t.duration };
+        ctx.setHostView({ ...lastHostVote, voted: votes.size, voters: eligibleVoters.size });
+      }
+      for (const [id, view] of lastVoteView) {
+        if (!eligibleVoters.has(id)) continue;
+        const v = { ...view, deadline: t.deadline, duration: t.duration, selected: votes.get(id) ?? null };
+        lastVoteView.set(id, v);
+        ctx.setPlayerView(id, v);
+      }
     }
 
     function finishVotes() {
@@ -178,8 +200,10 @@ export default {
       const allowed = (voteViewsFor.get(id) ?? voteOptions);
       if (!allowed.includes(choice)) return;
       votes.set(id, choice);
-      ctx.setPlayerView(id, { ...(lastVoteView.get(id) ?? {}), selected: choice, input: false });
-      if ([...eligibleVoters].every((v) => votes.has(v) || !ctx.player(v)?.connected)) finishVotes();
+      const updated = { ...(lastVoteView.get(id) ?? {}), selected: choice, input: false };
+      lastVoteView.set(id, updated);
+      ctx.setPlayerView(id, updated);
+      if ([...eligibleVoters].every((v) => votes.has(v) || !ctx.player(v)?.connected)) hurryVotes();
       else if (lastHostVote) ctx.setHostView({ ...lastHostVote, voted: votes.size, voters: eligibleVoters.size });
     }
 

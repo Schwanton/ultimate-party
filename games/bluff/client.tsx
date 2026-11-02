@@ -192,8 +192,8 @@ function Controller({ view, t, send, me }: ControllerViewProps) {
           <PhoneTimer deadline={view.deadline} duration={view.duration} hurryText={view.selected ? undefined : t('timer.hurry')} />
           <span className="up-label">{t('choose.title')}</span>
           <Question text={view.question} size={20} />
-          <ChoiceList options={view.options} selected={view.selected} onPick={(id) => send({ type: 'pick', option: id })} locked={!!view.selected} />
-          <p className="muted" style={{ textAlign: 'center', marginTop: 'auto' }}>{view.selected ? t('choose.done') : t('choose.pick')}</p>
+          <ChoiceList options={view.options} selected={view.selected} onPick={(id) => send({ type: 'pick', option: id })} />
+          <p className="muted" style={{ textAlign: 'center', marginTop: 'auto' }}>{view.selected ? `${t('choose.done')} · ${t('choose.change')}` : t('choose.pick')}</p>
         </>
       );
     case 'result':

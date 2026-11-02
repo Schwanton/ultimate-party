@@ -5,5 +5,5 @@ export { Stage, Logo, HostHeader, HostPrompt, Confetti, QrCode, PhoneWait, TextA
 export type { ChoiceOption } from './layout';
 export { VoterChips, Scoreboard, Podium } from './scores';
 export type { ScoreRow } from './scores';
-export { Drawing, DrawCanvas, DRAW_COLORS, DRAW_WIDTHS } from './draw';
+export { Drawing, DrawCanvas, DRAW_COLORS, DRAW_WIDTHS, ERASER } from './draw';
 export type { Stroke } from './draw';

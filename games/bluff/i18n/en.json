@@ -31,5 +31,6 @@
   "me.place": "Place {place} of {of}",
   "me.score": "{n} points",
   "audience.wait": "You're in the audience. You'll get to guess soon!",
-  "lookAtTv": "Look at the TV."
+  "lookAtTv": "Look at the TV.",
+  "choose.change": "You can change it while time is running."
 }

@@ -15,6 +15,7 @@ interface Fact {
 }
 
 const MULTS = [1, 1, 1, 2, 2, 3];
+const LAST_CHANCE = 5;
 const T = { write: 45, choose: 22 };
 const POINTS = { truth: 1000, fool: 500, audienceFool: 100 };
 const REVEAL_STEP = 3.2;
@@ -86,6 +87,16 @@ export default {
       ctx.setPlayerView(id, { screen: 'choose', input: !round.pickOf(id), question: fact.question, options: round.optionsFor(id), selected: round.pickOf(id) ?? null, deadline: timer!.deadline, duration: timer!.duration });
     }
 
+    /** Alle haben gewählt: Zeit auf wenige Sekunden verkürzen, damit man sich noch umentscheiden kann. */
+    function hurryChoose() {
+      const left = (timer?.deadline ?? 0) - Date.now();
+      if (!timer || left <= LAST_CHANCE * 1000 * 1.2) return;
+      timer.cancel();
+      timer = ctx.timer(LAST_CHANCE, startReveal);
+      hostChoose();
+      choosers().forEach(chooseView);
+    }
+
     function startReveal() {
       timer?.cancel();
       phase = 'reveal';
@@ -153,7 +164,7 @@ export default {
           if (!round.pick(id, action.option)) return;
           chooseView(id);
           hostChoose();
-          if (choosers().every((p) => round.pickOf(p) || !ctx.player(p)?.connected)) startReveal();
+          if (choosers().every((p) => round.pickOf(p) || !ctx.player(p)?.connected)) hurryChoose();
         }
       },
       onAudienceJoin(id) {

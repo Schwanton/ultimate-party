@@ -44,5 +44,9 @@
   "audience.wait": "Du bist im Publikum. Gleich darfst du mitraten!",
   "lookAtTv": "Schau auf den Fernseher.",
   "result.artist0": "Niemand hat dein Bild erkannt",
-  "result.artist1": "1 Person hat dein Bild erkannt"
+  "result.artist1": "1 Person hat dein Bild erkannt",
+  "draw.clear": "Löschen",
+  "draw.clearConfirm": "Wirklich die ganze Zeichnung löschen?",
+  "draw.eraser": "Radierer",
+  "choose.change": "Ändern geht, solange die Zeit läuft."
 }

@@ -44,5 +44,9 @@
   "audience.wait": "You're in the audience. You'll get to guess soon!",
   "lookAtTv": "Look at the TV.",
   "result.artist0": "Nobody recognised your drawing",
-  "result.artist1": "1 person recognised your drawing"
+  "result.artist1": "1 person recognised your drawing",
+  "draw.clear": "Clear",
+  "draw.clearConfirm": "Really clear the whole drawing?",
+  "draw.eraser": "Eraser",
+  "choose.change": "You can change it while time is running."
 }

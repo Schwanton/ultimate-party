@@ -16,6 +16,8 @@ interface Stroke {
   p: number[];
 }
 
+const COLOR_COUNT = 13;
+const LAST_CHANCE = 5;
 const T = { draw: 75, title: 40, choose: 22 };
 const POINTS = { truth: 1000, fool: 500, artist: 500, audienceFool: 100 };
 const REVEAL_STEP = 3.2;
@@ -28,7 +30,7 @@ function validStrokes(raw: unknown): Stroke[] | null {
     if (!s || !Array.isArray(s.p) || s.p.length < 2 || s.p.length > 1200) continue;
     total += s.p.length;
     if (total > 30000) break;
-    out.push({ c: Math.max(0, Math.min(3, Number(s.c) | 0)), w: s.w ? 1 : 0, p: s.p.map((n: unknown) => Math.max(0, Math.min(1000, Number(n) | 0))) });
+    out.push({ c: Math.max(0, Math.min(COLOR_COUNT - 1, Number(s.c) | 0)), w: s.w ? 1 : 0, p: s.p.map((n: unknown) => Math.max(0, Math.min(1000, Number(n) | 0))) });
   }
   return out;
 }
@@ -133,6 +135,16 @@ export default {
       ctx.setPlayerView(id, { screen: 'choose', input: !deception.pickOf(id), options: deception.optionsFor(id), selected: deception.pickOf(id) ?? null, strokes: drawings.get(artist()), deadline: timer!.deadline, duration: timer!.duration });
     }
 
+    /** Alle haben gewählt: Zeit auf wenige Sekunden verkürzen, damit man sich noch umentscheiden kann. */
+    function hurryChoose() {
+      const left = (timer?.deadline ?? 0) - Date.now();
+      if (!timer || left <= LAST_CHANCE * 1000 * 1.2) return;
+      timer.cancel();
+      timer = ctx.timer(LAST_CHANCE, startReveal);
+      hostChoose();
+      choosers().forEach(chooseView);
+    }
+
     function startReveal() {
       timer?.cancel();
       phase = 'reveal';
@@ -207,7 +219,7 @@ export default {
           if (!deception.pick(id, action.option)) return;
           chooseView(id);
           hostChoose();
-          if (choosers().every((p) => deception.pickOf(p) || !ctx.player(p)?.connected)) startReveal();
+          if (choosers().every((p) => deception.pickOf(p) || !ctx.player(p)?.connected)) hurryChoose();
         }
       },
       onAudienceJoin(id) {
@@ -224,7 +236,7 @@ export default {
               y = Math.max(20, Math.min(980, y + (Math.random() - 0.5) * 160));
               p.push(Math.round(x), Math.round(y));
             }
-            return { c: Math.floor(Math.random() * 4), w: Math.random() < 0.3 ? 1 : 0, p };
+            return { c: Math.floor(Math.random() * 11), w: Math.random() < 0.3 ? 1 : 0, p };
           });
           return { type: 'drawing', strokes };
         }

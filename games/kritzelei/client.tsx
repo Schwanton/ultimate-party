@@ -204,7 +204,7 @@ function DrawScreen({ view, t, send }: ControllerViewProps) {
         <span className="up-label">{t('draw.yourWord')}</span>
         <h1 style={{ fontSize: 26 }}>{view.word}</h1>
       </div>
-      <DrawCanvas onChange={onChange} labels={{ undo: t('draw.undo'), thin: t('draw.thin'), thick: t('draw.thick') }} />
+      <DrawCanvas onChange={onChange} labels={{ undo: t('draw.undo'), thin: t('draw.thin'), thick: t('draw.thick'), clear: t('draw.clear'), clearConfirm: t('draw.clearConfirm'), eraser: t('draw.eraser') }} />
       <button className="up-btn big full" onClick={() => latest.current.length && send({ type: 'drawing', strokes: latest.current })}>{t('draw.done')}</button>
     </>
   );
@@ -249,8 +249,8 @@ function Controller(props: ControllerViewProps) {
           <PhoneTimer deadline={view.deadline} duration={view.duration} hurryText={view.selected ? undefined : t('timer.hurry')} />
           <Drawing strokes={view.strokes} size={160} style={{ alignSelf: 'center' }} />
           <span className="up-label">{t('choose.title')}</span>
-          <ChoiceList options={view.options} selected={view.selected} onPick={(id) => send({ type: 'pick', option: id })} locked={!!view.selected} />
-          <p className="muted" style={{ textAlign: 'center', marginTop: 'auto' }}>{view.selected ? t('choose.done') : t('choose.pick')}</p>
+          <ChoiceList options={view.options} selected={view.selected} onPick={(id) => send({ type: 'pick', option: id })} />
+          <p className="muted" style={{ textAlign: 'center', marginTop: 'auto' }}>{view.selected ? `${t('choose.done')} · ${t('choose.change')}` : t('choose.pick')}</p>
         </>
       );
     case 'result':
