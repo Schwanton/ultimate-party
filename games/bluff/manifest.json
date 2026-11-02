@@ -1,6 +1,9 @@
 {
   "id": "bluff",
-  "name": { "de": "Bluff", "en": "Bluff" },
+  "name": {
+    "de": "Bluff",
+    "en": "Bluff"
+  },
   "description": {
     "de": "Erfindet glaubwürdige Lügen zu kuriosen, wahren Fakten – und findet die Wahrheit.",
     "en": "Invent believable lies about strange true facts – and spot the truth."
@@ -11,7 +14,53 @@
   "minutes": 15,
   "color": "#36D6F5",
   "sdkVersion": 1,
-  "contentFields": ["question", "answer"],
+  "contentFields": [
+    "question",
+    "answer"
+  ],
   "version": "1.0.0",
-  "author": "UP!"
+  "author": "UP!",
+  "options": [
+    {
+      "id": "questions",
+      "label": {
+        "de": "Fragen",
+        "en": "Questions"
+      },
+      "default": 6,
+      "min": 3,
+      "max": 12
+    },
+    {
+      "id": "writeTime",
+      "label": {
+        "de": "Zeit für Lügen",
+        "en": "Time for lies"
+      },
+      "default": 1,
+      "choices": [
+        {
+          "value": 0.75,
+          "label": {
+            "de": "Kurz",
+            "en": "Short"
+          }
+        },
+        {
+          "value": 1,
+          "label": {
+            "de": "Normal",
+            "en": "Normal"
+          }
+        },
+        {
+          "value": 1.5,
+          "label": {
+            "de": "Lang",
+            "en": "Long"
+          }
+        }
+      ]
+    }
+  ]
 }

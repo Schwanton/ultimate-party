@@ -19,7 +19,7 @@ function useSteps(times: number[], key: unknown) {
 }
 
 function roundInfo(view: any, t: HostViewProps['t']) {
-  const r = view.round === 3 ? t('roundFinal') : t('round', { n: view.round, total: 3 });
+  const r = view.round === view.totalRounds ? t('roundFinal') : t('round', { n: view.round, total: view.totalRounds });
   return view.mult > 1 ? `${r} · ${t('mult', { n: view.mult })}` : r;
 }
 
@@ -178,7 +178,7 @@ function HostDuelResult({ view, t, player }: HostViewProps) {
     return (
       <AnswerCard side={key} text={s.text ?? t('result.noAnswer')} style={{
         transform: step >= 3 ? (won ? 'scale(1.02)' : view.winner ? 'scale(.97)' : undefined) : undefined,
-        opacity: step >= 3 && view.winner && !won ? 0.8 : 1, boxShadow: `0 10px 0 ${dark ? '#A81B4B' : '#1A97B0'}${step >= 3 && won ? ', 0 0 0 5px var(--yellow)' : ''}`,
+        opacity: step >= 3 && view.winner && !won ? 0.8 : 1, boxShadow: `${step >= 3 && won ? '0 0 0 5px var(--yellow), ' : ''}0 ${step >= 3 && won ? 15 : 10}px 0 ${dark ? '#A81B4B' : '#1A97B0'}`,
       }}>
         {step >= 3 && won && <span className="up-tag" style={{ position: 'absolute', top: -18, right: 28, background: 'var(--yellow)', color: '#110D24', boxShadow: '0 5px 0 var(--yellow-d)', animation: 'upBadge .6s ease-out both' }}>{t('result.winner')}</span>}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>

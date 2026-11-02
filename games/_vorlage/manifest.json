@@ -1,6 +1,9 @@
 {
   "id": "_vorlage",
-  "name": { "de": "Schätzfrage (Vorlage)", "en": "Estimate (template)" },
+  "name": {
+    "de": "Schätzfrage (Vorlage)",
+    "en": "Estimate (template)"
+  },
   "description": {
     "de": "Ein Mini-Spiel als Vorlage für eigene Spiele: Wer schätzt am nächsten dran?",
     "en": "A mini game to copy for your own games: who guesses closest?"
@@ -11,8 +14,23 @@
   "minutes": 3,
   "color": "#4BE3A1",
   "sdkVersion": 1,
-  "contentFields": ["question", "answer"],
+  "contentFields": [
+    "question",
+    "answer"
+  ],
   "hidden": true,
   "version": "1.0.0",
-  "author": "UP!"
+  "author": "UP!",
+  "options": [
+    {
+      "id": "rounds",
+      "label": {
+        "de": "Fragen",
+        "en": "Questions"
+      },
+      "default": 3,
+      "min": 1,
+      "max": 4
+    }
+  ]
 }

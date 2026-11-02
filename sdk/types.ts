@@ -61,6 +61,39 @@ export interface GameManifest {
   author?: string;
   /** Geheime Einstellungen, die der Host einträgt (z. B. API-Schlüssel) */
   secrets?: GameSecret[];
+  /** Spiel-Einstellungen, die in der Lobby gewählt werden (Rundenanzahl usw.) */
+  options?: GameOption[];
+}
+
+/** Eine Spiel-Einstellung. Werte sind Zahlen oder Texte; `choices` macht daraus eine Auswahl. */
+export interface GameOption {
+  id: string;
+  label: Record<string, string>;
+  help?: Record<string, string>;
+  default: number | string;
+  /** Auswahl-Liste (sonst Zahl mit min/max/step) */
+  choices?: { value: number | string; label: Record<string, string> }[];
+  min?: number;
+  max?: number;
+  step?: number;
+}
+
+export type GameOptionValues = Record<string, number | string>;
+
+/** Liefert gültige Werte: Standardwerte + erlaubte Änderungen */
+export function resolveOptions(defs: GameOption[] | undefined, values: Record<string, unknown> | undefined): GameOptionValues {
+  const out: GameOptionValues = {};
+  for (const d of defs ?? []) {
+    const v = values?.[d.id];
+    if (d.choices) {
+      out[d.id] = d.choices.some((c) => c.value === v) ? (v as number | string) : d.default;
+    } else if (typeof v === 'number' && Number.isFinite(v)) {
+      const step = d.step ?? 1;
+      const clamped = Math.min(d.max ?? Infinity, Math.max(d.min ?? -Infinity, v));
+      out[d.id] = Math.round(clamped / step) * step;
+    } else out[d.id] = d.default;
+  }
+  return out;
 }
 
 export interface GameSecret {
@@ -104,6 +137,8 @@ export interface TimerHandle {
 /** Das bekommt jedes Spiel vom Server. */
 export interface GameContext {
   readonly lang: Lang;
+  /** Gewählte Spiel-Einstellungen (siehe manifest.options), immer mit gültigen Werten */
+  readonly options: GameOptionValues;
   /** Mitspieler (Rolle "player") beim Start des Spiels */
   readonly players: PlayerInfo[];
   /** Aktuelles Publikum (kann sich während des Spiels ändern) */
@@ -124,6 +159,8 @@ export interface GameContext {
 
   /** Countdown starten. Sekunden werden im Testmodus automatisch verkürzt. */
   timer(seconds: number, onEnd: () => void): TimerHandle;
+  /** Countdown bis zu einem festen Zeitpunkt (ms, Serverzeit) – z. B. um einen Timer zu verlängern */
+  timerAt(deadline: number, onEnd: () => void): TimerHandle;
   /** Kurze Pause (z. B. für Animationen), dann fn ausführen */
   after(seconds: number, fn: () => void): void;
   /** Alle laufenden Timer abbrechen */
@@ -185,6 +222,8 @@ export interface RoomSettings {
   disabledPacks: string[];
   /** Zeitfaktor für Timer (1 = normal, 1.5 = mehr Zeit) */
   timeFactor: number;
+  /** Spiel-Einstellungen pro Spiel (gameId → Werte) */
+  gameOptions: Record<string, GameOptionValues>;
 }
 
 export interface HostViewProps<V = any> {

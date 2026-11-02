@@ -16,11 +16,24 @@ if [ "$NODE_MAJOR" -lt 20 ]; then
   need_node "Auf diesem Mac ist Node.js $(node -v) installiert. UP! braucht Version 20 oder neuer."
 fi
 
-# Neu installieren, wenn noch nie installiert oder mit einer anderen Node-Version
-if [ ! -f node_modules/.up-node-version ] || [ "$(cat node_modules/.up-node-version)" != "$NODE_MAJOR" ]; then
-  echo "Ich installiere die nötigen Bausteine (dauert einmalig ca. 1 Minute) …"
-  rm -rf node_modules package-lock.json
-  npm install --no-audit --no-fund || { echo "Installation fehlgeschlagen. Bist du mit dem Internet verbunden?"; read -r -p "Enter zum Schließen"; exit 1; }
-  echo "$NODE_MAJOR" > node_modules/.up-node-version
-fi
-npm start
+export UP_LAUNCHER=1
+while true; do
+  # Installieren, wenn noch nie installiert, mit anderer Node-Version oder nach einem Update mit neuen Paketen
+  if [ ! -f node_modules/.up-node-version ] || [ "$(cat node_modules/.up-node-version)" != "$NODE_MAJOR" ]; then
+    echo "Ich installiere die nötigen Bausteine (dauert einmalig ca. 1 Minute) …"
+    rm -rf node_modules package-lock.json
+    npm install --no-audit --no-fund || { echo "Installation fehlgeschlagen. Bist du mit dem Internet verbunden?"; read -r -p "Enter zum Schließen"; exit 1; }
+    echo "$NODE_MAJOR" > node_modules/.up-node-version
+  fi
+  rm -f .up-data/restart
+  node node_modules/tsx/dist/cli.mjs server/index.ts
+  # Nach einem Update legt UP! diese Datei an → automatisch neu starten
+  if [ -f .up-data/restart ]; then
+    echo ""
+    echo "Update installiert – UP! startet neu …"
+    UP_NO_OPEN=1
+    export UP_NO_OPEN
+    continue
+  fi
+  break
+done

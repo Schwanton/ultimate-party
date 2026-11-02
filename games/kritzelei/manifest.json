@@ -1,6 +1,9 @@
 {
   "id": "kritzelei",
-  "name": { "de": "Kritzelei", "en": "Doodle" },
+  "name": {
+    "de": "Kritzelei",
+    "en": "Doodle"
+  },
   "description": {
     "de": "Zeichnet geheime Begriffe aufs Handy, erfindet falsche Titel und findet den echten.",
     "en": "Draw secret prompts on your phone, invent fake titles and find the real one."
@@ -11,7 +14,84 @@
   "minutes": 20,
   "color": "#FFD447",
   "sdkVersion": 1,
-  "contentFields": ["word"],
+  "contentFields": [
+    "word"
+  ],
   "version": "1.0.0",
-  "author": "UP!"
+  "author": "UP!",
+  "options": [
+    {
+      "id": "rounds",
+      "label": {
+        "de": "Runden",
+        "en": "Rounds"
+      },
+      "default": 0,
+      "choices": [
+        {
+          "value": 0,
+          "label": {
+            "de": "Automatisch",
+            "en": "Auto"
+          }
+        },
+        {
+          "value": 1,
+          "label": {
+            "de": "1",
+            "en": "1"
+          }
+        },
+        {
+          "value": 2,
+          "label": {
+            "de": "2",
+            "en": "2"
+          }
+        },
+        {
+          "value": 3,
+          "label": {
+            "de": "3",
+            "en": "3"
+          }
+        }
+      ],
+      "help": {
+        "de": "Automatisch: 2 Runden bis 5 Spieler, sonst 1.",
+        "en": "Auto: 2 rounds up to 5 players, otherwise 1."
+      }
+    },
+    {
+      "id": "drawTime",
+      "label": {
+        "de": "Zeit zum Zeichnen",
+        "en": "Drawing time"
+      },
+      "default": 75,
+      "choices": [
+        {
+          "value": 45,
+          "label": {
+            "de": "45 s",
+            "en": "45 s"
+          }
+        },
+        {
+          "value": 75,
+          "label": {
+            "de": "75 s",
+            "en": "75 s"
+          }
+        },
+        {
+          "value": 120,
+          "label": {
+            "de": "2 Min.",
+            "en": "2 min"
+          }
+        }
+      ]
+    }
+  ]
 }

@@ -4,6 +4,7 @@ import { net, useNet, loadSession, saveSession } from '../net';
 import { guessLang, useT } from '../i18n';
 import registry, { clientGame } from '../registry';
 import { Avatar, Crown, Logo, isLight, shade, vibrate } from '../ui';
+import { GameOptionsForm, optionsSummary } from './GameOptions';
 
 const params = new URLSearchParams(location.search);
 
@@ -214,6 +215,20 @@ function PhoneLobby({ onEditAvatar }: { onEditAvatar: () => void }) {
         })}
       </div>
 
+      {selected?.options?.length ? (
+        isVip ? (
+          <details className="up-card" style={{ padding: '14px 16px' }}>
+            <summary style={{ fontWeight: 700, cursor: 'pointer', fontSize: 16 }}>{t('lobby.gameSettings')}
+              <span className="faint" style={{ display: 'block', fontWeight: 500, fontSize: 13, marginTop: 4 }}>{optionsSummary(selected, room.settings.gameOptions?.[selected.id], room.lang)}</span>
+            </summary>
+            <div style={{ marginTop: 14 }}>
+              <GameOptionsForm game={selected} values={room.settings.gameOptions?.[selected.id]} lang={room.lang} compact />
+            </div>
+          </details>
+        ) : (
+          <p className="faint" style={{ fontSize: 13 }}>{optionsSummary(selected, room.settings.gameOptions?.[selected.id], room.lang)}</p>
+        )
+      ) : null}
       {error && <p className="up-error">{error}</p>}
       <div style={{ flex: 1 }} />
       {isVip && selected && (

@@ -88,6 +88,14 @@ function Host(props: HostViewProps) {
               <p className="muted" style={{ fontSize: 17 }}>{date} · {duration(v.durationSec)}</p>
               <h2 className="display" style={{ fontSize: 34, color: 'var(--yellow)', marginTop: 20 }}>{t('guess.title')}</h2>
               <span className="up-chip" style={{ alignSelf: 'flex-start', fontSize: 17 }}>{t('guess.count', { n: view.guessed, total: view.players })}</span>
+              <span className="up-chip" style={{ alignSelf: 'flex-start', fontSize: 17, background: view.extendVotes ? 'var(--surface-2)' : undefined }}>
+                {t('extend.tv', { n: view.extendVotes, need: view.extendNeeded })}
+              </span>
+              {view.extensions > 0 && (
+                <span key={view.extensions} className="up-tag" style={{ alignSelf: 'flex-start', fontSize: 20, background: 'var(--yellow)', color: '#110D24', boxShadow: '0 5px 0 var(--yellow-d)', animation: 'upBadge .5s ease-out both' }}>
+                  {t('extend.done', { n: view.extensions })}
+                </span>
+              )}
             </div>
           </div>
         </>
@@ -367,6 +375,12 @@ function Controller({ view, t, send, me, room }: ControllerViewProps) {
           </div>
           <span className="up-label">{t('guess.title')}</span>
           <Keypad key={view.videoId} lang={lang} t={t} initial={view.guess} locked={false} onSubmit={(n) => send({ type: 'guess', value: n })} />
+          {view.canExtend && (
+            <button type="button" className={`up-btn full ${view.wantsExtend ? 'cyan' : 'ghost'}`} aria-pressed={view.wantsExtend}
+              onClick={() => send({ type: 'extend', on: !view.wantsExtend })} style={{ minHeight: 52, fontSize: 17 }}>
+              {view.wantsExtend ? t('extend.on', { n: view.extendVotes, need: view.extendNeeded }) : t('extend.ask', { n: view.extendVotes, need: view.extendNeeded })}
+            </button>
+          )}
           {view.guess != null && (
             <p role="status" style={{ textAlign: 'center', fontSize: 15 }}>
               <b style={{ color: 'var(--green)' }}>✓ {t('guess.done')}: {fmt(view.guess, lang)}</b><br /><span className="muted">{t('guess.change')}</span>

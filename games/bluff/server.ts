@@ -14,7 +14,6 @@ interface Fact {
   source?: string;
 }
 
-const MULTS = [1, 1, 1, 2, 2, 3];
 const LAST_CHANCE = 5;
 const T = { write: 45, choose: 22 };
 const POINTS = { truth: 1000, fool: 500, audienceFool: 100 };
@@ -24,7 +23,10 @@ export default {
   create(ctx: GameContext) {
     const ids = ctx.players.map((p) => p.id);
     const scores = new Scores(ids);
-    const facts = ctx.content<Fact>().slice(0, MULTS.length);
+    const count = Number(ctx.options.questions) || 6;
+    const facts = ctx.content<Fact>().slice(0, count);
+    const half = Math.ceil(facts.length / 2);
+    const wf = Number(ctx.options.writeTime) || 1;
     let q = -1;
     let round: DeceptionRound;
     let fact: Fact;
@@ -35,7 +37,8 @@ export default {
 
     const isPlayer = (id: string) => ids.includes(id);
     const choosers = () => [...ids, ...ctx.audience().map((a) => a.id)];
-    const mult = () => MULTS[q] ?? 1;
+    // Erste Hälfte ×1, danach ×2, letzte Frage ×3
+    const mult = () => (q === facts.length - 1 && facts.length > 2 ? 3 : q >= half ? 2 : 1);
 
     function hostBase() {
       return { n: q + 1, total: facts.length, mult: mult(), question: fact.question };
@@ -50,11 +53,11 @@ export default {
     function next() {
       q++;
       if (q >= facts.length) return showScores(true);
-      if (q === 3 && lastScoresAt < 3) return showScores(false);
+      if (q === half && facts.length > 3 && lastScoresAt < half) return showScores(false);
       fact = facts[q];
       round = new DeceptionRound(fact.answer, fact.alternatives ?? [], fact.decoys ?? [], 40);
       phase = 'write';
-      timer = ctx.timer(T.write, startChoose);
+      timer = ctx.timer(T.write * wf, startChoose);
       hostWrite();
       ids.forEach((id) => writeView(id));
       ctx.setAudienceView({ screen: 'audienceWait' });

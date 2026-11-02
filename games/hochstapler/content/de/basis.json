@@ -124,66 +124,6 @@
    "task": "Zeig mit den Fingern: Wie gut kannst du singen? (0 bis 10)"
   },
   {
-   "category": "face",
-   "task": "Mach ein Gesicht, als hättest du gerade in eine Zitrone gebissen."
-  },
-  {
-   "category": "face",
-   "task": "Mach ein Gesicht, als hättest du im Lotto gewonnen."
-  },
-  {
-   "category": "face",
-   "task": "Mach ein Gesicht, als würdest du gleich niesen."
-  },
-  {
-   "category": "face",
-   "task": "Mach ein Gesicht, als hättest du deinen Schlüssel verloren."
-  },
-  {
-   "category": "face",
-   "task": "Mach ein Gesicht wie eine Katze, die etwas vom Tisch geschubst hat."
-  },
-  {
-   "category": "face",
-   "task": "Mach ein Gesicht, als hättest du einen Geist gesehen."
-  },
-  {
-   "category": "face",
-   "task": "Mach ein Gesicht, als würdest du ein Baby anlächeln."
-  },
-  {
-   "category": "face",
-   "task": "Mach ein Gesicht, als wärst du ein sehr strenger Lehrer."
-  },
-  {
-   "category": "face",
-   "task": "Mach ein Gesicht, als würde etwas furchtbar stinken."
-  },
-  {
-   "category": "face",
-   "task": "Mach ein Gesicht, als hättest du gerade eine Spinne auf deinem Arm entdeckt."
-  },
-  {
-   "category": "face",
-   "task": "Mach ein Gesicht, als würdest du einen sehr schlechten Witz hören."
-  },
-  {
-   "category": "face",
-   "task": "Mach ein Gesicht, als wärst du todmüde."
-  },
-  {
-   "category": "face",
-   "task": "Mach ein Gesicht, als hättest du gerade die beste Pizza deines Lebens gegessen."
-  },
-  {
-   "category": "face",
-   "task": "Mach ein Gesicht wie ein Model auf dem Laufsteg."
-  },
-  {
-   "category": "face",
-   "task": "Mach ein Gesicht, als würdest du ein Geheimnis verbergen."
-  },
-  {
    "category": "point",
    "task": "Zeig auf die Person, die am ehesten zu spät kommt."
   },
@@ -242,66 +182,6 @@
   {
    "category": "point",
    "task": "Zeig auf die Person, die am ehesten Weihnachtsdeko im Oktober aufhängt."
-  },
-  {
-   "category": "text",
-   "task": "Schreib auf: Dein Lieblingsessen."
-  },
-  {
-   "category": "text",
-   "task": "Schreib auf: Ein Tier, das du gerne wärst."
-  },
-  {
-   "category": "text",
-   "task": "Schreib auf: Das Erste, was du morgens machst."
-  },
-  {
-   "category": "text",
-   "task": "Schreib auf: Ein Ort, an den du gerne reisen würdest."
-  },
-  {
-   "category": "text",
-   "task": "Schreib auf: Ein Wort, das dich beschreibt."
-  },
-  {
-   "category": "text",
-   "task": "Schreib auf: Deine liebste Jahreszeit und warum."
-  },
-  {
-   "category": "text",
-   "task": "Schreib auf: Eine Superkraft, die du gerne hättest."
-  },
-  {
-   "category": "text",
-   "task": "Schreib auf: Ein Lied, das du laut mitsingst."
-  },
-  {
-   "category": "text",
-   "task": "Schreib auf: Was du mit einer Million Euro als Erstes kaufen würdest."
-  },
-  {
-   "category": "text",
-   "task": "Schreib auf: Dein liebstes Brettspiel oder Kartenspiel."
-  },
-  {
-   "category": "text",
-   "task": "Schreib auf: Ein Geräusch, das du nicht ausstehen kannst."
-  },
-  {
-   "category": "text",
-   "task": "Schreib auf: Ein Beruf, den du nie machen möchtest."
-  },
-  {
-   "category": "text",
-   "task": "Schreib auf: Das beste Eis."
-  },
-  {
-   "category": "text",
-   "task": "Schreib auf: Ein Hobby, das du gerne anfangen würdest."
-  },
-  {
-   "category": "text",
-   "task": "Schreib auf: Was in deinem Kühlschrank immer drin ist."
   }
  ]
 }

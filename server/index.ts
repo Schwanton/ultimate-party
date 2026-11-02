@@ -9,6 +9,7 @@ import { BUILD_DIR, DEV, PORT, QUIET } from './config';
 import { lanAddress } from './network';
 import { getGame, loadGames } from './registry';
 import { setSecret } from './secrets';
+import { installUpdate, onUpdateChange, startUpdateChecks, updateStatus } from './update';
 import { allRooms, createRoom, getRoom, type Room } from './room';
 import { buildClient, watchClient } from './build';
 
@@ -45,7 +46,7 @@ const server = http.createServer((req, res) => {
 
   if (url.pathname === '/api/info') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    return void res.end(JSON.stringify({ baseUrl, dev: DEV }));
+    return void res.end(JSON.stringify({ baseUrl, dev: DEV, version: updateStatus().current }));
   }
 
   if (url.pathname.startsWith('/assets/')) {
@@ -184,6 +185,9 @@ function handle(ws: WebSocket, msg: any) {
       const error = room.startGame();
       return reply(ws, msg, { ok: !error, error });
     }
+    case 'gameOption':
+      if (room && (isHost || isVip)) room.setGameOption(String(msg.gameId), String(msg.id), msg.value);
+      return;
     case 'lobby':
       if (room && (isHost || isVip)) room.backToLobby();
       return;
@@ -199,6 +203,12 @@ function handle(ws: WebSocket, msg: any) {
       for (const r of allRooms().values()) r.secretChanged(game.manifest.id, String(msg.id));
       return reply(ws, msg, { ok: true });
     }
+    case 'update:check':
+      if (isHost) void import('./update').then((u) => u.checkForUpdate());
+      return;
+    case 'update:install':
+      if (room && isHost && room.phase === 'lobby') void installUpdate(shutdown);
+      return;
     case 'kick':
       if (room && isHost) room.kick(String(msg.playerId));
       return;
@@ -215,6 +225,10 @@ function handle(ws: WebSocket, msg: any) {
 
 async function main() {
   const games = await loadGames();
+  onUpdateChange(() => {
+    for (const r of allRooms().values()) r.touch();
+  });
+  startUpdateChecks();
   log(`${games.size} Spiel(e) geladen: ${[...games.keys()].join(', ')}`);
   if (process.env.UP_NO_CLIENT === '1') {
     // nur Server (für automatische Tests)
@@ -248,6 +262,15 @@ function openBrowser(url: string) {
   try {
     spawn(cmd, args, { stdio: 'ignore', detached: true }).on('error', () => {}).unref();
   } catch { /* kein Browser – egal */ }
+}
+
+/** Server sauber beenden (für Updates) */
+function shutdown(): Promise<void> {
+  return new Promise((resolve) => {
+    for (const ws of wss.clients) ws.close();
+    server.close(() => resolve());
+    setTimeout(resolve, 1500);
+  });
 }
 
 server.on('error', (e: NodeJS.ErrnoException) => {

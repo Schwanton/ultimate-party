@@ -4,12 +4,13 @@ import { randomUUID } from 'node:crypto';
 import type { WebSocket } from 'ws';
 import {
   ANIMALS, type Avatar, type GameContext, type GameServer, type Lang, type PlayerInfo,
-  type RankingEntry, type RoomSettings, type RoomSnapshot, type TimerHandle,
+  resolveOptions, type RankingEntry, type RoomSettings, type RoomSnapshot, type TimerHandle,
 } from '../sdk/types';
 import { shuffle } from '../sdk/util';
 import { allGames, getGame, type LoadedGame } from './registry';
 import { DEV, QUIET, TIME_SCALE } from './config';
 import { getSecret, secretStatus, setSecret } from './secrets';
+import { updateStatus } from './update';
 
 export const PALETTE = [
   '#E8336F', '#36D6F5', '#FFD447', '#9B7BFF', '#4BE3A1', '#FF9F43',
@@ -50,7 +51,7 @@ export class Room {
   readonly code: string;
   readonly hostToken = randomUUID();
   lang: Lang;
-  settings: RoomSettings = { allowPhotos: true, disabledPacks: [], timeFactor: 1 };
+  settings: RoomSettings = { allowPhotos: true, disabledPacks: [], timeFactor: 1, gameOptions: {} };
   players = new Map<string, PlayerState>();
   hosts = new Set<WebSocket>();
   vipId: string | null = null;
@@ -242,6 +243,15 @@ export class Room {
     this.touch();
   }
 
+  setGameOption(gameId: string, id: string, value: unknown) {
+    const g = getGame(gameId);
+    const def = g?.manifest.options?.find((o) => o.id === id);
+    if (!g || !def || this.phase !== 'lobby') return;
+    const next = resolveOptions(g.manifest.options, { ...this.settings.gameOptions[gameId], [id]: value });
+    this.settings.gameOptions = { ...this.settings.gameOptions, [gameId]: next };
+    this.touch();
+  }
+
   /* ---------------- Spielablauf ---------------- */
 
   selectGame(id: string) {
@@ -365,6 +375,7 @@ export class Room {
     };
     return {
       lang: room.lang,
+      options: resolveOptions(g.loaded.manifest.options, room.settings.gameOptions[g.id]),
       players,
       audience: () => [...room.players.values()].filter((p) => p.info.role === 'audience' && g.memberIds.has(p.info.id)).map((p) => ({ ...p.info })),
       player: (id) => {
@@ -399,6 +410,18 @@ export class Room {
       },
       timer(seconds, onEnd): TimerHandle {
         const ms = seconds * 1000 * room.settings.timeFactor * TIME_SCALE;
+        const t = schedule(ms, onEnd);
+        return {
+          deadline: Date.now() + ms,
+          duration: ms,
+          cancel: () => {
+            clearTimeout(t);
+            g.timers.delete(t);
+          },
+        };
+      },
+      timerAt(deadline, onEnd): TimerHandle {
+        const ms = Math.max(0, deadline - Date.now());
         const t = schedule(ms, onEnd);
         return {
           deadline: Date.now() + ms,
@@ -487,6 +510,7 @@ export class Room {
       packs: allGames().flatMap((g) => g.packs.map((p) => p.info)),
       notice: this.notice,
       results: this.results,
+      update: updateStatus(),
     };
   }
 

@@ -40,7 +40,8 @@ export default {
     const nextPrompt = (): Prompt => prompts[promptIndex++ % Math.max(1, prompts.length)] ?? { id: 'x', prompt: '…' };
 
     let round = 0; // 1..3
-    const totalRounds = 3;
+    const totalRounds = Number(ctx.options.rounds) || 3;
+    const tf = Number(ctx.options.answerTime) || 1;
     let mult = 1;
     let answers: Answer[] = [];
     let promptsById = new Map<string, Prompt>();
@@ -74,7 +75,7 @@ export default {
 
     function startRound() {
       round++;
-      mult = round;
+      mult = round === totalRounds ? 3 : Math.min(2, round);
       roundStart = scores.snapshot();
       answers = [];
       promptsById = new Map();
@@ -87,12 +88,12 @@ export default {
         list.forEach((p) => promptsById.set(p.id, p));
         order.forEach((id, i) => assigned.set(id, [list[i].id, list[(i + order.length - 1) % order.length].id]));
         if (order.length === 2) assigned.set(order[1], [list[1].id, list[0].id]);
-        askAnswers(T.answerDuel);
+        askAnswers(T.answerDuel * tf);
       } else {
         const p = nextPrompt();
         promptsById.set(p.id, p);
         ids.forEach((id) => assigned.set(id, [p.id]));
-        askAnswers(T.answerSingle);
+        askAnswers(T.answerSingle * tf);
       }
     }
 
@@ -246,7 +247,7 @@ export default {
       if (!a.text || !b.text) return duelResult(pids, i, prompt, a, b, new Map([['a', { players: [], audience: [] }], ['b', { players: [], audience: [] }]]));
       const voters = members().map((m) => m.id).filter((id) => id !== a.authorId && id !== b.authorId);
       const t = collectVotes(['a', 'b'], voters, T.vote, () => duelResult(pids, i, prompt, a, b, tally(['a', 'b'])));
-      hostVote({ screen: 'duel', round, mult, prompt, n: i + 1, total: pids.length, a: a.text, b: b.text, deadline: t.deadline, duration: t.duration });
+      hostVote({ screen: 'duel', round, totalRounds, mult, prompt, n: i + 1, total: pids.length, a: a.text, b: b.text, deadline: t.deadline, duration: t.duration });
       for (const m of members()) {
         if (voters.includes(m.id)) {
           sendVoteView(m.id, { screen: 'vote', input: true, prompt, options: [{ id: 'a', text: a.text }, { id: 'b', text: b.text }], deadline: t.deadline, duration: t.duration }, ['a', 'b']);
@@ -271,7 +272,7 @@ export default {
       scores.add(a.authorId, pa + bonusA);
       scores.add(b.authorId, pb + bonusB);
       ctx.setHostView({
-        screen: 'duelResult', round, mult, prompt, n: i + 1, total: pids.length, winner, sweep: !!sweep,
+        screen: 'duelResult', round, totalRounds, mult, prompt, n: i + 1, total: pids.length, winner, sweep: !!sweep,
         a: { text: a.text, authorId: a.authorId, voters: ra.players, audience: ra.audience.length, points: pa + bonusA },
         b: { text: b.text, authorId: b.authorId, voters: rb.players, audience: rb.audience.length, points: pb + bonusB },
         crowd: eligibleCount(a, b),
@@ -295,7 +296,7 @@ export default {
       const prompt = promptsById.get(entries[0].promptId)?.prompt ?? '';
       const voters = members().map((m) => m.id);
       const t = collectVotes(options.map((o) => o.id), voters, T.finalVote, () => finalResult(options, prompt, isLast, champion));
-      hostVote({ screen: 'multiVote', round, mult, prompt, options: options.map((o) => ({ id: o.id, text: o.text })), deadline: t.deadline, duration: t.duration, champion });
+      hostVote({ screen: 'multiVote', round, totalRounds, mult, prompt, options: options.map((o) => ({ id: o.id, text: o.text })), deadline: t.deadline, duration: t.duration, champion });
       for (const m of members()) {
         const allowed = options.filter((o) => o.authorId !== m.id);
         sendVoteView(m.id, { screen: 'vote', input: true, prompt, options: allowed.map((o) => ({ id: o.id, text: o.text })), deadline: t.deadline, duration: t.duration }, allowed.map((o) => o.id));
@@ -312,7 +313,7 @@ export default {
       const winnerId = rows[0] && rows[0].points > 0 ? rows[0].authorId : null;
       rows.forEach((r) => scores.add(r.authorId, r.points + (champion && r.authorId === winnerId ? POINTS.champion * mult : 0)));
       if (champion && rows[0] && winnerId) rows[0].points += POINTS.champion * mult;
-      ctx.setHostView({ screen: 'multiResult', round, mult, prompt, rows, winnerId, crowd: members().length });
+      ctx.setHostView({ screen: 'multiResult', round, totalRounds, mult, prompt, rows, winnerId, crowd: members().length });
       for (const r of rows) ctx.setPlayerView(r.authorId, { screen: 'duelOutcome', won: r.authorId === winnerId, points: r.points, sweep: false, text: r.text, total: scores.get(r.authorId) });
       members().filter((m) => !rows.some((r) => r.authorId === m.id)).forEach((m) => ctx.setPlayerView(m.id, { screen: 'lookAtTv' }));
       void isLast;
@@ -352,13 +353,13 @@ export default {
           winners.push(w);
           shown.push({ text: w.text!, authorId: w.authorId, votes: best });
         });
-        ctx.setHostView({ screen: 'heatResult', round, mult, prompt, stage, winners: shown, groups: groups.length });
+        ctx.setHostView({ screen: 'heatResult', round, totalRounds, mult, prompt, stage, winners: shown, groups: groups.length });
         ctx.setAllPlayerViews((p) => ({ screen: winners.some((w) => w.authorId === p.id) ? 'advanced' : 'lookAtTv' }));
         ctx.setAudienceView({ screen: 'lookAtTv' });
         ctx.after(7, () => tournament(winners, stage + 1));
       });
-      ctx.setHostView({ screen: 'heat', round, mult, prompt, stage, groups: groups.length, entries: entries.length, deadline: t.deadline, duration: t.duration, voted: 0, voters: allVoters.length });
-      lastHostVote = { screen: 'heat', round, mult, prompt, stage, groups: groups.length, entries: entries.length, deadline: t.deadline, duration: t.duration };
+      ctx.setHostView({ screen: 'heat', round, totalRounds, mult, prompt, stage, groups: groups.length, entries: entries.length, deadline: t.deadline, duration: t.duration, voted: 0, voters: allVoters.length });
+      lastHostVote = { screen: 'heat', round, totalRounds, mult, prompt, stage, groups: groups.length, entries: entries.length, deadline: t.deadline, duration: t.duration };
       for (const id of allVoters) {
         const g = groupOf.get(id)!;
         const opts = groups[g].map((e, k) => ({ id: optionId(g, k), text: e.text!, own: e.authorId === id })).filter((o) => !o.own);

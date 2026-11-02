@@ -72,8 +72,15 @@ export function Confetti({ pieces = 28, loop = false, silent = false }: { pieces
   );
 }
 
-export function QrCode({ text, size = 168 }: { text: string; size?: number }) {
+export function QrCode({ text, size = 168, bare = false }: { text: string; size?: number; bare?: boolean }) {
   const { size: n, d } = useMemo(() => qrPath(text), [text]);
+  if (bare) {
+    return (
+      <svg width={size} height={size} viewBox={`0 0 ${n} ${n}`} role="img" aria-label={text} shapeRendering="crispEdges" style={{ display: 'block' }}>
+        <path d={d} fill="#110D24" />
+      </svg>
+    );
+  }
   return (
     <div style={{ width: size, height: size, background: '#fff', borderRadius: 18, padding: 12, flex: 'none' }}>
       <svg width={size - 24} height={size - 24} viewBox={`0 0 ${n} ${n}`} role="img" aria-label={text} shapeRendering="crispEdges">
@@ -143,7 +150,7 @@ export function ChoiceList({ options, selected, onPick, locked }: { options: Cho
     <div role="radiogroup" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       {options.map((o) => {
         const isSel = selected === o.id;
-        const style: CSSProperties = o.color ? { background: o.color, color: isLight(o.color) ? '#110D24' : '#fff', boxShadow: `0 5px 0 ${shade(o.color)}` } : {};
+        const style: CSSProperties = o.color ? { background: o.color, color: isLight(o.color) ? '#110D24' : '#fff', boxShadow: isSel ? `0 0 0 2px #fff, 0 7px 0 ${shade(o.color)}` : `0 5px 0 ${shade(o.color)}` } : {};
         return (
           <button key={o.id} type="button" role="radio" aria-checked={isSel} disabled={o.disabled || locked}
             className={`up-choice${isSel ? ' selected' : ''}${selected && !isSel ? ' dim' : ''}`} style={style} onClick={() => onPick(o.id)}>

@@ -10,7 +10,7 @@ Party-Spiele für zu Hause: Ein Bildschirm (Fernseher, Laptop, Beamer) zeigt das
 | **Bluff** | 3–12 (+ Publikum) | Glaubwürdige Lügen zu kuriosen, wahren Fakten erfinden – und die Wahrheit finden. |
 | **Kritzelei** | 3–10 (+ Publikum) | Geheime Begriffe aufs Handy zeichnen, falsche Titel erfinden, den echten finden. |
 | **Guess the Clicks!** | 2–100 | Ein zufälliges YouTube-Video läuft – wie viele Aufrufe hat es? Wer am nächsten dran ist, bekommt den Punkt. Braucht einen kostenlosen YouTube-API-Schlüssel (siehe unten). |
-| **Hochstapler** | 3–10 | Alle bekommen eine Aufgabe (Hand heben, Finger zeigen, Gesicht ziehen, auf jemanden zeigen, etwas aufschreiben) – nur einer nicht. Findet den Hochstapler, bevor er 3 Aufgaben übersteht! |
+| **Hochstapler** | 3–10 | Alle bekommen eine Aufgabe – Hand heben, Finger zeigen oder auf jemanden zeigen –, nur einer nicht. Findet den Hochstapler, bevor er 3 Aufgaben übersteht! |
 
 Neue Spiele lassen sich mit wenig Code hinzufügen und teilen – siehe [Spiele entwickeln](docs/SPIELE-ENTWICKELN.md).
 
@@ -53,8 +53,14 @@ Der Schlüssel wird nur auf deinem Rechner gespeichert (`.up-data/secrets.json`)
 - Alle Handys müssen **im selben WLAN** sein (nicht im Gäste-WLAN). Den **QR-Code** scannen oder die Adresse im Handy-Browser eingeben, dann den 4-stelligen **Raumcode**.
 - Der erste Spieler ist **VIP** (Krone) und wählt auf seinem Handy das Spiel aus.
 
+**Updates**
+
+Gibt es eine neue Version, erscheint in der TV-Lobby ein grüner Hinweis. Ein Klick auf **„Jetzt aktualisieren“** lädt sie herunter, installiert sie und startet UP! neu. Deine Einstellungen, der API-Schlüssel und eigene Fragen bleiben erhalten.
+(Das funktioniert, wenn UP! über „UP starten“ gestartet wurde.)
+
 **Tipps**
 
+- Unter **„Spiel-Einstellungen“** (TV-Lobby oder beim VIP auf dem Handy) stellt ihr Rundenanzahl, Zeiten und bei Hochstapler den Modus ein.
 - Das **Zahnrad** auf dem TV (oder die Taste `Esc`) öffnet die Einstellungen: Sprache, eigene Fotos erlauben, mehr Zeit für Antworten, Inhalte (Content-Packs) an- und ausschalten, Spieler entfernen.
 - Wer die Verbindung verliert, landet beim Neuladen der Seite automatisch wieder im Spiel.
 - Mit dem kleinen **⋯** unten rechts auf dem TV kann man ein laufendes Spiel abbrechen.

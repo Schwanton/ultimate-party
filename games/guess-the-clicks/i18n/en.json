@@ -47,5 +47,9 @@
   "setup.save": "Save and start",
   "setup.open": "Open Google page",
   "sound.on": "Turn sound on",
-  "error.network": "Can't reach YouTube. Is the computer online?"
+  "error.network": "Can't reach YouTube. Is the computer online?",
+  "extend.ask": "Watch the video longer? ({n}/{need})",
+  "extend.on": "You want more time ✓ ({n}/{need})",
+  "extend.tv": "More time? {n}/{need}",
+  "extend.done": "Time doubled! ×{n}"
 }

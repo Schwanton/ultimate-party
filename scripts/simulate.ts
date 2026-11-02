@@ -11,7 +11,7 @@ import WebSocket from 'ws';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PORT = 3271;
 
-const scenarios: { game: string; players: number }[] = [
+const scenarios: { game: string; players: number; options?: Record<string, number | string> }[] = [
   { game: '_vorlage', players: 2 },
   { game: 'schlagfertig', players: 3 },
   { game: 'schlagfertig', players: 8 },
@@ -31,11 +31,18 @@ const scenarios: { game: string; players: number }[] = [
   { game: 'hochstapler', players: 3 },
   { game: 'hochstapler', players: 6 },
   { game: 'hochstapler', players: 10 },
+  // mit Spiel-Einstellungen
+  { game: 'schlagfertig', players: 4, options: { rounds: 5, answerTime: 0.75 } },
+  { game: 'bluff', players: 4, options: { questions: 3 } },
+  { game: 'kritzelei', players: 4, options: { rounds: 1, drawTime: 45 } },
+  { game: 'guess-the-clicks', players: 3, options: { videos: 3, guessTime: 20 } },
+  { game: 'hochstapler', players: 4, options: { mode: 'point', rounds: 3 } },
+  { game: 'hochstapler', players: 4, options: { mode: 'random', rounds: 7 } },
 ];
 
 const server = spawn(process.execPath, ['--import', 'tsx', path.join(ROOT, 'server/index.ts')], {
   cwd: ROOT,
-  env: { ...process.env, PORT: String(PORT), UP_DEV: '1', UP_NO_CLIENT: '1', UP_TIME_SCALE: '0.02', UP_QUIET: '1', UP_FAKE_YOUTUBE: '1' },
+  env: { ...process.env, PORT: String(PORT), UP_DEV: '1', UP_NO_CLIENT: '1', UP_TIME_SCALE: '0.02', UP_QUIET: '1', UP_FAKE_YOUTUBE: '1', UP_NO_UPDATE: '1' },
   stdio: ['ignore', 'pipe', 'pipe'],
 });
 let serverErrors = '';
@@ -63,7 +70,7 @@ async function waitForServer() {
   throw new Error('Server startet nicht');
 }
 
-async function run({ game, players }: { game: string; players: number }) {
+async function run({ game, players, options }: { game: string; players: number; options?: Record<string, number | string> }) {
   const ws = await connect();
   let id = 1;
   const pending = new Map<number, (m: any) => void>();
@@ -88,7 +95,11 @@ async function run({ game, players }: { game: string; players: number }) {
   for (let left = players; left > 0; left -= 20) send('bots:add', { count: Math.min(20, left) });
   await new Promise((r) => setTimeout(r, 300));
   send('select', { gameId: game });
-  await new Promise((r) => setTimeout(r, 100));
+  for (const [id, value] of Object.entries(options ?? {})) send('gameOption', { gameId: game, id, value });
+  await new Promise((r) => setTimeout(r, 150));
+  for (const [id, value] of Object.entries(options ?? {})) {
+    if (state?.room?.settings?.gameOptions?.[game]?.[id] !== value) throw new Error(`Einstellung ${id} wurde nicht übernommen`);
+  }
   const started = await req('start');
   if (!started.ok) throw new Error(`Start fehlgeschlagen: ${started.error}`);
   const t0 = Date.now();
@@ -107,7 +118,7 @@ let failed = 0;
 try {
   await waitForServer();
   for (const s of scenarios) {
-    const label = `${s.game.padEnd(13)} ${String(s.players).padStart(3)} Spieler`;
+    const label = `${s.game.padEnd(13)} ${String(s.players).padStart(3)} Spieler${s.options ? ' ' + JSON.stringify(s.options) : ''}`;
     try {
       const r = await run(s);
       console.log(`✔ ${label}  ${r.seconds}s  Rangliste: ${r.ranked}  Bester: ${r.top}  [${r.screens}]`);

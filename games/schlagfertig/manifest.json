@@ -1,6 +1,9 @@
 {
   "id": "schlagfertig",
-  "name": { "de": "Schlagfertig", "en": "Quick Wit" },
+  "name": {
+    "de": "Schlagfertig",
+    "en": "Quick Wit"
+  },
   "description": {
     "de": "Schreibt die witzigste Antwort auf schräge Fragen – die anderen stimmen ab.",
     "en": "Write the funniest answer to odd prompts – everyone else votes."
@@ -11,7 +14,56 @@
   "minutes": 15,
   "color": "#E8336F",
   "sdkVersion": 1,
-  "contentFields": ["prompt"],
+  "contentFields": [
+    "prompt"
+  ],
   "version": "1.0.0",
-  "author": "UP!"
+  "author": "UP!",
+  "options": [
+    {
+      "id": "rounds",
+      "label": {
+        "de": "Runden",
+        "en": "Rounds"
+      },
+      "default": 3,
+      "min": 2,
+      "max": 6,
+      "help": {
+        "de": "Die letzte Runde ist das Finale mit einer Frage für alle.",
+        "en": "The last round is the final with one prompt for everyone."
+      }
+    },
+    {
+      "id": "answerTime",
+      "label": {
+        "de": "Zeit zum Antworten",
+        "en": "Time to answer"
+      },
+      "default": 1,
+      "choices": [
+        {
+          "value": 0.75,
+          "label": {
+            "de": "Kurz",
+            "en": "Short"
+          }
+        },
+        {
+          "value": 1,
+          "label": {
+            "de": "Normal",
+            "en": "Normal"
+          }
+        },
+        {
+          "value": 1.5,
+          "label": {
+            "de": "Lang",
+            "en": "Long"
+          }
+        }
+      ]
+    }
+  ]
 }

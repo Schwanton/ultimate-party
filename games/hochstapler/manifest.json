@@ -1,6 +1,9 @@
 {
   "id": "hochstapler",
-  "name": { "de": "Hochstapler", "en": "Undercover" },
+  "name": {
+    "de": "Hochstapler",
+    "en": "Undercover"
+  },
   "description": {
     "de": "Alle bekommen eine Aufgabe – nur einer nicht. Der Hochstapler muss mitmachen, ohne aufzufliegen.",
     "en": "Everyone gets a task – except one. The undercover player must blend in without getting caught."
@@ -11,7 +14,106 @@
   "minutes": 15,
   "color": "#9B7BFF",
   "sdkVersion": 1,
-  "contentFields": ["category", "task"],
+  "contentFields": [
+    "category",
+    "task"
+  ],
   "version": "1.0.0",
-  "author": "UP!"
+  "author": "UP!",
+  "options": [
+    {
+      "id": "mode",
+      "label": {
+        "de": "Spielmodus",
+        "en": "Game mode"
+      },
+      "default": "rotate",
+      "choices": [
+        {
+          "value": "rotate",
+          "label": {
+            "de": "Alle drei abwechselnd",
+            "en": "All three in turn"
+          }
+        },
+        {
+          "value": "random",
+          "label": {
+            "de": "Zufällig",
+            "en": "Random"
+          }
+        },
+        {
+          "value": "hands",
+          "label": {
+            "de": "Nur Hand heben",
+            "en": "Hands only"
+          }
+        },
+        {
+          "value": "number",
+          "label": {
+            "de": "Nur Finger zeigen",
+            "en": "Fingers only"
+          }
+        },
+        {
+          "value": "point",
+          "label": {
+            "de": "Nur Zeigen",
+            "en": "Pointing only"
+          }
+        }
+      ]
+    },
+    {
+      "id": "rounds",
+      "label": {
+        "de": "Runden",
+        "en": "Rounds"
+      },
+      "default": 0,
+      "choices": [
+        {
+          "value": 0,
+          "label": {
+            "de": "Automatisch",
+            "en": "Auto"
+          }
+        },
+        {
+          "value": 3,
+          "label": {
+            "de": "3",
+            "en": "3"
+          }
+        },
+        {
+          "value": 5,
+          "label": {
+            "de": "5",
+            "en": "5"
+          }
+        },
+        {
+          "value": 7,
+          "label": {
+            "de": "7",
+            "en": "7"
+          }
+        },
+        {
+          "value": 10,
+          "label": {
+            "de": "10",
+            "en": "10"
+          }
+        }
+      ],
+      "help": {
+        "de": "Automatisch: so viele Runden wie Spieler (höchstens 5) – jeder ist einmal Hochstapler.",
+        "en": "Auto: as many rounds as players (max. 5) – everyone is undercover once."
+      }
+    }
+  ]
 }

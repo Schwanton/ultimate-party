@@ -39,7 +39,8 @@ export default {
   create(ctx: GameContext) {
     const ids = ctx.players.map((p) => p.id);
     const scores = new Scores(ids);
-    const totalRounds = ids.length <= 5 ? 2 : 1;
+    const totalRounds = Number(ctx.options.rounds) || (ids.length <= 5 ? 2 : 1);
+    const drawTime = Number(ctx.options.drawTime) || T.draw;
     const words = ctx.content<Word>();
     let wordIndex = 0;
     let round = 0;
@@ -70,7 +71,7 @@ export default {
       drawings = new Map();
       ids.forEach((id) => secret.set(id, words[wordIndex++ % words.length]?.word ?? '?'));
       phase = 'draw';
-      timer = ctx.timer(T.draw, endDrawing);
+      timer = ctx.timer(drawTime, endDrawing);
       hostDraw();
       ids.forEach((id) => ctx.setPlayerView(id, { screen: 'draw', input: true, word: secret.get(id), deadline: timer!.deadline, duration: timer!.duration }));
       ctx.setAudienceView({ screen: 'audienceWait' });

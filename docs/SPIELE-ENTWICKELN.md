@@ -47,6 +47,18 @@ games/mein-spiel/
 - `audience: true` – wer über `maxPlayers` hinaus beitritt, ist Publikum und bekommt eigene Ansichten (z. B. mit abstimmen).
 - `contentFields` – Pflichtfelder jedes Content-Eintrags. Packs ohne diese Felder werden abgelehnt.
 - `hidden: true` – Spiel nur im Entwicklermodus zeigen.
+- `options` – Spiel-Einstellungen für die Lobby, z. B. Rundenanzahl. Zahl mit `min`/`max`/`step` oder Auswahl mit `choices`:
+
+```json
+"options": [
+  { "id": "rounds", "label": { "de": "Runden", "en": "Rounds" }, "default": 3, "min": 1, "max": 10 },
+  { "id": "speed", "label": { "de": "Tempo", "en": "Speed" }, "default": "normal",
+    "choices": [ { "value": "normal", "label": { "de": "Normal", "en": "Normal" } },
+                 { "value": "fast", "label": { "de": "Schnell", "en": "Fast" } } ] }
+]
+```
+
+  Im Spiel: `ctx.options.rounds` (immer gültig, sonst Standardwert).
 
 ## Grundidee: Ansichten statt Spielzustand
 
@@ -101,6 +113,8 @@ export default {
 | `ctx.setAllPlayerViews(p => view)` | Ansicht für alle Mitspieler |
 | `ctx.setAudienceView(view)` | Ansicht fürs Publikum |
 | `ctx.timer(sek, fn)` | Countdown; liefert `deadline`/`duration` für die Anzeige. Berücksichtigt die Einstellung „mehr Zeit“. |
+| `ctx.timerAt(zeitpunkt, fn)` | Countdown bis zu einem festen Zeitpunkt – z. B. um einen Timer zu verlängern |
+| `ctx.options` | gewählte Spiel-Einstellungen |
 | `ctx.after(sek, fn)` | kurze Pause, z. B. für Animationen |
 | `ctx.secret(id)` | geheime Einstellung lesen, z. B. einen API-Schlüssel (im Manifest unter `secrets` deklarieren; der Host trägt ihn in den Einstellungen ein) |
 | `ctx.finish(ranking)` | Spiel beendet; Rangliste wird gemeldet (später für den Olympia-Modus) |

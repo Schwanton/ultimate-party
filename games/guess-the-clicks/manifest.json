@@ -33,5 +33,55 @@
       },
       "url": "https://developers.google.com/youtube/v3/getting-started"
     }
+  ],
+  "options": [
+    {
+      "id": "videos",
+      "label": {
+        "de": "Videos",
+        "en": "Videos"
+      },
+      "default": 8,
+      "min": 3,
+      "max": 20
+    },
+    {
+      "id": "guessTime",
+      "label": {
+        "de": "Zeit zum Tippen",
+        "en": "Time to guess"
+      },
+      "default": 40,
+      "choices": [
+        {
+          "value": 20,
+          "label": {
+            "de": "20 s",
+            "en": "20 s"
+          }
+        },
+        {
+          "value": 40,
+          "label": {
+            "de": "40 s",
+            "en": "40 s"
+          }
+        },
+        {
+          "value": 60,
+          "label": {
+            "de": "60 s",
+            "en": "60 s"
+          }
+        },
+        {
+          "value": 90,
+          "label": {
+            "de": "90 s",
+            "en": "90 s"
+          }
+        }
+      ]
+    }
   ]
 }

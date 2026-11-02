@@ -47,5 +47,9 @@
   "setup.save": "Speichern und los",
   "setup.open": "Google-Seite öffnen",
   "sound.on": "Ton einschalten",
-  "error.network": "Keine Verbindung zu YouTube. Ist der Rechner online?"
+  "error.network": "Keine Verbindung zu YouTube. Ist der Rechner online?",
+  "extend.ask": "Video länger ansehen? ({n}/{need})",
+  "extend.on": "Du willst mehr Zeit ✓ ({n}/{need})",
+  "extend.tv": "Mehr Zeit? {n}/{need}",
+  "extend.done": "Zeit verdoppelt! ×{n}"
 }

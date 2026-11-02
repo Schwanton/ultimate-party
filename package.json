@@ -1,6 +1,6 @@
 {
   "name": "ultimate-party",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "description": "UP! – Ultimate Party: Party-Spiele, bei denen das Handy der Controller ist",
   "license": "MIT",
   "private": true,
@@ -29,5 +29,9 @@
   },
   "engines": {
     "node": ">=20"
+  },
+  "upUpdate": {
+    "repo": "Schwanton/ultimate-party",
+    "branch": "main"
   }
 }

@@ -13,13 +13,12 @@ interface Item {
   answer: string;
 }
 
-const ROUNDS = 3;
 
 export default {
   create(ctx: GameContext) {
     const ids = ctx.players.map((p) => p.id);
     const scores = new Scores(ids);
-    const items = ctx.content<Item>().slice(0, ROUNDS);
+    const items = ctx.content<Item>().slice(0, Number(ctx.options.rounds) || 3);
     let round = 0;
     let guesses = new Map<string, number>();
     let timer: { cancel(): void } | null = null;

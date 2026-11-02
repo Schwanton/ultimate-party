@@ -6,13 +6,13 @@
 import { Scores, type GameContext, type GameServerModule } from '@up/sdk';
 import { YouTubeError, checkKey, fakeVideo, randomVideo, type Video } from './youtube';
 
-const ROUNDS = 8;
-const GUESS_TIME = 40;
 const LAST_CHANCE = 5;
 const MAX_GUESS = 100_000_000_000;
 
 export default {
   create(ctx: GameContext) {
+    const ROUNDS = Number(ctx.options.videos) || 8;
+    const GUESS_TIME = Number(ctx.options.guessTime) || 40;
     const ids = ctx.players.map((p) => p.id);
     const scores = new Scores(ids);
     const videos: Video[] = [];
@@ -24,6 +24,11 @@ export default {
     let disposed = false;
     let loadingDone = false;
     let waited = 0;
+    let extendVotes = new Set<string>();
+    let extensions = 0;
+    let baseDuration = 0;
+    /** So viele Stimmen braucht es für „Video länger“ (mindestens die Hälfte der verbundenen Spieler) */
+    const extendNeeded = () => Math.max(1, Math.ceil(ids.filter((p) => ctx.player(p)?.connected).length / 2));
 
     const members = () => [...ids, ...ctx.audience().map((a) => a.id)];
     const isPlayer = (id: string) => ids.includes(id);
@@ -98,7 +103,7 @@ export default {
         }
         return showScores(true);
       }
-      if (round === 4 && phase !== 'other') return showScores(false);
+      if (round === Math.floor(ROUNDS / 2) && ROUNDS >= 6 && phase !== 'other') return showScores(false);
       // 3-Sekunden-Countdown vor jeder Runde
       phase = 'countdown';
       ctx.setHostView({ screen: 'countdown', n: round + 1, total: ROUNDS, key: Math.random() });
@@ -110,7 +115,10 @@ export default {
     function startGuess() {
       phase = 'guess';
       guesses = new Map();
+      extendVotes = new Set();
+      extensions = 0;
       timer = ctx.timer(GUESS_TIME, reveal);
+      baseDuration = timer.duration;
       sendGuessViews();
     }
 
@@ -119,6 +127,7 @@ export default {
       ctx.setHostView({
         screen: 'guess', n: round + 1, total: ROUNDS, video: { id: v.id, title: v.title, channel: v.channel, published: v.published, durationSec: v.durationSec },
         guessed: [...guesses.keys()].filter(isPlayer).length, players: ids.length, deadline: timer!.deadline, duration: timer!.duration,
+        extendVotes: extendVotes.size, extendNeeded: extendNeeded(), extensions,
       });
     }
 
@@ -127,6 +136,7 @@ export default {
       ctx.setPlayerView(id, {
         screen: 'guess', input: !guesses.has(id), title: v.title, videoId: v.id, guess: guesses.get(id) ?? null,
         deadline: timer!.deadline, duration: timer!.duration,
+        canExtend: isPlayer(id), wantsExtend: extendVotes.has(id), extendVotes: extendVotes.size, extendNeeded: extendNeeded(), extensions,
       });
     }
 
@@ -186,6 +196,20 @@ export default {
         if (phase === 'setup') void load();
       },
       onAction(id, action) {
+        if (phase === 'guess' && action?.type === 'extend' && isPlayer(id)) {
+          if (action.on === false) extendVotes.delete(id);
+          else extendVotes.add(id);
+          if (extendVotes.size >= extendNeeded()) {
+            // Zeit verdoppeln: noch einmal die volle Rate-Zeit obendrauf
+            const end = timer!.deadline + baseDuration;
+            timer?.cancel();
+            timer = ctx.timerAt(end, reveal);
+            extendVotes = new Set();
+            extensions++;
+          }
+          sendGuessViews();
+          return;
+        }
         if (phase === 'setup' && action?.type === 'setKey' && typeof action.key === 'string' && action.key.trim().length > 10) {
           ctx.setSecret('youtubeApiKey', action.key.trim());
           void load();

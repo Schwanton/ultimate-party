@@ -5,6 +5,8 @@ import { guessLang, useT } from '../i18n';
 import { clientGame } from '../registry';
 import { Avatar, Crown, Logo, QrCode, Stage, isLight, sfx, shade } from '../ui';
 import { HostSettings } from './HostSettings';
+import { GameOptionsForm, optionsSummary } from './GameOptions';
+import { UpdateBanner } from './Update';
 
 async function connectHost() {
   const saved = loadSession('host');
@@ -66,6 +68,7 @@ export function HostApp() {
         {s.status !== 'open' && <ConnectionBanner text={t('status.reconnecting')} />}
         {Host && s.host.view ? <Host view={s.host.view} room={room} t={t} player={player} setSecret={async (id: string, value: string) => !!(await net.request('secret', { gameId: room.gameId, id, value })).ok} /> : <div className="muted">…</div>}
         <GameMenu finished={room.finished} vip={room.vipId ? player(room.vipId) : undefined} />
+        <CornerJoin code={room.code} url={`${room.joinUrl}/?r=${room.code}`} />
       </Stage>
     );
   }
@@ -112,6 +115,18 @@ function SoundButton({ label }: { label: string }) {
     <button className="up-btn small" onClick={() => { sfx.unlock(); setTimeout(() => sfx.play('join'), 150); }} style={{ animation: 'upTick 1.4s ease-in-out infinite' }}>
       {label}
     </button>
+  );
+}
+
+/** Raumcode + QR-Code klein unten links (im Randbereich), damit Nachzügler jederzeit beitreten können */
+function CornerJoin({ code, url }: { code: string; url: string }) {
+  return (
+    <div aria-label={code} style={{ position: 'absolute', left: 4, bottom: 4, width: 50, zIndex: 44, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, opacity: 0.9 }}>
+      <span className="display" style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1, color: 'var(--yellow)' }}>{code}</span>
+      <div style={{ width: 50, height: 50, background: '#fff', borderRadius: 7, padding: 3 }}>
+        <QrCode text={url} size={44} bare />
+      </div>
+    </div>
   );
 }
 
@@ -170,6 +185,7 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
   const lastResult = host.results.at(-1);
   const lastWinner = lastResult?.ranking[0] ? players.find((p) => p.id === lastResult.ranking[0].playerId) : undefined;
   const canStart = !!selected && active.length >= selected.minPlayers;
+  const [optionsOpen, setOptionsOpen] = useState(false);
 
   const setLang = (lang: Lang) => {
     try { localStorage.setItem('up:lang', lang); } catch { /* egal */ }
@@ -207,6 +223,19 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
       </header>
 
       {host.notice && <div className="up-error" style={{ fontSize: 18 }}>{t(`error.${host.notice}`)}</div>}
+      <UpdateBanner />
+      {optionsOpen && selected && (
+        <div role="dialog" aria-modal="true" aria-label={t('lobby.gameSettings')} onClick={() => setOptionsOpen(false)}
+          style={{ position: 'absolute', inset: 0, zIndex: 70, background: 'rgba(10,7,22,.82)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="up-card anim-pop" onClick={(e) => e.stopPropagation()} style={{ width: 720, maxHeight: 640, overflow: 'auto', padding: 32, display: 'flex', flexDirection: 'column', gap: 22, borderRadius: 28, borderTop: `8px solid ${selected.color}` }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h2 style={{ fontSize: 30 }}>{selected.name[room.lang] ?? selected.name.en}</h2>
+              <button className="up-btn small" onClick={() => setOptionsOpen(false)}>{t('settings.close')}</button>
+            </div>
+            <GameOptionsForm game={selected} values={room.settings.gameOptions?.[selected.id]} lang={room.lang} />
+          </div>
+        </div>
+      )}
 
       <main style={{ flex: 1, minHeight: 0, display: 'flex', gap: 24 }}>
         <section className="up-card" style={{ width: 480, padding: 32, display: 'flex', flexDirection: 'column', gap: 20, borderRadius: 28 }}>
@@ -240,8 +269,14 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
               {lastWinner ? t('lobby.lastWinner', { name: lastWinner.name }) + ' · ' : ''}
               {vip ? t('lobby.vipPicks', { name: vip.name }) : t('lobby.waitingForPlayers')}
             </p>
-            {canStart && <button className="up-btn small" onClick={() => net.request('start')}>{t('lobby.start')}</button>}
+            <div style={{ display: 'flex', gap: 10, flex: 'none' }}>
+              {selected?.options?.length ? <button className="up-btn ghost small" onClick={() => setOptionsOpen(true)}>{t('lobby.gameSettings')}</button> : null}
+              {canStart && <button className="up-btn small" onClick={() => net.request('start')}>{t('lobby.start')}</button>}
+            </div>
           </div>
+          {selected?.options?.length ? (
+            <p className="faint" style={{ fontSize: 14, marginTop: -8 }}>{optionsSummary(selected, room.settings.gameOptions?.[selected.id], room.lang)}</p>
+          ) : null}
         </section>
       </main>
 
@@ -253,7 +288,7 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
           return (
             <button key={g.id} onClick={() => net.send('select', { gameId: g.id })} style={{
               border: 0, textAlign: 'left', background: g.color, borderRadius: 22, padding: games.length > 4 ? '14px 16px' : '18px 22px', color: light ? '#110D24' : '#fff',
-              boxShadow: `0 6px 0 ${shade(g.color)}${sel ? ', 0 0 0 4px #fff' : ''}`, transform: sel ? 'translateY(-6px)' : undefined,
+              boxShadow: `${sel ? '0 0 0 4px #fff, ' : ''}0 ${sel ? 10 : 6}px 0 ${shade(g.color)}`, transform: sel ? 'translateY(-6px)' : undefined,
               display: 'flex', flexDirection: 'column', justifyContent: 'space-between', opacity: fits || sel ? 1 : 0.55, transition: 'transform .2s',
             }}>
               <span style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>

@@ -18,6 +18,7 @@ export interface HostData {
   packs: PackInfo[];
   notice: string | null;
   results: { gameId: string; ranking: { playerId: string; score: number }[] }[];
+  update?: { state: string; current: string; latest?: string; notes?: string[]; error?: string; git?: boolean };
   view: any;
 }
 

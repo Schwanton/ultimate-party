@@ -11,7 +11,7 @@ Dieses Dokument hält fest, was beim Bauen entschieden wurde (ohne Rückfrage) u
 | 3 · Schlagfertig, Bluff, Kritzelei mit Basis-Packs DE/EN | fertig |
 | Zusatz · Guess the Clicks! (YouTube-Aufrufe schätzen) | fertig |
 | Zusatz · Hochstapler (à la „Fakin' It“) | fertig |
-| 4 · Sounds | fertig |
+| 4 · Sounds, Spiel-Einstellungen, Updater | fertig |
 | 4 · Olympia-Modus, Teams, Pack-Import per Drag & Drop, Spiele-Import | offen |
 | 5 · Fertige `.app` / `.exe`, Online-Modus | offen |
 
@@ -58,10 +58,29 @@ React bleibt wie besprochen. Ein Umstieg auf Vite/Tailwind wäre später möglic
 - Neu in der Plattform: Spiele können im Manifest „secrets“ (z. B. API-Schlüssel) anfordern. Der Host trägt sie in den Einstellungen ein; gespeichert in `.up-data/secrets.json`, nur der Server liest sie (`ctx.secret()`).
 
 **Hochstapler** (nach dem Prinzip von „Fakin' It“, eigene Umsetzung und Texte)
-- Runden = Spielerzahl, höchstens 5; jede Runde ein neuer Hochstapler und eine Kategorie: Hand hoch, Finger zeigen, Gesicht ziehen, auf jemanden zeigen, aufschreiben. Der Hochstapler kennt nur die Kategorie.
-- Ablauf pro Aufgabe: 7 s lesen → Countdown 3-2-1 → „JETZT!“ (7 s halten) bzw. 40 s schreiben + Antworten auf dem TV → 45 s diskutieren und abstimmen (wenn alle gewählt haben: noch 5 s).
-- Mehr als die Hälfte auf dieselbe Person = Anklage. Hochstapler erwischt: jeder, der richtig getippt hat, bekommt 1000 / 750 / 500 (Aufgabe 1/2/3), der Hochstapler 250 pro überstandener Aufgabe. Unschuldigen angeklagt oder 3 Aufgaben ohne Mehrheit: Hochstapler +2000.
-- 75 Aufgaben pro Sprache (15 je Kategorie).
+- Drei Modi: Hand heben (gelb), Finger zeigen (cyan), auf jemanden zeigen (grün) – jeweils mit eigener Farbe und Piktogramm. „Gesicht ziehen“ und „Aufschreiben“ wurden nach dem ersten Test entfernt.
+- Einstellung „Spielmodus“: alle drei abwechselnd (Standard), zufällig oder nur einer. Runden: automatisch (= Spielerzahl, höchstens 5) oder 3/5/7/10.
+- Der Hochstapler sieht Kategorie, eine konkrete Anleitung („Beim JETZT! heben alle die Hand – oder nicht …“) und drei Schritte. Sein Handy hat dieselbe Farbe und dasselbe Piktogramm wie die der anderen, damit ihn niemand per Blick aufs Handy enttarnt.
+- Ablauf pro Aufgabe: 7 s lesen → 3-2-1 → „JETZT!“ (7 s halten, Handy vibriert) → 45 s diskutieren und abstimmen (wenn alle gewählt haben: noch 5 s).
+- Mehr als die Hälfte auf dieselbe Person = Anklage. Erwischt: jeder Richtige bekommt 1000 / 750 / 500 (Aufgabe 1/2/3), der Hochstapler 250 pro überstandener Aufgabe. Unschuldigen angeklagt oder 3 Aufgaben ohne Mehrheit: Hochstapler +2000.
+- 45 Aufgaben pro Sprache (15 je Modus).
+
+**Spiel-Einstellungen**
+- Jedes Spiel kann im Manifest `options` anbieten. Sie stehen in der TV-Lobby unter „Spiel-Einstellungen“ und beim VIP auf dem Handy; gelten pro Raum.
+- Schlagfertig: Runden 2–6 (letzte = Finale, ×3), Antwortzeit kurz/normal/lang. Bluff: 3–12 Fragen (zweite Hälfte ×2, letzte ×3), Zeit für Lügen. Kritzelei: Runden automatisch/1–3, Zeichenzeit 45 s/75 s/2 Min. Guess the Clicks!: 3–20 Videos, Tippzeit 20–90 s. Hochstapler: Modus und Runden.
+
+**Guess the Clicks! – „Video länger“**
+- Jeder Spieler kann während des Tippens „Video länger ansehen?“ antippen. Sobald mindestens die Hälfte der verbundenen Spieler dafür ist, kommt die volle Tippzeit noch einmal obendrauf (Zeit verdoppelt). Danach wird neu gezählt – beliebig oft.
+
+**Raumcode im Spiel**
+- Unten links (im Randbereich der Bühne, ohne Spielinhalte zu verdecken) stehen während jedes Spiels Raumcode und ein kleiner QR-Code. Nachzügler werden Publikum bzw. sind in der nächsten Runde dabei.
+
+**Updater**
+- Version steht in `package.json` („version“). Beim Start und alle 30 Minuten prüft UP! auf GitHub (`raw.githubusercontent.com`), ob es eine neuere gibt; dann erscheint in der TV-Lobby ein grüner Hinweis mit den Neuerungen aus `CHANGELOG.md`.
+- „Jetzt aktualisieren“ lädt das ZIP von GitHub, entpackt es (mit `tar`, auf macOS und Windows 10+ eingebaut) und überschreibt die Programmdateien. Unangetastet bleiben `.up-data/` (Einstellungen, API-Schlüssel), `node_modules/`, eigene Spiele und eigene Content-Packs. Haben sich Pakete geändert, wird `npm install` ausgeführt.
+- Danach beendet sich UP!, und das Startskript startet es automatisch neu (Datei `.up-data/restart`). Der TV lädt sich selbst neu; Handys müssen neu beitreten. Updates sind nur in der Lobby möglich.
+- Git-Checkouts (Entwickler) werden nicht automatisch aktualisiert, sondern bekommen den Hinweis „git pull“.
+- Wichtig für jede neue Version: `version` in `package.json` erhöhen und einen Abschnitt in `CHANGELOG.md` ergänzen.
 
 **Sounds**
 - Alle Sounds und die Lobby-Musik werden live im Browser erzeugt (Web Audio) – keine Audiodateien, keine Lizenzfragen, funktioniert offline.

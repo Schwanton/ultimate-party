@@ -86,7 +86,8 @@ textarea.up-input { resize: none; line-height: 1.3; }
   box-shadow: 0 5px 0 #0A0716; transition: transform .1s, opacity .2s, border-color .2s;
 }
 .up-choice:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 2px 0 #0A0716; }
-.up-choice.selected { border-color: #fff; background: var(--surface-2); }
+.up-choice.selected { border-color: #fff; background: var(--surface-2); box-shadow: 0 0 0 2px #fff, 0 7px 0 #0A0716; }
+.up-choice.selected:active:not(:disabled) { box-shadow: 0 0 0 2px #fff, 0 4px 0 #0A0716; }
 .up-choice.dim { opacity: .4; }
 .up-choice:disabled { cursor: default; }
 
