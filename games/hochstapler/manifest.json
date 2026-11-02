@@ -1,0 +1,17 @@
+{
+  "id": "hochstapler",
+  "name": { "de": "Hochstapler", "en": "Undercover" },
+  "description": {
+    "de": "Alle bekommen eine Aufgabe – nur einer nicht. Der Hochstapler muss mitmachen, ohne aufzufliegen.",
+    "en": "Everyone gets a task – except one. The undercover player must blend in without getting caught."
+  },
+  "minPlayers": 3,
+  "maxPlayers": 10,
+  "audience": false,
+  "minutes": 15,
+  "color": "#9B7BFF",
+  "sdkVersion": 1,
+  "contentFields": ["category", "task"],
+  "version": "1.0.0",
+  "author": "UP!"
+}

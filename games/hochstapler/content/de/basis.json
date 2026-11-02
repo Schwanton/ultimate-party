@@ -1,0 +1,307 @@
+{
+ "name": "Basis",
+ "author": "UP!",
+ "version": "1.0.0",
+ "items": [
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du schon mal in einem Flugzeug geschlafen hast."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du Ananas auf Pizza magst."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du heute schon Kaffee getrunken hast."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du ein Instrument spielen kannst."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du schon mal etwas Wichtiges im Taxi oder Zug vergessen hast."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du lieber am Meer als in den Bergen Urlaub machst."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du schon mal bei einem Film geweint hast."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du schwimmen kannst."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du ein Haustier hast."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du schon mal einen Knochen gebrochen hast."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du schon mal auf einer Bühne standest."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du morgens gerne früh aufstehst."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du schon mal in einem anderen Land gewohnt hast."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du Horrorfilme magst."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du schon mal ein Rad gewechselt hast."
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie viele Tassen Kaffee oder Tee trinkst du am Tag?"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie viele Stunden Schlaf brauchst du mindestens? (max. 10)"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie gut kannst du kochen? (0 bis 10)"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie viele Geschwister hast du?"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie sehr magst du Montage? (0 bis 10)"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie viele Länder hast du schon besucht? (max. 10)"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie gut tanzt du? (0 bis 10)"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie viele Apps hast du heute schon geöffnet? (max. 10)"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie abenteuerlustig bist du? (0 bis 10)"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie viele Paar Schuhe besitzt du? (max. 10)"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie sehr magst du Spinnen? (0 bis 10)"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie oft warst du diese Woche einkaufen?"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie pünktlich bist du normalerweise? (0 bis 10)"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie viele Minuten brauchst du morgens im Bad? (in 5er-Schritten, max. 10 Finger)"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie gut kannst du singen? (0 bis 10)"
+  },
+  {
+   "category": "face",
+   "task": "Mach ein Gesicht, als hättest du gerade in eine Zitrone gebissen."
+  },
+  {
+   "category": "face",
+   "task": "Mach ein Gesicht, als hättest du im Lotto gewonnen."
+  },
+  {
+   "category": "face",
+   "task": "Mach ein Gesicht, als würdest du gleich niesen."
+  },
+  {
+   "category": "face",
+   "task": "Mach ein Gesicht, als hättest du deinen Schlüssel verloren."
+  },
+  {
+   "category": "face",
+   "task": "Mach ein Gesicht wie eine Katze, die etwas vom Tisch geschubst hat."
+  },
+  {
+   "category": "face",
+   "task": "Mach ein Gesicht, als hättest du einen Geist gesehen."
+  },
+  {
+   "category": "face",
+   "task": "Mach ein Gesicht, als würdest du ein Baby anlächeln."
+  },
+  {
+   "category": "face",
+   "task": "Mach ein Gesicht, als wärst du ein sehr strenger Lehrer."
+  },
+  {
+   "category": "face",
+   "task": "Mach ein Gesicht, als würde etwas furchtbar stinken."
+  },
+  {
+   "category": "face",
+   "task": "Mach ein Gesicht, als hättest du gerade eine Spinne auf deinem Arm entdeckt."
+  },
+  {
+   "category": "face",
+   "task": "Mach ein Gesicht, als würdest du einen sehr schlechten Witz hören."
+  },
+  {
+   "category": "face",
+   "task": "Mach ein Gesicht, als wärst du todmüde."
+  },
+  {
+   "category": "face",
+   "task": "Mach ein Gesicht, als hättest du gerade die beste Pizza deines Lebens gegessen."
+  },
+  {
+   "category": "face",
+   "task": "Mach ein Gesicht wie ein Model auf dem Laufsteg."
+  },
+  {
+   "category": "face",
+   "task": "Mach ein Gesicht, als würdest du ein Geheimnis verbergen."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten zu spät kommt."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten in einer Zombie-Apokalypse überlebt."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten heimlich Schlager hört."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten berühmt wird."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am besten kochen kann."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten ihr Handy verliert."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten bei einem Horrorfilm schreit."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten einen Marathon läuft."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten mit Pflanzen spricht."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten in einer Quizshow gewinnt."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten ein Geheimnis ausplaudert."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten zehn Katzen hat."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am lautesten lacht."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten auswandert."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten Weihnachtsdeko im Oktober aufhängt."
+  },
+  {
+   "category": "text",
+   "task": "Schreib auf: Dein Lieblingsessen."
+  },
+  {
+   "category": "text",
+   "task": "Schreib auf: Ein Tier, das du gerne wärst."
+  },
+  {
+   "category": "text",
+   "task": "Schreib auf: Das Erste, was du morgens machst."
+  },
+  {
+   "category": "text",
+   "task": "Schreib auf: Ein Ort, an den du gerne reisen würdest."
+  },
+  {
+   "category": "text",
+   "task": "Schreib auf: Ein Wort, das dich beschreibt."
+  },
+  {
+   "category": "text",
+   "task": "Schreib auf: Deine liebste Jahreszeit und warum."
+  },
+  {
+   "category": "text",
+   "task": "Schreib auf: Eine Superkraft, die du gerne hättest."
+  },
+  {
+   "category": "text",
+   "task": "Schreib auf: Ein Lied, das du laut mitsingst."
+  },
+  {
+   "category": "text",
+   "task": "Schreib auf: Was du mit einer Million Euro als Erstes kaufen würdest."
+  },
+  {
+   "category": "text",
+   "task": "Schreib auf: Dein liebstes Brettspiel oder Kartenspiel."
+  },
+  {
+   "category": "text",
+   "task": "Schreib auf: Ein Geräusch, das du nicht ausstehen kannst."
+  },
+  {
+   "category": "text",
+   "task": "Schreib auf: Ein Beruf, den du nie machen möchtest."
+  },
+  {
+   "category": "text",
+   "task": "Schreib auf: Das beste Eis."
+  },
+  {
+   "category": "text",
+   "task": "Schreib auf: Ein Hobby, das du gerne anfangen würdest."
+  },
+  {
+   "category": "text",
+   "task": "Schreib auf: Was in deinem Kühlschrank immer drin ist."
+  }
+ ]
+}

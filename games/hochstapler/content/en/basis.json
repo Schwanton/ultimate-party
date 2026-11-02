@@ -1,0 +1,307 @@
+{
+ "name": "Basic",
+ "author": "UP!",
+ "version": "1.0.0",
+ "items": [
+  {
+   "category": "hands",
+   "task": "Raise your hand if you've ever fallen asleep on a plane."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you like pineapple on pizza."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you've had coffee today."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you can play an instrument."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you've ever left something important in a taxi or train."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you prefer beach holidays to mountain holidays."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you've ever cried at a movie."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you can swim."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you have a pet."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you've ever broken a bone."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you've ever been on a stage."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you like getting up early."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you've ever lived in another country."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you like horror movies."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you've ever changed a tyre."
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How many cups of coffee or tea do you drink a day?"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How many hours of sleep do you need at least? (max. 10)"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How good a cook are you? (0 to 10)"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How many siblings do you have?"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How much do you like Mondays? (0 to 10)"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How many countries have you visited? (max. 10)"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How good a dancer are you? (0 to 10)"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How many apps have you opened today? (max. 10)"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How adventurous are you? (0 to 10)"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How many pairs of shoes do you own? (max. 10)"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How much do you like spiders? (0 to 10)"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How many times did you go shopping this week?"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How punctual are you usually? (0 to 10)"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How many minutes do you spend in the bathroom in the morning? (in fives, max. 10 fingers)"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How well can you sing? (0 to 10)"
+  },
+  {
+   "category": "face",
+   "task": "Make a face like you just bit into a lemon."
+  },
+  {
+   "category": "face",
+   "task": "Make a face like you just won the lottery."
+  },
+  {
+   "category": "face",
+   "task": "Make a face like you're about to sneeze."
+  },
+  {
+   "category": "face",
+   "task": "Make a face like you've lost your keys."
+  },
+  {
+   "category": "face",
+   "task": "Make a face like a cat that just pushed something off the table."
+  },
+  {
+   "category": "face",
+   "task": "Make a face like you've seen a ghost."
+  },
+  {
+   "category": "face",
+   "task": "Make a face like you're smiling at a baby."
+  },
+  {
+   "category": "face",
+   "task": "Make a face like a very strict teacher."
+  },
+  {
+   "category": "face",
+   "task": "Make a face like something smells terrible."
+  },
+  {
+   "category": "face",
+   "task": "Make a face like you just found a spider on your arm."
+  },
+  {
+   "category": "face",
+   "task": "Make a face like you're hearing a very bad joke."
+  },
+  {
+   "category": "face",
+   "task": "Make a face like you're exhausted."
+  },
+  {
+   "category": "face",
+   "task": "Make a face like you just ate the best pizza of your life."
+  },
+  {
+   "category": "face",
+   "task": "Make a face like a model on the catwalk."
+  },
+  {
+   "category": "face",
+   "task": "Make a face like you're hiding a secret."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to be late."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to survive a zombie apocalypse."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to secretly love cheesy pop songs."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to become famous."
+  },
+  {
+   "category": "point",
+   "task": "Point at the best cook in the room."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to lose their phone."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to scream during a horror movie."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to run a marathon."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to talk to their plants."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to win a quiz show."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to spill a secret."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to own ten cats."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person with the loudest laugh."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to move abroad."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to put up Christmas decorations in October."
+  },
+  {
+   "category": "text",
+   "task": "Write down: Your favourite food."
+  },
+  {
+   "category": "text",
+   "task": "Write down: An animal you'd like to be."
+  },
+  {
+   "category": "text",
+   "task": "Write down: The first thing you do in the morning."
+  },
+  {
+   "category": "text",
+   "task": "Write down: A place you'd love to travel to."
+  },
+  {
+   "category": "text",
+   "task": "Write down: One word that describes you."
+  },
+  {
+   "category": "text",
+   "task": "Write down: Your favourite season and why."
+  },
+  {
+   "category": "text",
+   "task": "Write down: A superpower you'd like to have."
+  },
+  {
+   "category": "text",
+   "task": "Write down: A song you sing along to loudly."
+  },
+  {
+   "category": "text",
+   "task": "Write down: The first thing you'd buy with a million."
+  },
+  {
+   "category": "text",
+   "task": "Write down: Your favourite board or card game."
+  },
+  {
+   "category": "text",
+   "task": "Write down: A sound you can't stand."
+  },
+  {
+   "category": "text",
+   "task": "Write down: A job you'd never want to do."
+  },
+  {
+   "category": "text",
+   "task": "Write down: The best ice cream flavour."
+  },
+  {
+   "category": "text",
+   "task": "Write down: A hobby you'd like to start."
+  },
+  {
+   "category": "text",
+   "task": "Write down: Something that's always in your fridge."
+  }
+ ]
+}

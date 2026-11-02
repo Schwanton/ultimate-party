@@ -10,6 +10,7 @@ Party-Spiele für zu Hause: Ein Bildschirm (Fernseher, Laptop, Beamer) zeigt das
 | **Bluff** | 3–12 (+ Publikum) | Glaubwürdige Lügen zu kuriosen, wahren Fakten erfinden – und die Wahrheit finden. |
 | **Kritzelei** | 3–10 (+ Publikum) | Geheime Begriffe aufs Handy zeichnen, falsche Titel erfinden, den echten finden. |
 | **Guess the Clicks!** | 2–100 | Ein zufälliges YouTube-Video läuft – wie viele Aufrufe hat es? Wer am nächsten dran ist, bekommt den Punkt. Braucht einen kostenlosen YouTube-API-Schlüssel (siehe unten). |
+| **Hochstapler** | 3–10 | Alle bekommen eine Aufgabe (Hand heben, Finger zeigen, Gesicht ziehen, auf jemanden zeigen, etwas aufschreiben) – nur einer nicht. Findet den Hochstapler, bevor er 3 Aufgaben übersteht! |
 
 Neue Spiele lassen sich mit wenig Code hinzufügen und teilen – siehe [Spiele entwickeln](docs/SPIELE-ENTWICKELN.md).
 

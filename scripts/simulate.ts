@@ -28,6 +28,9 @@ const scenarios: { game: string; players: number }[] = [
   { game: 'guess-the-clicks', players: 2 },
   { game: 'guess-the-clicks', players: 30 },
   { game: 'guess-the-clicks', players: 100 },
+  { game: 'hochstapler', players: 3 },
+  { game: 'hochstapler', players: 6 },
+  { game: 'hochstapler', players: 10 },
 ];
 
 const server = spawn(process.execPath, ['--import', 'tsx', path.join(ROOT, 'server/index.ts')], {

@@ -10,6 +10,7 @@ Dieses Dokument hält fest, was beim Bauen entschieden wurde (ohne Rückfrage) u
 | 2 · Game-SDK, UI-Baukasten, Entwicklermodus mit Bots, Spielvorlage, automatische Tests | fertig |
 | 3 · Schlagfertig, Bluff, Kritzelei mit Basis-Packs DE/EN | fertig |
 | Zusatz · Guess the Clicks! (YouTube-Aufrufe schätzen) | fertig |
+| Zusatz · Hochstapler (à la „Fakin' It“) | fertig |
 | 4 · Olympia-Modus, Teams, Pack-Import per Drag & Drop, Spiele-Import, Sounds | offen |
 | 5 · Fertige `.app` / `.exe`, Online-Modus | offen |
 
@@ -54,6 +55,12 @@ React bleibt wie besprochen. Ein Umstieg auf Vite/Tailwind wäre später möglic
 - Fehlt der API-Schlüssel oder ist er ungültig, zeigt der TV eine Anleitung mit Eingabefeld und QR-Code zur Google-Seite; dasselbe Feld gibt es auf allen Handys. Nach dem Speichern wird der Schlüssel geprüft und das Spiel startet direkt.
 - Kontingent: ca. 101 von 10.000 Einheiten pro Video → rund 12 Spiele pro Tag mit einem kostenlosen Schlüssel.
 - Neu in der Plattform: Spiele können im Manifest „secrets“ (z. B. API-Schlüssel) anfordern. Der Host trägt sie in den Einstellungen ein; gespeichert in `.up-data/secrets.json`, nur der Server liest sie (`ctx.secret()`).
+
+**Hochstapler** (nach dem Prinzip von „Fakin' It“, eigene Umsetzung und Texte)
+- Runden = Spielerzahl, höchstens 5; jede Runde ein neuer Hochstapler und eine Kategorie: Hand hoch, Finger zeigen, Gesicht ziehen, auf jemanden zeigen, aufschreiben. Der Hochstapler kennt nur die Kategorie.
+- Ablauf pro Aufgabe: 7 s lesen → Countdown 3-2-1 → „JETZT!“ (7 s halten) bzw. 40 s schreiben + Antworten auf dem TV → 45 s diskutieren und abstimmen (wenn alle gewählt haben: noch 5 s).
+- Mehr als die Hälfte auf dieselbe Person = Anklage. Hochstapler erwischt: jeder, der richtig getippt hat, bekommt 1000 / 750 / 500 (Aufgabe 1/2/3), der Hochstapler 250 pro überstandener Aufgabe. Unschuldigen angeklagt oder 3 Aufgaben ohne Mehrheit: Hochstapler +2000.
+- 75 Aufgaben pro Sprache (15 je Kategorie).
 
 **Allgemein**
 - Zeitdruck: ab 8 s orange, ab 5 s rot mit Pulsieren, Rand-Glühen und Vibration (bei Timern ≤ 12 s: ab 5 / 3 s).
