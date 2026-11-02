@@ -18,7 +18,7 @@ Neue Spiele lassen sich mit wenig Code hinzufügen und teilen – siehe [Spiele 
 
 ### 1. Einmalig: Node.js installieren
 
-UP! braucht **Node.js** (kostenlos). Lade die **LTS-Version** von [nodejs.org](https://nodejs.org/de/download) herunter und installiere sie wie jedes andere Programm.
+UP! braucht **Node.js ab Version 20** (kostenlos). Lade die **LTS-Version** von [nodejs.org](https://nodejs.org/de/download) herunter und installiere sie wie jedes andere Programm. Ist schon eine ältere Version installiert, einfach drüberinstallieren.
 
 > Später gibt es UP! als fertige `.app` bzw. `.exe` – dann entfällt dieser Schritt.
 
