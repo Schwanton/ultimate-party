@@ -1,5 +1,6 @@
 /** UP! Server: liefert die App aus, verwaltet Räume und spricht per WebSocket mit TV und Handys. */
 
+import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
@@ -207,7 +208,9 @@ function handle(ws: WebSocket, msg: any) {
 async function main() {
   const games = await loadGames();
   log(`${games.size} Spiel(e) geladen: ${[...games.keys()].join(', ')}`);
-  if (DEV) {
+  if (process.env.UP_NO_CLIENT === '1') {
+    // nur Server (für automatische Tests)
+  } else if (DEV) {
     await watchClient(() => {
       log('App neu gebaut – Browser laden neu');
       for (const ws of wss.clients) if (ws.readyState === 1) ws.send('{"t":"reload"}');
@@ -224,7 +227,19 @@ async function main() {
     console.log(`  Handys:              ${baseUrl}`);
     if (DEV) console.log(`  Entwicklermodus:     http://localhost:${PORT}/dev`);
     console.log('');
+    console.log('  Beenden: dieses Fenster schließen oder Strg+C drücken.');
+    console.log('');
+    if (!DEV && process.env.UP_NO_OPEN !== '1' && process.env.UP_NO_CLIENT !== '1') openBrowser(`http://localhost:${PORT}/host`);
   });
+}
+
+/** TV-Ansicht automatisch im Standardbrowser öffnen */
+function openBrowser(url: string) {
+  const cmd = process.platform === 'darwin' ? 'open' : process.platform === 'win32' ? 'cmd' : 'xdg-open';
+  const args = process.platform === 'win32' ? ['/c', 'start', '', url] : [url];
+  try {
+    spawn(cmd, args, { stdio: 'ignore', detached: true }).on('error', () => {}).unref();
+  } catch { /* kein Browser – egal */ }
 }
 
 server.on('error', (e: NodeJS.ErrnoException) => {

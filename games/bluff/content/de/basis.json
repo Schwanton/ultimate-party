@@ -1,0 +1,387 @@
+{
+ "name": "Basis",
+ "author": "UP!",
+ "version": "1.0.0",
+ "description": "Kuriose, wahre Fakten. Quelle bei jeder Frage.",
+ "items": [
+  {
+   "question": "Der längste Ortsname Europas gehört zu einem Dorf in ___.",
+   "answer": "Wales",
+   "alternatives": [
+    "Großbritannien"
+   ],
+   "decoys": [
+    "Island",
+    "Finnland",
+    "Ungarn"
+   ],
+   "source": "Wikipedia: Llanfairpwllgwyngyll"
+  },
+  {
+   "question": "Wombats hinterlassen ihren Kot in Form von ___.",
+   "answer": "Würfeln",
+   "alternatives": [
+    "Würfel",
+    "Wuerfeln"
+   ],
+   "decoys": [
+    "Herzen",
+    "Spiralen",
+    "Sternen"
+   ],
+   "source": "Wikipedia: Wombat"
+  },
+  {
+   "question": "Ein Krake hat ___ Herzen.",
+   "answer": "drei",
+   "alternatives": [
+    "3"
+   ],
+   "decoys": [
+    "zwei",
+    "vier",
+    "neun"
+   ],
+   "source": "Wikipedia: Octopus"
+  },
+  {
+   "question": "Das Blut von Kraken hat die Farbe ___.",
+   "answer": "Blau",
+   "alternatives": [
+    "blau"
+   ],
+   "decoys": [
+    "Grün",
+    "Gelb",
+    "Durchsichtig"
+   ],
+   "source": "Wikipedia: Octopus / Hämocyanin"
+  },
+  {
+   "question": "Die einzige Nationalflagge der Welt, die nicht rechteckig ist, gehört zu ___.",
+   "answer": "Nepal",
+   "alternatives": [],
+   "decoys": [
+    "Bhutan",
+    "Schweiz",
+    "Vatikanstadt"
+   ],
+   "source": "Wikipedia: Flag of Nepal"
+  },
+  {
+   "question": "Das Auge eines Straußes ist größer als sein ___.",
+   "answer": "Gehirn",
+   "alternatives": [
+    "Hirn"
+   ],
+   "decoys": [
+    "Schnabel",
+    "Herz",
+    "Magen"
+   ],
+   "source": "Wikipedia: Common ostrich"
+  },
+  {
+   "question": "Botanisch gesehen sind Bananen ___.",
+   "answer": "Beeren",
+   "alternatives": [
+    "Beere"
+   ],
+   "decoys": [
+    "Kräuter",
+    "Nüsse",
+    "Gräser"
+   ],
+   "source": "Wikipedia: Banana"
+  },
+  {
+   "question": "Das Nationaltier von Schottland ist das ___.",
+   "answer": "Einhorn",
+   "alternatives": [],
+   "decoys": [
+    "Rothirsch",
+    "Hochlandrind",
+    "Loch-Ness-Monster"
+   ],
+   "source": "Wikipedia: National symbols of Scotland"
+  },
+  {
+   "question": "Ein Tag auf der Venus dauert länger als ein ___ auf der Venus.",
+   "answer": "Jahr",
+   "alternatives": [],
+   "decoys": [
+    "Monat",
+    "Sommer",
+    "Winter"
+   ],
+   "source": "Wikipedia: Venus"
+  },
+  {
+   "question": "Seeotter halten sich beim Schlafen gegenseitig an den ___ fest.",
+   "answer": "Pfoten",
+   "alternatives": [
+    "Händen",
+    "Haenden",
+    "Pfote",
+    "Hand"
+   ],
+   "decoys": [
+    "Schwänzen",
+    "Ohren",
+    "Schnurrhaaren"
+   ],
+   "source": "Wikipedia: Sea otter"
+  },
+  {
+   "question": "Fredric Baur, der Erfinder der Pringles-Dose, wurde teilweise in einer ___ beigesetzt.",
+   "answer": "Pringles-Dose",
+   "alternatives": [
+    "Pringlesdose",
+    "Pringles Dose",
+    "Chipsdose"
+   ],
+   "decoys": [
+    "Kaffeekanne",
+    "Keksdose",
+    "Tupperdose"
+   ],
+   "source": "Wikipedia: Fredric J. Baur"
+  },
+  {
+   "question": "Das Wort „Roboter“ stammt ursprünglich aus der ___ Sprache.",
+   "answer": "tschechischen",
+   "alternatives": [
+    "tschechisch",
+    "Tschechisch"
+   ],
+   "decoys": [
+    "japanischen",
+    "russischen",
+    "griechischen"
+   ],
+   "source": "Wikipedia: Robot (Karel Čapek)"
+  },
+  {
+   "question": "Auf dem berühmten Gemälde „Mona Lisa“ fehlen ihr die ___.",
+   "answer": "Augenbrauen",
+   "alternatives": [
+    "Augenbraue"
+   ],
+   "decoys": [
+    "Ohrringe",
+    "Schuhe",
+    "Fingernägel"
+   ],
+   "source": "Wikipedia: Mona Lisa"
+  },
+  {
+   "question": "Der kürzeste Krieg der Geschichte dauerte nur etwa ___ Minuten.",
+   "answer": "38",
+   "alternatives": [
+    "38 bis 45",
+    "40",
+    "45"
+   ],
+   "decoys": [
+    "12",
+    "90",
+    "7"
+   ],
+   "source": "Wikipedia: Anglo-Zanzibar War"
+  },
+  {
+   "question": "Kolibris sind die einzigen Vögel, die auch ___ fliegen können.",
+   "answer": "rückwärts",
+   "alternatives": [
+    "rueckwaerts",
+    "nach hinten"
+   ],
+   "decoys": [
+    "auf dem Rücken",
+    "im Schlaf",
+    "unter Wasser"
+   ],
+   "source": "Wikipedia: Hummingbird"
+  },
+  {
+   "question": "Erdnüsse gehören botanisch nicht zu den Nüssen, sondern zu den ___.",
+   "answer": "Hülsenfrüchten",
+   "alternatives": [
+    "Hülsenfrüchte",
+    "Huelsenfruechten",
+    "Leguminosen"
+   ],
+   "decoys": [
+    "Kartoffeln",
+    "Gräsern",
+    "Pilzen"
+   ],
+   "source": "Wikipedia: Peanut"
+  },
+  {
+   "question": "In den 1830er-Jahren wurde Tomatenketchup in den USA als ___ verkauft.",
+   "answer": "Medizin",
+   "alternatives": [
+    "Medikament",
+    "Heilmittel",
+    "Arznei"
+   ],
+   "decoys": [
+    "Haarfärbemittel",
+    "Schuhcreme",
+    "Rostschutz"
+   ],
+   "source": "Wikipedia: Ketchup"
+  },
+  {
+   "question": "Lachse finden ihren Geburtsfluss vor allem mithilfe ihres ___ wieder.",
+   "answer": "Geruchssinns",
+   "alternatives": [
+    "Geruchssinn",
+    "Geruch",
+    "Geruchs",
+    "Nase"
+   ],
+   "decoys": [
+    "Magnetsinns",
+    "Gedächtnisses",
+    "Sonars"
+   ],
+   "source": "Wikipedia: Salmon run"
+  },
+  {
+   "question": "Louis Blériot überquerte 1909 als erster Mensch den Ärmelkanal mit einem ___.",
+   "answer": "Flugzeug",
+   "alternatives": [
+    "Motorflugzeug"
+   ],
+   "decoys": [
+    "Heißluftballon",
+    "Tretboot",
+    "Fahrrad"
+   ],
+   "source": "Wikipedia: Louis Blériot"
+  },
+  {
+   "question": "Die Fingerabdrücke von ___ sind denen von Menschen so ähnlich, dass man sie verwechseln kann.",
+   "answer": "Koalas",
+   "alternatives": [
+    "Koala"
+   ],
+   "decoys": [
+    "Schimpansen",
+    "Waschbären",
+    "Pandas"
+   ],
+   "source": "Wikipedia: Koala"
+  },
+  {
+   "question": "Ein Jahr auf dem Merkur dauert nur ___ Erdtage.",
+   "answer": "88",
+   "alternatives": [
+    "achtundachtzig"
+   ],
+   "decoys": [
+    "12",
+    "150",
+    "365"
+   ],
+   "source": "Wikipedia: Mercury (planet)"
+  },
+  {
+   "question": "Die Farbe Orange wurde nach der ___ benannt.",
+   "answer": "Frucht",
+   "alternatives": [
+    "Orange",
+    "Apfelsine",
+    "Obstsorte"
+   ],
+   "decoys": [
+    "Stadt Orange",
+    "Königsfamilie",
+    "Morgenröte"
+   ],
+   "source": "Wikipedia: Orange (colour)"
+  },
+  {
+   "question": "Die Funktechnik „Bluetooth“ ist nach einem ___ König benannt.",
+   "answer": "dänischen",
+   "alternatives": [
+    "dänischer",
+    "Dänischen",
+    "daenischen"
+   ],
+   "decoys": [
+    "schwedischen",
+    "norwegischen",
+    "isländischen"
+   ],
+   "source": "Wikipedia: Harald Bluetooth"
+  },
+  {
+   "question": "Geparden können nicht ___, sie schnurren stattdessen.",
+   "answer": "brüllen",
+   "alternatives": [
+    "bruellen"
+   ],
+   "decoys": [
+    "schwimmen",
+    "klettern",
+    "rückwärts laufen"
+   ],
+   "source": "Wikipedia: Cheetah"
+  },
+  {
+   "question": "Manche Pinguine umwerben ihre Partnerin, indem sie ihr einen ___ schenken.",
+   "answer": "Kieselstein",
+   "alternatives": [
+    "Stein",
+    "Kiesel"
+   ],
+   "decoys": [
+    "Fisch",
+    "Federn",
+    "Muschel"
+   ],
+   "source": "Wikipedia: Gentoo penguin / Adélie penguin"
+  },
+  {
+   "question": "Die Muttersprache mit den meisten Sprechern der Welt ist ___.",
+   "answer": "Mandarin",
+   "alternatives": [
+    "Chinesisch",
+    "Hochchinesisch"
+   ],
+   "decoys": [
+    "Englisch",
+    "Spanisch",
+    "Hindi"
+   ],
+   "source": "Wikipedia: List of languages by number of native speakers"
+  },
+  {
+   "question": "Die Hauptstadt von Australien ist ___.",
+   "answer": "Canberra",
+   "alternatives": [],
+   "decoys": [
+    "Sydney",
+    "Melbourne",
+    "Perth"
+   ],
+   "source": "Wikipedia: Canberra"
+  },
+  {
+   "question": "Eine Gruppe von Flamingos heißt auf Englisch „a ___ of flamingos“.",
+   "answer": "flamboyance",
+   "alternatives": [
+    "Flamboyance"
+   ],
+   "decoys": [
+    "parade",
+    "blush",
+    "fiesta"
+   ],
+   "source": "Merriam-Webster / Wikipedia: Flamingo"
+  }
+ ]
+}

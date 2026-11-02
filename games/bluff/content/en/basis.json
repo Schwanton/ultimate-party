@@ -1,0 +1,364 @@
+{
+ "name": "Basic",
+ "author": "UP!",
+ "version": "1.0.0",
+ "description": "Strange but true facts. Source listed for each question.",
+ "items": [
+  {
+   "question": "The longest place name in Europe belongs to a village in ___.",
+   "answer": "Wales",
+   "alternatives": [
+    "Britain",
+    "UK"
+   ],
+   "decoys": [
+    "Iceland",
+    "Finland",
+    "Hungary"
+   ],
+   "source": "Wikipedia: Llanfairpwllgwyngyll"
+  },
+  {
+   "question": "Wombats produce poop shaped like ___.",
+   "answer": "cubes",
+   "alternatives": [
+    "cube",
+    "dice"
+   ],
+   "decoys": [
+    "hearts",
+    "spirals",
+    "stars"
+   ],
+   "source": "Wikipedia: Wombat"
+  },
+  {
+   "question": "An octopus has ___ hearts.",
+   "answer": "three",
+   "alternatives": [
+    "3"
+   ],
+   "decoys": [
+    "two",
+    "four",
+    "nine"
+   ],
+   "source": "Wikipedia: Octopus"
+  },
+  {
+   "question": "Octopus blood is the colour ___.",
+   "answer": "blue",
+   "alternatives": [],
+   "decoys": [
+    "green",
+    "yellow",
+    "clear"
+   ],
+   "source": "Wikipedia: Octopus / Hämocyanin"
+  },
+  {
+   "question": "The only national flag in the world that isn't rectangular belongs to ___.",
+   "answer": "Nepal",
+   "alternatives": [],
+   "decoys": [
+    "Bhutan",
+    "Switzerland",
+    "Vatican City"
+   ],
+   "source": "Wikipedia: Flag of Nepal"
+  },
+  {
+   "question": "An ostrich's eye is bigger than its ___.",
+   "answer": "brain",
+   "alternatives": [],
+   "decoys": [
+    "beak",
+    "heart",
+    "stomach"
+   ],
+   "source": "Wikipedia: Common ostrich"
+  },
+  {
+   "question": "Botanically speaking, bananas are ___.",
+   "answer": "berries",
+   "alternatives": [
+    "berry"
+   ],
+   "decoys": [
+    "herbs",
+    "nuts",
+    "grasses"
+   ],
+   "source": "Wikipedia: Banana"
+  },
+  {
+   "question": "Scotland's national animal is the ___.",
+   "answer": "unicorn",
+   "alternatives": [],
+   "decoys": [
+    "red deer",
+    "highland cow",
+    "Loch Ness Monster"
+   ],
+   "source": "Wikipedia: National symbols of Scotland"
+  },
+  {
+   "question": "A day on Venus lasts longer than a ___ on Venus.",
+   "answer": "year",
+   "alternatives": [],
+   "decoys": [
+    "month",
+    "summer",
+    "winter"
+   ],
+   "source": "Wikipedia: Venus"
+  },
+  {
+   "question": "Sea otters hold each other's ___ while they sleep.",
+   "answer": "paws",
+   "alternatives": [
+    "hands",
+    "paw",
+    "hand"
+   ],
+   "decoys": [
+    "tails",
+    "ears",
+    "whiskers"
+   ],
+   "source": "Wikipedia: Sea otter"
+  },
+  {
+   "question": "Fredric Baur, inventor of the Pringles can, was partly buried in a ___.",
+   "answer": "Pringles can",
+   "alternatives": [
+    "pringles tube"
+   ],
+   "decoys": [
+    "coffee pot",
+    "cookie jar",
+    "lunch box"
+   ],
+   "source": "Wikipedia: Fredric J. Baur"
+  },
+  {
+   "question": "The word \"robot\" originally comes from the ___ language.",
+   "answer": "Czech",
+   "alternatives": [],
+   "decoys": [
+    "Japanese",
+    "Russian",
+    "Greek"
+   ],
+   "source": "Wikipedia: Robot (Karel Čapek)"
+  },
+  {
+   "question": "In the famous painting, the Mona Lisa has no ___.",
+   "answer": "eyebrows",
+   "alternatives": [
+    "eyebrow"
+   ],
+   "decoys": [
+    "earrings",
+    "shoes",
+    "fingernails"
+   ],
+   "source": "Wikipedia: Mona Lisa"
+  },
+  {
+   "question": "The shortest war in history lasted only about ___ minutes.",
+   "answer": "38",
+   "alternatives": [
+    "40",
+    "45"
+   ],
+   "decoys": [
+    "12",
+    "90",
+    "7"
+   ],
+   "source": "Wikipedia: Anglo-Zanzibar War"
+  },
+  {
+   "question": "Hummingbirds are the only birds that can also fly ___.",
+   "answer": "backwards",
+   "alternatives": [
+    "backward"
+   ],
+   "decoys": [
+    "upside down",
+    "in their sleep",
+    "underwater"
+   ],
+   "source": "Wikipedia: Hummingbird"
+  },
+  {
+   "question": "Botanically, peanuts aren't nuts but ___.",
+   "answer": "legumes",
+   "alternatives": [
+    "legume",
+    "pulses"
+   ],
+   "decoys": [
+    "potatoes",
+    "grasses",
+    "mushrooms"
+   ],
+   "source": "Wikipedia: Peanut"
+  },
+  {
+   "question": "In the 1830s, tomato ketchup was sold in the US as ___.",
+   "answer": "medicine",
+   "alternatives": [
+    "a medicine",
+    "medication"
+   ],
+   "decoys": [
+    "hair dye",
+    "shoe polish",
+    "rust remover"
+   ],
+   "source": "Wikipedia: Ketchup"
+  },
+  {
+   "question": "Salmon find their way back to the river they were born in mainly by ___.",
+   "answer": "smell",
+   "alternatives": [
+    "their sense of smell",
+    "scent"
+   ],
+   "decoys": [
+    "magnetism",
+    "memory",
+    "sonar"
+   ],
+   "source": "Wikipedia: Salmon run"
+  },
+  {
+   "question": "In 1909, Louis Blériot became the first person to cross the English Channel in an ___.",
+   "answer": "aeroplane",
+   "alternatives": [
+    "airplane",
+    "plane",
+    "aircraft"
+   ],
+   "decoys": [
+    "air balloon",
+    "amphibious car",
+    "ice yacht"
+   ],
+   "source": "Wikipedia: Louis Blériot"
+  },
+  {
+   "question": "The fingerprints of ___ are so similar to human ones that they can be confused.",
+   "answer": "koalas",
+   "alternatives": [
+    "koala"
+   ],
+   "decoys": [
+    "chimpanzees",
+    "raccoons",
+    "pandas"
+   ],
+   "source": "Wikipedia: Koala"
+  },
+  {
+   "question": "A year on Mercury lasts only ___ Earth days.",
+   "answer": "88",
+   "alternatives": [
+    "eighty-eight"
+   ],
+   "decoys": [
+    "12",
+    "150",
+    "365"
+   ],
+   "source": "Wikipedia: Mercury (planet)"
+  },
+  {
+   "question": "The colour orange was named after the ___.",
+   "answer": "fruit",
+   "alternatives": [
+    "orange"
+   ],
+   "decoys": [
+    "royal family",
+    "sunrise",
+    "town of Orange"
+   ],
+   "source": "Wikipedia: Orange (colour)"
+  },
+  {
+   "question": "Bluetooth is named after a ___ king.",
+   "answer": "Danish",
+   "alternatives": [],
+   "decoys": [
+    "Swedish",
+    "Norwegian",
+    "Icelandic"
+   ],
+   "source": "Wikipedia: Harald Bluetooth"
+  },
+  {
+   "question": "Cheetahs can't ___ – they purr instead.",
+   "answer": "roar",
+   "alternatives": [],
+   "decoys": [
+    "swim",
+    "climb",
+    "walk backwards"
+   ],
+   "source": "Wikipedia: Cheetah"
+  },
+  {
+   "question": "Some penguins court their partner by giving them a ___.",
+   "answer": "pebble",
+   "alternatives": [
+    "stone",
+    "rock"
+   ],
+   "decoys": [
+    "fish",
+    "feather",
+    "shell"
+   ],
+   "source": "Wikipedia: Gentoo penguin / Adélie penguin"
+  },
+  {
+   "question": "The native language with the most speakers in the world is ___.",
+   "answer": "Mandarin",
+   "alternatives": [
+    "Chinese",
+    "Mandarin Chinese"
+   ],
+   "decoys": [
+    "English",
+    "Spanish",
+    "Hindi"
+   ],
+   "source": "Wikipedia: List of languages by number of native speakers"
+  },
+  {
+   "question": "The capital of Australia is ___.",
+   "answer": "Canberra",
+   "alternatives": [],
+   "decoys": [
+    "Sydney",
+    "Melbourne",
+    "Perth"
+   ],
+   "source": "Wikipedia: Canberra"
+  },
+  {
+   "question": "A group of flamingos is called a ___.",
+   "answer": "flamboyance",
+   "alternatives": [],
+   "decoys": [
+    "parade",
+    "blush",
+    "fiesta"
+   ],
+   "source": "Merriam-Webster / Wikipedia: Flamingo"
+  }
+ ]
+}

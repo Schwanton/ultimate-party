@@ -1,0 +1,17 @@
+{
+  "id": "bluff",
+  "name": { "de": "Bluff", "en": "Bluff" },
+  "description": {
+    "de": "Erfindet glaubwürdige Lügen zu kuriosen, wahren Fakten – und findet die Wahrheit.",
+    "en": "Invent believable lies about strange true facts – and spot the truth."
+  },
+  "minPlayers": 3,
+  "maxPlayers": 12,
+  "audience": true,
+  "minutes": 15,
+  "color": "#36D6F5",
+  "sdkVersion": 1,
+  "contentFields": ["question", "answer"],
+  "version": "1.0.0",
+  "author": "UP!"
+}

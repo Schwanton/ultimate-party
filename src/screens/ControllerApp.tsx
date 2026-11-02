@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ANIMALS, type Animal, type Avatar as AvatarData } from '@up/sdk';
 import { net, useNet, loadSession, saveSession } from '../net';
 import { guessLang, useT } from '../i18n';
@@ -105,6 +105,7 @@ function InRoom() {
   const [picking, setPicking] = useState(false);
   const player = (id: string) => room.players.find((p) => p.id === id);
   const isVip = room.vipId === me.id;
+  const send = useCallback((action: unknown) => net.send('action', { action }), []);
 
   // Kurz vibrieren, wenn eine neue Aufgabe kommt
   const lastScreen = useRef<string | null>(null);
@@ -118,7 +119,7 @@ function InRoom() {
   if (room.phase === 'game' && room.gameId) {
     const Controller = clientGame(room.gameId)?.client.Controller;
     content = s.view && Controller ? (
-      <Controller key={room.gameId} view={s.view} room={room} me={me} t={t} player={player} send={(action: unknown) => net.send('action', { action })} />
+      <Controller key={room.gameId} view={s.view} room={room} me={me} t={t} player={player} send={send} />
     ) : (
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, textAlign: 'center' }}>
         <Avatar player={me} size={96} />

@@ -1,0 +1,17 @@
+{
+  "id": "kritzelei",
+  "name": { "de": "Kritzelei", "en": "Doodle" },
+  "description": {
+    "de": "Zeichnet geheime Begriffe aufs Handy, erfindet falsche Titel und findet den echten.",
+    "en": "Draw secret prompts on your phone, invent fake titles and find the real one."
+  },
+  "minPlayers": 3,
+  "maxPlayers": 10,
+  "audience": true,
+  "minutes": 20,
+  "color": "#FFD447",
+  "sdkVersion": 1,
+  "contentFields": ["word"],
+  "version": "1.0.0",
+  "author": "UP!"
+}
