@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ControllerViewProps, GameClientModule, HostViewProps, PlayerInfo, Translate } from '@up/sdk';
-import { Avatar, Confetti, Crown, HostHeader, HostTimer, PhoneTimer, PhoneWait, Podium, QrCode, Scoreboard, TextAnswer, sfx, vibrate } from '@up/ui';
+import { Avatar, Confetti, Crown, HostHeader, HostTimer, PhoneTimer, PhoneWait, Podium, QrCode, Scoreboard, TextAnswer, sfx, useServerNow, vibrate } from '@up/ui';
+import { START_DELAY, buildTimeline, lg, positionAt, unlg } from './reveal';
 
 const RED = '#FF5A4E';
 
@@ -21,28 +22,6 @@ function duration(sec: number) {
   const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
   return h ? `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}` : `${m}:${String(s).padStart(2, '0')}`;
 }
-
-/** Zählt in ~2,5 s von 0 hoch (logarithmisch, damit kleine und große Zahlen spannend sind). */
-function useCountUp(target: number, key: unknown, delay = 600) {
-  const [v, setV] = useState(0);
-  useEffect(() => {
-    setV(0);
-    let raf = 0;
-    const t0 = performance.now() + delay;
-    const tick = (now: number) => {
-      const p = Math.min(1, Math.max(0, (now - t0) / 2500));
-      const eased = 1 - (1 - p) ** 3;
-      setV(p >= 1 ? target : Math.round(Math.expm1(Math.log1p(target) * eased)));
-      if (p < 1) raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key]);
-  return v;
-}
-
-/* ================= TV ================= */
 
 function Host(props: HostViewProps) {
   const { view, t, player, room } = props;
@@ -271,46 +250,111 @@ function VideoPlayer({ id, t }: { id: string; t: Translate }) {
   );
 }
 
+interface Entry { playerId: string; guess: number; diff: number; player: boolean }
+
+/**
+ * Auflösung als Zahlenstrahl: Eine Säule fährt auf einer logarithmischen Skala hoch – schnell, solange sie weit
+ * von Tipps und Ziel entfernt ist, langsam in deren Nähe. Erreicht sie einen Tipp, erscheint das Bild des Spielers.
+ */
 function HostReveal({ view, t, player, room }: HostViewProps) {
   const lang = room.lang;
-  const count = useCountUp(view.views, `${view.n}`);
-  const done = count === view.views;
+  const entries = (view.entries as Entry[]).filter((e) => player(e.playerId));
+  const tl = useMemo(() => buildTimeline(view.views, entries.map((e) => e.guess)), [view.startAt]); // eslint-disable-line react-hooks/exhaustive-deps
+  const now = useServerNow(33);
+  const elapsed = (now - view.startAt) / 1000 - START_DELAY;
+  const pos = positionAt(tl, elapsed);
+  const target = lg(view.views);
+  const done = elapsed >= tl.seconds;
+  const value = done ? view.views : Math.round(unlg(pos));
   const winners = new Set<string>(view.winners);
-  const entries = (view.entries as any[]).filter((e) => player(e.playerId));
-  const shown = entries.slice(0, 8);
+
+  // Geometrie (Bühnenpixel)
+  const H = 560, bottom = H - 24, topY = 24;
+  const y = (x: number) => bottom - (x / tl.top) * (bottom - topY);
+  const axisX = 460, barW = 36;
+  const crowd = entries.length > 12;
+  const colW = crowd ? 46 : 212, rowGap = crowd ? 40 : 54, maxCols = crowd ? 15 : 3;
+
+  // Spalten so verteilen, dass sich Tipps nicht überlappen
+  const placed = useMemo(() => {
+    const sorted = [...entries].sort((a, b) => a.guess - b.guess);
+    const lastY: number[] = [];
+    return sorted.map((e) => {
+      const yy = y(lg(e.guess));
+      let col = lastY.findIndex((ly) => Math.abs(ly - yy) >= rowGap);
+      if (col < 0) col = lastY.length < maxCols ? lastY.length : lastY.indexOf(Math.min(...lastY));
+      lastY[col] = yy;
+      return { e, yy, col };
+    });
+  }, [view.startAt]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const ticks = Array.from({ length: Math.floor(tl.top) + 1 }, (_, i) => i).filter((i) => i >= 1);
+  const winnerNames = entries.filter((e) => winners.has(e.playerId)).map((e) => player(e.playerId)!.name);
+
   return (
     <>
-      {done && winners.size > 0 && <Confetti />}
+      {done && winners.size > 0 && <Confetti silent />}
       <HostHeader title={t('title')} color={RED} info={t('video', { n: view.n, total: view.total })} />
-      <div style={{ display: 'flex', gap: 28, alignItems: 'center' }}>
-        <img src={`https://i.ytimg.com/vi/${view.video.id}/mqdefault.jpg`} alt="" width={256} height={144} style={{ borderRadius: 16, objectFit: 'cover', flex: 'none' }} />
-        <div style={{ minWidth: 0 }}>
-          <p className="muted" style={{ fontSize: 20, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{view.video.title}</p>
-          <p className="display" style={{ fontSize: 84, fontWeight: 800, lineHeight: 1.05, color: done ? 'var(--yellow)' : '#fff', transition: 'color .3s', fontVariantNumeric: 'tabular-nums' }}>{fmt(count, lang)}</p>
-          <p className="muted" style={{ fontSize: 20 }}>{t('reveal.views')}</p>
+      <div style={{ flex: 1, position: 'relative', minHeight: 0 }}>
+        {/* Links: Video und Zähler */}
+        <div style={{ position: 'absolute', left: 0, top: 10, width: 330, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <img src={`https://i.ytimg.com/vi/${view.video.id}/mqdefault.jpg`} alt="" width={320} height={180} style={{ borderRadius: 16, objectFit: 'cover' }} />
+          <p className="muted" style={{ fontSize: 17, lineHeight: 1.25, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{view.video.title}</p>
+          <p className="display" style={{ fontSize: value >= 1e8 ? 48 : 56, fontWeight: 800, lineHeight: 1, color: done ? 'var(--yellow)' : '#fff', fontVariantNumeric: 'tabular-nums', transition: 'color .3s' }}>{fmt(value, lang)}</p>
+          <p className="muted" style={{ fontSize: 18 }}>{t('reveal.views')}</p>
+          {done && (
+            <div className="anim-pop" style={{ marginTop: 8, background: RED, borderRadius: 18, padding: '12px 16px', boxShadow: '0 5px 0 #C22E24' }}>
+              <span style={{ fontSize: 15, fontWeight: 700 }}>{winnerNames.length ? t('reveal.closest') : t('reveal.noGuess')}</span>
+              {winnerNames.length > 0 && <p className="display" style={{ fontSize: 26, fontWeight: 800 }}>{winnerNames.join(' & ')} <span style={{ color: 'var(--yellow)' }}>+1</span></p>}
+            </div>
+          )}
         </div>
-      </div>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8, opacity: done ? 1 : 0, transition: 'opacity .4s' }}>
-        {shown.length === 0 && <p className="muted" style={{ fontSize: 22 }}>{t('reveal.noGuess')}</p>}
-        {shown.map((e, i) => {
-          const p = player(e.playerId) as PlayerInfo;
-          const win = winners.has(e.playerId);
+
+        {/* Rechts: Zahlenstrahl */}
+        <svg width={1168} height={H} viewBox={`0 0 1168 ${H}`} style={{ position: 'absolute', left: 0, top: 0, overflow: 'visible', pointerEvents: 'none' }} aria-hidden="true">
+          {ticks.map((i) => (
+            <g key={i}>
+              <line x1={axisX - 8} x2={1168} y1={y(lg(10 ** i))} y2={y(lg(10 ** i))} stroke="#262048" strokeWidth={1} />
+              <text x={axisX - 16} y={y(lg(10 ** i)) + 6} textAnchor="end" fontSize={16} fontWeight={700} fill="#8F88B8" fontFamily="DM Sans, sans-serif">{short(10 ** i, lang, t)}</text>
+            </g>
+          ))}
+          <rect x={axisX} y={topY} width={barW} height={bottom - topY} rx={barW / 2} fill="#1C1738" />
+          <rect x={axisX} y={y(pos)} width={barW} height={Math.max(barW, bottom - y(pos))} rx={barW / 2} fill={RED} />
+          {done && (
+            <g>
+              <line x1={axisX - 10} x2={1168} y1={y(target)} y2={y(target)} stroke="#FFD447" strokeWidth={4} strokeDasharray="10 8" />
+            </g>
+          )}
+          {!done && <circle cx={axisX + barW / 2} cy={y(pos)} r={barW / 2 + 6} fill="none" stroke="#fff" strokeWidth={3} opacity={0.8} />}
+        </svg>
+
+        {/* Tipps: erscheinen, sobald die Säule sie erreicht (Tipps über der echten Zahl erst am Ende) */}
+        {placed.map(({ e, yy, col }) => {
+          const p = player(e.playerId)!;
+          const reached = lg(e.guess) <= pos + 1e-9 && (lg(e.guess) <= target || done);
+          const over = lg(e.guess) > target;
+          if (!reached && !(done && over)) return null;
+          const win = done && winners.has(e.playerId);
+          const left = axisX + barW + 22 + col * colW;
           return (
             <div key={e.playerId} style={{
-              display: 'flex', alignItems: 'center', gap: 14, padding: '6px 16px', borderRadius: 16, minHeight: 50,
-              background: win ? RED : 'var(--surface)', boxShadow: win ? '0 0 0 3px var(--yellow)' : undefined,
-              animation: done ? `upSlideUp .4s ease-out ${(i * 0.08).toFixed(2)}s both` : undefined,
+              position: 'absolute', left, top: yy - (crowd ? 18 : 24), display: 'flex', alignItems: 'center', gap: 8,
+              opacity: done && !win ? (over ? 0.45 : 0.6) : 1, transition: 'opacity .4s', animation: 'upPop .35s ease-out both', zIndex: win ? 3 : 2,
             }}>
-              {win ? <Crown size={30} /> : <span className="display muted" style={{ width: 30, textAlign: 'center', fontWeight: 800 }}>{i + 1}</span>}
-              <Avatar player={p} size={38} flat />
-              <b style={{ width: 170, fontSize: 18, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}{!e.player ? ` · ${t('game.audience')}` : ''}</b>
-              <span className="display" style={{ flex: 1, fontSize: 24, fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>{fmt(e.guess, lang)}</span>
-              <span style={{ fontSize: 17, color: win ? '#fff' : 'var(--muted)' }}>{e.diff === 0 ? t('reveal.exact') : `${e.guess > view.views ? '+' : '−'}${short(e.diff, lang, t)} ${t('reveal.off')}`}</span>
-              {win && <span className="display" style={{ fontSize: 26, fontWeight: 800, color: 'var(--yellow)', width: 50, textAlign: 'right', animation: 'upPop .5s ease-out .4s both' }}>+1</span>}
+              {col === 0 && <span style={{ position: 'absolute', left: -22, top: crowd ? 17 : 23, width: 18, height: 3, background: win ? 'var(--yellow)' : '#4A4378' }} />}
+              <span style={{ position: 'relative' }}>
+                <Avatar player={p} size={crowd ? 36 : 48} />
+                {win && <Crown size={crowd ? 22 : 30} style={{ position: 'absolute', top: crowd ? -14 : -19, left: crowd ? 7 : 9 }} />}
+              </span>
+              {!crowd && (
+                <span style={{ background: win ? RED : 'var(--surface)', borderRadius: 12, padding: '4px 10px', boxShadow: win ? '0 0 0 3px var(--yellow)' : undefined, whiteSpace: 'nowrap' }}>
+                  <b style={{ fontSize: 15 }}>{p.name}{!e.player ? ' ·' : ''}</b>
+                  <span className="display" style={{ display: 'block', fontSize: 17, fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>{short(e.guess, lang, t)}{win ? ' +1' : ''}</span>
+                </span>
+              )}
             </div>
           );
         })}
-        {entries.length > shown.length && <p className="faint" style={{ textAlign: 'center' }}>+ {entries.length - shown.length}</p>}
       </div>
     </>
   );
@@ -349,6 +393,7 @@ function Keypad({ lang, t, initial, onSubmit, locked }: { lang: string; t: Trans
 
 function Controller({ view, t, send, me, room }: ControllerViewProps) {
   const lang = room.lang;
+  const now = useServerNow(250);
   switch (view.screen) {
     case 'setup':
       return (
@@ -389,6 +434,7 @@ function Controller({ view, t, send, me, room }: ControllerViewProps) {
         </>
       );
     case 'result':
+      if (view.doneAt && now < view.doneAt) return <PhoneWait title={t('lookAtTv')} text={view.guess != null ? `${t('guess.yours')}: ${fmt(view.guess, lang)}` : undefined} emoji={<Avatar player={me} size={96} />} />;
       return (
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, textAlign: 'center' }} className="anim-fade">
           {view.won && <Confetti pieces={14} />}

@@ -69,6 +69,11 @@ React bleibt wie besprochen. Ein Umstieg auf Vite/Tailwind wäre später möglic
 - Jedes Spiel kann im Manifest `options` anbieten. Sie stehen in der TV-Lobby unter „Spiel-Einstellungen“ und beim VIP auf dem Handy; gelten pro Raum.
 - Schlagfertig: Runden 2–6 (letzte = Finale, ×3), Antwortzeit kurz/normal/lang. Bluff: 3–12 Fragen (zweite Hälfte ×2, letzte ×3), Zeit für Lügen. Kritzelei: Runden automatisch/1–3, Zeichenzeit 45 s/75 s/2 Min. Guess the Clicks!: 3–20 Videos, Tippzeit 20–90 s. Hochstapler: Modus und Runden.
 
+**Spannende Auflösungen**
+- Schlagfertig: Bei jeder Abstimmung steht 3 Sekunden lang nur die Frage groß auf dem TV (und auf den Handys), dann fliegen die Antworten herein. Die Abstimmzeit beginnt erst danach.
+- Guess the Clicks!: Zahlenstrahl auf logarithmischer Skala (10, 100, 1.000 …). Geschwindigkeit = Grundtempo + Abstand zum nächsten Tipp bzw. zur echten Zahl darüber (höchstens 2,4 Zehnerpotenzen/s, nahe der echten Zahl nur noch ca. 0,04). Erreicht die Säule einen Tipp, erscheint der Spieler daneben; Tipps über der echten Zahl erscheinen am Ende blasser. Maximal 22 s Fahrt. Der Zeitplan wird in `games/guess-the-clicks/reveal.ts` berechnet und ist auf TV, Handys und Server gleich; die Handys zeigen ihr Ergebnis erst, wenn die Säule angekommen ist.
+- Hochstapler: 2,5 s nach „JETZT!“ erscheint die Aufgabe auf dem TV und bleibt während der Abstimmung sichtbar (auch auf den Handys). So kann auch der Hochstapler mitdiskutieren.
+
 **Guess the Clicks! – „Video länger“**
 - Jeder Spieler kann während des Tippens „Video länger ansehen?“ antippen. Sobald mindestens die Hälfte der verbundenen Spieler dafür ist, kommt die volle Tippzeit noch einmal obendrauf (Zeit verdoppelt). Danach wird neu gezählt – beliebig oft.
 

@@ -47,5 +47,6 @@
   "me.place": "Platz {place} von {of}",
   "me.score": "{n} Punkte",
   "audience.wait": "Du bist im Publikum. Gleich darfst du mit abstimmen!",
-  "lookAtTv": "Schau auf den Fernseher."
+  "lookAtTv": "Schau auf den Fernseher.",
+  "vote.soon": "Gleich kommen die Antworten …"
 }

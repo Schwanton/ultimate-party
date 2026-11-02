@@ -57,5 +57,7 @@
   "faker.vote": "Vote for someone else – steer suspicion away from you!",
   "go.doIt": "Do it now!",
   "go.fakerNow": "Blend in – quick!",
-  "rounds.label": "Round {n} of {total}"
+  "rounds.label": "Round {n} of {total}",
+  "task.was": "The task was",
+  "task.is": "The task"
 }

@@ -47,5 +47,6 @@
   "me.place": "Place {place} of {of}",
   "me.score": "{n} points",
   "audience.wait": "You're in the audience. You'll get to vote soon!",
-  "lookAtTv": "Look at the TV."
+  "lookAtTv": "Look at the TV.",
+  "vote.soon": "The answers are coming …"
 }

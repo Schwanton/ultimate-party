@@ -18,6 +18,8 @@ interface Task {
 
 const CATEGORIES: Category[] = ['hands', 'number', 'point'];
 const T = { read: 7, ready: 3, hold: 7, vote: 45, lastChance: 5, result: 8 };
+/** Sekunden nach „JETZT!“, bis die Aufgabe auf dem TV erscheint */
+const TASK_AFTER = 2.5;
 const POINTS = { caught: [1000, 750, 500], survivedTask: 250, escaped: 2000 };
 
 export default {
@@ -91,7 +93,9 @@ export default {
       const t = ctx.timer(T.ready + T.hold, startVote);
       timer = t;
       const goAt = t.deadline - t.duration * (T.hold / (T.ready + T.hold));
-      ctx.setHostView({ screen: 'go', ...base(), now: goAt, deadline: t.deadline, duration: t.duration });
+      // Kurz nach dem „JETZT!“ wird die Aufgabe für alle eingeblendet
+      const taskAt = goAt + t.duration * (TASK_AFTER / (T.ready + T.hold));
+      ctx.setHostView({ screen: 'go', ...base(), now: goAt, taskAt, task: task().task, deadline: t.deadline, duration: t.duration });
       ctx.setAllPlayerViews((p) => playerTaskView(p.id, { go: true, goAt }));
     }
 
@@ -105,12 +109,12 @@ export default {
     }
 
     function hostVote() {
-      ctx.setHostView({ screen: 'vote', ...base(), voted: votes.size, voters: ids.length, deadline: timer!.deadline, duration: timer!.duration });
+      ctx.setHostView({ screen: 'vote', ...base(), task: task().task, voted: votes.size, voters: ids.length, deadline: timer!.deadline, duration: timer!.duration });
     }
 
     function voteView(id: string) {
       ctx.setPlayerView(id, {
-        screen: 'vote', input: !votes.has(id), isFaker: id === faker, category, options: ids.filter((x) => x !== id),
+        screen: 'vote', input: !votes.has(id), isFaker: id === faker, category, task: task().task, options: ids.filter((x) => x !== id),
         selected: votes.get(id) ?? null, deadline: timer!.deadline, duration: timer!.duration,
       });
     }

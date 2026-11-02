@@ -57,5 +57,7 @@
   "faker.vote": "Stimm für jemand anderen – lenk den Verdacht weg von dir!",
   "go.doIt": "Mach's jetzt!",
   "go.fakerNow": "Mach mit – schnell!",
-  "rounds.label": "Runde {n} von {total}"
+  "rounds.label": "Runde {n} von {total}",
+  "task.was": "Die Aufgabe war",
+  "task.is": "Die Aufgabe"
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
 import type { ControllerViewProps, GameClientModule, HostViewProps, PlayerInfo } from '@up/sdk';
 import {
-  Avatar, ChoiceList, Confetti, Crown, HostHeader, HostPrompt, HostTimer, PhoneTimer, PhoneWait, Podium, Scoreboard, TextAnswer, VoterChips, sfx,
+  Avatar, ChoiceList, Confetti, Crown, HostHeader, HostPrompt, HostTimer, PhoneTimer, PhoneWait, Podium, Scoreboard, TextAnswer, VoterChips, sfx, useServerNow,
 } from '@up/ui';
 
 const PINK = '#E8336F';
@@ -141,10 +141,39 @@ function AnswerCard({ side, text, children, style }: { side: 'a' | 'b'; text: st
   );
 }
 
+/** Erst nur die Frage, ab `showAt` (Serverzeit) dann die Antworten */
+function useShown(showAt?: number) {
+  const now = useServerNow(100);
+  const shown = !showAt || now >= showAt;
+  useEffect(() => {
+    if (shown && showAt) sfx.play('whoosh');
+  }, [shown, showAt]);
+  return shown;
+}
+
+/** Große Frage in der Bildmitte, bevor die Antworten kommen */
+function PromptStage({ label, prompt }: { label: string; prompt: string }) {
+  return (
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 18, textAlign: 'center', padding: '0 40px' }}>
+      <span className="anim-fade" style={{ fontSize: 20, fontWeight: 700, letterSpacing: 2, color: 'var(--muted)', textTransform: 'uppercase' }}>{label}</span>
+      <h1 className="anim-pop" style={{ fontSize: prompt.length > 60 ? 56 : 68, lineHeight: 1.12 }}>{prompt}</h1>
+    </div>
+  );
+}
+
 function HostDuel({ view, t }: HostViewProps) {
+  const shown = useShown(view.showAt);
+  if (!shown) {
+    return (
+      <>
+        <HostHeader title={t('title')} color={PINK} info={`${roundInfo(view, t)} · ${t('vote.duel', { n: view.n, total: view.total })}`} />
+        <PromptStage label={t('vote.duel', { n: view.n, total: view.total })} prompt={view.prompt} />
+      </>
+    );
+  }
   return (
     <>
-      <HostHeader title={t('title')} color={PINK} info={`${roundInfo(view, t)} · ${t('vote.duel', { n: view.n, total: view.total })}`} right={<HostTimer deadline={view.deadline} duration={view.duration} />} />
+      <HostHeader title={t('title')} color={PINK} info={`${roundInfo(view, t)} · ${t('vote.duel', { n: view.n, total: view.total })}`} right={<HostTimer deadline={view.deadline} duration={view.deadline - (view.showAt ?? view.deadline - view.duration)} />} />
       <HostPrompt label={t('vote.label')}>{view.prompt}</HostPrompt>
       <section style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
         <AnswerCard side="a" text={view.a} style={{ animation: 'upSlideLeft .7s ease-out both', minHeight: 230 }} />
@@ -228,9 +257,18 @@ function HostDuelResult({ view, t, player }: HostViewProps) {
 function HostMultiVote({ view, t }: HostViewProps) {
   const n = view.options.length;
   const cols = n <= 4 ? 2 : n <= 9 ? 3 : 4;
+  const shown = useShown(view.showAt);
+  if (!shown) {
+    return (
+      <>
+        <HostHeader title={t('title')} color={PINK} info={roundInfo(view, t)} />
+        <PromptStage label={t('vote.multi')} prompt={view.prompt} />
+      </>
+    );
+  }
   return (
     <>
-      <HostHeader title={t('title')} color={PINK} info={roundInfo(view, t)} right={<HostTimer deadline={view.deadline} duration={view.duration} />} />
+      <HostHeader title={t('title')} color={PINK} info={roundInfo(view, t)} right={<HostTimer deadline={view.deadline} duration={view.deadline - (view.showAt ?? view.deadline - view.duration)} />} />
       <HostPrompt label={t('vote.multi')} size={38}>{view.prompt}</HostPrompt>
       <div style={{ flex: 1, display: 'grid', gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gap: 14, alignContent: 'center' }}>
         {view.options.map((o: any, i: number) => (
@@ -307,7 +345,39 @@ function HostScores({ view, t, player }: HostViewProps) {
 
 /* ================= Handy ================= */
 
-function Controller({ view, t, send, me }: ControllerViewProps) {
+function PhoneVote({ view, t, send }: ControllerViewProps) {
+  const now = useServerNow(100);
+  if (view.showAt && now < view.showAt) {
+    return (
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 16, textAlign: 'center' }}>
+        <span className="up-label">{t('vote.label')}</span>
+        <h1 className="anim-pop" style={{ fontSize: 30, lineHeight: 1.2 }}>{view.prompt}</h1>
+        <p className="muted">{t('vote.soon')}</p>
+      </div>
+    );
+  }
+  return (
+        <>
+          <PhoneTimer deadline={view.deadline} duration={view.showAt ? view.deadline - view.showAt : view.duration} hurryText={view.selected ? undefined : t('timer.hurry')} />
+          <span className="up-label">{t('vote.label')}</span>
+          <h1 style={{ fontSize: 22, lineHeight: 1.2 }}>{view.prompt}</h1>
+          <ChoiceList
+            options={view.options.map((o: any, i: number) => ({ id: o.id, text: o.text, color: view.options.length === 2 ? (i === 0 ? PINK : '#36D6F5') : undefined }))}
+            selected={view.selected} onPick={(id) => send({ type: 'vote', choice: id })} />
+          {view.selected ? (
+            <div role="status" className="up-card anim-pop" style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 'auto' }}>
+              <span style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--green)', color: '#110D24', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✓</span>
+              <span><b className="display" style={{ fontSize: 18 }}>{t('vote.done')}</b><br /><span className="muted" style={{ fontSize: 14 }}>{t('vote.change')}</span></span>
+            </div>
+          ) : (
+            <p className="muted" style={{ textAlign: 'center', marginTop: 'auto' }}>{t('vote.pick')}</p>
+          )}
+        </>
+      );
+}
+
+function Controller(props: ControllerViewProps) {
+  const { view, t, send, me } = props;
   switch (view.screen) {
     case 'intro':
       return <PhoneWait title={t('intro.title')} text={t('lookAtTv')} />;
@@ -325,24 +395,7 @@ function Controller({ view, t, send, me }: ControllerViewProps) {
     case 'audienceWait':
       return <PhoneWait title={t('game.audience')} text={t('audience.wait')} emoji={<Avatar player={me} size={96} />} />;
     case 'vote':
-      return (
-        <>
-          <PhoneTimer deadline={view.deadline} duration={view.duration} hurryText={view.selected ? undefined : t('timer.hurry')} />
-          <span className="up-label">{t('vote.label')}</span>
-          <h1 style={{ fontSize: 22, lineHeight: 1.2 }}>{view.prompt}</h1>
-          <ChoiceList
-            options={view.options.map((o: any, i: number) => ({ id: o.id, text: o.text, color: view.options.length === 2 ? (i === 0 ? PINK : '#36D6F5') : undefined }))}
-            selected={view.selected} onPick={(id) => send({ type: 'vote', choice: id })} />
-          {view.selected ? (
-            <div role="status" className="up-card anim-pop" style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 'auto' }}>
-              <span style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--green)', color: '#110D24', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✓</span>
-              <span><b className="display" style={{ fontSize: 18 }}>{t('vote.done')}</b><br /><span className="muted" style={{ fontSize: 14 }}>{t('vote.change')}</span></span>
-            </div>
-          ) : (
-            <p className="muted" style={{ textAlign: 'center', marginTop: 'auto' }}>{t('vote.pick')}</p>
-          )}
-        </>
-      );
+      return <PhoneVote {...props} />;
     case 'yourDuel':
       return <PhoneWait title={t('yourDuel.title')} text={t('yourDuel.text')} emoji={<span className="display" style={{ fontSize: 22, fontWeight: 800, color: 'var(--muted)', textAlign: 'center' }}>{view.prompt}</span>} />;
     case 'duelOutcome':

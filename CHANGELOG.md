@@ -2,6 +2,12 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.4.0
+
+- Guess the Clicks!: neue Auflösung als Zahlenstrahl – die Säule fährt hoch, wird nahe an Tipps und der echten Zahl langsamer, und jeder Tipp erscheint mit Bild, sobald er erreicht ist
+- Schlagfertig: bei der Abstimmung erscheint zuerst die Frage, kurz danach die Antworten
+- Hochstapler: kurz nach „JETZT!“ wird die Aufgabe für alle eingeblendet und bleibt während der Diskussion sichtbar
+
 ## 0.3.1
 
 - Updater: TV und Handys laden nach einem Update automatisch die neue Version

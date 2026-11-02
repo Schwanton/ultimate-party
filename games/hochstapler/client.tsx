@@ -116,8 +116,9 @@ function Host(props: HostViewProps) {
         <>
           <HostHeader title={t('title')} color={PURPLE} info={info(view, t)} right={<HostTimer deadline={view.deadline} duration={view.duration} />} />
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 30 }}>
-            <h1 className="anim-pop" style={{ fontSize: 64 }}>{t('vote.title')}</h1>
-            <p style={{ fontSize: 26 }}>{t('vote.discuss')}</p>
+            {view.task && <TaskCard text={view.task} t={t} dark={cat(view.category).dark} small />}
+            <h1 className="anim-pop" style={{ fontSize: 56 }}>{t('vote.title')}</h1>
+            <p style={{ fontSize: 24 }}>{t('vote.discuss')}</p>
             <div style={{ display: 'flex', gap: 22, flexWrap: 'wrap', justifyContent: 'center' }}>
               {ps.map((p, i) => (
                 <div key={p.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, animation: `upFloat 3s ease-in-out ${(-0.4 * i).toFixed(1)}s infinite` }}>
@@ -154,10 +155,24 @@ function Host(props: HostViewProps) {
   return null;
 }
 
+/** Die Aufgabe, für alle sichtbar – hilft beim Diskutieren (auch dem Hochstapler) */
+function TaskCard({ text, t, dark, small = false, label = 'task.was' }: { text: string; t: Translate; dark: string; small?: boolean; label?: string }) {
+  return (
+    <div className="anim-pop" style={{ background: '#fff', color: INK, borderRadius: 24, padding: small ? '14px 22px' : '20px 30px', boxShadow: `0 8px 0 ${dark}`, maxWidth: 1000, textAlign: 'center' }}>
+      <span className="up-label" style={{ color: '#6E6890' }}>{t(label)}</span>
+      <p className="display" style={{ fontSize: small ? 26 : 34, fontWeight: 800, lineHeight: 1.2, marginTop: 4 }}>{text}</p>
+    </div>
+  );
+}
+
 function HostGo({ view, t }: HostViewProps) {
   const now = useServerNow(100);
   const toGo = Math.ceil((view.now - now) / 1000);
   const go = toGo <= 0;
+  const showTask = go && !!view.taskAt && now >= view.taskAt;
+  useEffect(() => {
+    if (showTask) sfx.play('reveal');
+  }, [showTask]);
   useEffect(() => {
     if (toGo > 0 && toGo <= 3) sfx.play('beep');
     if (toGo === 0) sfx.play('go');
@@ -168,11 +183,11 @@ function HostGo({ view, t }: HostViewProps) {
       <Tint category={view.category} strong={go} />
       <HostHeader title={t('title')} color={PURPLE} info={info(view, t)} right={go ? <HostTimer deadline={view.deadline} duration={view.deadline - view.now} /> : null} />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 20, textAlign: 'center', color: go ? INK : '#fff' }}>
-        <Pictogram category={view.category} size={go ? 150 : 110} color={go ? INK : c.color} />
+        <Pictogram category={view.category} size={showTask ? 90 : go ? 150 : 110} color={go ? INK : c.color} />
         {go ? (
           <>
-            <h1 key="now" style={{ fontSize: 150, lineHeight: 1, animation: 'upPop .4s ease-out both' }}>{t('go.now')}</h1>
-            <p style={{ fontSize: 28, fontWeight: 700 }}>{t('go.hold')}</p>
+            <h1 key="now" style={{ fontSize: showTask ? 96 : 150, lineHeight: 1, animation: 'upPop .4s ease-out both', transition: 'font-size .4s' }}>{t('go.now')}</h1>
+            {showTask ? <TaskCard text={view.task} t={t} dark={c.dark} label="task.is" /> : <p style={{ fontSize: 28, fontWeight: 700 }}>{t('go.hold')}</p>}
           </>
         ) : (
           <>
@@ -304,6 +319,12 @@ function Controller(props: ControllerViewProps) {
       return (
         <>
           <PhoneTimer deadline={view.deadline} duration={view.duration} hurryText={view.selected ? undefined : t('timer.hurry')} />
+          {view.task && (
+            <div style={{ background: '#fff', color: INK, borderRadius: 16, padding: '10px 14px', borderLeft: `6px solid ${cat(view.category).color}` }}>
+              <span className="up-label" style={{ color: '#6E6890', fontSize: 12 }}>{t('task.was')}</span>
+              <p style={{ fontWeight: 700, fontSize: 16, marginTop: 2 }}>{view.task}</p>
+            </div>
+          )}
           <h1 style={{ fontSize: 26 }}>{t('vote.title')}</h1>
           {view.isFaker && <p style={{ fontSize: 15, color: PURPLE, fontWeight: 700 }}>{t('faker.vote')}</p>}
           <ChoiceList

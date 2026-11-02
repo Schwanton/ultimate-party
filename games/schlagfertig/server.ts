@@ -16,6 +16,8 @@ const DUEL_LIMIT = 12;
 const LAST_CHANCE = 5;
 const MAX_LEN = 60;
 const T = { answerDuel: 80, answerSingle: 55, vote: 20, heat: 25, finalVote: 30 };
+/** Sekunden, in denen zuerst nur die Frage zu sehen ist, bevor die Antworten kommen */
+const PROMPT_FIRST = 3;
 const POINTS = { vote: 100, audience: 25, sweep: 250, champion: 500 };
 
 const BOT_ANSWERS: Record<string, string[]> = {
@@ -163,10 +165,11 @@ export default {
       voteOptions = options;
       eligibleVoters = new Set(voters);
       onVotesComplete = done;
-      const t = ctx.timer(seconds, finishVotes);
+      const t = ctx.timer(seconds + PROMPT_FIRST, finishVotes);
       phaseTimer = t;
       voteTimer = t;
-      return t;
+      // Zeitpunkt, ab dem die Antworten sichtbar sind
+      return Object.assign(t, { showAt: t.deadline - t.duration * (seconds / (seconds + PROMPT_FIRST)) });
     }
 
     /** Alle haben abgestimmt: Zeit auf wenige Sekunden verkürzen, damit man sich noch umentscheiden kann. */
@@ -247,10 +250,10 @@ export default {
       if (!a.text || !b.text) return duelResult(pids, i, prompt, a, b, new Map([['a', { players: [], audience: [] }], ['b', { players: [], audience: [] }]]));
       const voters = members().map((m) => m.id).filter((id) => id !== a.authorId && id !== b.authorId);
       const t = collectVotes(['a', 'b'], voters, T.vote, () => duelResult(pids, i, prompt, a, b, tally(['a', 'b'])));
-      hostVote({ screen: 'duel', round, totalRounds, mult, prompt, n: i + 1, total: pids.length, a: a.text, b: b.text, deadline: t.deadline, duration: t.duration });
+      hostVote({ screen: 'duel', round, totalRounds, mult, prompt, n: i + 1, total: pids.length, a: a.text, b: b.text, deadline: t.deadline, duration: t.duration, showAt: t.showAt });
       for (const m of members()) {
         if (voters.includes(m.id)) {
-          sendVoteView(m.id, { screen: 'vote', input: true, prompt, options: [{ id: 'a', text: a.text }, { id: 'b', text: b.text }], deadline: t.deadline, duration: t.duration }, ['a', 'b']);
+          sendVoteView(m.id, { screen: 'vote', input: true, prompt, options: [{ id: 'a', text: a.text }, { id: 'b', text: b.text }], deadline: t.deadline, duration: t.duration, showAt: t.showAt }, ['a', 'b']);
         } else if (isPlayer(m.id)) {
           ctx.setPlayerView(m.id, { screen: 'yourDuel', prompt });
         }
@@ -296,10 +299,10 @@ export default {
       const prompt = promptsById.get(entries[0].promptId)?.prompt ?? '';
       const voters = members().map((m) => m.id);
       const t = collectVotes(options.map((o) => o.id), voters, T.finalVote, () => finalResult(options, prompt, isLast, champion));
-      hostVote({ screen: 'multiVote', round, totalRounds, mult, prompt, options: options.map((o) => ({ id: o.id, text: o.text })), deadline: t.deadline, duration: t.duration, champion });
+      hostVote({ screen: 'multiVote', round, totalRounds, mult, prompt, options: options.map((o) => ({ id: o.id, text: o.text })), deadline: t.deadline, duration: t.duration, champion, showAt: t.showAt });
       for (const m of members()) {
         const allowed = options.filter((o) => o.authorId !== m.id);
-        sendVoteView(m.id, { screen: 'vote', input: true, prompt, options: allowed.map((o) => ({ id: o.id, text: o.text })), deadline: t.deadline, duration: t.duration }, allowed.map((o) => o.id));
+        sendVoteView(m.id, { screen: 'vote', input: true, prompt, options: allowed.map((o) => ({ id: o.id, text: o.text })), deadline: t.deadline, duration: t.duration, showAt: t.showAt }, allowed.map((o) => o.id));
       }
     }
 
@@ -363,7 +366,7 @@ export default {
       for (const id of allVoters) {
         const g = groupOf.get(id)!;
         const opts = groups[g].map((e, k) => ({ id: optionId(g, k), text: e.text!, own: e.authorId === id })).filter((o) => !o.own);
-        sendVoteView(id, { screen: 'vote', input: true, prompt, options: opts.map(({ id: oid, text }) => ({ id: oid, text })), deadline: t.deadline, duration: t.duration }, opts.map((o) => o.id));
+        sendVoteView(id, { screen: 'vote', input: true, prompt, options: opts.map(({ id: oid, text }) => ({ id: oid, text })), deadline: t.deadline, duration: t.duration, showAt: t.showAt }, opts.map((o) => o.id));
       }
     }
 

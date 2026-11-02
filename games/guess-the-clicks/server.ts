@@ -5,6 +5,7 @@
 
 import { Scores, type GameContext, type GameServerModule } from '@up/sdk';
 import { YouTubeError, checkKey, fakeVideo, randomVideo, type Video } from './youtube';
+import { revealSeconds } from './reveal';
 
 const LAST_CHANCE = 5;
 const MAX_GUESS = 100_000_000_000;
@@ -154,16 +155,20 @@ export default {
       const best = entries.find((e) => e.player)?.diff;
       const winners = best === undefined ? [] : entries.filter((e) => e.player && e.diff === best).map((e) => e.playerId);
       winners.forEach((w) => scores.add(w, 1));
-      ctx.setHostView({ screen: 'reveal', n: round + 1, total: ROUNDS, video: { id: v.id, title: v.title, channel: v.channel }, views: v.views, entries, winners, crowd: members().length });
+      // Zahlenstrahl: startet gleich, Handys zeigen ihr Ergebnis erst, wenn die Säule angekommen ist
+      const startAt = Date.now() + 300;
+      const rideSeconds = revealSeconds(v.views, entries.map((e) => e.guess));
+      const doneAt = startAt + rideSeconds * 1000;
+      ctx.setHostView({ screen: 'reveal', n: round + 1, total: ROUNDS, video: { id: v.id, title: v.title, channel: v.channel }, views: v.views, entries, winners, crowd: members().length, startAt });
       const ranked = entries.filter((e) => e.player);
       for (const id of members()) {
         const mine = entries.find((e) => e.playerId === id);
         ctx.setPlayerView(id, {
           screen: 'result', views: v.views, guess: mine?.guess ?? null, won: winners.includes(id),
-          place: mine?.player ? ranked.findIndex((e) => e.playerId === id) + 1 : null, of: ranked.length, total: scores.get(id),
+          place: mine?.player ? ranked.findIndex((e) => e.playerId === id) + 1 : null, of: ranked.length, total: scores.get(id), doneAt,
         });
       }
-      ctx.after(Math.min(14, 9 + entries.length * 0.2), next);
+      ctx.after(rideSeconds + 7, next);
     }
 
     function showScores(final: boolean) {
