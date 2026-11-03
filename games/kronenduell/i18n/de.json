@@ -96,8 +96,7 @@
   "part.wardMatch": "Paar {v}",
   "part.none": "nichts",
   "dmg.parts": "1 + Volltreffer {crit} + Paar {match}",
-  "next.tv": "Weiter zu „{phase}“ – beide aufs Handy:",
-  "next.tvEnd": "Nächste Runde – beide aufs Handy:",
+  "next.tvEnd": "Runde vorbei – beide aufs Handy:",
   "next.wait": "…",
   "end.win": "{name} gewinnt das Kronenduell!",
   "end.draw": "Beide Könige stürzen – unentschieden!",
@@ -127,5 +126,14 @@
   "phone.corruptNote": "Du bist korrupt: Korruption gesperrt, 2 Karten bleiben übrig.",
   "phone.tapBack": "Nochmal tippen: zurück auf die Hand",
   "watch": "Schau auf den Fernseher!",
-  "jester": "Narr"
+  "jester": "Narr",
+  "fx.blocked": "Geblockt!",
+  "fx.cards": "+{n} Karten",
+  "fx.siphon": "+{n} Korruption",
+  "fx.shatter": "Zerschmettert!",
+  "fx.corrupt": "Korrupt!",
+  "next.tvResult": "Zum Ergebnis – beide aufs Handy:",
+  "phone.toResult": "Zum Ergebnis",
+  "phone.nextRound": "Nächste Runde",
+  "phone.watching": "Schau auf den TV …"
 }

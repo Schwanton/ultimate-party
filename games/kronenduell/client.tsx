@@ -127,15 +127,146 @@ function CardBack({ w = 50, style }: { w?: number; style?: CSSProperties }) {
   );
 }
 
-/** Kartenreihe, überlappend wenn es eng wird */
-function Row({ cards, w, max, justify = 'center', render }: { cards: AnyCard[]; w: number; max: number; justify?: CSSProperties['justifyContent']; render?: (c: AnyCard, i: number) => ReactNode }) {
+/** Welche Karten wurden schon gezeigt? (key → war sie offen?) – für Einflug- und Umdreh-Animationen */
+const seen = new Map<string, boolean>();
+
+function AnimCard({ k, face, children }: { k: string; face: boolean; children: ReactNode }) {
+  const [anim] = useState(() => {
+    if (!seen.has(k)) return 'kdIn .55s cubic-bezier(.2,.9,.3,1.25) both';
+    if (!seen.get(k) && face) return 'kdFlip .5s ease-out both';
+    return undefined;
+  });
+  useEffect(() => {
+    seen.set(k, face);
+  }, [k, face]);
+  return <div style={{ animation: anim }}>{children}</div>;
+}
+
+/** Kartenreihe, überlappend wenn es eng wird. scope = Animationen für neue/umgedrehte Karten */
+function Row({ cards, w, max, justify = 'center', render, scope }: { cards: AnyCard[]; w: number; max: number; justify?: CSSProperties['justifyContent']; render?: (c: AnyCard, i: number) => ReactNode; scope?: string }) {
   const overlap = cards.length > 1 ? Math.max(0, Math.min(w * 0.45, (cards.length * w - max) / (cards.length - 1))) : 0;
   return (
     <div style={{ display: 'flex', justifyContent: justify, alignItems: 'center', flex: 1, minHeight: Math.round(w * 1.4) }}>
-      {cards.map((c, i) => (
-        <div key={c.id ?? `h${i}`} style={{ marginLeft: i ? -overlap : 0, zIndex: i }}>{render ? render(c, i) : <CardFace c={c} w={w} />}</div>
-      ))}
+      {cards.map((c, i) => {
+        const inner = render ? render(c, i) : <CardFace c={c} w={w} />;
+        return (
+          <div key={`${c.id ?? 'h' + i}-${c.s ? 'f' : 'b'}`} style={{ marginLeft: i ? -overlap : 0, zIndex: i }}>
+            {scope ? <AnimCard k={`${scope}:${c.id ?? i}`} face={!!c.s}>{inner}</AnimCard> : inner}
+          </div>
+        );
+      })}
     </div>
+  );
+}
+
+/** Keyframes für Kronenduell */
+function KdStyles() {
+  return (
+    <style>{`
+@keyframes kdIn { 0% { transform: translateY(-46px) scale(1.3) rotate(-10deg); opacity: 0; } 60% { transform: translateY(4px) scale(.96) rotate(1deg); opacity: 1; } 100% { transform: none; opacity: 1; } }
+@keyframes kdFlip { 0% { transform: perspective(400px) rotateY(90deg) scale(1.15); } 70% { transform: perspective(400px) rotateY(-8deg) scale(1.05); } 100% { transform: none; } }
+@keyframes kdOut { 0% { opacity: 1; transform: none; } 25% { opacity: 1; transform: translateY(-10px) rotate(-6deg) scale(1.08); } 100% { opacity: 0; transform: translate(40px, -70px) rotate(35deg) scale(.5); } }
+@keyframes kdShatter { 0% { opacity: 1; transform: none; filter: none; } 25% { transform: scale(1.18) rotate(-5deg); filter: brightness(1.8) saturate(2); } 45% { transform: scale(1.1) rotate(4deg); } 100% { opacity: 0; transform: scale(1.8) rotate(14deg); filter: blur(6px) brightness(2.5); } }
+@keyframes kdShake { 0%,100% { transform: none; } 12% { transform: translateX(-12px) rotate(-3deg); } 26% { transform: translateX(10px) rotate(2deg); } 40% { transform: translateX(-8px) rotate(-1deg); } 55% { transform: translateX(6px); } 70% { transform: translateX(-3px); } 85% { transform: translateX(2px); } }
+@keyframes kdBubble { 0% { opacity: 0; transform: translate(-50%, 14px) scale(.4); } 14% { opacity: 1; transform: translate(-50%, -8px) scale(1.18); } 24% { transform: translate(-50%, -6px) scale(1); } 78% { opacity: 1; transform: translate(-50%, -14px); } 100% { opacity: 0; transform: translate(-50%, -38px); } }
+@keyframes kdBanner { 0% { opacity: 0; transform: translate(-50%, -50%) scale(.5) rotate(-4deg); } 22% { opacity: 1; transform: translate(-50%, -50%) scale(1.1) rotate(1deg); } 34% { transform: translate(-50%, -50%) scale(1) rotate(0); } 78% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.06); } }
+@keyframes kdGlow { 0%,100% { box-shadow: 0 0 0 0 transparent; } 40% { box-shadow: 0 0 34px 8px var(--kd-glow); } }
+@keyframes kdPop { 0% { transform: scale(.3); } 60% { transform: scale(1.35); } 100% { transform: scale(1); } }
+@keyframes kdRoyal { 0% { transform: scale(.2) rotate(-25deg); opacity: 0; } 65% { transform: scale(1.2) rotate(6deg); opacity: 1; } 100% { transform: none; } }
+@keyframes kdFlash { 0% { box-shadow: inset 0 0 0 3px var(--kd-glow), 0 0 0 0 var(--kd-glow); } 30% { box-shadow: inset 0 0 0 3px var(--kd-glow), 0 0 30px 6px var(--kd-glow); } 100% { box-shadow: inset 0 0 0 3px var(--kd-glow), 0 0 0 0 transparent; } }
+`}</style>
+  );
+}
+
+/* ---------- Klänge (nur TV) ---------- */
+
+type Synth = Parameters<Parameters<typeof sfx.custom>[0]>[0];
+const snap = (s: Synth, at = 0, vol = 0.18) => s.noise(0.05, { filter: 3200, type: 'bandpass', vol, at });
+
+/** Eigener Klang je Zone beim Legen */
+const ZONE_SFX: Record<Zone, (s: Synth) => void> = {
+  // Klinge: helles Schleifen
+  atk: (s) => { snap(s); s.noise(0.28, { filter: 3500, type: 'highpass', sweepTo: 9000, vol: 0.16, at: 0.04 }); s.tone(1500, 0.3, { type: 'triangle', vol: 0.07, to: 2300, at: 0.05 }); },
+  // Schild: dumpfes Holz
+  def: (s) => { snap(s); s.tone(160, 0.2, { vol: 0.35, to: 70, at: 0.03 }); s.noise(0.1, { filter: 900, type: 'lowpass', vol: 0.25, at: 0.03 }); },
+  // Zauber: Glitzern
+  spell: (s) => { snap(s); [988, 1319, 1760, 2349].forEach((f, i) => s.tone(f, 0.25, { type: 'triangle', vol: 0.06, at: 0.04 + i * 0.05 })); },
+  // Korruption: dunkles Saugen
+  corr: (s) => { snap(s); s.tone(240, 0.55, { type: 'sawtooth', vol: 0.05, to: 60, at: 0.03 }); s.noise(0.5, { filter: 500, type: 'lowpass', sweepTo: 120, vol: 0.16, at: 0.03 }); },
+};
+
+const STEP_SFX: Record<string, (s: Synth, v: any) => void> = {
+  phase: (s) => { s.tone(523, 0.14, { type: 'triangle', vol: 0.09 }); s.tone(784, 0.22, { type: 'triangle', vol: 0.09, at: 0.1 }); },
+  reveal: (s) => { for (let i = 0; i < 7; i++) snap(s, i * 0.07, 0.2); s.tone(660, 0.3, { type: 'triangle', vol: 0.06, at: 0.5 }); },
+  higherSw: (s) => { s.noise(0.4, { filter: 1400, type: 'bandpass', sweepTo: 300, vol: 0.2 }); s.tone(520, 0.35, { type: 'square', vol: 0.035, to: 160 }); },
+  wrongZone: (s) => { s.tone(300, 0.15, { type: 'square', vol: 0.05 }); s.tone(220, 0.25, { type: 'square', vol: 0.05, at: 0.14 }); s.noise(0.4, { filter: 1400, type: 'bandpass', sweepTo: 300, vol: 0.18, at: 0.2 }); },
+  spellCancel: (s) => { s.noise(0.55, { filter: 6000, type: 'highpass', sweepTo: 1500, vol: 0.13 }); s.tone(900, 0.45, { vol: 0.08, to: 180 }); },
+  strength: (s) => { s.noise(0.2, { filter: 4000, type: 'highpass', sweepTo: 9000, vol: 0.14 }); s.tone(1200, 0.22, { type: 'triangle', vol: 0.06, to: 1900 }); },
+  block: (s) => { s.tone(140, 0.22, { vol: 0.32, to: 75 }); s.noise(0.09, { filter: 700, type: 'lowpass', vol: 0.22 }); },
+  allOutAtk: (s) => [392, 523, 659, 784].forEach((f, i) => s.tone(f, 0.18, { type: 'sawtooth', vol: 0.06, at: i * 0.08 })),
+  allOutDef: (s) => [196, 262, 330, 392].forEach((f, i) => s.tone(f, 0.22, { type: 'square', vol: 0.06, at: i * 0.09 })),
+  facePlant: (s) => [392, 370, 349, 311].forEach((f, i) => s.tone(f, 0.32, { type: 'square', vol: 0.06, at: i * 0.26, to: f * 0.96 })),
+  hit: (s, v) => {
+    s.noise(0.32, { filter: 650, type: 'lowpass', vol: 0.5 });
+    s.tone(120, 0.38, { vol: 0.45, to: 40 });
+    for (let i = 1; i < Math.min(5, v?.dmg ?? 1); i++) { s.noise(0.16, { filter: 900, type: 'lowpass', vol: 0.35, at: i * 0.2 }); s.tone(150, 0.2, { vol: 0.3, to: 60, at: i * 0.2 }); }
+  },
+  miss: (s) => { s.tone(1760, 0.4, { type: 'square', vol: 0.045 }); s.tone(2350, 0.35, { type: 'square', vol: 0.035, at: 0.01 }); s.noise(0.08, { filter: 5000, type: 'highpass', vol: 0.15 }); },
+  counter: (s, v) => { for (let i = 0; i < Math.min(5, v?.n ?? 1); i++) snap(s, i * 0.1); s.tone(880, 0.15, { type: 'triangle', vol: 0.06, at: 0.05 }); },
+  draw: (s, v) => { for (let i = 0; i < Math.min(6, v?.n ?? 1); i++) snap(s, i * 0.09, 0.14); },
+  siphon: (s) => { s.tone(320, 0.7, { vol: 0.12, to: 80 }); s.noise(0.65, { filter: 900, type: 'bandpass', sweepTo: 180, vol: 0.13 }); },
+  shatter: (s) => { for (let i = 0; i < 9; i++) s.tone(1800 + Math.random() * 3200, 0.12, { type: 'triangle', vol: 0.055, at: i * 0.03 }); s.noise(0.45, { filter: 5000, type: 'highpass', vol: 0.25 }); },
+  shatterNone: (s) => s.tone(620, 0.35, { type: 'triangle', vol: 0.06, to: 380 }),
+  noSpells: (s) => s.tone(440, 0.12, { vol: 0.05 }),
+  cleanup: (s) => { s.noise(0.7, { filter: 2600, type: 'bandpass', sweepTo: 700, vol: 0.11 }); },
+  royalFalls: (s) => {
+    [523, 440, 349, 262].forEach((f, i) => s.tone(f, 0.26, { type: 'triangle', vol: 0.1, at: i * 0.15 }));
+    s.tone(85, 0.5, { vol: 0.42, to: 40, at: 0.65 });
+    [523, 659, 784, 1047].forEach((f, i) => s.tone(f, 0.25, { type: 'triangle', vol: 0.08, at: 1.3 + i * 0.09 }));
+  },
+  kingFalls: (s) => { [523, 440, 349, 262, 196].forEach((f, i) => s.tone(f, 0.3, { type: 'sawtooth', vol: 0.07, at: i * 0.22 })); s.noise(1.1, { filter: 300, type: 'lowpass', vol: 0.45, at: 1.1 }); s.tone(70, 1, { vol: 0.4, to: 30, at: 1.1 }); },
+  corrupt: (s) => { for (let i = 0; i < 5; i++) s.tone(i % 2 ? 233 : 220, 0.3, { type: 'sawtooth', vol: 0.05, at: i * 0.14 }); s.tone(110, 1.1, { vol: 0.16, to: 52 }); },
+  pure: (s) => [784, 988, 1175, 1568].forEach((f, i) => s.tone(f, 0.2, { type: 'triangle', vol: 0.06, at: i * 0.06 })),
+};
+STEP_SFX.higherSh = STEP_SFX.higherSw;
+
+/* ---------- Effekte je Schritt ---------- */
+
+interface Fx { key: string; bubble?: { text: string; color: string }; shake?: boolean; glow?: string; dur: number }
+
+function stepFx(step: StepT | undefined, idx: number, t: Translate): Record<string, Fx> {
+  if (!step) return {};
+  const v = step.v ?? {};
+  const out: Record<string, Fx> = {};
+  const set = (id: string | undefined, f: Omit<Fx, 'key' | 'dur'>) => { if (id) out[id] = { key: String(idx), dur: step.d ?? 1.5, ...f }; };
+  switch (step.k) {
+    case 'hit': set(v.t, { shake: true, glow: '#FF3B4E', bubble: { text: `−${v.dmg} ♥`, color: '#FF5D6E' } }); break;
+    case 'miss': set(v.t, { bubble: { text: t('fx.blocked'), color: SUIT.sh.c } }); break;
+    case 'counter': case 'draw': set(v.p, { bubble: { text: t('fx.cards', { n: v.n }), color: '#fff' } }); break;
+    case 'siphon': set(v.p, { glow: '#9B7BFF', bubble: { text: t('fx.siphon', { n: v.n }), color: '#C4B2FF' } }); break;
+    case 'shatter': set(v.t, { shake: true, bubble: { text: t('fx.shatter'), color: SUIT.cr.c } }); break;
+    case 'corrupt': set(v.p, { glow: '#9B7BFF', bubble: { text: t('fx.corrupt'), color: '#C4B2FF' } }); break;
+    case 'pure': set(v.p, { bubble: { text: '✨', color: GOLD } }); break;
+    case 'royalFalls': set(v.p, { glow: GOLD, bubble: { text: t('royal.' + v.royal) + '!', color: GOLD } }); break;
+    case 'kingFalls': set(v.p, { shake: true, glow: '#FF3B4E', bubble: { text: '💀', color: '#fff' } }); break;
+    case 'allOutAtk': set(v.p, { glow: SUIT.sw.c, bubble: { text: t('rules.allOutAtk') + '!', color: SUIT.sw.c } }); break;
+    case 'allOutDef': set(v.p, { glow: SUIT.sh.c, bubble: { text: t('rules.allOutDef') + '!', color: SUIT.sh.c } }); break;
+    case 'facePlant': set(v.p, { shake: true, bubble: { text: '😵', color: '#fff' } }); break;
+    case 'strength': set(v.p, { bubble: { text: t('str', { n: v.value }), color: SUIT.sw.c } }); break;
+    case 'block': set(v.p, { bubble: { text: t('blk', { n: v.value }), color: SUIT.sh.c } }); break;
+    default:
+  }
+  return out;
+}
+
+function Bubble({ fx }: { fx?: Fx }) {
+  if (!fx?.bubble) return null;
+  return (
+    <span key={fx.key} className="display" style={{
+      position: 'absolute', left: '50%', top: -18, zIndex: 5, whiteSpace: 'nowrap', pointerEvents: 'none',
+      background: INK, color: fx.bubble.color, border: `2px solid ${fx.bubble.color}`, borderRadius: 999, padding: '3px 12px', fontSize: 18, fontWeight: 800,
+      boxShadow: '0 6px 18px rgba(0,0,0,.5)', animation: `kdBubble ${Math.max(1, fx.dur)}s ease-out forwards`,
+    }}>{fx.bubble.text}</span>
   );
 }
 
@@ -147,7 +278,7 @@ function partsText(parts: Part[], t: Translate) {
   return parts.map((p) => t('part.' + p.k, { v: p.v }) + (p.extra ? ' ' + t('part.extra', { n: p.extra }) : '')).join(' + ');
 }
 
-interface StepT { k: string; v?: any; b: any[]; hl?: { p: string; z: string }[] }
+interface StepT { k: string; v?: any; b: any[]; hl?: { p: string; z: string }[]; ph: string; at: number; d: number }
 
 function stepText(s: StepT, t: Translate, name: (id: string) => string) {
   const v = s.v ?? {};
@@ -170,6 +301,10 @@ function visibleStats(z: any) {
 /* ================= TV ================= */
 
 function Host(props: HostViewProps) {
+  return <><KdStyles /><HostScreen {...props} /></>;
+}
+
+function HostScreen(props: HostViewProps) {
   const { view } = props;
   switch (view.screen) {
     case 'intro':
@@ -262,57 +397,87 @@ function HostIntro({ view, t, player }: HostViewProps) {
 
 /* ---------- Spielfeld ---------- */
 
-function ZoneBox({ zone, cards, t, w, hl, value, locked, extra, style, cardMax }: {
-  zone: Zone; cards: AnyCard[]; t: Translate; w: number; hl?: boolean; value?: ReactNode; locked?: boolean; extra?: ReactNode; style?: CSSProperties; cardMax: number;
+interface Ghosts { key: string; cards: AnyCard[]; kind: 'out' | 'shatter' }
+
+function ZoneBox({ zone, cards, t, w, hl, value, locked, extra, style, cardMax, scope, ghosts, flash }: {
+  zone: Zone; cards: AnyCard[]; t: Translate; w: number; hl?: boolean; value?: number; locked?: boolean; extra?: ReactNode; style?: CSSProperties; cardMax: number;
+  scope?: string; ghosts?: Ghosts; flash?: string;
 }) {
   return (
-    <div style={{
-      borderRadius: 14, background: SURF, padding: '5px 10px', display: 'flex', flexDirection: 'column', gap: 3, boxSizing: 'border-box', minWidth: 0,
-      boxShadow: hl ? `inset 0 0 0 3px ${GOLD}, 0 0 24px rgba(255,212,71,.35)` : undefined, opacity: locked ? 0.55 : 1, transition: 'box-shadow .3s', ...style,
+    <div key={flash} style={{
+      position: 'relative', borderRadius: 14, background: SURF, padding: '5px 10px', display: 'flex', flexDirection: 'column', gap: 3, boxSizing: 'border-box', minWidth: 0,
+      boxShadow: hl ? `inset 0 0 0 3px ${GOLD}, 0 0 24px rgba(255,212,71,.35)` : undefined, opacity: locked ? 0.55 : 1, transition: 'box-shadow .3s',
+      ...(flash ? { ['--kd-glow' as any]: ZONE_COLOR[zone], animation: 'kdFlash 1.2s ease-out both' } : {}), ...style,
     }}>
       <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: ZONE_COLOR[zone] }}>
         <Icon k={zone === 'spell' ? 'spell' : zone} size={15} />
         {locked ? t('zone.corrLocked') : t('zone.' + zone)}
-        {value != null && <span className="display" style={{ marginLeft: 'auto', fontSize: 18, color: '#fff', letterSpacing: 0 }}>{value}</span>}
+        {value != null && <span key={value} className="display" style={{ marginLeft: 'auto', fontSize: 18, color: '#fff', letterSpacing: 0, animation: 'kdPop .45s ease-out' }}>{value}</span>}
         {extra}
       </span>
-      <Row cards={cards} w={w} max={cardMax} />
+      <Row cards={cards} w={w} max={cardMax} scope={scope} />
+      {ghosts && ghosts.cards.length > 0 && (
+        <div key={ghosts.key} style={{ position: 'absolute', left: 0, right: 0, bottom: 6, display: 'flex', justifyContent: 'center', gap: 6, pointerEvents: 'none', zIndex: 4 }}>
+          {ghosts.cards.map((c, i) => (
+            <div key={c.id ?? i} style={{ animation: `${ghosts.kind === 'shatter' ? 'kdShatter 1s' : 'kdOut .95s'} ease-in ${i * 0.08}s forwards` }}><CardFace c={c} w={w} /></div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
-function RoyalBox({ p, player, t, active, hl, w = 230 }: { p: any; player?: PlayerInfo; t: Translate; active?: boolean; hl?: boolean; w?: number }) {
+function RoyalBox({ p, player, t, active, hl, w = 230, fx }: { p: any; player?: PlayerInfo; t: Translate; active?: boolean; hl?: boolean; w?: number; fx?: Fx }) {
   return (
-    <div style={{
-      width: w, borderRadius: 18, background: SURF2, display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', boxSizing: 'border-box',
-      boxShadow: hl ? `inset 0 0 0 3px #FF3B4E, 0 0 26px rgba(255,59,78,.45)` : active ? `inset 0 0 0 3px ${player?.color ?? GOLD}, 0 0 26px ${(player?.color ?? GOLD)}55` : undefined,
-      transition: 'box-shadow .3s',
-    }}>
-      <Crowned player={player} royal={p.royal} size={52} fallen={p.hp <= 0} />
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0 }}>
-        <span className="display" style={{ fontSize: 17, fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{player?.name}</span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 700 }}>{t('royal.' + p.royal)} <Hearts hp={p.hp} vit={p.vit} size={16} /></span>
-        <span style={{ fontSize: 12, fontWeight: 700, color: p.corrupt ? '#C4B2FF' : 'var(--muted)' }}>
-          {p.hp <= 0 ? t('fallen') : p.hand ? t('cards', { n: p.hand }) : ''}{p.corrupt ? (p.hand || p.hp <= 0 ? ' · ' : '') + t('corrupt') : ''}
-        </span>
+    <div style={{ position: 'relative', width: w }}>
+      <Bubble fx={fx} />
+      <div key={fx?.shake || fx?.glow ? fx.key : 'calm'} style={{
+        width: w, height: '100%', borderRadius: 18, background: SURF2, display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', boxSizing: 'border-box',
+        boxShadow: hl ? `inset 0 0 0 3px #FF3B4E, 0 0 26px rgba(255,59,78,.45)` : active ? `inset 0 0 0 3px ${player?.color ?? GOLD}, 0 0 26px ${(player?.color ?? GOLD)}55` : undefined,
+        transition: 'box-shadow .3s',
+        ...(fx?.glow ? { ['--kd-glow' as any]: fx.glow } : {}),
+        animation: [fx?.shake && 'kdShake .6s ease-out', fx?.glow && 'kdGlow 1.3s ease-out'].filter(Boolean).join(', ') || undefined,
+      }}>
+        <span key={p.royal} style={{ display: 'inline-flex', animation: 'kdRoyal .8s ease-out' }}><Crowned player={player} royal={p.royal} size={52} fallen={p.hp <= 0} /></span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0 }}>
+          <span className="display" style={{ fontSize: 17, fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{player?.name}</span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 700 }}>{t('royal.' + p.royal)} <Hearts hp={p.hp} vit={p.vit} size={16} /></span>
+          <span style={{ fontSize: 12, fontWeight: 700, color: p.corrupt ? '#C4B2FF' : 'var(--muted)' }}>
+            {p.hp <= 0 ? t('fallen') : p.hand ? t('cards', { n: p.hand }) : ''}{p.corrupt ? (p.hand || p.hp <= 0 ? ' · ' : '') + t('corrupt') : ''}
+          </span>
+        </div>
       </div>
     </div>
   );
 }
 
+interface SideFx { hl?: StepT['hl']; fx?: Fx; prev?: any; ghostKey?: string; ghostKind?: Ghosts['kind']; flash?: { z: Zone; key: string } | null }
+
 /** Eine Seite des Tisches. top = Gegenüber (gespiegelt wie am echten Tisch) */
-function Side({ p, player, t, top, hl, active, values, narrow }: { p: any; player?: PlayerInfo; t: Translate; top?: boolean; hl?: StepT['hl']; active?: boolean; values?: { str: number; blk: number } | null; narrow?: boolean }) {
-  const h = (z: string) => !!hl?.some((x) => x.p === p.id && x.z === z);
+function Side({ p, player, t, top, active, values, narrow, sfx: e }: { p: any; player?: PlayerInfo; t: Translate; top?: boolean; active?: boolean; values?: { str: number; blk: number } | null; narrow?: boolean; sfx: SideFx }) {
+  const h = (z: string) => !!e.hl?.some((x) => x.p === p.id && x.z === z);
   const w = 44;
   const royalW = narrow ? 210 : 236;
   const sideMax = narrow ? 230 : 330;
+  // Karten, die seit dem letzten Schritt verschwunden sind, fliegen sichtbar raus
+  const ghosts = (z: Zone): Ghosts | undefined => {
+    if (!e.prev || !e.ghostKey) return undefined;
+    const gone = (e.prev.zones[z] as AnyCard[]).filter((c) => c.s && !p.zones[z].some((x: AnyCard) => x.id === c.id));
+    return gone.length ? { key: e.ghostKey, cards: gone, kind: e.ghostKind ?? 'out' } : undefined;
+  };
+  const flash = (z: Zone) => (e.flash?.z === z ? e.flash.key : undefined);
+  const scope = (z: Zone) => `${p.id}:${z}`;
   const corr = (
     <div style={{ display: 'flex', justifyContent: 'center' }}>
-      <ZoneBox zone="corr" cards={[]} t={t} w={w} hl={h('corr')} locked={p.corrupt} cardMax={0}
+      <ZoneBox zone="corr" cards={[]} t={t} w={w} hl={h('corr')} locked={p.corrupt} cardMax={0} flash={flash('corr')}
         style={{ width: 330, height: 44, flexDirection: 'row', alignItems: 'center' }}
         extra={!p.corrupt && (
           <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8, letterSpacing: 0 }}>
-            <span style={{ display: 'flex' }}>{p.zones.corr.map((_: unknown, i: number) => <span key={i} style={{ width: 16, height: 24, borderRadius: 4, background: '#2B2260', border: '2px solid #4A4378', marginLeft: i ? -6 : 0 }} />)}</span>
+            <span style={{ display: 'flex' }}>{p.zones.corr.map((c: AnyCard, i: number) => (
+              <span key={c.id ?? i} style={{ marginLeft: i ? -6 : 0 }}>
+                <AnimCard k={`${scope('corr')}:${c.id ?? i}`} face={false}><span style={{ display: 'block', width: 16, height: 24, borderRadius: 4, background: '#2B2260', border: '2px solid #7B6CF0' }} /></AnimCard>
+              </span>
+            ))}</span>
             {p.zones.corr.length} / {p.vit}
           </span>
         )} />
@@ -320,15 +485,15 @@ function Side({ p, player, t, top, hl, active, values, narrow }: { p: any; playe
   );
   const spell = (
     <div style={{ display: 'flex', justifyContent: 'center' }}>
-      <ZoneBox zone="spell" cards={p.zones.spell} t={t} w={w} hl={h('spell')} cardMax={300} style={{ width: 330, height: 92 }} />
+      <ZoneBox zone="spell" cards={p.zones.spell} t={t} w={w} hl={h('spell')} cardMax={300} style={{ width: 330, height: 92 }} scope={scope('spell')} ghosts={ghosts('spell')} flash={flash('spell')} />
     </div>
   );
-  const atk = <ZoneBox zone="atk" cards={p.zones.atk} t={t} w={w} hl={h('atk')} value={values ? values.str : undefined} cardMax={sideMax} />;
-  const def = <ZoneBox zone="def" cards={p.zones.def} t={t} w={w} hl={h('def')} value={values ? values.blk : undefined} cardMax={sideMax} />;
+  const atk = <ZoneBox zone="atk" cards={p.zones.atk} t={t} w={w} hl={h('atk')} value={values ? values.str : undefined} cardMax={sideMax} scope={scope('atk')} ghosts={ghosts('atk')} flash={flash('atk')} />;
+  const def = <ZoneBox zone="def" cards={p.zones.def} t={t} w={w} hl={h('def')} value={values ? values.blk : undefined} cardMax={sideMax} scope={scope('def')} ghosts={ghosts('def')} flash={flash('def')} />;
   const mid = (
     <div style={{ display: 'grid', gridTemplateColumns: `1fr ${royalW}px 1fr`, gap: 10, height: 108 }}>
       {top ? atk : def}
-      <RoyalBox p={p} player={player} t={t} active={active} hl={h('royal')} w={royalW} />
+      <RoyalBox p={p} player={player} t={t} active={active} hl={h('royal')} w={royalW} fx={e.fx} />
       {top ? def : atk}
     </div>
   );
@@ -339,14 +504,26 @@ function Side({ p, player, t, top, hl, active, values, narrow }: { p: any; playe
   );
 }
 
-function Table({ board, player, t, hl, turn, values, narrow }: { board: any[]; player: (id: string) => PlayerInfo | undefined; t: Translate; hl?: StepT['hl']; turn?: string; values?: boolean; narrow?: boolean }) {
+function Table({ board, prev, player, t, hl, turn, values, narrow, fx, ghostKey, ghostKind, flash, banner }: {
+  board: any[]; prev?: any[]; player: (id: string) => PlayerInfo | undefined; t: Translate; hl?: StepT['hl']; turn?: string; values?: boolean; narrow?: boolean;
+  fx?: Record<string, Fx>; ghostKey?: string; ghostKind?: Ghosts['kind']; flash?: { p: string; z: Zone; key: string } | null; banner?: { key: string; text: string } | null;
+}) {
   const [bottom, top] = board;
   const v = (p: any) => (values ? visibleStats(p.zones) : null);
+  const se = (p: any): SideFx => ({
+    hl, fx: fx?.[p.id], prev: prev?.find((x) => x.id === p.id), ghostKey, ghostKind, flash: flash && flash.p === p.id ? flash : null,
+  });
   return (
-    <main style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0, justifyContent: 'center' }}>
-      <Side p={top} player={player(top.id)} t={t} top hl={hl} active={turn === top.id} values={v(top)} narrow={narrow} />
+    <main style={{ position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0, justifyContent: 'center' }}>
+      <Side p={top} player={player(top.id)} t={t} top active={turn === top.id} values={v(top)} narrow={narrow} sfx={se(top)} />
       <div style={{ height: 2, background: 'linear-gradient(90deg, transparent, #4A4378, transparent)', margin: '1px 0' }} />
-      <Side p={bottom} player={player(bottom.id)} t={t} hl={hl} active={turn === bottom.id} values={v(bottom)} narrow={narrow} />
+      <Side p={bottom} player={player(bottom.id)} t={t} active={turn === bottom.id} values={v(bottom)} narrow={narrow} sfx={se(bottom)} />
+      {banner && (
+        <span key={banner.key} className="display" style={{
+          position: 'absolute', left: '50%', top: '50%', zIndex: 10, pointerEvents: 'none', fontSize: 64, fontWeight: 800, color: INK, background: GOLD,
+          padding: '6px 40px', borderRadius: 22, boxShadow: '0 8px 0 #C79E1A, 0 20px 50px rgba(0,0,0,.6)', animation: 'kdBanner 1.1s ease-out forwards',
+        }}>{banner.text}</span>
+      )}
     </main>
   );
 }
@@ -382,32 +559,41 @@ function DeckAside({ view, t }: { view: any; t: Translate }) {
 }
 
 function HostPlan({ view, t, player }: HostViewProps) {
-  useEffect(() => sfx.play('select'), [view.turn, view.board?.[0]?.hand, view.board?.[1]?.hand]);
+  const pk = view.placed?.k ?? 0;
+  useEffect(() => {
+    if (view.placed) sfx.custom((s) => ZONE_SFX[view.placed.zone as Zone](s));
+  }, [pk]);
+  useEffect(() => {
+    sfx.custom((s) => s.tone(660, 0.12, { type: 'triangle', vol: 0.05 }));
+  }, [view.turn]);
   const turnP = player(view.turn);
   return (
     <>
       <HostHeader title={t('title')} color={GOLD} info={`${t('round', { n: view.round })} · ${t('phase.plan')}`}
-        right={turnP && <Pill color={turnP.color}>{t('turn', { name: turnP.name })}</Pill>} />
+        right={turnP && <Pill color={turnP.color}><span key={view.turn} style={{ display: 'inline-block', animation: 'kdPop .4s ease-out' }}>{t('turn', { name: turnP.name })}</span></Pill>} />
       <div style={{ flex: 1, display: 'flex', gap: 14, minHeight: 0, marginTop: -12 }}>
         <JesterAside view={view} t={t} player={player} />
-        <Table board={view.board} player={player} t={t} turn={view.turn} />
+        <Table board={view.board} player={player} t={t} turn={view.turn} flash={view.placed ? { p: view.placed.p, z: view.placed.zone, key: String(pk) } : null}
+          banner={view.round && !view.placed ? { key: 'r' + view.round, text: t('round', { n: view.round }) } : null} />
         <DeckAside view={view} t={t} />
       </div>
     </>
   );
 }
 
+/** Welcher Schritt der Auflösung ist gerade dran? (Schritte haben eigene Dauern) */
 function useStepIndex(view: any) {
-  const now = useServerNow(100);
-  const len = view.steps?.length ?? 0;
-  const i = Math.floor((now - view.startAt) / (view.step * 1000));
-  return { idx: Math.max(0, Math.min(len - 1, i)), done: now >= view.startAt + len * view.step * 1000, started: now >= view.startAt };
+  const now = useServerNow(80);
+  const steps: StepT[] = view.steps ?? [];
+  const el = (now - view.startAt) / 1000;
+  let idx = 0;
+  steps.forEach((s, i) => {
+    if ((s.at ?? 0) <= el) idx = i;
+  });
+  const last = steps[steps.length - 1];
+  const total = last ? (last.at ?? 0) + (last.d ?? 1.5) : 0;
+  return { idx, done: el >= total, started: el >= 0 };
 }
-
-const STEP_SOUND: Record<string, Parameters<typeof sfx.play>[0]> = {
-  reveal: 'reveal', hit: 'stamp', miss: 'wrong', royalFalls: 'drumroll', kingFalls: 'drumroll', shatter: 'whoosh', siphon: 'sneaky',
-  counter: 'pop', corrupt: 'sneaky', higherSw: 'whoosh', higherSh: 'whoosh', wrongZone: 'whoosh', spellCancel: 'whoosh', draw: 'pop',
-};
 
 function PhaseSteps({ phase, t, size = 15, noPlan }: { phase: string; t: Translate; size?: number; noPlan?: boolean }) {
   const cur = PHASES.indexOf(phase as any);
@@ -417,7 +603,7 @@ function PhaseSteps({ phase, t, size = 15, noPlan }: { phase: string; t: Transla
         const state = i - 1 < cur ? 'done' : i - 1 === cur ? 'now' : 'next';
         return (
           <span key={p} style={{
-            fontSize: size, fontWeight: 700, padding: '4px 10px', borderRadius: 999,
+            fontSize: size, fontWeight: 700, padding: '4px 10px', borderRadius: 999, transition: 'background .3s, color .3s',
             background: state === 'now' ? GOLD : state === 'done' ? SURF2 : 'transparent', color: state === 'now' ? INK : state === 'done' ? '#E6E2FF' : '#6F68A0',
           }}>{t('phase.' + p)}</span>
         );
@@ -426,45 +612,75 @@ function PhaseSteps({ phase, t, size = 15, noPlan }: { phase: string; t: Transla
   );
 }
 
+/** Liste der Schritte mit Phasen-Zwischentiteln */
+function StepList({ steps, idx, started, done, t, name, big }: { steps: StepT[]; idx: number; started: boolean; done: boolean; t: Translate; name: (id: string) => string; big?: boolean }) {
+  return (
+    <>
+      {steps.slice(0, started ? idx + 1 : 0).map((s, i) => {
+        if (s.k === 'phase' || i === 0) {
+          const head = (
+            <span key={'h' + i} className="display anim-up" style={{ fontSize: big ? 15 : 17, fontWeight: 800, color: GOLD, marginTop: i ? 6 : 0, textTransform: 'uppercase', letterSpacing: '.05em' }}>
+              {t('phase.' + s.ph)}
+            </span>
+          );
+          if (s.k === 'phase') return head;
+          return [head, <StepLine key={i} s={s} cur={i === idx && !done} t={t} name={name} big={big} />];
+        }
+        return <StepLine key={i} s={s} cur={i === idx && !done} t={t} name={name} big={big} />;
+      })}
+    </>
+  );
+}
+
+function StepLine({ s, cur, t, name, big }: { s: StepT; cur: boolean; t: Translate; name: (id: string) => string; big?: boolean }) {
+  return (
+    <div className="anim-up" style={{ display: 'flex', gap: 9, alignItems: 'flex-start', fontSize: cur ? (big ? 18 : 16) : 14, lineHeight: 1.3, color: cur ? '#fff' : 'var(--muted)', fontWeight: cur ? 700 : 400 }}>
+      <span style={{ width: 20, height: 20, borderRadius: '50%', flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, background: cur ? GOLD : '#4BE3A1', color: INK, marginTop: 1 }}>{cur ? '▶' : '✓'}</span>
+      {stepText(s, t, name)}
+    </div>
+  );
+}
+
 function HostResolve({ view, t, player }: HostViewProps) {
   const { idx, done, started } = useStepIndex(view);
-  const step: StepT | undefined = view.steps[idx];
+  const steps: StepT[] = view.steps;
+  const step: StepT | undefined = steps[idx];
   const name = (id: string) => player(id)?.name ?? '?';
   const listRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!started || !step) return;
-    sfx.play(STEP_SOUND[step.k] ?? 'pop');
-  }, [idx, started, view.phase]);
+    const fn = STEP_SFX[step.k];
+    if (fn) sfx.custom((s) => fn(s, step.v));
+  }, [idx, started, view.startAt]);
+  useEffect(() => {
+    if (done) sfx.custom((s) => [659, 880].forEach((f, i) => s.tone(f, 0.14, { type: 'triangle', vol: 0.07, at: i * 0.1 })));
+  }, [done]);
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' });
   }, [idx]);
   const board = step?.b ?? [];
-  const nextName = view.phaseIdx < 3 ? t('phase.' + PHASES[view.phaseIdx + 1]) : null;
+  const prev = idx > 0 ? steps[idx - 1].b : undefined;
+  const fx = useMemo(() => (started ? stepFx(step, idx, t) : {}), [idx, started, view.startAt]);
+  const banner = started && step && (step.k === 'phase' || idx === 0) ? { key: `${view.startAt}-${idx}`, text: t('phase.' + step.ph) } : null;
   return (
     <>
-      <HostHeader title={t('title')} color={GOLD} info={t('round', { n: view.round })} right={<PhaseSteps phase={view.phase} t={t} />} />
+      <HostHeader title={t('title')} color={GOLD} info={t('round', { n: view.round })} right={<PhaseSteps phase={step?.ph ?? 'reveal'} t={t} />} />
       <div style={{ flex: 1, display: 'flex', gap: 16, minHeight: 0, marginTop: -12 }}>
-        {board.length === 2 && <Table board={board} player={player} t={t} hl={started ? step?.hl : undefined} values={view.phase === 'fight'} narrow />}
+        {board.length === 2 && (
+          <Table board={board} prev={started ? prev : undefined} player={player} t={t} hl={started ? step?.hl : undefined} values={step?.ph === 'fight'} narrow
+            fx={fx} ghostKey={`${view.startAt}-${idx}`} ghostKind={step?.k === 'shatter' || step?.k === 'spellCancel' ? 'shatter' : 'out'} banner={banner} />
+        )}
         <aside style={{ width: 320, flex: 'none', background: SURF, borderRadius: 18, padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10, minHeight: 0 }}>
-          <span className="display" style={{ fontSize: 22, fontWeight: 800 }}>{t('phase.' + view.phase)}</span>
           <div ref={listRef} style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 8, minHeight: 0 }}>
-            {view.steps.slice(0, started ? idx + 1 : 0).map((s: StepT, i: number) => {
-              const cur = i === idx && !done;
-              return (
-                <div key={i} className="anim-up" style={{ display: 'flex', gap: 9, alignItems: 'flex-start', fontSize: cur ? 16 : 14, lineHeight: 1.3, color: cur ? '#fff' : 'var(--muted)', fontWeight: cur ? 700 : 400 }}>
-                  <span style={{ width: 20, height: 20, borderRadius: '50%', flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, background: cur ? GOLD : '#4BE3A1', color: INK, marginTop: 1 }}>{cur ? '▶' : '✓'}</span>
-                  {stepText(s, t, name)}
-                </div>
-              );
-            })}
+            <StepList steps={steps} idx={idx} started={started} done={done} t={t} name={name} />
           </div>
-          <div style={{ borderTop: '1px solid #3A3366', paddingTop: 10, opacity: done ? 1 : 0.4, transition: 'opacity .3s' }}>
-            <div style={{ fontSize: 14, color: 'var(--muted)', marginBottom: 6 }}>{nextName ? t('next.tv', { phase: nextName }) : t('next.tvEnd')}</div>
+          <div style={{ borderTop: '1px solid #3A3366', paddingTop: 10, opacity: done ? 1 : 0.35, transition: 'opacity .3s' }}>
+            <div style={{ fontSize: 14, color: done ? '#fff' : 'var(--muted)', fontWeight: done ? 700 : 400, marginBottom: 6 }}>{view.last ? t('next.tvResult') : t('next.tvEnd')}</div>
             <div style={{ display: 'flex', gap: 14 }}>
               {view.players.map((id: string) => {
                 const ok = view.ready.includes(id) || player(id)?.isBot;
                 return (
-                  <span key={id} style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700, opacity: ok ? 1 : 0.6 }}>
+                  <span key={id + (ok ? 'y' : 'n')} style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700, opacity: ok ? 1 : 0.6, animation: ok && done ? 'kdPop .4s ease-out' : undefined }}>
                     <Avatar player={player(id)} size={26} flat />{ok ? '✓' : t('next.wait')}
                   </span>
                 );
@@ -501,6 +717,10 @@ function HostEnd({ view, t, player }: HostViewProps) {
 /* ================= Handy ================= */
 
 function Controller(props: ControllerViewProps) {
+  return <><KdStyles /><PhoneScreen {...props} /></>;
+}
+
+function PhoneScreen(props: ControllerViewProps) {
   const { view, t, me } = props;
   switch (view.screen) {
     case 'intro':
@@ -672,7 +892,7 @@ function PhonePlan({ view, t, me, send, player, room }: ControllerViewProps) {
             {t('rules.' + role)}
           </span>
         ) : (
-          <Row cards={all} w={40} max={z === 'spell' || z === 'corr' ? 200 : 104} render={(c) => {
+          <Row cards={all} w={40} max={z === 'spell' || z === 'corr' ? 200 : 104} scope={`me:${z}`} render={(c) => {
             const isPlanned = plannedHere.some((p) => p.id === c.id);
             return (
               <span onClick={isPlanned ? (e) => { e.stopPropagation(); tapCard(c as Card); } : undefined} style={{ display: 'block' }}>
@@ -729,7 +949,7 @@ function PhonePlan({ view, t, me, send, player, room }: ControllerViewProps) {
       </div>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7, justifyContent: 'center', minHeight: 96, paddingTop: 8 }}>
         {hand.filter((c) => !plan[c.id]).sort((a, b) => a.s.localeCompare(b.s) || a.n - b.n).map((c) => (
-          <CardFace key={c.id} c={c} w={hand.length > 6 ? 52 : 62} selected={sel === c.id} onClick={() => tapCard(c)} />
+          <AnimCard key={c.id} k={`hand:${c.id}`} face><CardFace c={c} w={hand.length > 6 ? 52 : 62} selected={sel === c.id} onClick={() => tapCard(c)} /></AnimCard>
         ))}
       </div>
       {view.me.corrupt && <p style={{ fontSize: 12, color: '#C4B2FF', textAlign: 'center' }}>{t('phone.corruptNote')}</p>}
@@ -746,52 +966,62 @@ function PhonePlan({ view, t, me, send, player, room }: ControllerViewProps) {
 
 function PhoneResolve({ view, t, send, player, room }: ControllerViewProps) {
   const { idx, done, started } = useStepIndex(view);
-  const name = (id: string) => (id === view.me.id ? (player(id)?.name ?? '?') : (player(id) ?? room.players.find((p) => p.id === id))?.name ?? '?');
-  const step: StepT | undefined = view.steps[idx];
+  const name = (id: string) => (player(id) ?? room.players.find((p) => p.id === id))?.name ?? '?';
+  const steps: StepT[] = view.steps;
+  const step: StepT | undefined = steps[idx];
   const opp = player(view.opp.id) ?? room.players.find((p) => p.id === view.opp.id);
   const meNow = step?.b.find((p: any) => p.id === view.me.id) ?? view.me;
   const oppNow = step?.b.find((p: any) => p.id === view.opp.id) ?? view.opp;
+  const fx = useMemo(() => (started ? stepFx(step, idx, t) : {}), [idx, started, view.startAt]);
+  const listRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!started || !step) return;
     const v = step.v ?? {};
-    if (step.k === 'hit' && v.t === view.me.id) vibrate([60, 40, 60]);
+    if (step.k === 'hit' && v.t === view.me.id) vibrate([70, 40, 70]);
+    else if (step.k === 'hit') vibrate(25);
+    else if (step.k === 'royalFalls' || step.k === 'kingFalls') vibrate([40, 30, 40, 30, 120]);
   }, [idx, started]);
+  useEffect(() => {
+    listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' });
+  }, [idx]);
+  useEffect(() => { if (done) vibrate(30); }, [done]);
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
-      <PhaseSteps phase={view.phase} t={t} size={13} noPlan />
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12, minHeight: 0, maxHeight: 'calc(100dvh - 40px)' }}>
+      <PhaseSteps phase={step?.ph ?? 'reveal'} t={t} size={13} noPlan />
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, paddingTop: 14 }}>
         {[meNow, oppNow].map((p: any, i: number) => {
           const pl = i ? opp : player(view.me.id);
           const vs = visibleStats(p.zones);
+          const f = fx[p.id];
           return (
-            <div key={p.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, background: SURF, borderRadius: 14, padding: '10px 8px' }}>
-              <Crowned player={pl} royal={p.royal} size={54} fallen={p.hp <= 0} />
-              <span style={{ fontWeight: 700, fontSize: 14, maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{pl?.name}</span>
-              <Hearts hp={p.hp} vit={p.vit} size={15} />
-              {view.phase !== 'reveal' && (
-                <span style={{ fontSize: 12, fontWeight: 700 }}>
-                  <span style={{ color: SUIT.sw.c }}>{t('str', { n: vs.str })}</span> · <span style={{ color: SUIT.sh.c }}>{t('blk', { n: vs.blk })}</span>
-                </span>
-              )}
+            <div key={p.id} style={{ position: 'relative' }}>
+              <Bubble fx={f} />
+              <div key={f?.shake || f?.glow ? f.key : 'calm'} style={{
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, background: SURF, borderRadius: 14, padding: '10px 8px',
+                ...(f?.glow ? { ['--kd-glow' as any]: f.glow } : {}),
+                animation: [f?.shake && 'kdShake .6s ease-out', f?.glow && 'kdGlow 1.3s ease-out'].filter(Boolean).join(', ') || undefined,
+              }}>
+                <span key={p.royal} style={{ display: 'inline-flex', animation: 'kdRoyal .8s ease-out' }}><Crowned player={pl} royal={p.royal} size={54} fallen={p.hp <= 0} /></span>
+                <span style={{ fontWeight: 700, fontSize: 14, maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{pl?.name}</span>
+                <Hearts hp={p.hp} vit={p.vit} size={15} />
+                {step?.ph !== 'reveal' && (
+                  <span style={{ fontSize: 12, fontWeight: 700 }}>
+                    <span style={{ color: SUIT.sw.c }}>{t('str', { n: vs.str })}</span> · <span style={{ color: SUIT.sh.c }}>{t('blk', { n: vs.blk })}</span>
+                  </span>
+                )}
+              </div>
             </div>
           );
         })}
       </div>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8, overflowY: 'auto', minHeight: 0 }}>
-        {view.steps.slice(0, started ? idx + 1 : 0).map((s: StepT, i: number) => {
-          const cur = i === idx;
-          return (
-            <p key={i} className="anim-up" style={{ fontSize: cur ? 18 : 14, fontWeight: cur ? 700 : 400, color: cur ? '#fff' : 'var(--muted)', lineHeight: 1.3 }}>
-              {stepText(s, t, name)}
-            </p>
-          );
-        })}
+      <div ref={listRef} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8, overflowY: 'auto', minHeight: 0 }}>
+        <StepList steps={steps} idx={idx} started={started} done={done} t={t} name={name} big />
       </div>
       {view.pressed ? (
         <p className="muted" style={{ textAlign: 'center' }}>{t('phone.waitOther', { name: opp?.name ?? '' })}</p>
       ) : (
-        <button type="button" className="up-btn" disabled={!done} onClick={() => { vibrate(20); send({ type: 'next' }); }} style={{ width: '100%', opacity: done ? 1 : 0.4 }}>
-          {t('phone.next')}
+        <button type="button" className="up-btn" disabled={!done} onClick={() => { vibrate(20); send({ type: 'next' }); }} style={{ width: '100%', opacity: done ? 1 : 0.4, flex: 'none' }}>
+          {done ? (view.last ? t('phone.toResult') : t('phone.nextRound')) : t('phone.watching')}
         </button>
       )}
     </div>

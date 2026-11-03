@@ -31,22 +31,28 @@ export const VITALITY = [3, 4, 5];
 export const emptyZones = (): Zones => ({ atk: [], def: [], spell: [], corr: [] });
 export const cloneZones = (z: Zones): Zones => ({ atk: z.atk.map((c) => ({ ...c })), def: z.def.map((c) => ({ ...c })), spell: z.spell.map((c) => ({ ...c })), corr: z.corr.map((c) => ({ ...c })) });
 
-export function newDeck(rand: () => number = Math.random): Card[] {
-  const cards: Card[] = [];
-  let id = 1;
-  for (const s of SUITS) for (let n = 1; n <= 10; n++) cards.push({ id: id++, s, n });
-  for (let i = cards.length - 1; i > 0; i--) {
+/** Mischen (Fisher-Yates) */
+export function shuffle<T>(a: T[], rand: () => number = Math.random): T[] {
+  for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(rand() * (i + 1));
-    [cards[i], cards[j]] = [cards[j], cards[i]];
+    [a[i], a[j]] = [a[j], a[i]];
   }
-  return cards;
+  return a;
+}
+
+/** 40 Karten, gemischt. Die IDs sind zufällig, damit verdeckte Karten nichts verraten. */
+export function newDeck(rand: () => number = Math.random): Card[] {
+  const ids = shuffle(Array.from({ length: 40 }, (_, i) => i + 1), rand);
+  const cards: Card[] = [];
+  for (const s of SUITS) for (let n = 1; n <= 10; n++) cards.push({ id: ids[cards.length], s, n });
+  return shuffle(cards, rand);
 }
 
 /* ---------------- Aufdecken ---------------- */
 
 export interface RevealResult {
   zones: Zones;
-  /** abgeworfen: höhere Waffen/Rüstungen, falsche Zone, doppelte Zauber */
+  /** abgeworfen: schon liegende Waffen/Rüstungen, die höher sind als die kleinste neue; falsche Zone; doppelte Zauber */
   higherSw: Card[];
   higherSh: Card[];
   wrongZone: Card[];
@@ -62,13 +68,14 @@ export function reveal(z0: Zones): RevealResult {
   let higherSh: Card[] = [];
   if (newSw.length) {
     const low = Math.min(...newSw.map((c) => c.n));
-    higherSw = z.atk.filter((c) => c.s === 'sw' && c.n > low);
-    z.atk = z.atk.filter((c) => !(c.s === 'sw' && c.n > low));
+    // nur schon liegende Waffen fliegen raus – neu gelegte bleiben alle
+    higherSw = z.atk.filter((c) => c.s === 'sw' && !c.hidden && c.n > low);
+    z.atk = z.atk.filter((c) => !(c.s === 'sw' && !c.hidden && c.n > low));
   }
   if (newSh.length) {
     const low = Math.min(...newSh.map((c) => c.n));
-    higherSh = z.def.filter((c) => c.s === 'sh' && c.n > low);
-    z.def = z.def.filter((c) => !(c.s === 'sh' && c.n > low));
+    higherSh = z.def.filter((c) => c.s === 'sh' && !c.hidden && c.n > low);
+    z.def = z.def.filter((c) => !(c.s === 'sh' && !c.hidden && c.n > low));
   }
   const wrongZone = [...z.def.filter((c) => c.s === 'sw'), ...z.atk.filter((c) => c.s === 'sh')];
   z.def = z.def.filter((c) => c.s !== 'sw');

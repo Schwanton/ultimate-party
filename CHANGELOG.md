@@ -2,6 +2,13 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.9.1
+
+- Kronenduell: Beim Aufdecken fliegen nur Waffen/Rüstungen raus, die schon vorher lagen – neu gelegte bleiben alle liegen (z. B. Schild 5 und 8 neu = Block 9)
+- Kronenduell: Nur noch ein „Weiter“ pro Runde, nachdem alles ausgewertet ist
+- Kronenduell: Animationen und Klänge für alles – Karten fliegen ein, drehen sich um, fliegen raus oder zerspringen, Treffer schütteln die Figur, Sprechblasen zeigen Schaden, Block, Korruption usw. Jede Zone hat beim Legen einen eigenen Klang
+- Kronenduell: Verdeckte Karten verraten über ihre interne Nummer nichts mehr
+
 ## 0.9.0
 
 - Neues Spiel: **Kronenduell** – taktisches Kartenduell für zwei nach den Regeln von „Regicide: Crown Duels“. Auf dem TV liegt der Tisch wie im echten Spiel, auf dem Handy plant ihr eure Karten (auch schon, wenn der andere dran ist) und legt sie mit „Karte legen“. Die Auflösung läuft Schritt für Schritt, am Ende jeder Phase drücken beide „Weiter“. Spickzettel jederzeit auf dem Handy

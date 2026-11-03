@@ -7,11 +7,16 @@
 
 import { type GameContext, type GameServerModule } from '@up/sdk';
 import {
-  VITALITY, cloneZones, counterDraws, damage, emptyZones, keepCount, newDeck, reveal, shatter, siphonCount, stats,
+  VITALITY, cloneZones, shuffle, counterDraws, damage, emptyZones, keepCount, newDeck, reveal, shatter, siphonCount, stats,
   type Card, type Part, type Zone, type Zones,
 } from './rules';
 
-const STEP = 1.7; // Sekunden pro Auflösungs-Schritt auf dem TV
+/** Dauer (Sekunden) je Auflösungs-Schritt auf dem TV – wichtige Momente bekommen mehr Zeit */
+const DUR: Record<string, number> = {
+  phase: 1.1, reveal: 1.6, strength: 1.3, block: 1.3, hit: 2, miss: 1.5, royalFalls: 2.6, kingFalls: 3, shatter: 1.8, siphon: 1.6,
+  corrupt: 2, draw: 1, cleanup: 1.4, counter: 1.4,
+};
+const DEFAULT_DUR = 1.4;
 const PHASES = ['reveal', 'fight', 'spells', 'cleanup'] as const;
 type PhaseName = (typeof PHASES)[number];
 
@@ -31,7 +36,7 @@ function pub(p: PState, showHidden = false) {
   const hide = (c: Card & { hidden?: boolean }) => (c.hidden && !showHidden ? { id: c.id, hidden: true } : { ...c });
   return {
     id: p.id, royal: p.royal, hp: p.hp, vit: VITALITY[Math.min(2, p.royal)], corrupt: p.corrupt, defeated: p.defeated, hand: p.hand.length,
-    zones: { atk: p.zones.atk.map(hide), def: p.zones.def.map(hide), spell: p.zones.spell.map(hide), corr: p.zones.corr.map(() => ({ hidden: true })) },
+    zones: { atk: p.zones.atk.map(hide), def: p.zones.def.map(hide), spell: p.zones.spell.map(hide), corr: p.zones.corr.map((c) => ({ id: c.id, hidden: true })) },
   };
 }
 
@@ -42,6 +47,11 @@ interface Step {
   b: ReturnType<typeof pub>[];
   /** betroffene Zonen zum Hervorheben */
   hl?: { p: string; z: Zone | 'royal' }[];
+  /** Phase */
+  ph: PhaseName;
+  /** Beginn (Sekunden ab Start der Auflösung) und Dauer */
+  at: number;
+  d: number;
 }
 
 export default {
@@ -54,11 +64,13 @@ export default {
     let round = 0;
     let phase: 'intro' | 'plan' | 'resolve' | 'end' = 'intro';
     let turn = 0;
-    let resolvePhase = 0;
-    let steps: Record<PhaseName, Step[]> = { reveal: [], fight: [], spells: [], cleanup: [] };
+    let steps: Step[] = [];
     let phaseStart = 0;
-    let phaseDone = false; // Auflösungs-Animation dieser Phase ist durch
+    let phaseDone = false; // Auflösungs-Animation ist durch
     let phaseToken = 0;
+    /** zuletzt gelegte Karte (für die Animation auf dem TV) */
+    let lastPlaced: { p: string; zone: Zone; k: number } | null = null;
+    let placedCount = 0;
     let ready = new Set<string>();
     let winner: number | null = null; // -1 = unentschieden
     const P = (i: number) => players[i];
@@ -68,7 +80,7 @@ export default {
     function draw(p: PState, n: number) {
       for (let i = 0; i < n; i++) {
         if (!deck.length) {
-          deck = newDeck().filter((c) => discard.some((d) => d.id === c.id)); // Ablage neu mischen
+          deck = shuffle(discard); // Ablage neu mischen
           discard = [];
           if (!deck.length) return;
         }
@@ -95,6 +107,7 @@ export default {
     function startPlot() {
       round++;
       phase = 'plan';
+      lastPlaced = null;
       const [a, b] = [P(0).hand.length, P(1).hand.length];
       if (a === b) {
         if (round > 1) jester = other(jester);
@@ -113,6 +126,7 @@ export default {
       if (k < 0 || !['atk', 'def', 'spell', 'corr'].includes(zone)) return;
       const [card] = p.hand.splice(k, 1);
       p.zones[zone].push({ ...card, hidden: true });
+      lastPlaced = { p: p.id, zone, k: ++placedCount };
       // Wer mehr Karten hat, legt weiter, bis beide gleich viele haben; sonst abwechselnd
       const o = other(i);
       if (!canPlace(i)) turn = canPlace(o) ? o : -1;
@@ -123,15 +137,14 @@ export default {
     }
 
     function endPlot() {
-      // Letzte Karte(n) abwerfen
+      // Letzte Karte(n) auf der Hand abwerfen (wie im Regelheft)
       for (const p of players) {
         toDiscard(p.hand);
         p.hand = [];
       }
       buildResolution();
       phase = 'resolve';
-      resolvePhase = 0;
-      startResolvePhase();
+      startResolve();
     }
 
     /* ---------------- Auflösung ---------------- */
@@ -141,9 +154,20 @@ export default {
     }
 
     function buildResolution() {
-      steps = { reveal: [], fight: [], spells: [], cleanup: [] };
+      steps = [];
+      let t = 0;
       const order = [jester, other(jester)]; // wer den Narren hat, löst zuerst auf
-      const push = (ph: PhaseName, k: string, v?: Record<string, unknown>, hl?: Step['hl']) => steps[ph].push({ k, v, b: snap(), hl });
+      const push = (ph: PhaseName, k: string, v?: Record<string, unknown>, hl?: Step['hl']) => {
+        // neue Phase: kurzer Zwischentitel
+        if (steps.length && steps[steps.length - 1].ph !== ph) {
+          const d = DUR.phase;
+          steps.push({ k: 'phase', ph, b: steps[steps.length - 1].b, at: t, d });
+          t += d;
+        }
+        const d = DUR[k] ?? DEFAULT_DUR;
+        steps.push({ k, v, b: snap(), hl, ph, at: t, d });
+        t += d;
+      };
 
       // 1. Aufdecken
       const revealed = players.map((p) => reveal(p.zones));
@@ -221,7 +245,7 @@ export default {
         any = true;
         for (let k = 0; k < n; k++) {
           if (!deck.length) {
-            deck = newDeck().filter((c) => discard.some((d) => d.id === c.id));
+            deck = shuffle(discard);
             discard = [];
           }
           const c = deck.pop();
@@ -285,18 +309,16 @@ export default {
       }
     }
 
-    function phaseEnd() {
-      return phaseStart + steps[PHASES[resolvePhase]].length * STEP * 1000;
-    }
+    const totalDur = () => (steps.length ? steps[steps.length - 1].at + steps[steps.length - 1].d : 0);
 
-    function startResolvePhase() {
+    function startResolve() {
       ready = new Set();
       phaseStart = Date.now() + 300;
       phaseDone = false;
       const token = ++phaseToken;
       broadcast();
-      // erst wenn alle Schritte gezeigt wurden, darf es weitergehen (Testspieler/Getrennte zählen als bereit)
-      ctx.after((phaseEnd() - Date.now()) / 1000 + 0.2, () => {
+      // Erst wenn die ganze Runde gezeigt wurde, darf es weitergehen (Testspieler/Getrennte zählen als bereit)
+      ctx.after(totalDur() + 0.5, () => {
         if (token !== phaseToken) return;
         phaseDone = true;
         checkAdvance();
@@ -309,8 +331,6 @@ export default {
       const need = ids.filter((id) => ctx.player(id)?.connected && !ctx.player(id)?.isBot);
       if (!need.every((id) => ready.has(id))) return;
       if (phase === 'intro') return startPlot();
-      resolvePhase++;
-      if (resolvePhase < PHASES.length) return startResolvePhase();
       if (winner != null) return endGame();
       startPlot();
     }
@@ -327,11 +347,8 @@ export default {
     function hostView() {
       const base = { round, jester: ids[jester], players: ids };
       if (phase === 'intro') return { screen: 'intro', ...base, ready: [...ready] };
-      if (phase === 'plan') return { screen: 'plan', ...base, turn: ids[turn], board: snap(), deck: deck.length, discardTop: discard[discard.length - 1] ?? null };
-      if (phase === 'resolve') {
-        const name = PHASES[resolvePhase];
-        return { screen: 'resolve', ...base, phase: name, phaseIdx: resolvePhase, steps: steps[name], startAt: phaseStart, step: STEP, ready: [...ready], deck: deck.length };
-      }
+      if (phase === 'plan') return { screen: 'plan', ...base, turn: ids[turn], board: snap(), deck: deck.length, discardTop: discard[discard.length - 1] ?? null, placed: lastPlaced };
+      if (phase === 'resolve') return { screen: 'resolve', ...base, steps, startAt: phaseStart, ready: [...ready], deck: deck.length, last: winner != null };
       return { screen: 'end', ...base, winner: winner === -1 ? null : ids[winner!], draw: winner === -1, board: snap() };
     }
 
@@ -342,13 +359,10 @@ export default {
       if (phase === 'intro') return { screen: 'intro', ...base, input: true, pressed: ready.has(p.id) };
       if (phase === 'plan') {
         return {
-          screen: 'plan', ...base, hand: p.hand, myTurn: turn === i, input: turn === i, canPlace: canPlace(i), keep: keepCount(p.corrupt),
+          screen: 'plan', ...base, placed: lastPlaced, hand: p.hand, myTurn: turn === i, input: turn === i, canPlace: canPlace(i), keep: keepCount(p.corrupt),
         };
       }
-      if (phase === 'resolve') {
-        const name = PHASES[resolvePhase];
-        return { screen: 'resolve', ...base, phase: name, phaseIdx: resolvePhase, steps: steps[name], startAt: phaseStart, step: STEP, pressed: ready.has(p.id), input: !ready.has(p.id) };
-      }
+      if (phase === 'resolve') return { screen: 'resolve', ...base, steps, startAt: phaseStart, pressed: ready.has(p.id), input: !ready.has(p.id), last: winner != null };
       return { screen: 'end', ...base, won: winner === i, draw: winner === -1 };
     }
 

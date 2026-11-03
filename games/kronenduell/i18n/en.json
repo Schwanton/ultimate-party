@@ -96,8 +96,7 @@
   "part.wardMatch": "Pair {v}",
   "part.none": "nothing",
   "dmg.parts": "1 + critical {crit} + pair {match}",
-  "next.tv": "On to “{phase}” – both on your phones:",
-  "next.tvEnd": "Next round – both on your phones:",
+  "next.tvEnd": "Round over – both on your phones:",
   "next.wait": "…",
   "end.win": "{name} wins the Crown Duel!",
   "end.draw": "Both Kings fall – it's a draw!",
@@ -127,5 +126,14 @@
   "phone.corruptNote": "You're corrupt: corruption locked, 2 cards stay in hand.",
   "phone.tapBack": "Tap again: back to hand",
   "watch": "Look at the TV!",
-  "jester": "Jester"
+  "jester": "Jester",
+  "fx.blocked": "Blocked!",
+  "fx.cards": "+{n} cards",
+  "fx.siphon": "+{n} corruption",
+  "fx.shatter": "Shattered!",
+  "fx.corrupt": "Corrupt!",
+  "next.tvResult": "To the result – both on your phones:",
+  "phone.toResult": "See result",
+  "phone.nextRound": "Next round",
+  "phone.watching": "Watch the TV …"
 }
