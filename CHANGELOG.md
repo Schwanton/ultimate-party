@@ -2,6 +2,12 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.9.3
+
+- Kronenduell: Treffer – der ganze Angriffsbereich schlägt gegen die Verteidigung des Gegners, die zurückgeschleudert wird und rot aufleuchtet, mit Einschlag-Geräusch
+- Kronenduell: Geblockt – Angriff und Verteidigung bewegen sich aufeinander zu, prallen in der Mitte ab, mit metallischem Block-Klang
+- Kronenduell: Die zählende (höchste) Waffe bzw. Rüstung ist etwas größer dargestellt
+
 ## 0.9.2
 
 - Kronenduell: Auf dem TV stehen Angriff und Verteidigung jetzt als großes Schwert/Schild mit großem Wert (statt Überschrift) – immer der aktuelle liegende Wert

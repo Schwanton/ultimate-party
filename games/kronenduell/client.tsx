@@ -172,6 +172,9 @@ function KdStyles() {
 @keyframes kdBanner { 0% { opacity: 0; transform: translate(-50%, -50%) scale(.5) rotate(-4deg); } 22% { opacity: 1; transform: translate(-50%, -50%) scale(1.1) rotate(1deg); } 34% { transform: translate(-50%, -50%) scale(1) rotate(0); } 78% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.06); } }
 @keyframes kdGlow { 0%,100% { box-shadow: 0 0 0 0 transparent; } 40% { box-shadow: 0 0 34px 8px var(--kd-glow); } }
 @keyframes kdTurn { 0%,100% { opacity: 1; } 50% { opacity: .55; } }
+@keyframes kdLunge { 0% { transform: none; } 30% { transform: translateY(calc(var(--d) * -22px)) scale(.97); } 55% { transform: translateY(calc(var(--d) * 208px)) scale(1.07); } 64% { transform: translateY(calc(var(--d) * 190px)) scale(1.03); } 100% { transform: none; } }
+@keyframes kdRecoil { 0%, 54% { transform: none; filter: none; } 60% { transform: translateY(calc(var(--d) * -30px)) rotate(-2.5deg); filter: drop-shadow(0 0 22px #FF3B4E) brightness(1.4); } 70% { transform: translate(9px, calc(var(--d) * -12px)) rotate(1.5deg); } 80% { transform: translateX(-6px); filter: drop-shadow(0 0 10px #FF3B4E); } 90% { transform: translateX(3px); } 100% { transform: none; filter: none; } }
+@keyframes kdClash { 0% { transform: none; } 45% { transform: translateY(calc(var(--d) * 104px)) scale(1.04); filter: drop-shadow(0 0 18px #fff); } 53% { transform: translateY(calc(var(--d) * 88px)); filter: none; } 62% { transform: translateY(calc(var(--d) * 100px)); } 100% { transform: none; } }
 @keyframes kdPop { 0% { transform: scale(.3); } 60% { transform: scale(1.35); } 100% { transform: scale(1); } }
 @keyframes kdRoyal { 0% { transform: scale(.2) rotate(-25deg); opacity: 0; } 65% { transform: scale(1.2) rotate(6deg); opacity: 1; } 100% { transform: none; } }
 @keyframes kdFlash { 0% { box-shadow: inset 0 0 0 3px var(--kd-glow), 0 0 0 0 var(--kd-glow); } 30% { box-shadow: inset 0 0 0 3px var(--kd-glow), 0 0 30px 6px var(--kd-glow); } 100% { box-shadow: inset 0 0 0 3px var(--kd-glow), 0 0 0 0 transparent; } }
@@ -207,12 +210,24 @@ const STEP_SFX: Record<string, (s: Synth, v: any) => void> = {
   allOutAtk: (s) => [392, 523, 659, 784].forEach((f, i) => s.tone(f, 0.18, { type: 'sawtooth', vol: 0.06, at: i * 0.08 })),
   allOutDef: (s) => [196, 262, 330, 392].forEach((f, i) => s.tone(f, 0.22, { type: 'square', vol: 0.06, at: i * 0.09 })),
   facePlant: (s) => [392, 370, 349, 311].forEach((f, i) => s.tone(f, 0.32, { type: 'square', vol: 0.06, at: i * 0.26, to: f * 0.96 })),
+  // Angriff rauscht heran (0–0,5 s), dann schwerer Einschlag; jeder weitere Schadenspunkt ein Nachschlag
   hit: (s, v) => {
-    s.noise(0.32, { filter: 650, type: 'lowpass', vol: 0.5 });
-    s.tone(120, 0.38, { vol: 0.45, to: 40 });
-    for (let i = 1; i < Math.min(5, v?.dmg ?? 1); i++) { s.noise(0.16, { filter: 900, type: 'lowpass', vol: 0.35, at: i * 0.2 }); s.tone(150, 0.2, { vol: 0.3, to: 60, at: i * 0.2 }); }
+    s.noise(0.45, { filter: 800, type: 'bandpass', sweepTo: 3000, vol: 0.14 });
+    const at = CLASH.hitAt;
+    s.noise(0.4, { filter: 650, type: 'lowpass', vol: 0.6, at });
+    s.tone(120, 0.45, { vol: 0.5, to: 38, at });
+    s.tone(60, 0.5, { type: 'sawtooth', vol: 0.12, to: 30, at });
+    for (let i = 1; i < Math.min(5, v?.dmg ?? 1); i++) { s.noise(0.16, { filter: 900, type: 'lowpass', vol: 0.35, at: at + i * 0.22 }); s.tone(150, 0.2, { vol: 0.3, to: 60, at: at + i * 0.22 }); }
   },
-  miss: (s) => { s.tone(1760, 0.4, { type: 'square', vol: 0.045 }); s.tone(2350, 0.35, { type: 'square', vol: 0.035, at: 0.01 }); s.noise(0.08, { filter: 5000, type: 'highpass', vol: 0.15 }); },
+  // beide bewegen sich aufeinander zu und prallen ab: metallisches Klirren
+  miss: (s) => {
+    s.noise(0.35, { filter: 900, type: 'bandpass', sweepTo: 2500, vol: 0.1 });
+    const at = CLASH.blockAt;
+    s.noise(0.12, { filter: 4500, type: 'highpass', vol: 0.3, at });
+    s.tone(1760, 0.6, { type: 'square', vol: 0.05, at });
+    s.tone(2637, 0.5, { type: 'square', vol: 0.035, at: at + 0.005 });
+    s.tone(220, 0.25, { vol: 0.3, to: 120, at });
+  },
   counter: (s, v) => { for (let i = 0; i < Math.min(5, v?.n ?? 1); i++) snap(s, i * 0.1); s.tone(880, 0.15, { type: 'triangle', vol: 0.06, at: 0.05 }); },
   draw: (s, v) => { for (let i = 0; i < Math.min(6, v?.n ?? 1); i++) snap(s, i * 0.09, 0.14); },
   siphon: (s) => { s.tone(320, 0.7, { vol: 0.12, to: 80 }); s.noise(0.65, { filter: 900, type: 'bandpass', sweepTo: 180, vol: 0.13 }); },
@@ -230,6 +245,9 @@ const STEP_SFX: Record<string, (s: Synth, v: any) => void> = {
   pure: (s) => [784, 988, 1175, 1568].forEach((f, i) => s.tone(f, 0.2, { type: 'triangle', vol: 0.06, at: i * 0.06 })),
 };
 STEP_SFX.higherSh = STEP_SFX.higherSw;
+
+/** Zusammenprall Angriff ↔ Verteidigung: Dauer und Zeitpunkt des Aufpralls (Sekunden) */
+const CLASH = { dur: 0.95, hitAt: 0.95 * 0.55, blockAt: 0.95 * 0.45 };
 
 /* ---------- Effekte je Schritt ---------- */
 
@@ -400,6 +418,14 @@ function HostIntro({ view, t, player }: HostViewProps) {
 
 interface Ghosts { key: string; cards: AnyCard[]; kind: 'out' | 'shatter' }
 
+/** Die zählende (höchste) offene Waffe bzw. Rüstung einer Zone */
+function topCardId(cards: AnyCard[], zone: Zone) {
+  const suit = zone === 'atk' ? 'sw' : zone === 'def' ? 'sh' : null;
+  let best: AnyCard | null = null;
+  for (const c of cards) if (c.s === suit && !c.hidden && (!best || (c.n ?? 0) > (best.n ?? 0))) best = c;
+  return best?.id ?? null;
+}
+
 /** Angriff/Verteidigung auf dem TV: großes Symbol + großer Wert statt Überschrift */
 function StatZone({ zone, cards, w, hl, value, cardMax, scope, ghosts, flash, statRight }: {
   zone: 'atk' | 'def'; cards: AnyCard[]; w: number; hl?: boolean; value: number; cardMax: number; scope?: string; ghosts?: Ghosts; flash?: string; statRight?: boolean;
@@ -418,7 +444,7 @@ function StatZone({ zone, cards, w, hl, value, cardMax, scope, ghosts, flash, st
       ...(flash ? { ['--kd-glow' as any]: col, animation: 'kdFlash 1.2s ease-out both' } : {}),
     }}>
       {stat}
-      <Row cards={cards} w={w} max={cardMax} scope={scope} />
+      <Row cards={cards} w={w} max={cardMax} scope={scope} render={(c) => <CardFace c={c} w={c.id != null && c.id === topCardId(cards, zone) ? Math.round(w * 1.28) : w} />} />
       {ghosts && ghosts.cards.length > 0 && (
         <div key={ghosts.key} style={{ position: 'absolute', left: 0, right: 0, bottom: 6, display: 'flex', justifyContent: 'center', gap: 6, pointerEvents: 'none', zIndex: 4 }}>
           {ghosts.cards.map((c, i) => (
@@ -482,7 +508,8 @@ function RoyalBox({ p, player, t, active, hl, w = 230, fx }: { p: any; player?: 
   );
 }
 
-interface SideFx { hl?: StepT['hl']; fx?: Fx; prev?: any; ghostKey?: string; ghostKind?: Ghosts['kind']; flash?: { z: Zone; key: string } | null }
+interface Clash { key: string; kind: 'hit' | 'miss'; a: string; d: string }
+interface SideFx { hl?: StepT['hl']; fx?: Fx; prev?: any; ghostKey?: string; ghostKind?: Ghosts['kind']; flash?: { z: Zone; key: string } | null; clash?: Clash | null }
 
 /** Eine Seite des Tisches. top = Gegenüber (gespiegelt wie am echten Tisch) */
 function Side({ p, player, t, top, active, values, narrow, sfx: e }: { p: any; player?: PlayerInfo; t: Translate; top?: boolean; active?: boolean; values?: { str: number; blk: number } | null; narrow?: boolean; sfx: SideFx }) {
@@ -520,8 +547,22 @@ function Side({ p, player, t, top, active, values, narrow, sfx: e }: { p: any; p
     </div>
   );
   // Werte stehen jeweils außen: unten Verteidigung links/Angriff rechts, oben gespiegelt
-  const atk = <StatZone zone="atk" cards={p.zones.atk} w={w} hl={h('atk')} value={values?.str ?? 0} cardMax={sideMax - 80} scope={scope('atk')} ghosts={ghosts('atk')} flash={flash('atk')} statRight={!top} />;
-  const def = <StatZone zone="def" cards={p.zones.def} w={w} hl={h('def')} value={values?.blk ?? 0} cardMax={sideMax - 80} scope={scope('def')} ghosts={ghosts('def')} flash={flash('def')} statRight={!!top} />;
+  // Zusammenprall: oben bewegt sich nach unten (+1), unten nach oben (−1)
+  const clashWrap = (z: 'atk' | 'def', node: ReactNode) => {
+    const c = e.clash;
+    let anim: string | undefined;
+    if (c && z === 'atk' && c.a === p.id) anim = c.kind === 'hit' ? 'kdLunge' : 'kdClash';
+    if (c && z === 'def' && c.d === p.id) anim = c.kind === 'hit' ? 'kdRecoil' : 'kdClash';
+    return (
+      <div key={anim ? `${z}-${c!.key}` : `${z}-still`} style={{ position: 'relative', zIndex: anim ? 6 : undefined, display: 'grid', ['--d' as any]: top ? 1 : -1, animation: anim ? `${anim} ${CLASH.dur}s cubic-bezier(.4,0,.3,1) both` : undefined }}>
+        {node}
+      </div>
+    );
+  };
+  const atk0 = <StatZone zone="atk" cards={p.zones.atk} w={w} hl={h('atk')} value={values?.str ?? 0} cardMax={sideMax - 80} scope={scope('atk')} ghosts={ghosts('atk')} flash={flash('atk')} statRight={!top} />;
+  const def0 = <StatZone zone="def" cards={p.zones.def} w={w} hl={h('def')} value={values?.blk ?? 0} cardMax={sideMax - 80} scope={scope('def')} ghosts={ghosts('def')} flash={flash('def')} statRight={!!top} />;
+  const atk = clashWrap('atk', atk0);
+  const def = clashWrap('def', def0);
   const mid = (
     <div style={{ display: 'grid', gridTemplateColumns: `1fr ${royalW}px 1fr`, gap: 10, height: 108 }}>
       {top ? atk : def}
@@ -536,9 +577,10 @@ function Side({ p, player, t, top, active, values, narrow, sfx: e }: { p: any; p
   );
 }
 
-function Table({ board, prev, player, t, hl, turn, values, narrow, fx, ghostKey, ghostKind, flash, banner }: {
+function Table({ board, prev, player, t, hl, turn, values, narrow, fx, ghostKey, ghostKind, flash, banner, clash }: {
   board: any[]; prev?: any[]; player: (id: string) => PlayerInfo | undefined; t: Translate; hl?: StepT['hl']; turn?: string; values?: boolean; narrow?: boolean;
   fx?: Record<string, Fx>; ghostKey?: string; ghostKind?: Ghosts['kind']; flash?: { p: string; z: Zone; key: string } | null; banner?: { key: string; text: string } | null;
+  clash?: Clash | null;
 }) {
   const [bottom, top] = board;
   // liegende (aufgedeckte) Werte immer zeigen; im Kampf inkl. „Alles auf Angriff/Abwehr“
@@ -547,7 +589,7 @@ function Table({ board, prev, player, t, hl, turn, values, narrow, fx, ghostKey,
     return values ? { str: st.str, blk: st.blk } : { str: st.baseStr, blk: st.baseBlk };
   };
   const se = (p: any): SideFx => ({
-    hl, fx: fx?.[p.id], prev: prev?.find((x) => x.id === p.id), ghostKey, ghostKind, flash: flash && flash.p === p.id ? flash : null,
+    hl, fx: fx?.[p.id], prev: prev?.find((x) => x.id === p.id), ghostKey, ghostKind, flash: flash && flash.p === p.id ? flash : null, clash,
   });
   return (
     <main style={{ position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0, justifyContent: 'center' }}>
@@ -704,7 +746,8 @@ function HostResolve({ view, t, player }: HostViewProps) {
       <div style={{ flex: 1, display: 'flex', gap: 16, minHeight: 0, marginTop: -12 }}>
         {board.length === 2 && (
           <Table board={board} prev={started ? prev : undefined} player={player} t={t} hl={started ? step?.hl : undefined} values={step?.ph === 'fight'} narrow
-            fx={fx} ghostKey={`${view.startAt}-${idx}`} ghostKind={step?.k === 'shatter' || step?.k === 'spellCancel' ? 'shatter' : 'out'} banner={banner} />
+            fx={fx} ghostKey={`${view.startAt}-${idx}`}
+            clash={started && step && (step.k === 'hit' || step.k === 'miss') ? { key: `${view.startAt}-${idx}`, kind: step.k, a: step.v.p, d: step.v.t } : null} ghostKind={step?.k === 'shatter' || step?.k === 'spellCancel' ? 'shatter' : 'out'} banner={banner} />
         )}
         <aside style={{ width: 320, flex: 'none', background: SURF, borderRadius: 18, padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10, minHeight: 0 }}>
           <div ref={listRef} style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 8, minHeight: 0 }}>
@@ -933,7 +976,7 @@ function PhonePlan({ view, t, me, send, player, room }: ControllerViewProps) {
             const isPlanned = plannedHere.some((p) => p.id === c.id);
             return (
               <span onClick={isPlanned ? (e) => { e.stopPropagation(); tapCard(c as Card); } : undefined} style={{ display: 'block' }}>
-                <CardFace c={c} w={40} planned={isPlanned} mark={!!c.hidden && !isPlanned} />
+                <CardFace c={c} w={!isPlanned && c.id === topCardId(existing, z) ? 48 : 40} planned={isPlanned} mark={!!c.hidden && !isPlanned} />
               </span>
             );
           }} />
