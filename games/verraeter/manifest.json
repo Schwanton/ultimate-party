@@ -1,0 +1,38 @@
+{
+  "id": "verraeter",
+  "name": { "de": "Verräter-Team", "en": "Traitors" },
+  "description": {
+    "de": "Unter euch sind heimliche Verräter. Erfüllt Missionen, diskutiert und werft die Richtigen raus – bevor sie euch sabotieren.",
+    "en": "Secret traitors are among you. Complete missions, argue and vote out the right people – before they sabotage you."
+  },
+  "minPlayers": 5,
+  "maxPlayers": 30,
+  "audience": false,
+  "minutes": 15,
+  "color": "#6C8CFF",
+  "tags": ["deceive", "social"],
+  "sdkVersion": 1,
+  "version": "1.0.0",
+  "author": "UP!",
+  "options": [
+    {
+      "id": "traitors", "label": { "de": "Verräter", "en": "Traitors" }, "default": 0,
+      "choices": [
+        { "value": 0, "label": { "de": "Automatisch", "en": "Auto" } },
+        { "value": 1, "label": { "de": "1", "en": "1" } },
+        { "value": 2, "label": { "de": "2", "en": "2" } },
+        { "value": 3, "label": { "de": "3", "en": "3" } },
+        { "value": 4, "label": { "de": "4", "en": "4" } }
+      ],
+      "help": { "de": "Automatisch: etwa jeder Fünfte ist Verräter (5 Spieler: 1, 10 Spieler: 2, 20 Spieler: 4).", "en": "Auto: roughly one in five is a traitor (5 players: 1, 10 players: 2, 20 players: 4)." }
+    },
+    {
+      "id": "discussTime", "label": { "de": "Zeit zum Diskutieren", "en": "Discussion time" }, "default": 90,
+      "choices": [
+        { "value": 60, "label": { "de": "1 Min.", "en": "1 min" } },
+        { "value": 90, "label": { "de": "1,5 Min.", "en": "1.5 min" } },
+        { "value": 150, "label": { "de": "2,5 Min.", "en": "2.5 min" } }
+      ]
+    }
+  ]
+}

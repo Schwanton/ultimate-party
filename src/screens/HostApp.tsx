@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
-import type { Lang, PlayerInfo } from '@up/sdk';
+import type { GameManifest, Lang, PlayerInfo, Translate } from '@up/sdk';
 import { net, useNet, loadSession, saveSession } from '../net';
 import { guessLang, useT } from '../i18n';
 import { clientGame } from '../registry';
@@ -7,6 +7,7 @@ import { Avatar, Crown, Logo, QrCode, Stage, isLight, sfx, shade } from '../ui';
 import { HostSettings } from './HostSettings';
 import { GameOptionsForm, optionsSummary } from './GameOptions';
 import { UpdateBanner } from './Update';
+import { GameLibrary, TagChip, fitOf, gameDesc, gameName, gameTags } from './GameLibrary';
 
 async function connectHost() {
   const saved = loadSession('host');
@@ -186,6 +187,7 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
   const lastWinner = lastResult?.ranking[0] ? players.find((p) => p.id === lastResult.ranking[0].playerId) : undefined;
   const canStart = !!selected && active.length >= selected.minPlayers;
   const [optionsOpen, setOptionsOpen] = useState(false);
+  const [libraryOpen, setLibraryOpen] = useState(false);
 
   const setLang = (lang: Lang) => {
     try { localStorage.setItem('up:lang', lang); } catch { /* egal */ }
@@ -237,6 +239,11 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
         </div>
       )}
 
+      {libraryOpen && (
+        <GameLibrary games={games} selectedId={room.selectedGameId} players={active.length} lang={room.lang} t={t}
+          onPick={(id) => { net.send('select', { gameId: id }); setLibraryOpen(false); }} onClose={() => setLibraryOpen(false)} />
+      )}
+
       <main style={{ flex: 1, minHeight: 0, display: 'flex', gap: 24 }}>
         <section className="up-card" style={{ width: 480, padding: 32, display: 'flex', flexDirection: 'column', gap: 20, borderRadius: 28 }}>
           <h2 style={{ fontSize: 40, fontWeight: 800 }}>{t('join.title')}</h2>
@@ -269,40 +276,53 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
               {lastWinner ? t('lobby.lastWinner', { name: lastWinner.name }) + ' · ' : ''}
               {vip ? t('lobby.vipPicks', { name: vip.name }) : t('lobby.waitingForPlayers')}
             </p>
-            <div style={{ display: 'flex', gap: 10, flex: 'none' }}>
-              {selected?.options?.length ? <button className="up-btn ghost small" onClick={() => setOptionsOpen(true)}>{t('lobby.gameSettings')}</button> : null}
-              {canStart && <button className="up-btn small" onClick={() => net.request('start')}>{t('lobby.start')}</button>}
-            </div>
           </div>
-          {selected?.options?.length ? (
-            <p className="faint" style={{ fontSize: 14, marginTop: -8 }}>{optionsSummary(selected, room.settings.gameOptions?.[selected.id], room.lang)}</p>
-          ) : null}
         </section>
       </main>
 
-      <section aria-label="Spiele" style={{ height: 120, flex: 'none', display: 'grid', gridTemplateColumns: `repeat(${Math.max(3, games.length)}, minmax(0, 1fr))`, gap: 20 }}>
-        {games.map((g) => {
-          const sel = g.id === room.selectedGameId;
-          const light = isLight(g.color);
-          const fits = active.length >= g.minPlayers;
-          return (
-            <button key={g.id} onClick={() => net.send('select', { gameId: g.id })} style={{
-              border: 0, textAlign: 'left', background: g.color, borderRadius: 22, padding: games.length > 4 ? '14px 16px' : '18px 22px', color: light ? '#110D24' : '#fff',
-              boxShadow: `${sel ? '0 0 0 4px #fff, ' : ''}0 ${sel ? 10 : 6}px 0 ${shade(g.color)}`, transform: sel ? 'translateY(-6px)' : undefined,
-              display: 'flex', flexDirection: 'column', justifyContent: 'space-between', opacity: fits || sel ? 1 : 0.55, transition: 'transform .2s',
-            }}>
-              <span style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-                <span className="display" style={{ fontSize: games.length > 4 ? 20 : 26, fontWeight: 800, lineHeight: 1.1 }}>{g.name[room.lang] ?? g.name.en}</span>
-                {sel && <span style={{ background: '#fff', color: shade(g.color, 0.4), fontSize: 13, fontWeight: 700, padding: '4px 10px', borderRadius: 999 }}>{t('lobby.selected')}</span>}
-              </span>
-              <span style={{ fontSize: games.length > 4 ? 13 : 15, fontWeight: 500 }}>
-                {t('lobby.playersRange', { min: g.minPlayers, max: g.maxPlayers })}{g.audience ? ' +' : ''} · {t('lobby.minutes', { n: g.minutes })}
-              </span>
-            </button>
-          );
-        })}
-      </section>
+      <SelectedGameBar game={selected} players={active.length} canStart={canStart} gameCount={games.length} lang={room.lang} t={t}
+        summary={selected?.options?.length ? optionsSummary(selected, room.settings.gameOptions?.[selected.id], room.lang) : ''}
+        onLibrary={() => setLibraryOpen(true)} onOptions={() => setOptionsOpen(true)} />
     </>
+  );
+}
+
+/** Unten in der Lobby: das gewählte Spiel mit Kurzbeschreibung, Einstellungen und Start */
+function SelectedGameBar({ game, players, canStart, gameCount, lang, t, summary, onLibrary, onOptions }: {
+  game?: GameManifest; players: number; canStart: boolean; gameCount: number; lang: Lang; t: Translate; summary: string; onLibrary: () => void; onOptions: () => void;
+}) {
+  if (!game) {
+    return (
+      <section style={{ height: 150, flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 24, borderRadius: 26, border: '3px dashed var(--line)' }}>
+        <span className="muted display" style={{ fontSize: 26, fontWeight: 700 }}>{t('lobby.noGame')}</span>
+        <button className="up-btn" onClick={onLibrary}>{t('lobby.pickGame')} · {t('lobby.gamesCount', { n: gameCount })}</button>
+      </section>
+    );
+  }
+  const light = isLight(game.color);
+  const fit = fitOf(game, players);
+  return (
+    <section key={game.id} className="anim-up" style={{ height: 150, flex: 'none', display: 'flex', borderRadius: 26, overflow: 'hidden', background: 'var(--surface)', boxShadow: `0 0 0 3px ${game.color}, 0 8px 0 ${shade(game.color)}` }}>
+      <div style={{ width: 300, flex: 'none', background: game.color, color: light ? '#110D24' : '#fff', padding: '18px 22px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        <span className="display" style={{ fontSize: 32, fontWeight: 800, lineHeight: 1.05 }}>{gameName(game, lang)}</span>
+        <span style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>{gameTags(game).map((x) => <TagChip key={x} tag={x} t={t} small />)}</span>
+      </div>
+      <div style={{ flex: 1, minWidth: 0, padding: '16px 22px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <p style={{ fontSize: 19, lineHeight: 1.35, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{gameDesc(game, lang)}</p>
+        <p style={{ marginTop: 'auto', fontSize: 15, fontWeight: 600, color: fit === 'ok' ? 'var(--faint)' : 'var(--yellow)' }}>
+          {t('lobby.playersRange', { min: game.minPlayers, max: game.maxPlayers })}{game.audience ? ' +' : ''} · {t('lobby.minutes', { n: game.minutes })}
+          {fit === 'few' ? ` · ${t('lobby.needPlayers', { n: game.minPlayers - players })}` : fit === 'many' ? ` · ${t('lobby.tooMany', { n: game.maxPlayers })}` : ''}
+          {summary ? <span style={{ display: 'block', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{summary}</span> : null}
+        </p>
+      </div>
+      <div style={{ flex: 'none', padding: '16px 20px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 10, minWidth: 250 }}>
+        {canStart && <button className="up-btn" onClick={() => net.request('start')}>{t('lobby.start')}</button>}
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button className="up-btn ghost small" style={{ flex: 1 }} onClick={onLibrary}>{t('lobby.changeGame')}</button>
+          {game.options?.length ? <button className="up-btn ghost small" aria-label={t('lobby.gameSettings')} title={t('lobby.gameSettings')} onClick={onOptions}>⚙︎</button> : null}
+        </div>
+      </div>
+    </section>
   );
 }
 

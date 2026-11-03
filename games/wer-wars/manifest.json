@@ -1,0 +1,29 @@
+{
+  "id": "wer-wars",
+  "name": { "de": "Wer war's?", "en": "Who Said It?" },
+  "description": {
+    "de": "Alle beantworten anonym eine persönliche Frage. Dann wird geraten: Welche Antwort stammt von wem?",
+    "en": "Everyone answers a personal question anonymously. Then guess: who wrote which answer?"
+  },
+  "minPlayers": 3,
+  "maxPlayers": 10,
+  "audience": false,
+  "minutes": 15,
+  "color": "#FF6FB5",
+  "tags": ["social", "words"],
+  "sdkVersion": 1,
+  "contentFields": ["question"],
+  "version": "1.0.0",
+  "author": "UP!",
+  "options": [
+    { "id": "rounds", "label": { "de": "Runden", "en": "Rounds" }, "default": 3, "min": 1, "max": 6 },
+    {
+      "id": "writeTime", "label": { "de": "Zeit zum Schreiben", "en": "Time to write" }, "default": 1,
+      "choices": [
+        { "value": 0.67, "label": { "de": "Kurz", "en": "Short" } },
+        { "value": 1, "label": { "de": "Normal", "en": "Normal" } },
+        { "value": 1.5, "label": { "de": "Lang", "en": "Long" } }
+      ]
+    }
+  ]
+}

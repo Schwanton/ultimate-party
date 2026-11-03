@@ -1,0 +1,168 @@
+{
+ "name": "Basics",
+ "author": "UP!",
+ "version": "1.0.0",
+ "description": "Personal questions for groups who know each other (a bit).",
+ "items": [
+  {
+   "id": "w1",
+   "question": "What's your most embarrassing purchase?"
+  },
+  {
+   "id": "w2",
+   "question": "What did you want to be as a kid?"
+  },
+  {
+   "id": "w3",
+   "question": "What's your weirdest talent?"
+  },
+  {
+   "id": "w4",
+   "question": "What food could you eat every day?"
+  },
+  {
+   "id": "w5",
+   "question": "What was your worst haircut?"
+  },
+  {
+   "id": "w6",
+   "question": "What's your secret guilty-pleasure song?"
+  },
+  {
+   "id": "w7",
+   "question": "What were you afraid of as a kid?"
+  },
+  {
+   "id": "w8",
+   "question": "What would you buy first with a million dollars?"
+  },
+  {
+   "id": "w9",
+   "question": "Which celebrity would be your best friend?"
+  },
+  {
+   "id": "w10",
+   "question": "What's the craziest lie you've ever told?"
+  },
+  {
+   "id": "w11",
+   "question": "What's the most useless thing in your home?"
+  },
+  {
+   "id": "w12",
+   "question": "Where would you rather be right now?"
+  },
+  {
+   "id": "w13",
+   "question": "What was your first nickname?"
+  },
+  {
+   "id": "w14",
+   "question": "Which animal would you be – and why?"
+  },
+  {
+   "id": "w15",
+   "question": "What's your biggest dating no-go?"
+  },
+  {
+   "id": "w16",
+   "question": "Which show have you watched way too often?"
+  },
+  {
+   "id": "w17",
+   "question": "What's the bravest thing you've ever done?"
+  },
+  {
+   "id": "w18",
+   "question": "What word do you say way too often?"
+  },
+  {
+   "id": "w19",
+   "question": "What do you do when nobody's watching?"
+  },
+  {
+   "id": "w20",
+   "question": "What was your first job?"
+  },
+  {
+   "id": "w21",
+   "question": "What's the best excuse you've ever used?"
+  },
+  {
+   "id": "w22",
+   "question": "Which rule would you abolish immediately?"
+  },
+  {
+   "id": "w23",
+   "question": "What's your most unpopular opinion?"
+  },
+  {
+   "id": "w24",
+   "question": "What did you last spend way too much money on?"
+  },
+  {
+   "id": "w25",
+   "question": "What's your favorite sound?"
+  },
+  {
+   "id": "w26",
+   "question": "Which skill would you like to learn overnight?"
+  },
+  {
+   "id": "w27",
+   "question": "What's your party trick?"
+  },
+  {
+   "id": "w28",
+   "question": "Which movie always makes you cry?"
+  },
+  {
+   "id": "w29",
+   "question": "What's the strangest thing in your fridge?"
+  },
+  {
+   "id": "w30",
+   "question": "What would your autobiography be called?"
+  },
+  {
+   "id": "w31",
+   "question": "What's your worst cooking disaster?"
+  },
+  {
+   "id": "w32",
+   "question": "Who would you swap lives with for a day?"
+  },
+  {
+   "id": "w33",
+   "question": "What was your most embarrassing moment at school?"
+  },
+  {
+   "id": "w34",
+   "question": "Which hobby did you quit after a week?"
+  },
+  {
+   "id": "w35",
+   "question": "What are you secretly proud of?"
+  },
+  {
+   "id": "w36",
+   "question": "What's your favorite (family-friendly) swear word?"
+  },
+  {
+   "id": "w37",
+   "question": "What would you take to a desert island?"
+  },
+  {
+   "id": "w38",
+   "question": "Which app do you use the most?"
+  },
+  {
+   "id": "w39",
+   "question": "What's the most absurd dream you remember?"
+  },
+  {
+   "id": "w40",
+   "question": "What would you tell your 15-year-old self?"
+  }
+ ]
+}

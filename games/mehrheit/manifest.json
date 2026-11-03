@@ -1,0 +1,29 @@
+{
+  "id": "mehrheit",
+  "name": { "de": "Mehrheit", "en": "Majority" },
+  "description": {
+    "de": "Eine Frage, ein paar Antworten: Wähle deine – und tippe, was die Mehrheit wählt. Wer die Gruppe kennt, gewinnt.",
+    "en": "One question, a few answers: pick yours – and predict what the majority picks. Know your crowd to win."
+  },
+  "minPlayers": 3,
+  "maxPlayers": 100,
+  "audience": false,
+  "minutes": 8,
+  "color": "#FF9F1C",
+  "tags": ["social", "quick"],
+  "sdkVersion": 1,
+  "contentFields": ["question"],
+  "version": "1.0.0",
+  "author": "UP!",
+  "options": [
+    { "id": "rounds", "label": { "de": "Fragen", "en": "Questions" }, "default": 8, "min": 4, "max": 15 },
+    {
+      "id": "voteTime", "label": { "de": "Zeit pro Frage", "en": "Time per question" }, "default": 1,
+      "choices": [
+        { "value": 0.7, "label": { "de": "Kurz", "en": "Short" } },
+        { "value": 1, "label": { "de": "Normal", "en": "Normal" } },
+        { "value": 1.5, "label": { "de": "Lang", "en": "Long" } }
+      ]
+    }
+  ]
+}

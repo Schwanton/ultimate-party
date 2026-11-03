@@ -13,6 +13,10 @@
   "audience": true,
   "minutes": 10,
   "color": "#FF5A4E",
+  "tags": [
+    "guess",
+    "quick"
+  ],
   "sdkVersion": 1,
   "autoSounds": false,
   "contentFields": [

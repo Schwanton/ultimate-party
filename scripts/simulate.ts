@@ -31,6 +31,17 @@ const scenarios: { game: string; players: number; options?: Record<string, numbe
   { game: 'hochstapler', players: 3 },
   { game: 'hochstapler', players: 6 },
   { game: 'hochstapler', players: 10 },
+  { game: 'mehrheit', players: 3 },
+  { game: 'mehrheit', players: 12 },
+  { game: 'mehrheit', players: 100 },
+  { game: 'wer-wars', players: 3 },
+  { game: 'wer-wars', players: 10 },
+  { game: 'schaetzmeister', players: 2 },
+  { game: 'schaetzmeister', players: 15 },
+  { game: 'schaetzmeister', players: 100 },
+  { game: 'verraeter', players: 5 },
+  { game: 'verraeter', players: 12 },
+  { game: 'verraeter', players: 30 },
   // mit Spiel-Einstellungen
   { game: 'schlagfertig', players: 4, options: { rounds: 5, answerTime: 0.75 } },
   { game: 'bluff', players: 4, options: { questions: 3 } },
@@ -38,7 +49,12 @@ const scenarios: { game: string; players: number; options?: Record<string, numbe
   { game: 'guess-the-clicks', players: 3, options: { videos: 3, guessTime: 20 } },
   { game: 'hochstapler', players: 4, options: { mode: 'point', rounds: 3 } },
   { game: 'hochstapler', players: 4, options: { mode: 'random', rounds: 7 } },
+  { game: 'mehrheit', players: 5, options: { rounds: 4, voteTime: 0.7 } },
+  { game: 'wer-wars', players: 4, options: { rounds: 1 } },
 ];
+// Nur bestimmte Spiele testen:  npm test -- mehrheit wer-wars
+const only = process.argv.slice(2);
+if (only.length) scenarios.splice(0, scenarios.length, ...scenarios.filter((s) => only.includes(s.game)));
 
 const server = spawn(process.execPath, ['--import', 'tsx', path.join(ROOT, 'server/index.ts')], {
   cwd: ROOT,

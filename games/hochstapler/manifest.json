@@ -13,6 +13,9 @@
   "audience": false,
   "minutes": 15,
   "color": "#9B7BFF",
+  "tags": [
+    "deceive"
+  ],
   "sdkVersion": 1,
   "contentFields": [
     "category",

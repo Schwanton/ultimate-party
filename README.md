@@ -11,6 +11,10 @@ Party-Spiele für zu Hause: Ein Bildschirm (Fernseher, Laptop, Beamer) zeigt das
 | **Kritzelei** | 3–10 (+ Publikum) | Geheime Begriffe aufs Handy zeichnen, falsche Titel erfinden, den echten finden. |
 | **Guess the Clicks!** | 2–100 | Ein zufälliges YouTube-Video läuft – wie viele Aufrufe hat es? Wer am nächsten dran ist, bekommt den Punkt. Braucht einen kostenlosen YouTube-API-Schlüssel (siehe unten). |
 | **Hochstapler** | 3–10 | Alle bekommen eine Aufgabe – Hand heben, Finger zeigen oder auf jemanden zeigen –, nur einer nicht. Findet den Hochstapler, bevor er 3 Aufgaben übersteht! |
+| **Mehrheit** | 3–100 | Eine Frage, 2–4 Antworten: Wähle deine eigene – und tippe, was die Mehrheit wählt. |
+| **Wer war's?** | 3–10 | Alle beantworten anonym eine persönliche Frage, dann wird geraten, wer was geschrieben hat. |
+| **Schätzmeister** | 2–100 | Schätzfragen mit Zahlen (Eiffelturm, Knochen, Mondlandung …). Der Zahlenstrahl zeigt, wer am nächsten dran ist. |
+| **Verräter-Team** | 5–30 | Heimliche Verräter sabotieren Missionen. Diskutiert, werft die Richtigen raus – oder gewinnt als Verräter. |
 
 Neue Spiele lassen sich mit wenig Code hinzufügen und teilen – siehe [Spiele entwickeln](docs/SPIELE-ENTWICKELN.md).
 

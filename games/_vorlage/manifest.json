@@ -13,6 +13,9 @@
   "audience": false,
   "minutes": 3,
   "color": "#4BE3A1",
+  "tags": [
+    "guess"
+  ],
   "sdkVersion": 1,
   "contentFields": [
     "question",

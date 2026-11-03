@@ -1,0 +1,420 @@
+{
+ "name": "Basics",
+ "author": "UP!",
+ "version": "1.0.0",
+ "description": "Everyday questions every group answers differently.",
+ "items": [
+  {
+   "id": "m1",
+   "question": "Pineapple on pizza?",
+   "answers": [
+    "Yes, delicious!",
+    "Never!"
+   ]
+  },
+  {
+   "id": "m2",
+   "question": "What is worse?",
+   "answers": [
+    "Cold coffee",
+    "Warm beer",
+    "Soggy fries"
+   ]
+  },
+  {
+   "id": "m3",
+   "question": "How do you sleep?",
+   "answers": [
+    "On my back",
+    "On my stomach",
+    "On my side",
+    "Like a starfish"
+   ]
+  },
+  {
+   "id": "m4",
+   "question": "Toilet paper goes …",
+   "answers": [
+    "over",
+    "under",
+    "Don't care"
+   ]
+  },
+  {
+   "id": "m5",
+   "question": "Rather be stuck in eternal …",
+   "answers": [
+    "Summer",
+    "Winter"
+   ]
+  },
+  {
+   "id": "m6",
+   "question": "Which superpower would you rather have?",
+   "answers": [
+    "Flying",
+    "Invisibility",
+    "Mind reading",
+    "Time travel"
+   ]
+  },
+  {
+   "id": "m7",
+   "question": "When do you get up on weekends?",
+   "answers": [
+    "Before 8",
+    "8–10",
+    "10–12",
+    "After noon"
+   ]
+  },
+  {
+   "id": "m8",
+   "question": "Best pasta shape?",
+   "answers": [
+    "Spaghetti",
+    "Penne",
+    "Fusilli",
+    "Farfalle"
+   ]
+  },
+  {
+   "id": "m9",
+   "question": "Dog or cat?",
+   "answers": [
+    "Dog",
+    "Cat",
+    "Neither"
+   ]
+  },
+  {
+   "id": "m10",
+   "question": "How many unread messages do you have right now?",
+   "answers": [
+    "0",
+    "1–10",
+    "11–100",
+    "Over 100"
+   ]
+  },
+  {
+   "id": "m11",
+   "question": "Socks in bed?",
+   "answers": [
+    "Always",
+    "Never",
+    "Only in winter"
+   ]
+  },
+  {
+   "id": "m12",
+   "question": "Best breakfast?",
+   "answers": [
+    "Toast",
+    "Cereal",
+    "Eggs",
+    "Coffee is enough"
+   ]
+  },
+  {
+   "id": "m13",
+   "question": "Rather never again …",
+   "answers": [
+    "listen to music",
+    "watch movies"
+   ]
+  },
+  {
+   "id": "m14",
+   "question": "Fries with …",
+   "answers": [
+    "Ketchup",
+    "Mayo",
+    "Both",
+    "Nothing"
+   ]
+  },
+  {
+   "id": "m15",
+   "question": "Worst chore?",
+   "answers": [
+    "Ironing",
+    "Cleaning windows",
+    "Cleaning the bathroom",
+    "Emptying the dishwasher"
+   ]
+  },
+  {
+   "id": "m16",
+   "question": "Beach or mountains?",
+   "answers": [
+    "Beach",
+    "Mountains",
+    "City"
+   ]
+  },
+  {
+   "id": "m17",
+   "question": "How do you eat gummy bears?",
+   "answers": [
+    "All mixed up",
+    "Favorite color first",
+    "Favorite color last"
+   ]
+  },
+  {
+   "id": "m18",
+   "question": "Is a hot dog a sandwich?",
+   "answers": [
+    "Yes",
+    "No",
+    "What kind of question is that?"
+   ]
+  },
+  {
+   "id": "m19",
+   "question": "Rich or famous?",
+   "answers": [
+    "Rich",
+    "Famous"
+   ]
+  },
+  {
+   "id": "m20",
+   "question": "How many alarms do you set?",
+   "answers": [
+    "None",
+    "One",
+    "Two or three",
+    "More than three"
+   ]
+  },
+  {
+   "id": "m21",
+   "question": "Best season?",
+   "answers": [
+    "Spring",
+    "Summer",
+    "Autumn",
+    "Winter"
+   ]
+  },
+  {
+   "id": "m22",
+   "question": "Rather too early or too late?",
+   "answers": [
+    "Too early",
+    "Too late",
+    "On time to the second"
+   ]
+  },
+  {
+   "id": "m23",
+   "question": "You find $50 on the street. What do you do?",
+   "answers": [
+    "Keep it",
+    "Lost and found",
+    "Donate it"
+   ]
+  },
+  {
+   "id": "m24",
+   "question": "Never again chocolate or never again chips?",
+   "answers": [
+    "No more chocolate",
+    "No more chips"
+   ]
+  },
+  {
+   "id": "m25",
+   "question": "How often do you check your phone a day?",
+   "answers": [
+    "Under 20 times",
+    "20–50 times",
+    "50–100 times",
+    "I don't want to know"
+   ]
+  },
+  {
+   "id": "m26",
+   "question": "Funniest pet?",
+   "answers": [
+    "Llama",
+    "Penguin",
+    "Sloth",
+    "Raccoon"
+   ]
+  },
+  {
+   "id": "m27",
+   "question": "Where do you sit in the cinema?",
+   "answers": [
+    "Front row",
+    "Middle",
+    "Back row"
+   ]
+  },
+  {
+   "id": "m28",
+   "question": "What's scarier?",
+   "answers": [
+    "Spiders",
+    "Heights",
+    "Small spaces",
+    "Public speaking"
+   ]
+  },
+  {
+   "id": "m29",
+   "question": "Live in the past or the future?",
+   "answers": [
+    "Past",
+    "Future"
+   ]
+  },
+  {
+   "id": "m30",
+   "question": "What do you do with receipts?",
+   "answers": [
+    "Throw them away",
+    "Collect them in my wallet",
+    "Never take them"
+   ]
+  },
+  {
+   "id": "m31",
+   "question": "One year without internet or one year without seeing friends?",
+   "answers": [
+    "No internet",
+    "No friends"
+   ]
+  },
+  {
+   "id": "m32",
+   "question": "What do you do on a plane?",
+   "answers": [
+    "Sleep",
+    "Watch movies",
+    "Look out the window",
+    "Be nervous"
+   ]
+  },
+  {
+   "id": "m33",
+   "question": "Best ice cream flavor?",
+   "answers": [
+    "Chocolate",
+    "Vanilla",
+    "Strawberry",
+    "Cookie dough"
+   ]
+  },
+  {
+   "id": "m34",
+   "question": "How many browser tabs are open right now?",
+   "answers": [
+    "Under 5",
+    "5–20",
+    "Over 20",
+    "I stopped counting"
+   ]
+  },
+  {
+   "id": "m35",
+   "question": "Always sing instead of talk – or always dance instead of walk?",
+   "answers": [
+    "Sing",
+    "Dance"
+   ]
+  },
+  {
+   "id": "m36",
+   "question": "Who wins: 100 duck-sized horses or one horse-sized duck?",
+   "answers": [
+    "100 tiny horses",
+    "The giant duck"
+   ]
+  },
+  {
+   "id": "m37",
+   "question": "A voice message longer than 3 minutes. You …",
+   "answers": [
+    "Listen to all of it",
+    "Play it at 2× speed",
+    "Ignore it"
+   ]
+  },
+  {
+   "id": "m38",
+   "question": "Shoes inside the house?",
+   "answers": [
+    "Off!",
+    "Can stay on",
+    "Slippers"
+   ]
+  },
+  {
+   "id": "m39",
+   "question": "Elephant the size of a cat or cat the size of an elephant?",
+   "answers": [
+    "Tiny elephant",
+    "Giant cat"
+   ]
+  },
+  {
+   "id": "m40",
+   "question": "Best pizza topping?",
+   "answers": [
+    "Salami",
+    "Mushrooms",
+    "Extra cheese",
+    "Pineapple"
+   ]
+  },
+  {
+   "id": "m41",
+   "question": "When does the weekend start?",
+   "answers": [
+    "Friday after work",
+    "Friday noon",
+    "Saturday morning"
+   ]
+  },
+  {
+   "id": "m42",
+   "question": "Call or text?",
+   "answers": [
+    "Call",
+    "Text",
+    "Voice message"
+   ]
+  },
+  {
+   "id": "m43",
+   "question": "What do you do when you can't sleep?",
+   "answers": [
+    "Phone",
+    "Read",
+    "Count sheep",
+    "Raid the fridge"
+   ]
+  },
+  {
+   "id": "m44",
+   "question": "Cake or pie?",
+   "answers": [
+    "Cake",
+    "Pie"
+   ]
+  },
+  {
+   "id": "m45",
+   "question": "Window or aisle seat?",
+   "answers": [
+    "Window",
+    "Aisle",
+    "Whatever is free"
+   ]
+  }
+ ]
+}

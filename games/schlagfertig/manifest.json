@@ -13,6 +13,10 @@
   "audience": true,
   "minutes": 15,
   "color": "#E8336F",
+  "tags": [
+    "words",
+    "quick"
+  ],
   "sdkVersion": 1,
   "contentFields": [
     "prompt"

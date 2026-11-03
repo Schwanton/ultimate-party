@@ -103,6 +103,11 @@ React bleibt wie besprochen. Ein Umstieg auf Vite/Tailwind wäre später möglic
 - Wer zu spät kommt, schaut als Publikum zu und ist in der nächsten Runde dabei.
 - Wer in der Lobby länger als 45 s weg ist, wird entfernt. Im Spiel bleibt jeder drin.
 - Fotos werden auf 320 × 320 px verkleinert, nur im Arbeitsspeicher gehalten und beim Schließen des Raums gelöscht.
+- Spielmenü: In der TV-Lobby steht unten das gewählte Spiel mit Kurzbeschreibung, Start und Einstellungen. „Spiel wechseln“ öffnet die Bibliothek (4 Spalten, scrollbar, Reiter nach Kategorie aus `tags`, Filter „nur passende für N Spieler“). Auf dem Handy des VIP: Kategorie-Reiter und Kurzbeschreibung je Spiel.
+- Mehrheit: eigene Antwort + Tipp auf die Mehrheit. Mehrheit richtig getippt 1000, selbst in der Mehrheit 250, letzte Frage ×2. Gleichstand oben: alle Spitzenantworten zählen. Stimmen erscheinen nacheinander, Zwischenstand alle 4 Fragen.
+- Wer war's?: 60 s schreiben (max. 70 Zeichen), je Antwort 18 s raten (Autor rät nicht). Richtig 500, Autor 200 pro Fehltipp, letzte Runde ×2.
+- Schätzmeister: Zahlenstrahl wie Guess the Clicks!; Platz 1/2/3 = 1000/600/300, exakt +500, letzte Frage ×2. Gleich nah = gleicher Platz. Antworten nur ganze Zahlen ≥ 0, mit optionaler Einheit und Quelle.
+- Verräter-Team: Verräter automatisch ≈ Spieler/5 (mind. 1, höchstens weniger als die Hälfte). Teamgröße nach Lebenden: ≤5 → 2, ≤7 → 3, ≤10 → 4, ≤15 → 5, sonst 6. Eine Sabotage = Mission gescheitert, Karten werden gemischt aufgedeckt. Rauswählen mit Option „Niemanden“; Gleichstand = niemand. Sieg: Loyale bei 0 Verrätern oder 3 erfüllten Missionen; Verräter bei 3 Sabotagen oder Verräter ≥ Loyale. Gewinnerteam 1000 (+500 wenn noch drin), Loyale +250 für eine Stimme gegen einen rausgeworfenen Verräter.
 
 ## Offen / nächste Schritte
 

@@ -55,6 +55,8 @@ export interface GameManifest {
   contentFields?: string[];
   /** false = keine automatischen Plattform-Sounds (Timer-Ticken, Übergänge, Jubel); das Spiel spielt selbst Sounds ab */
   autoSounds?: boolean;
+  /** Kategorien für das Spielmenü: words, draw, guess, deceive, social, quick (andere landen unter „Weitere“) */
+  tags?: string[];
   /** Nur im Entwicklermodus anzeigen (z. B. Vorlagen) */
   hidden?: boolean;
   version?: string;

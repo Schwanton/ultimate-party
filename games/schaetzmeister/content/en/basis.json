@@ -1,0 +1,290 @@
+{
+ "name": "Basics",
+ "author": "UP!",
+ "version": "1.0.0",
+ "description": "Estimation questions with verified numbers.",
+ "items": [
+  {
+   "id": "s1",
+   "question": "How many keys does a standard piano have?",
+   "answer": 88,
+   "source": "Wikipedia (de): Klavier"
+  },
+  {
+   "id": "s2",
+   "question": "How many bones does an adult human have?",
+   "answer": 206,
+   "source": "Wikipedia (de): Skelett des Menschen"
+  },
+  {
+   "id": "s3",
+   "question": "How tall is the Eiffel Tower (including antennas)?",
+   "answer": 330,
+   "unit": "m",
+   "source": "Wikipedia (de): Eiffelturm"
+  },
+  {
+   "id": "s4",
+   "question": "How high is the Zugspitze, Germany's highest mountain?",
+   "answer": 2962,
+   "unit": "m",
+   "source": "Wikipedia (de): Zugspitze"
+  },
+  {
+   "id": "s5",
+   "question": "How high is Mount Everest?",
+   "answer": 8849,
+   "unit": "m",
+   "source": "Wikipedia (de): Mount Everest"
+  },
+  {
+   "id": "s6",
+   "question": "How tall is Cologne Cathedral?",
+   "answer": 157,
+   "unit": "m",
+   "source": "Wikipedia (de): Kölner Dom"
+  },
+  {
+   "id": "s7",
+   "question": "How tall is the Berlin TV Tower?",
+   "answer": 368,
+   "unit": "m",
+   "source": "Wikipedia (de): Berliner Fernsehturm"
+  },
+  {
+   "id": "s8",
+   "question": "How tall is the Burj Khalifa in Dubai?",
+   "answer": 828,
+   "unit": "m",
+   "source": "Wikipedia (de): Burj Khalifa"
+  },
+  {
+   "id": "s9",
+   "question": "On average, how far is the Moon from Earth?",
+   "answer": 384400,
+   "unit": "km",
+   "source": "Wikipedia (de): Mond"
+  },
+  {
+   "id": "s10",
+   "question": "How long is the equator?",
+   "answer": 40075,
+   "unit": "km",
+   "source": "Wikipedia (de): Äquator"
+  },
+  {
+   "id": "s11",
+   "question": "In which year did humans first land on the Moon?",
+   "answer": 1969,
+   "source": "Wikipedia (de): Apollo 11"
+  },
+  {
+   "id": "s12",
+   "question": "In which year did the Berlin Wall fall?",
+   "answer": 1989,
+   "source": "Wikipedia (de): Berliner Mauer"
+  },
+  {
+   "id": "s13",
+   "question": "In which year did the Titanic sink?",
+   "answer": 1912,
+   "source": "Wikipedia (de): Titanic"
+  },
+  {
+   "id": "s14",
+   "question": "In which year was the first iPhone released?",
+   "answer": 2007,
+   "source": "Wikipedia (de): iPhone"
+  },
+  {
+   "id": "s15",
+   "question": "In which year was Google founded?",
+   "answer": 1998,
+   "source": "Wikipedia (de): Google LLC"
+  },
+  {
+   "id": "s16",
+   "question": "In which year was the first FIFA World Cup held?",
+   "answer": 1930,
+   "source": "Wikipedia (de): Fußball-Weltmeisterschaft 1930"
+  },
+  {
+   "id": "s17",
+   "question": "How many seconds are in a day?",
+   "answer": 86400,
+   "source": "24 × 60 × 60"
+  },
+  {
+   "id": "s18",
+   "question": "How many minutes are in a week?",
+   "answer": 10080,
+   "source": "7 × 24 × 60"
+  },
+  {
+   "id": "s19",
+   "question": "How many countries are in the European Union?",
+   "answer": 27,
+   "source": "Wikipedia (de): Europäische Union"
+  },
+  {
+   "id": "s20",
+   "question": "How many member states does the United Nations have?",
+   "answer": 193,
+   "source": "Wikipedia (de): Vereinte Nationen"
+  },
+  {
+   "id": "s21",
+   "question": "How many countries are there in Africa?",
+   "answer": 54,
+   "source": "Wikipedia (de): Afrika"
+  },
+  {
+   "id": "s22",
+   "question": "How many chemical elements are in the periodic table today?",
+   "answer": 118,
+   "source": "Wikipedia (de): Periodensystem"
+  },
+  {
+   "id": "s23",
+   "question": "How many squares does a chessboard have?",
+   "answer": 64,
+   "source": "Wikipedia (de): Schachbrett"
+  },
+  {
+   "id": "s24",
+   "question": "How many spaces are on a classic Monopoly board?",
+   "answer": 40,
+   "source": "Wikipedia (de): Monopoly"
+  },
+  {
+   "id": "s25",
+   "question": "How many teeth does an adult have (including wisdom teeth)?",
+   "answer": 32,
+   "source": "Wikipedia (de): Gebiss des Menschen"
+  },
+  {
+   "id": "s26",
+   "question": "How many hearts does an octopus have?",
+   "answer": 3,
+   "source": "Wikipedia (de): Kraken"
+  },
+  {
+   "id": "s27",
+   "question": "How many symphonies did Beethoven complete?",
+   "answer": 9,
+   "source": "Wikipedia (de): Ludwig van Beethoven"
+  },
+  {
+   "id": "s28",
+   "question": "How many time zones does Russia have?",
+   "answer": 11,
+   "source": "Wikipedia (de): Zeitzonen in Russland"
+  },
+  {
+   "id": "s29",
+   "question": "How long is a marathon?",
+   "answer": 42195,
+   "unit": "m",
+   "source": "Wikipedia (de): Marathonlauf"
+  },
+  {
+   "id": "s30",
+   "question": "At how many degrees Fahrenheit does water boil (at sea level)?",
+   "answer": 212,
+   "unit": "°F",
+   "source": "Wikipedia (de): Grad Fahrenheit"
+  },
+  {
+   "id": "s31",
+   "question": "How many players from one rugby union team are on the field?",
+   "answer": 15,
+   "source": "Wikipedia (de): Rugby Union"
+  },
+  {
+   "id": "s32",
+   "question": "How tall is the Statue of Liberty from the ground to the tip of the torch?",
+   "answer": 93,
+   "unit": "m",
+   "source": "Wikipedia (de): Freiheitsstatue"
+  },
+  {
+   "id": "s33",
+   "question": "What is the total length of the Golden Gate Bridge?",
+   "answer": 2737,
+   "unit": "m",
+   "source": "Wikipedia (de): Golden Gate Bridge"
+  },
+  {
+   "id": "s34",
+   "question": "How many cantons does Switzerland have?",
+   "answer": 26,
+   "source": "Wikipedia (de): Kanton (Schweiz)"
+  },
+  {
+   "id": "s35",
+   "question": "How fast does sound travel in air at 20 °C?",
+   "answer": 343,
+   "unit": "m/s",
+   "source": "Wikipedia (de): Schallgeschwindigkeit"
+  },
+  {
+   "id": "s36",
+   "question": "How fast is light in a vacuum?",
+   "answer": 299792,
+   "unit": "km/s",
+   "source": "Wikipedia (de): Lichtgeschwindigkeit"
+  },
+  {
+   "id": "s37",
+   "question": "How many episodes does the TV show “Friends” have?",
+   "answer": 236,
+   "source": "Wikipedia (de): Friends"
+  },
+  {
+   "id": "s38",
+   "question": "How old was Wolfgang Amadeus Mozart when he died?",
+   "answer": 35,
+   "unit": "years",
+   "source": "Wikipedia (de): Wolfgang Amadeus Mozart"
+  },
+  {
+   "id": "s39",
+   "question": "How many pips are on a standard die in total?",
+   "answer": 21,
+   "source": "1 + 2 + 3 + 4 + 5 + 6"
+  },
+  {
+   "id": "s40",
+   "question": "How many legs does a lobster have?",
+   "answer": 10,
+   "source": "Wikipedia (de): Hummer"
+  },
+  {
+   "id": "s41",
+   "question": "How tall is the Brandenburg Gate?",
+   "answer": 26,
+   "unit": "m",
+   "source": "Wikipedia (de): Brandenburger Tor"
+  },
+  {
+   "id": "s42",
+   "question": "How large is Lake Constance?",
+   "answer": 536,
+   "unit": "km²",
+   "source": "Wikipedia (de): Bodensee"
+  },
+  {
+   "id": "s43",
+   "question": "Roughly how long is an African elephant pregnant?",
+   "answer": 22,
+   "unit": "months",
+   "source": "Wikipedia (de): Afrikanischer Elefant"
+  },
+  {
+   "id": "s44",
+   "question": "How many cards are in a standard deck (without jokers)?",
+   "answer": 52,
+   "source": "Wikipedia (de): Skat / Spielkarte"
+  }
+ ]
+}

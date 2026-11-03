@@ -1,0 +1,29 @@
+{
+  "id": "schaetzmeister",
+  "name": { "de": "Schätzmeister", "en": "Estimation Master" },
+  "description": {
+    "de": "Wie hoch ist der Eiffelturm? Wie viele Knochen hast du? Alle schätzen – der Zahlenstrahl zeigt, wer am nächsten dran ist.",
+    "en": "How tall is the Eiffel Tower? How many bones do you have? Everyone estimates – the number line reveals who's closest."
+  },
+  "minPlayers": 2,
+  "maxPlayers": 100,
+  "audience": false,
+  "minutes": 10,
+  "color": "#4BE3A1",
+  "tags": ["guess", "quick"],
+  "sdkVersion": 1,
+  "contentFields": ["question"],
+  "version": "1.0.0",
+  "author": "UP!",
+  "options": [
+    { "id": "rounds", "label": { "de": "Fragen", "en": "Questions" }, "default": 8, "min": 3, "max": 15 },
+    {
+      "id": "guessTime", "label": { "de": "Zeit zum Schätzen", "en": "Time to estimate" }, "default": 30,
+      "choices": [
+        { "value": 20, "label": { "de": "20 Sek.", "en": "20 sec" } },
+        { "value": 30, "label": { "de": "30 Sek.", "en": "30 sec" } },
+        { "value": 45, "label": { "de": "45 Sek.", "en": "45 sec" } }
+      ]
+    }
+  ]
+}

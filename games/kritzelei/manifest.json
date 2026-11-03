@@ -13,6 +13,9 @@
   "audience": true,
   "minutes": 20,
   "color": "#FFD447",
+  "tags": [
+    "draw"
+  ],
   "sdkVersion": 1,
   "contentFields": [
     "word"

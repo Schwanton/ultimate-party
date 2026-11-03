@@ -46,6 +46,8 @@ games/mein-spiel/
 - `id` muss dem Ordnernamen entsprechen.
 - `audience: true` – wer über `maxPlayers` hinaus beitritt, ist Publikum und bekommt eigene Ansichten (z. B. mit abstimmen).
 - `contentFields` – Pflichtfelder jedes Content-Eintrags. Packs ohne diese Felder werden abgelehnt.
+- `tags` – Kategorien fürs Spielmenü: `words`, `draw`, `guess`, `deceive`, `social`, `quick` (mehrere möglich; Unbekanntes landet unter „Weitere“).
+- `description` – Kurzbeschreibung (1–2 Sätze), steht im Spielmenü und in der Lobby.
 - `hidden: true` – Spiel nur im Entwicklermodus zeigen.
 - `options` – Spiel-Einstellungen für die Lobby, z. B. Rundenanzahl. Zahl mit `min`/`max`/`step` oder Auswahl mit `choices`:
 

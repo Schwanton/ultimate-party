@@ -13,6 +13,10 @@
   "audience": true,
   "minutes": 15,
   "color": "#36D6F5",
+  "tags": [
+    "words",
+    "deceive"
+  ],
   "sdkVersion": 1,
   "contentFields": [
     "question",

@@ -1,0 +1,168 @@
+{
+ "name": "Basis",
+ "author": "UP!",
+ "version": "1.0.0",
+ "description": "Persönliche Fragen für Gruppen, die sich (ein bisschen) kennen.",
+ "items": [
+  {
+   "id": "w1",
+   "question": "Was ist dein peinlichster Kauf?"
+  },
+  {
+   "id": "w2",
+   "question": "Was wolltest du als Kind werden?"
+  },
+  {
+   "id": "w3",
+   "question": "Was ist dein seltsamstes Talent?"
+  },
+  {
+   "id": "w4",
+   "question": "Welches Essen könntest du jeden Tag essen?"
+  },
+  {
+   "id": "w5",
+   "question": "Was war deine schlimmste Frisur?"
+  },
+  {
+   "id": "w6",
+   "question": "Was ist dein geheimes Guilty-Pleasure-Lied?"
+  },
+  {
+   "id": "w7",
+   "question": "Wovor hattest du als Kind Angst?"
+  },
+  {
+   "id": "w8",
+   "question": "Was würdest du mit einer Million Euro als Erstes kaufen?"
+  },
+  {
+   "id": "w9",
+   "question": "Welcher Promi wäre dein bester Freund?"
+  },
+  {
+   "id": "w10",
+   "question": "Was ist die verrückteste Lüge, die du je erzählt hast?"
+  },
+  {
+   "id": "w11",
+   "question": "Was ist dein nutzlosester Gegenstand zu Hause?"
+  },
+  {
+   "id": "w12",
+   "question": "Wo wärst du jetzt am liebsten?"
+  },
+  {
+   "id": "w13",
+   "question": "Was war dein erster Handy-Klingelton (oder Spitzname)?"
+  },
+  {
+   "id": "w14",
+   "question": "Welches Tier wärst du – und warum?"
+  },
+  {
+   "id": "w15",
+   "question": "Was ist dein größtes No-Go beim Date?"
+  },
+  {
+   "id": "w16",
+   "question": "Welche Serie hast du viel zu oft gesehen?"
+  },
+  {
+   "id": "w17",
+   "question": "Was ist das Mutigste, das du je gemacht hast?"
+  },
+  {
+   "id": "w18",
+   "question": "Welches Wort sagst du viel zu oft?"
+  },
+  {
+   "id": "w19",
+   "question": "Was machst du, wenn niemand zuschaut?"
+  },
+  {
+   "id": "w20",
+   "question": "Was war dein erster Job?"
+  },
+  {
+   "id": "w21",
+   "question": "Was ist die beste Ausrede, die du je benutzt hast?"
+  },
+  {
+   "id": "w22",
+   "question": "Welche Regel würdest du sofort abschaffen?"
+  },
+  {
+   "id": "w23",
+   "question": "Was ist deine unpopulärste Meinung?"
+  },
+  {
+   "id": "w24",
+   "question": "Wofür hast du zuletzt viel zu viel Geld ausgegeben?"
+  },
+  {
+   "id": "w25",
+   "question": "Was ist dein Lieblingsgeräusch?"
+  },
+  {
+   "id": "w26",
+   "question": "Welche Fähigkeit würdest du gerne über Nacht lernen?"
+  },
+  {
+   "id": "w27",
+   "question": "Was ist dein Party-Trick?"
+  },
+  {
+   "id": "w28",
+   "question": "Welcher Film bringt dich garantiert zum Weinen?"
+  },
+  {
+   "id": "w29",
+   "question": "Was ist das Seltsamste in deinem Kühlschrank?"
+  },
+  {
+   "id": "w30",
+   "question": "Wie würde dein Autobiografie-Titel lauten?"
+  },
+  {
+   "id": "w31",
+   "question": "Was ist dein schlimmstes Kochergebnis?"
+  },
+  {
+   "id": "w32",
+   "question": "Mit wem würdest du gerne einen Tag tauschen?"
+  },
+  {
+   "id": "w33",
+   "question": "Was war dein peinlichster Moment in der Schule?"
+  },
+  {
+   "id": "w34",
+   "question": "Welches Hobby hast du nach einer Woche aufgegeben?"
+  },
+  {
+   "id": "w35",
+   "question": "Wofür bist du heimlich stolz?"
+  },
+  {
+   "id": "w36",
+   "question": "Was ist dein Lieblingsschimpfwort (jugendfrei)?"
+  },
+  {
+   "id": "w37",
+   "question": "Was würdest du auf eine einsame Insel mitnehmen?"
+  },
+  {
+   "id": "w38",
+   "question": "Welche App nutzt du am meisten?"
+  },
+  {
+   "id": "w39",
+   "question": "Was ist dein absurdester Traum, an den du dich erinnerst?"
+  },
+  {
+   "id": "w40",
+   "question": "Was würdest du deinem 15-jährigen Ich sagen?"
+  }
+ ]
+}

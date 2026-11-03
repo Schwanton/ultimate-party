@@ -1,0 +1,421 @@
+{
+ "name": "Basis",
+ "author": "UP!",
+ "version": "1.0.0",
+ "description": "Alltagsfragen, bei denen sich jede Gruppe anders entscheidet.",
+ "items": [
+  {
+   "id": "m1",
+   "question": "Pizza mit Ananas?",
+   "answers": [
+    "Ja, lecker!",
+    "Niemals!"
+   ]
+  },
+  {
+   "id": "m2",
+   "question": "Was ist schlimmer?",
+   "answers": [
+    "Kalter Kaffee",
+    "Warmes Bier",
+    "Lauwarme Pommes"
+   ]
+  },
+  {
+   "id": "m3",
+   "question": "Wie schläfst du am liebsten?",
+   "answers": [
+    "Auf dem Rücken",
+    "Auf dem Bauch",
+    "Auf der Seite",
+    "Wie ein Seestern"
+   ]
+  },
+  {
+   "id": "m4",
+   "question": "Toilettenpapier hängt …",
+   "answers": [
+    "vorne über",
+    "hinten runter",
+    "Ist mir egal"
+   ]
+  },
+  {
+   "id": "m5",
+   "question": "Lieber für immer …",
+   "answers": [
+    "Sommer",
+    "Winter"
+   ]
+  },
+  {
+   "id": "m6",
+   "question": "Welche Superkraft hättest du lieber?",
+   "answers": [
+    "Fliegen",
+    "Unsichtbar sein",
+    "Gedanken lesen",
+    "Zeitreisen"
+   ]
+  },
+  {
+   "id": "m7",
+   "question": "Was isst du zuerst beim Döner?",
+   "answers": [
+    "Das Fleisch",
+    "Den Salat",
+    "Alles gleichzeitig"
+   ]
+  },
+  {
+   "id": "m8",
+   "question": "Wann stehst du am Wochenende auf?",
+   "answers": [
+    "Vor 8 Uhr",
+    "8–10 Uhr",
+    "10–12 Uhr",
+    "Nach 12 Uhr"
+   ]
+  },
+  {
+   "id": "m9",
+   "question": "Die beste Nudelform?",
+   "answers": [
+    "Spaghetti",
+    "Penne",
+    "Fusilli",
+    "Farfalle"
+   ]
+  },
+  {
+   "id": "m10",
+   "question": "Hund oder Katze?",
+   "answers": [
+    "Hund",
+    "Katze",
+    "Keins von beiden"
+   ]
+  },
+  {
+   "id": "m11",
+   "question": "Wie viele ungelesene Nachrichten hast du gerade?",
+   "answers": [
+    "0",
+    "1–10",
+    "11–100",
+    "Mehr als 100"
+   ]
+  },
+  {
+   "id": "m12",
+   "question": "Socken im Bett?",
+   "answers": [
+    "Immer",
+    "Nie",
+    "Nur im Winter"
+   ]
+  },
+  {
+   "id": "m13",
+   "question": "Was ist das bessere Frühstück?",
+   "answers": [
+    "Brötchen",
+    "Müsli",
+    "Rührei",
+    "Kaffee reicht"
+   ]
+  },
+  {
+   "id": "m14",
+   "question": "Lieber nie wieder …",
+   "answers": [
+    "Musik hören",
+    "Filme schauen"
+   ]
+  },
+  {
+   "id": "m15",
+   "question": "Ketchup oder Mayo zu Pommes?",
+   "answers": [
+    "Ketchup",
+    "Mayo",
+    "Beides – rot-weiß",
+    "Gar nichts"
+   ]
+  },
+  {
+   "id": "m16",
+   "question": "Wie lange darf man nach dem Klingeln brauchen, bis man die Tür öffnet?",
+   "answers": [
+    "Sofort",
+    "Unter einer Minute",
+    "Ich mache gar nicht auf"
+   ]
+  },
+  {
+   "id": "m17",
+   "question": "Was ist die schlimmste Hausarbeit?",
+   "answers": [
+    "Bügeln",
+    "Fenster putzen",
+    "Bad putzen",
+    "Spülmaschine ausräumen"
+   ]
+  },
+  {
+   "id": "m18",
+   "question": "Strand oder Berge?",
+   "answers": [
+    "Strand",
+    "Berge",
+    "Stadt"
+   ]
+  },
+  {
+   "id": "m19",
+   "question": "Wie isst du Gummibärchen?",
+   "answers": [
+    "Alle Farben durcheinander",
+    "Lieblingsfarbe zuerst",
+    "Lieblingsfarbe zuletzt"
+   ]
+  },
+  {
+   "id": "m20",
+   "question": "Ist ein Hotdog ein Sandwich?",
+   "answers": [
+    "Ja",
+    "Nein",
+    "Was ist das für eine Frage?"
+   ]
+  },
+  {
+   "id": "m21",
+   "question": "Lieber reich oder berühmt?",
+   "answers": [
+    "Reich",
+    "Berühmt"
+   ]
+  },
+  {
+   "id": "m22",
+   "question": "Was machst du, wenn ein Lied nervt, das alle mögen?",
+   "answers": [
+    "Mitsingen",
+    "Leise leiden",
+    "Lied wechseln"
+   ]
+  },
+  {
+   "id": "m23",
+   "question": "Wie viele Wecker stellst du?",
+   "answers": [
+    "Keinen",
+    "Einen",
+    "Zwei bis drei",
+    "Mehr als drei"
+   ]
+  },
+  {
+   "id": "m24",
+   "question": "Was ist die beste Jahreszeit?",
+   "answers": [
+    "Frühling",
+    "Sommer",
+    "Herbst",
+    "Winter"
+   ]
+  },
+  {
+   "id": "m25",
+   "question": "Lieber zu früh oder zu spät?",
+   "answers": [
+    "Zu früh",
+    "Zu spät",
+    "Pünktlich auf die Sekunde"
+   ]
+  },
+  {
+   "id": "m26",
+   "question": "Du findest 50 € auf der Straße. Was tust du?",
+   "answers": [
+    "Behalten",
+    "Fundbüro",
+    "Spenden"
+   ]
+  },
+  {
+   "id": "m27",
+   "question": "Welches Getränk zum Essen?",
+   "answers": [
+    "Wasser",
+    "Saftschorle",
+    "Softdrink",
+    "Bier oder Wein"
+   ]
+  },
+  {
+   "id": "m28",
+   "question": "Lieber nie wieder Schokolade oder nie wieder Chips?",
+   "answers": [
+    "Nie wieder Schokolade",
+    "Nie wieder Chips"
+   ]
+  },
+  {
+   "id": "m29",
+   "question": "Wie oft schaust du am Tag aufs Handy?",
+   "answers": [
+    "Unter 20-mal",
+    "20–50-mal",
+    "50–100-mal",
+    "Ich will es nicht wissen"
+   ]
+  },
+  {
+   "id": "m30",
+   "question": "Welches Haustier wäre am lustigsten?",
+   "answers": [
+    "Lama",
+    "Pinguin",
+    "Faultier",
+    "Waschbär"
+   ]
+  },
+  {
+   "id": "m31",
+   "question": "Wo sitzt du im Kino am liebsten?",
+   "answers": [
+    "Ganz vorne",
+    "Mitte",
+    "Ganz hinten"
+   ]
+  },
+  {
+   "id": "m32",
+   "question": "Was ist schlimmer?",
+   "answers": [
+    "Spinnen",
+    "Höhe",
+    "Enge Räume",
+    "Öffentlich reden"
+   ]
+  },
+  {
+   "id": "m33",
+   "question": "Lieber in der Vergangenheit oder in der Zukunft leben?",
+   "answers": [
+    "Vergangenheit",
+    "Zukunft"
+   ]
+  },
+  {
+   "id": "m34",
+   "question": "Wie gehst du mit Kassenzetteln um?",
+   "answers": [
+    "Sofort wegwerfen",
+    "Im Portemonnaie sammeln",
+    "Gar nicht erst nehmen"
+   ]
+  },
+  {
+   "id": "m35",
+   "question": "Das beste Brettspiel-Gefühl?",
+   "answers": [
+    "Gewinnen",
+    "Andere ärgern",
+    "Snacks nebenbei"
+   ]
+  },
+  {
+   "id": "m36",
+   "question": "Lieber ein Jahr ohne Internet oder ein Jahr ohne Freunde treffen?",
+   "answers": [
+    "Ohne Internet",
+    "Ohne Freunde treffen"
+   ]
+  },
+  {
+   "id": "m37",
+   "question": "Was machst du im Flugzeug?",
+   "answers": [
+    "Schlafen",
+    "Filme schauen",
+    "Aus dem Fenster gucken",
+    "Nervös sein"
+   ]
+  },
+  {
+   "id": "m38",
+   "question": "Die beste Eissorte?",
+   "answers": [
+    "Schokolade",
+    "Vanille",
+    "Erdbeere",
+    "Stracciatella"
+   ]
+  },
+  {
+   "id": "m39",
+   "question": "Wie viele Tabs hast du gerade offen?",
+   "answers": [
+    "Unter 5",
+    "5–20",
+    "Mehr als 20",
+    "Ich zähle nicht mehr"
+   ]
+  },
+  {
+   "id": "m40",
+   "question": "Lieber immer singen müssen statt sprechen – oder immer tanzen statt gehen?",
+   "answers": [
+    "Singen",
+    "Tanzen"
+   ]
+  },
+  {
+   "id": "m41",
+   "question": "Wer gewinnt: 100 entengroße Pferde oder ein pferdegroßes Huhn?",
+   "answers": [
+    "Die 100 Mini-Pferde",
+    "Das Riesenhuhn"
+   ]
+  },
+  {
+   "id": "m42",
+   "question": "Wie reagierst du auf eine Sprachnachricht über 3 Minuten?",
+   "answers": [
+    "Komplett anhören",
+    "Auf doppelter Geschwindigkeit",
+    "Ignorieren"
+   ]
+  },
+  {
+   "id": "m43",
+   "question": "Was ist das beste Weihnachtsessen?",
+   "answers": [
+    "Gans oder Ente",
+    "Raclette oder Fondue",
+    "Würstchen mit Kartoffelsalat",
+    "Etwas Vegetarisches"
+   ]
+  },
+  {
+   "id": "m44",
+   "question": "Schuhe in der Wohnung?",
+   "answers": [
+    "Aus!",
+    "Dürfen anbleiben",
+    "Hausschuhe"
+   ]
+  },
+  {
+   "id": "m45",
+   "question": "Lieber ein Elefant in Katzengröße oder eine Katze in Elefantengröße?",
+   "answers": [
+    "Mini-Elefant",
+    "Riesen-Katze"
+   ]
+  }
+ ]
+}

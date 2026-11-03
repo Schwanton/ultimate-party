@@ -2,6 +2,14 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.5.0
+
+- Neues Spielmenü: gewähltes Spiel mit Kurzbeschreibung in der Lobby, Bibliothek mit Kategorien und Filter für die Spielerzahl
+- Neues Spiel: Mehrheit – wähle deine Antwort und tippe, was die Mehrheit wählt (3–100 Spieler)
+- Neues Spiel: Wer war's? – anonyme Antworten, ratet, wer was geschrieben hat (3–10 Spieler)
+- Neues Spiel: Schätzmeister – Schätzfragen mit Zahlenstrahl-Auflösung (2–100 Spieler)
+- Neues Spiel: Verräter-Team – heimliche Verräter, Missionen und Rauswählen (5–30 Spieler)
+
 ## 0.4.1
 
 - Guess the Clicks!: Die Skala wächst mit der Säule mit und verrät nicht mehr, wie hoch es geht

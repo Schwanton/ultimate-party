@@ -1,0 +1,290 @@
+{
+ "name": "Basis",
+ "author": "UP!",
+ "version": "1.0.0",
+ "description": "Schätzfragen mit belegten Zahlen.",
+ "items": [
+  {
+   "id": "s1",
+   "question": "Wie viele Tasten hat ein klassisches Klavier?",
+   "answer": 88,
+   "source": "Wikipedia: Klavier"
+  },
+  {
+   "id": "s2",
+   "question": "Wie viele Knochen hat ein erwachsener Mensch?",
+   "answer": 206,
+   "source": "Wikipedia: Skelett des Menschen"
+  },
+  {
+   "id": "s3",
+   "question": "Wie hoch ist der Eiffelturm (mit Antennen)?",
+   "answer": 330,
+   "unit": "m",
+   "source": "Wikipedia: Eiffelturm"
+  },
+  {
+   "id": "s4",
+   "question": "Wie hoch ist die Zugspitze?",
+   "answer": 2962,
+   "unit": "m",
+   "source": "Wikipedia: Zugspitze"
+  },
+  {
+   "id": "s5",
+   "question": "Wie hoch ist der Mount Everest?",
+   "answer": 8849,
+   "unit": "m",
+   "source": "Wikipedia: Mount Everest"
+  },
+  {
+   "id": "s6",
+   "question": "Wie hoch ist der Kölner Dom?",
+   "answer": 157,
+   "unit": "m",
+   "source": "Wikipedia: Kölner Dom"
+  },
+  {
+   "id": "s7",
+   "question": "Wie hoch ist der Berliner Fernsehturm?",
+   "answer": 368,
+   "unit": "m",
+   "source": "Wikipedia: Berliner Fernsehturm"
+  },
+  {
+   "id": "s8",
+   "question": "Wie hoch ist der Burj Khalifa in Dubai?",
+   "answer": 828,
+   "unit": "m",
+   "source": "Wikipedia: Burj Khalifa"
+  },
+  {
+   "id": "s9",
+   "question": "Wie weit ist der Mond im Durchschnitt von der Erde entfernt?",
+   "answer": 384400,
+   "unit": "km",
+   "source": "Wikipedia: Mond"
+  },
+  {
+   "id": "s10",
+   "question": "Wie lang ist der Äquator?",
+   "answer": 40075,
+   "unit": "km",
+   "source": "Wikipedia: Äquator"
+  },
+  {
+   "id": "s11",
+   "question": "In welchem Jahr landeten zum ersten Mal Menschen auf dem Mond?",
+   "answer": 1969,
+   "source": "Wikipedia: Apollo 11"
+  },
+  {
+   "id": "s12",
+   "question": "In welchem Jahr fiel die Berliner Mauer?",
+   "answer": 1989,
+   "source": "Wikipedia: Berliner Mauer"
+  },
+  {
+   "id": "s13",
+   "question": "In welchem Jahr sank die Titanic?",
+   "answer": 1912,
+   "source": "Wikipedia: Titanic"
+  },
+  {
+   "id": "s14",
+   "question": "In welchem Jahr kam das erste iPhone auf den Markt?",
+   "answer": 2007,
+   "source": "Wikipedia: iPhone"
+  },
+  {
+   "id": "s15",
+   "question": "In welchem Jahr wurde Google gegründet?",
+   "answer": 1998,
+   "source": "Wikipedia: Google LLC"
+  },
+  {
+   "id": "s16",
+   "question": "In welchem Jahr fand die erste Fußball-Weltmeisterschaft statt?",
+   "answer": 1930,
+   "source": "Wikipedia: Fußball-Weltmeisterschaft 1930"
+  },
+  {
+   "id": "s17",
+   "question": "Wie viele Sekunden hat ein Tag?",
+   "answer": 86400,
+   "source": "24 × 60 × 60"
+  },
+  {
+   "id": "s18",
+   "question": "Wie viele Minuten hat eine Woche?",
+   "answer": 10080,
+   "source": "7 × 24 × 60"
+  },
+  {
+   "id": "s19",
+   "question": "Wie viele Länder gehören zur Europäischen Union?",
+   "answer": 27,
+   "source": "Wikipedia: Europäische Union"
+  },
+  {
+   "id": "s20",
+   "question": "Wie viele Mitgliedsstaaten haben die Vereinten Nationen?",
+   "answer": 193,
+   "source": "Wikipedia: Vereinte Nationen"
+  },
+  {
+   "id": "s21",
+   "question": "Wie viele Staaten gibt es in Afrika?",
+   "answer": 54,
+   "source": "Wikipedia: Afrika"
+  },
+  {
+   "id": "s22",
+   "question": "Wie viele chemische Elemente kennt das Periodensystem heute?",
+   "answer": 118,
+   "source": "Wikipedia: Periodensystem"
+  },
+  {
+   "id": "s23",
+   "question": "Wie viele Felder hat ein Schachbrett?",
+   "answer": 64,
+   "source": "Wikipedia: Schachbrett"
+  },
+  {
+   "id": "s24",
+   "question": "Wie viele Felder hat ein klassisches Monopoly-Spielbrett?",
+   "answer": 40,
+   "source": "Wikipedia: Monopoly"
+  },
+  {
+   "id": "s25",
+   "question": "Wie viele Zähne hat ein Erwachsener (mit Weisheitszähnen)?",
+   "answer": 32,
+   "source": "Wikipedia: Gebiss des Menschen"
+  },
+  {
+   "id": "s26",
+   "question": "Wie viele Herzen hat ein Oktopus?",
+   "answer": 3,
+   "source": "Wikipedia: Kraken"
+  },
+  {
+   "id": "s27",
+   "question": "Wie viele Sinfonien hat Beethoven vollendet?",
+   "answer": 9,
+   "source": "Wikipedia: Ludwig van Beethoven"
+  },
+  {
+   "id": "s28",
+   "question": "Wie viele Zeitzonen hat Russland?",
+   "answer": 11,
+   "source": "Wikipedia: Zeitzonen in Russland"
+  },
+  {
+   "id": "s29",
+   "question": "Wie lang ist ein Marathon?",
+   "answer": 42195,
+   "unit": "m",
+   "source": "Wikipedia: Marathonlauf"
+  },
+  {
+   "id": "s30",
+   "question": "Bei wie viel Grad Fahrenheit kocht Wasser (auf Meereshöhe)?",
+   "answer": 212,
+   "unit": "°F",
+   "source": "Wikipedia: Grad Fahrenheit"
+  },
+  {
+   "id": "s31",
+   "question": "Wie viele Spieler einer Rugby-Union-Mannschaft stehen auf dem Feld?",
+   "answer": 15,
+   "source": "Wikipedia: Rugby Union"
+  },
+  {
+   "id": "s32",
+   "question": "Wie hoch ist die Freiheitsstatue vom Boden bis zur Fackelspitze?",
+   "answer": 93,
+   "unit": "m",
+   "source": "Wikipedia: Freiheitsstatue"
+  },
+  {
+   "id": "s33",
+   "question": "Wie lang ist die Golden Gate Bridge insgesamt?",
+   "answer": 2737,
+   "unit": "m",
+   "source": "Wikipedia: Golden Gate Bridge"
+  },
+  {
+   "id": "s34",
+   "question": "Wie viele Kantone hat die Schweiz?",
+   "answer": 26,
+   "source": "Wikipedia: Kanton (Schweiz)"
+  },
+  {
+   "id": "s35",
+   "question": "Wie schnell breitet sich Schall in Luft bei 20 °C aus?",
+   "answer": 343,
+   "unit": "m/s",
+   "source": "Wikipedia: Schallgeschwindigkeit"
+  },
+  {
+   "id": "s36",
+   "question": "Wie schnell ist das Licht im Vakuum?",
+   "answer": 299792,
+   "unit": "km/s",
+   "source": "Wikipedia: Lichtgeschwindigkeit"
+  },
+  {
+   "id": "s37",
+   "question": "Wie viele Folgen hat die Serie „Friends“?",
+   "answer": 236,
+   "source": "Wikipedia: Friends"
+  },
+  {
+   "id": "s38",
+   "question": "Wie alt wurde Wolfgang Amadeus Mozart?",
+   "answer": 35,
+   "unit": "Jahre",
+   "source": "Wikipedia: Wolfgang Amadeus Mozart"
+  },
+  {
+   "id": "s39",
+   "question": "Wie viele Augen hat ein normaler Spielwürfel insgesamt?",
+   "answer": 21,
+   "source": "1 + 2 + 3 + 4 + 5 + 6"
+  },
+  {
+   "id": "s40",
+   "question": "Wie viele Beine hat ein Hummer?",
+   "answer": 10,
+   "source": "Wikipedia: Hummer"
+  },
+  {
+   "id": "s41",
+   "question": "Wie hoch ist das Brandenburger Tor?",
+   "answer": 26,
+   "unit": "m",
+   "source": "Wikipedia: Brandenburger Tor"
+  },
+  {
+   "id": "s42",
+   "question": "Wie groß ist der Bodensee?",
+   "answer": 536,
+   "unit": "km²",
+   "source": "Wikipedia: Bodensee"
+  },
+  {
+   "id": "s43",
+   "question": "Wie lange ist ein afrikanischer Elefant ungefähr trächtig?",
+   "answer": 22,
+   "unit": "Monate",
+   "source": "Wikipedia: Afrikanischer Elefant"
+  },
+  {
+   "id": "s44",
+   "question": "Wie viele Karten hat ein Skatblatt?",
+   "answer": 32,
+   "source": "Wikipedia: Skat / Spielkarte"
+  }
+ ]
+}

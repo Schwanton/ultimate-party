@@ -5,6 +5,7 @@ import { guessLang, useT } from '../i18n';
 import registry, { clientGame } from '../registry';
 import { Avatar, Crown, Logo, isLight, shade, vibrate } from '../ui';
 import { GameOptionsForm, optionsSummary } from './GameOptions';
+import { fitOf, gameDesc, useTagFilter } from './GameLibrary';
 
 const params = new URLSearchParams(location.search);
 
@@ -164,7 +165,8 @@ function PhoneLobby({ onEditAvatar }: { onEditAvatar: () => void }) {
   const vip = room.players.find((p) => p.id === room.vipId);
   const [error, setError] = useState<string | null>(null);
   const active = room.players.filter((p) => p.connected || p.isBot).length;
-  const list = useGames();
+  const all = useGames();
+  const { tag, setTag, present, shown: list } = useTagFilter(all);
   const selected = list.find((g) => g.id === room.selectedGameId);
 
   const start = async () => {
@@ -199,16 +201,28 @@ function PhoneLobby({ onEditAvatar }: { onEditAvatar: () => void }) {
         <span className="muted" style={{ fontSize: 14 }}>{t('lobby.playersReady', { n: active })}</span>
       </div>
 
+      {present.length > 1 && (
+        <div style={{ display: 'flex', gap: 6, overflowX: 'auto', margin: '0 -16px', padding: '2px 16px 4px', scrollbarWidth: 'none' }}>
+          {['all', ...present].map((x) => (
+            <button key={x} type="button" aria-pressed={tag === x} onClick={() => setTag(x)} style={{
+              flex: 'none', border: 0, minHeight: 40, padding: '6px 14px', borderRadius: 999, fontSize: 14, fontWeight: 700,
+              background: tag === x ? '#fff' : 'var(--surface)', color: tag === x ? '#110D24' : 'var(--muted)',
+            }}>{t(`tag.${x}`)}</button>
+          ))}
+        </div>
+      )}
+
       <div role="radiogroup" aria-label={t('lobby.pickGame')} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {list.map((g) => {
           const sel = g.id === room.selectedGameId;
           return (
             <button key={g.id} type="button" role="radio" aria-checked={sel} disabled={!isVip} onClick={() => net.send('select', { gameId: g.id })}
               style={{ minHeight: 72, width: '100%', display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px', borderRadius: 20, textAlign: 'left', background: sel ? 'var(--surface-2)' : 'var(--surface)', border: `3px solid ${sel ? g.color : 'transparent'}`, opacity: !isVip && !sel ? 0.6 : 1 }}>
-              <span style={{ width: 40, height: 40, flex: 'none', borderRadius: 12, background: g.color }} />
-              <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <span style={{ width: 12, alignSelf: 'stretch', flex: 'none', borderRadius: 6, background: g.color }} />
+              <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0 }}>
                 <span className="display" style={{ fontSize: 19, fontWeight: 700 }}>{g.name[room.lang] ?? g.name.en}</span>
-                <span className="muted" style={{ fontSize: 14 }}>{t('lobby.playersRange', { min: g.minPlayers, max: g.maxPlayers })} · {t('lobby.minutes', { n: g.minutes })}</span>
+                <span style={{ fontSize: 14, lineHeight: 1.3, color: 'var(--muted)', display: '-webkit-box', WebkitLineClamp: sel ? 4 : 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{gameDesc(g, room.lang)}</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: fitOf(g, active) === 'ok' ? 'var(--faint)' : 'var(--yellow)' }}>{t('lobby.playersRange', { min: g.minPlayers, max: g.maxPlayers })} · {t('lobby.minutes', { n: g.minutes })}</span>
               </span>
             </button>
           );
