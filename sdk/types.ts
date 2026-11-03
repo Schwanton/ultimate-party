@@ -150,6 +150,8 @@ export interface GameContext {
   audience(): PlayerInfo[];
   /** Aktuelle Daten eines Spielers (Name, Avatar, Verbindung) */
   player(id: string): PlayerInfo | undefined;
+  /** Aktuelle*r VIP (entscheidet z. B., wie es weitergeht) – kann sich ändern, wenn jemand geht */
+  vip(): string | null;
   /** Alle aktivierten Content-Einträge dieses Spiels in der Raumsprache, gemischt */
   content<T extends ContentItem = ContentItem>(): T[];
 

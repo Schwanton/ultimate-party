@@ -46,7 +46,7 @@ games/mein-spiel/
 - `id` muss dem Ordnernamen entsprechen.
 - `audience: true` – wer über `maxPlayers` hinaus beitritt, ist Publikum und bekommt eigene Ansichten (z. B. mit abstimmen).
 - `contentFields` – Pflichtfelder jedes Content-Eintrags. Packs ohne diese Felder werden abgelehnt.
-- `tags` – Kategorien fürs Spielmenü: `words`, `draw`, `guess`, `deceive`, `social`, `quick` (mehrere möglich; Unbekanntes landet unter „Weitere“).
+- `tags` – Kategorien fürs Spielmenü: `words`, `draw`, `guess`, `deceive`, `social`, `team`, `quick` (mehrere möglich; Unbekanntes landet unter „Weitere“).
 - `description` – Kurzbeschreibung (1–2 Sätze), steht im Spielmenü und in der Lobby.
 - `hidden: true` – Spiel nur im Entwicklermodus zeigen.
 - `options` – Spiel-Einstellungen für die Lobby, z. B. Rundenanzahl. Zahl mit `min`/`max`/`step` oder Auswahl mit `choices`:
@@ -108,6 +108,7 @@ export default {
 | `ctx.players` | Mitspieler beim Start (id, name, avatar, color) |
 | `ctx.audience()` | aktuelles Publikum |
 | `ctx.player(id)` | aktuelle Infos zu einem Spieler (z. B. ob verbunden) |
+| `ctx.vip()` | aktuelle*r VIP – z. B. wer im Spiel entscheidet, wie es weitergeht |
 | `ctx.lang` | Raumsprache (`de` / `en`) |
 | `ctx.content()` | Einträge aller aktivierten Content-Packs, gemischt, ungespielte zuerst |
 | `ctx.setHostView(view)` | Ansicht für den TV |
@@ -169,7 +170,7 @@ Der TV ist immer eine **1280 × 720 Bühne**, die automatisch auf jeden Bildschi
 | `VoterChips` | Wer hat wofür gestimmt (passt sich der Gruppengröße an) |
 | `Scoreboard`, `Podium` | Zwischenstand mit Balken, Siegerehrung |
 | `Confetti` | Konfetti (mit Jubel-Sound, `silent` schaltet ihn ab) |
-| `sfx` | Sounds: `sfx.play('ding')` – u. a. `pop`, `whoosh`, `ding`, `wrong`, `stamp`, `fanfare`, `cheer`, `drumroll`, `beep`, `go`, `reveal`, `sneaky`. Timer-Ticken, Übergänge und Jubel kommen automatisch; mit `"autoSounds": false` im Manifest abschalten und eigene Sounds mit `sfx.play(name, { always: true })` spielen. |
+| `sfx` | Sounds: `sfx.play('ding')` – u. a. `pop`, `whoosh`, `ding`, `wrong`, `stamp`, `fanfare`, `cheer`, `drumroll`, `beep`, `go`, `reveal`, `sneaky`. Timer-Ticken, Übergänge und Jubel kommen automatisch; mit `"autoSounds": false` im Manifest abschalten und eigene Sounds mit `sfx.play(name, { always: true })` spielen. Ganz eigene Klänge: `sfx.custom((s) => s.tone(440, 0.1, { type: 'square' }))` (auch `s.noise(…)`); eigene Hintergrundmusik: `sfx.startMusic({ bpm: () => 110, step(s, i) { … } })` und `sfx.stopMusic()` – Beispiel in `games/schwarmsinn/client.tsx`. |
 | `DrawCanvas`, `Drawing` | Zeichnen auf dem Handy, Zeichnung anzeigen |
 | `useDraft` | Entwürfe automatisch übertragen (siehe unten). `TextAnswer` macht das mit `onDraft` und `deadline` schon von selbst. |
 

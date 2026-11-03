@@ -1,0 +1,217 @@
+{
+  "id": "schwarmsinn",
+  "name": {
+    "de": "Schwarmsinn",
+    "en": "Swarm Sense"
+  },
+  "description": {
+    "de": "Steuert gemeinsam bis zu vier Figuren durch ein Labyrinth im Nebel – jeder hat nur ein paar der Knöpfe. Ohne Zurufen geht nichts.",
+    "en": "Together, steer up to four figures through a foggy maze – everyone only has a few of the buttons. Shout or fail."
+  },
+  "minPlayers": 1,
+  "maxPlayers": 100,
+  "audience": false,
+  "minutes": 20,
+  "color": "#B6F23C",
+  "tags": [
+    "team",
+    "quick"
+  ],
+  "sdkVersion": 1,
+  "version": "1.0.0",
+  "author": "UP!",
+  "options": [
+    {
+      "id": "level",
+      "label": {
+        "de": "Start-Level",
+        "en": "Start level"
+      },
+      "default": 1,
+      "choices": [
+        {
+          "value": 1,
+          "label": {
+            "de": "Level 1",
+            "en": "Level 1"
+          }
+        },
+        {
+          "value": 2,
+          "label": {
+            "de": "Level 2",
+            "en": "Level 2"
+          }
+        },
+        {
+          "value": 3,
+          "label": {
+            "de": "Level 3",
+            "en": "Level 3"
+          }
+        },
+        {
+          "value": 4,
+          "label": {
+            "de": "Level 4",
+            "en": "Level 4"
+          }
+        },
+        {
+          "value": 5,
+          "label": {
+            "de": "Level 5",
+            "en": "Level 5"
+          }
+        },
+        {
+          "value": 6,
+          "label": {
+            "de": "Level 6",
+            "en": "Level 6"
+          }
+        },
+        {
+          "value": 7,
+          "label": {
+            "de": "Level 7",
+            "en": "Level 7"
+          }
+        },
+        {
+          "value": 8,
+          "label": {
+            "de": "Level 8",
+            "en": "Level 8"
+          }
+        },
+        {
+          "value": 9,
+          "label": {
+            "de": "Level 9",
+            "en": "Level 9"
+          }
+        },
+        {
+          "value": 10,
+          "label": {
+            "de": "Level 10",
+            "en": "Level 10"
+          }
+        },
+        {
+          "value": 11,
+          "label": {
+            "de": "Level 11",
+            "en": "Level 11"
+          }
+        },
+        {
+          "value": 12,
+          "label": {
+            "de": "Level 12",
+            "en": "Level 12"
+          }
+        },
+        {
+          "value": 13,
+          "label": {
+            "de": "Level 13",
+            "en": "Level 13"
+          }
+        },
+        {
+          "value": 14,
+          "label": {
+            "de": "Level 14",
+            "en": "Level 14"
+          }
+        },
+        {
+          "value": 15,
+          "label": {
+            "de": "Level 15",
+            "en": "Level 15"
+          }
+        },
+        {
+          "value": 16,
+          "label": {
+            "de": "Level 16",
+            "en": "Level 16"
+          }
+        },
+        {
+          "value": 17,
+          "label": {
+            "de": "Level 17",
+            "en": "Level 17"
+          }
+        },
+        {
+          "value": 18,
+          "label": {
+            "de": "Level 18",
+            "en": "Level 18"
+          }
+        },
+        {
+          "value": 19,
+          "label": {
+            "de": "Level 19",
+            "en": "Level 19"
+          }
+        },
+        {
+          "value": 20,
+          "label": {
+            "de": "Level 20",
+            "en": "Level 20"
+          }
+        },
+        {
+          "value": 21,
+          "label": {
+            "de": "Endlos (ab 21)",
+            "en": "Endless (21+)"
+          }
+        }
+      ],
+      "help": {
+        "de": "Alle Level sind freigeschaltet. Neue Bausteine werden beim ersten Auftauchen erklärt.",
+        "en": "All levels are unlocked. New elements are explained the first time they appear."
+      }
+    },
+    {
+      "id": "time",
+      "label": {
+        "de": "Zeitlimit",
+        "en": "Time limit"
+      },
+      "default": 1,
+      "choices": [
+        {
+          "value": 1,
+          "label": {
+            "de": "Normal",
+            "en": "Normal"
+          }
+        },
+        {
+          "value": 1.5,
+          "label": {
+            "de": "Lang",
+            "en": "Long"
+          }
+        },
+        {
+          "value": 2,
+          "label": {
+            "de": "Entspannt",
+            "en": "Relaxed"
+          }
+        }
+      ]
+    }
+  ]
+}

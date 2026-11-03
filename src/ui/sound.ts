@@ -12,6 +12,20 @@ export type SoundName =
 
 type Listener = () => void;
 
+/** Werkzeuge für eigene Klänge (sfx.custom) und eigene Musik (sfx.startMusic(track)) */
+export interface SynthApi {
+  /** Ton: Frequenz (Hz), Dauer (s). at = Verzögerung (s), to = Tonhöhe am Ende, vol = Lautstärke 0–1 */
+  tone(freq: number, dur: number, opts?: { type?: OscillatorType; vol?: number; at?: number; to?: number; attack?: number }): void;
+  /** Rauschen (Schlagzeug, Zischen, Wind) */
+  noise(dur: number, opts?: { vol?: number; at?: number; filter?: number; type?: BiquadFilterType; sweepTo?: number }): void;
+}
+
+/** Eigene Musik: step() wird für jeden Schritt (Achtel) aufgerufen; bpm darf sich ändern (z. B. schneller bei Zeitdruck) */
+export interface MusicTrack {
+  bpm(): number;
+  step(api: SynthApi, index: number): void;
+}
+
 class Sfx {
   private ctx: AudioContext | null = null;
   private fxGain: GainNode | null = null;
@@ -132,6 +146,23 @@ class Sfx {
     } catch { /* egal */ }
   }
 
+  /** Eigener Klang, z. B. sfx.custom((s) => s.tone(440, 0.1)). Spielt auch bei autoSounds: false. */
+  custom(fn: (api: SynthApi) => void) {
+    if (!this.enabledOnDevice) return;
+    this.unlock();
+    if (!this.ctx || this.ctx.state !== 'running') return;
+    try {
+      fn(this.api(this.fxGain!, 0));
+    } catch { /* egal */ }
+  }
+
+  private api(out: AudioNode, baseAt: number): SynthApi {
+    return {
+      tone: (f, d, o = {}) => this.tone(f, d, { ...o, at: baseAt + (o.at ?? 0), out }),
+      noise: (d, o = {}) => this.noise(d, { ...o, at: baseAt + (o.at ?? 0), out }),
+    };
+  }
+
   private compose(name: SoundName) {
     const N = [523.25, 587.33, 659.25, 698.46, 783.99, 880, 987.77, 1046.5]; // C-Dur ab c''
     switch (name) {
@@ -211,16 +242,37 @@ class Sfx {
 
   /* ---------- Lobby-Musik: kleine, fröhliche Schleife ---------- */
 
-  startMusic() {
-    if (!this.enabledOnDevice || this.musicTimer) return;
+  private track: MusicTrack | null = null;
+
+  /** Musik starten – ohne Angabe die Lobby-Musik, sonst eine eigene Schleife (MusicTrack) */
+  startMusic(track: MusicTrack | null = null) {
+    if (!this.enabledOnDevice) return;
+    if (this.musicTimer && this.track === track) return;
+    this.stopMusic();
+    this.track = track;
     this.musicStep = 0;
     this.musicNext = 0;
-    this.musicTimer = setInterval(() => this.scheduleMusic(), 50);
+    this.musicTimer = setInterval(() => (this.track ? this.scheduleTrack(this.track) : this.scheduleMusic()), 50);
   }
 
   stopMusic() {
     if (this.musicTimer) clearInterval(this.musicTimer);
     this.musicTimer = null;
+    this.track = null;
+  }
+
+  private scheduleTrack(track: MusicTrack) {
+    const c = this.ctx;
+    if (!c || c.state !== 'running' || this.musicVolume <= 0) return;
+    if (this.musicNext < c.currentTime) this.musicNext = c.currentTime + 0.05;
+    while (this.musicNext < c.currentTime + 0.2) {
+      const at = this.musicNext - c.currentTime;
+      try {
+        track.step(this.api(this.musicGain!, at), this.musicStep);
+      } catch { /* egal */ }
+      this.musicStep++;
+      this.musicNext += 60 / Math.max(40, track.bpm()) / 2;
+    }
   }
 
   private scheduleMusic() {

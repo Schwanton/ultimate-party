@@ -14,6 +14,7 @@ Party-Spiele für zu Hause: Ein Bildschirm (Fernseher, Laptop, Beamer) zeigt das
 | **Mehrheit** | 3–100 | Eine Frage, 2–4 Antworten: Wähle deine eigene – und tippe, was die Mehrheit wählt. |
 | **Wer war's?** | 3–10 | Alle beantworten anonym eine persönliche Frage, dann wird geraten, wer was geschrieben hat. |
 | **Schätzmeister** | 2–100 | Schätzfragen mit Zahlen (Eiffelturm, Knochen, Mondlandung …). Der Zahlenstrahl zeigt, wer am nächsten dran ist. |
+| **Schwarmsinn** | 1–100 | Steuert gemeinsam bis zu vier Figuren durch ein Labyrinth im Nebel zu ihren Ausgängen. Jeder hat nur ein paar Knöpfe (Farbe + Richtung) – ohne Zurufen geht nichts. 20 Level plus Endlos-Modus, jedes Level wird neu erzeugt. |
 | **Verräter-Team** | 5–30 | Heimliche Verräter sabotieren Missionen. Diskutiert, werft die Richtigen raus – oder gewinnt als Verräter. |
 
 Neue Spiele lassen sich mit wenig Code hinzufügen und teilen – siehe [Spiele entwickeln](docs/SPIELE-ENTWICKELN.md).

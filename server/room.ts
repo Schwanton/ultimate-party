@@ -382,6 +382,7 @@ export class Room {
         const p = room.players.get(id);
         return p ? { ...p.info } : undefined;
       },
+      vip: () => room.vipId,
       content: <T,>() => room.contentFor(g) as T[],
       setHostView(view) {
         if (!alive()) return;

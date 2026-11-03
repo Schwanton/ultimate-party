@@ -2,6 +2,14 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.6.0
+
+- Neues Spiel: Schwarmsinn – gemeinsam bis zu vier Figuren durch ein Labyrinth im Nebel steuern, jeder hat nur ein paar Knöpfe (1–100 Spieler)
+- 20 Level mit Erklärung neuer Bausteine (Halte- und Schalter-Platten, farbige Türen, Eis, Lava, Teleporter, Einbahnfelder, Laterne, Schlüssel, Geist, Tausch, Richtungs-Chaos) plus Endlos-Modus
+- Jedes Level wird neu erzeugt und automatisch auf Lösbarkeit geprüft; nach einem Level „genau so nochmal“ oder „neu erzeugen“
+- Eigene Hintergrundmusik und Klänge für Spiele (sfx.custom, sfx.startMusic)
+- Neue Kategorie „Teamwork“ im Spielmenü
+
 ## 0.5.1
 
 - Eingaben gehen nicht mehr verloren: Zeichnungen, Texte und Schätzungen werden laufend übertragen – auch ohne „Abschicken“ zählt bei Zeitablauf der letzte Stand
