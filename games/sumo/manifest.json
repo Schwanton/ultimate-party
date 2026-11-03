@@ -1,0 +1,20 @@
+{
+  "id": "sumo",
+  "name": { "de": "Sumo", "en": "Sumo" },
+  "description": {
+    "de": "Jeder steuert eine Kugel auf einer schrumpfenden Plattform – mit dem Handy als Joystick. Schubst die anderen runter und bleibt als Letzte*r stehen!",
+    "en": "Everyone steers a ball on a shrinking platform – your phone is the joystick. Push the others off and be the last one standing!"
+  },
+  "minPlayers": 2,
+  "maxPlayers": 100,
+  "audience": false,
+  "minutes": 6,
+  "color": "#36F5C8",
+  "tags": ["quick", "team"],
+  "sdkVersion": 1,
+  "version": "1.0.0",
+  "author": "UP!",
+  "options": [
+    { "id": "rounds", "label": { "de": "Runden", "en": "Rounds" }, "default": 3, "min": 1, "max": 7 }
+  ]
+}

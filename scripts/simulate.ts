@@ -45,6 +45,13 @@ const scenarios: { game: string; players: number; options?: Record<string, numbe
   { game: 'schwarmsinn', players: 1 },
   { game: 'schwarmsinn', players: 4 },
   { game: 'schwarmsinn', players: 12 },
+  { game: 'crash', players: 2 },
+  { game: 'crash', players: 100 },
+  { game: 'kartoffel', players: 3 },
+  { game: 'kartoffel', players: 20 },
+  { game: 'sumo', players: 2 },
+  { game: 'sumo', players: 12 },
+  { game: 'sumo', players: 60 },
   // mit Spiel-Einstellungen
   { game: 'schlagfertig', players: 4, options: { rounds: 5, answerTime: 0.75 } },
   { game: 'bluff', players: 4, options: { questions: 3 } },
@@ -55,6 +62,9 @@ const scenarios: { game: string; players: number; options?: Record<string, numbe
   { game: 'mehrheit', players: 5, options: { rounds: 4, voteTime: 0.7 } },
   { game: 'wer-wars', players: 4, options: { rounds: 1 } },
   { game: 'schwarmsinn', players: 3, options: { level: 18, time: 2 } },
+  { game: 'crash', players: 4, options: { rounds: 4 } },
+  { game: 'kartoffel', players: 5, options: { lives: 2 } },
+  { game: 'sumo', players: 4, options: { rounds: 1 } },
 ];
 // Nur bestimmte Spiele testen:  npm test -- mehrheit wer-wars
 const only = process.argv.slice(2);

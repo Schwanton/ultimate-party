@@ -1,0 +1,20 @@
+{
+  "id": "crash",
+  "name": { "de": "Crash", "en": "Crash" },
+  "description": {
+    "de": "Der Multiplikator steigt und steigt – bis er abstürzt. Steig rechtzeitig aus! Wer zu gierig ist, verliert alles.",
+    "en": "The multiplier climbs and climbs – until it crashes. Cash out in time! Get greedy and lose it all."
+  },
+  "minPlayers": 2,
+  "maxPlayers": 100,
+  "audience": false,
+  "minutes": 8,
+  "color": "#FF4F7B",
+  "tags": ["quick"],
+  "sdkVersion": 1,
+  "version": "1.0.0",
+  "author": "UP!",
+  "options": [
+    { "id": "rounds", "label": { "de": "Runden", "en": "Rounds" }, "default": 8, "min": 4, "max": 15 }
+  ]
+}

@@ -48,6 +48,14 @@ class Net {
   private serverVersion: string | null = null;
   /** wird nach jedem (Wieder-)Verbinden aufgerufen */
   onOpen: (() => void) | null = null;
+  /** Live-Daten eines Spiels (ctx.stream) – getrennt vom normalen Zustand, damit nicht alles neu rendert */
+  streamData: unknown = null;
+  private streamListeners = new Set<() => void>();
+  subscribeStream = (l: () => void) => {
+    this.streamListeners.add(l);
+    return () => this.streamListeners.delete(l);
+  };
+  getStream = () => this.streamData;
 
   start() {
     if (this.started) return;
@@ -105,6 +113,10 @@ class Net {
         this.set(rest);
         return;
       }
+      case 'stream':
+        this.streamData = msg.d;
+        this.streamListeners.forEach((l) => l());
+        return;
       case 'reload':
         location.reload();
         return;
@@ -151,6 +163,11 @@ export const net = new Net();
 
 export function useNet(): NetState {
   return useSyncExternalStore(net.subscribe, net.getState);
+}
+
+/** Live-Daten vom Spiel-Server (ctx.stream), z. B. Positionen in Echtzeit-Spielen */
+export function useStream<T = any>(): T | null {
+  return useSyncExternalStore(net.subscribeStream, net.getStream) as T | null;
 }
 
 /** Gespeicherte Sitzung (pro Tab-„Slot“, damit der Entwicklermodus mehrere Handys simulieren kann). */

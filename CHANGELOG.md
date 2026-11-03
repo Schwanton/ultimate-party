@@ -2,6 +2,13 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.7.0
+
+- Neues Spiel: Crash – rechtzeitig aussteigen, bevor der Multiplikator abstürzt (2–100 Spieler)
+- Neues Spiel: Heiße Kartoffel – Bombe mit geheimer Zündschnur, Mini-Aufgaben, wer sie beim Knall hält, fliegt raus (3–20 Spieler)
+- Neues Spiel: Sumo – Echtzeit-Rempeln auf einer schrumpfenden Plattform mit dem Handy als Joystick (2–100 Spieler)
+- Live-Kanal für Echtzeit-Spiele (ctx.stream / useStream)
+
 ## 0.6.0
 
 - Neues Spiel: Schwarmsinn – gemeinsam bis zu vier Figuren durch ein Labyrinth im Nebel steuern, jeder hat nur ein paar Knöpfe (1–100 Spieler)

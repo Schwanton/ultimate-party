@@ -152,6 +152,11 @@ export interface GameContext {
   player(id: string): PlayerInfo | undefined;
   /** Aktuelle*r VIP (entscheidet z. B., wie es weitergeht) – kann sich ändern, wenn jemand geht */
   vip(): string | null;
+  /**
+   * Schnelle Live-Daten an den TV (z. B. Positionen 20× pro Sekunde in Echtzeit-Spielen).
+   * Geht am normalen Zustand vorbei; im Client mit useStream() aus '@up/ui' lesen.
+   */
+  stream(data: object): void;
   /** Alle aktivierten Content-Einträge dieses Spiels in der Raumsprache, gemischt */
   content<T extends ContentItem = ContentItem>(): T[];
 
