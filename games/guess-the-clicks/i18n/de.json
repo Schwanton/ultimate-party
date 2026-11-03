@@ -51,5 +51,7 @@
   "extend.ask": "Video länger ansehen? ({n}/{need})",
   "extend.on": "Du willst mehr Zeit ✓ ({n}/{need})",
   "extend.tv": "Mehr Zeit? {n}/{need}",
-  "extend.done": "Zeit verdoppelt! ×{n}"
+  "extend.done": "Zeit verdoppelt! ×{n}",
+  "reveal.real": "Echte Zahl",
+  "reveal.above": "Und wer lag drüber?"
 }

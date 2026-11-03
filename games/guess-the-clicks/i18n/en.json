@@ -51,5 +51,7 @@
   "extend.ask": "Watch the video longer? ({n}/{need})",
   "extend.on": "You want more time ✓ ({n}/{need})",
   "extend.tv": "More time? {n}/{need}",
-  "extend.done": "Time doubled! ×{n}"
+  "extend.done": "Time doubled! ×{n}",
+  "reveal.real": "Actual views",
+  "reveal.above": "Who went higher?"
 }

@@ -1,4 +1,5 @@
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
+import { voterSchedule, votersSeconds } from './timing';
 import type { ControllerViewProps, GameClientModule, HostViewProps, PlayerInfo } from '@up/sdk';
 import {
   Avatar, ChoiceList, Confetti, Crown, HostHeader, HostPrompt, HostTimer, PhoneTimer, PhoneWait, Podium, Scoreboard, TextAnswer, VoterChips, sfx, useServerNow,
@@ -16,6 +17,23 @@ function useSteps(times: number[], key: unknown) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
   return step;
+}
+
+/** Sekunden seit dem Wechsel von key (aktualisiert sich bis zu `until` Sekunden lang) */
+function useElapsed(key: unknown, until: number) {
+  const [start] = useState(() => ({ key, at: Date.now() }));
+  const [, tick] = useState(0);
+  if (start.key !== key) {
+    start.key = key;
+    start.at = Date.now();
+  }
+  const elapsed = (Date.now() - start.at) / 1000;
+  useEffect(() => {
+    if (elapsed > until) return;
+    const id = setInterval(() => tick((n) => n + 1), 60);
+    return () => clearInterval(id);
+  }, [key, until, elapsed > until]); // eslint-disable-line react-hooks/exhaustive-deps
+  return elapsed;
 }
 
 function roundInfo(view: any, t: HostViewProps['t']) {
@@ -189,21 +207,32 @@ function HostDuel({ view, t }: HostViewProps) {
   );
 }
 
+const VOTES_FROM = 0.5;
+
 function HostDuelResult({ view, t, player }: HostViewProps) {
-  const step = useSteps([0.5, 2.1, 3.1], `${view.round}-${view.n}`);
+  const key = `${view.round}-${view.n}`;
+  // Die Abstimmenden erscheinen nacheinander, abwechselnd links und rechts – danach Autor und Gewinner
+  const V = votersSeconds(view.a.voters.length + view.b.voters.length);
+  const step = useSteps([VOTES_FROM, VOTES_FROM + V + 0.9, VOTES_FROM + V + 1.9], key);
+  const elapsed = useElapsed(key, VOTES_FROM + V + 0.5) - VOTES_FROM;
+  const sched = voterSchedule([view.a.voters.length, view.b.voters.length]);
+  const allIn = elapsed >= V;
+  const shownOf = (key: 'a' | 'b') => sched[key === 'a' ? 0 : 1].filter((at) => at <= elapsed).length;
   useEffect(() => {
     if (step === 2) sfx.play('reveal');
     if (step === 3) sfx.play(view.sweep ? 'fanfare' : view.winner ? 'stamp' : 'wrong');
   }, [step, view.sweep, view.winner]);
   const total = Math.max(1, view.a.voters.length + view.b.voters.length + view.a.audience + view.b.audience);
-  const pct = (s: any) => Math.round(((s.voters.length + s.audience) / total) * 100);
   const side = (key: 'a' | 'b') => {
     const s = view[key];
     const won = view.winner === key;
     const author = player(s.authorId);
-    const voters: PlayerInfo[] = s.voters.map((id: string) => player(id)).filter(Boolean);
+    const n = step >= 1 ? shownOf(key) : 0;
+    const voters: PlayerInfo[] = s.voters.slice(0, n).map((id: string) => player(id)).filter(Boolean);
+    const audience = allIn ? s.audience : 0;
+    const pctVal = Math.round(((n + audience) / total) * 100);
     const dark = key === 'a';
-    const votesLabel = s.voters.length === 1 ? t('result.vote1') : t('result.votes', { n: s.voters.length });
+    const votesLabel = n === 1 ? t('result.vote1') : t('result.votes', { n });
     return (
       <AnswerCard side={key} text={s.text ?? t('result.noAnswer')} style={{
         transform: step >= 3 ? (won ? 'scale(1.02)' : view.winner ? 'scale(.97)' : undefined) : undefined,
@@ -212,14 +241,14 @@ function HostDuelResult({ view, t, player }: HostViewProps) {
         {step >= 3 && won && <span className="up-tag" style={{ position: 'absolute', top: -18, right: 28, background: 'var(--yellow)', color: '#110D24', boxShadow: '0 5px 0 var(--yellow-d)', animation: 'upBadge .6s ease-out both' }}>{t('result.winner')}</span>}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           <div style={{ height: 20, borderRadius: 999, background: 'rgba(17,13,36,.22)', overflow: 'hidden' }}>
-            <div style={{ height: '100%', borderRadius: 999, background: dark ? '#fff' : '#110D24', width: step >= 1 ? `${pct(s)}%` : '0%', transition: 'width 1.1s cubic-bezier(.2,.9,.3,1.2)' }} />
+            <div style={{ height: '100%', borderRadius: 999, background: dark ? '#fff' : '#110D24', width: `${pctVal}%`, transition: 'width .35s cubic-bezier(.2,.9,.3,1.2)' }} />
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 18, fontWeight: 700 }}>
-            <span>{step >= 1 ? `${votesLabel} · ${pct(s)} %` : '…'}</span>
-            <span>{step >= 1 && s.audience > 0 ? t('result.audience', { n: s.audience }) : ''}</span>
+            <span style={{ fontVariantNumeric: 'tabular-nums' }}>{step >= 1 ? `${votesLabel} · ${pctVal} %` : '…'}</span>
+            <span>{audience > 0 ? t('result.audience', { n: audience }) : ''}</span>
           </div>
         </div>
-        <div style={{ flex: 1, minHeight: 40 }}>{step >= 1 && <VoterChips voters={voters} crowdSize={view.crowd} onDark={dark} />}</div>
+        <div style={{ flex: 1, minHeight: 40 }}><VoterChips voters={voters} crowdSize={view.crowd} onDark={dark} stagger={0} /></div>
         <div style={{ height: 56, display: 'flex', alignItems: 'center', gap: 12 }}>
           {step >= 2 && author ? (
             <div className="anim-up" style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1 }}>
@@ -285,7 +314,13 @@ function HostMultiVote({ view, t }: HostViewProps) {
 }
 
 function HostMultiResult({ view, t, player }: HostViewProps) {
-  const step = useSteps([0.6, 2.2], `${view.round}-multi`);
+  const key = `${view.round}-multi-${view.prompt}`;
+  const shownRows = (view.rows as any[]).slice(0, 6);
+  // Stimmen erscheinen nacheinander, reihum über die Antworten
+  const sched = voterSchedule(shownRows.map((r) => r.voters.length));
+  const V = votersSeconds(shownRows.reduce((n, r) => n + r.voters.length, 0));
+  const step = useSteps([0.6, 0.6 + V + 0.8], key);
+  const elapsed = useElapsed(key, 0.6 + V + 0.5) - 0.6;
   useEffect(() => {
     if (step === 2) sfx.play('stamp');
   }, [step]);
@@ -300,7 +335,7 @@ function HostMultiResult({ view, t, player }: HostViewProps) {
         {shown.map((r, i) => {
           const author = player(r.authorId);
           const first = i === 0 && r.points > 0;
-          const voters: PlayerInfo[] = r.voters.map((id: string) => player(id)).filter(Boolean);
+          const voters: PlayerInfo[] = r.voters.slice(0, sched[i].filter((at) => at <= elapsed).length).map((id: string) => player(id)).filter(Boolean);
           return (
             <div key={r.id} style={{
               display: 'flex', alignItems: 'center', gap: 16, padding: '12px 20px', borderRadius: 22, minHeight: 70,
@@ -309,7 +344,7 @@ function HostMultiResult({ view, t, player }: HostViewProps) {
             }}>
               {first && step >= 2 && <Crown size={34} />}
               <p className="display" style={{ flex: 1, fontSize: 24, fontWeight: 800, lineHeight: 1.15 }}>{r.text}</p>
-              <div style={{ maxWidth: 360 }}>{step >= 1 && <VoterChips voters={voters} crowdSize={view.crowd > 10 ? 20 : view.crowd} />}</div>
+              <div style={{ maxWidth: 360 }}><VoterChips voters={voters} crowdSize={view.crowd > 10 ? 20 : view.crowd} stagger={0} /></div>
               {step >= 2 && author && (
                 <span className="anim-up" style={{ display: 'flex', alignItems: 'center', gap: 8, width: 170 }}>
                   <Avatar player={author} size={40} /> <b style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{author.name}</b>

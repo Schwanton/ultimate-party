@@ -8,7 +8,8 @@ import { sfx } from './sound';
  * Wer hat wofür gestimmt – passt sich der Gruppengröße an:
  * bis 10 Abstimmende mit Namen, bis 40 nur Avatare, darüber gar nicht (nur Zahlen).
  */
-export function VoterChips({ voters, crowdSize, onDark = true, delay = 0 }: { voters: PlayerInfo[]; crowdSize: number; onDark?: boolean; delay?: number }) {
+/** stagger: Abstand der Einblend-Animation je Chip (0, wenn die Chips schon einzeln nacheinander übergeben werden) */
+export function VoterChips({ voters, crowdSize, onDark = true, delay = 0, stagger = 0.1 }: { voters: PlayerInfo[]; crowdSize: number; onDark?: boolean; delay?: number; stagger?: number }) {
   const count = voters.length;
   useEffect(() => {
     if (count > 0 && crowdSize <= 40) sfx.play('pop');
@@ -22,7 +23,7 @@ export function VoterChips({ voters, crowdSize, onDark = true, delay = 0 }: { vo
           display: 'inline-flex', alignItems: 'center', gap: 8, borderRadius: 999,
           padding: named ? 4 : 0, paddingRight: named ? 12 : 0,
           background: named ? (onDark ? 'rgba(17,13,36,.28)' : 'rgba(17,13,36,.14)') : undefined,
-          animation: `upChip .4s ease-out ${(delay + 0.1 * i).toFixed(2)}s both`,
+          animation: `upChip .4s ease-out ${(delay + stagger * i).toFixed(2)}s both`,
         }}>
           <Avatar player={v} size={named ? 32 : 34} flat={named} />
           {named && <span style={{ fontSize: 16, fontWeight: 700, color: onDark ? '#fff' : '#110D24' }}>{v.name}</span>}

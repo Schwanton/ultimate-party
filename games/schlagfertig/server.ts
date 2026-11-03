@@ -5,6 +5,7 @@
  * Ab 13 Spieler: jede Runde ein Prompt für alle, Abstimmung im Turnier (Vorrunden parallel am Handy, Finale am TV).
  */
 
+import { votersSeconds } from './timing';
 import { Scores, cleanText, pick, shuffle, splitEvenly, type GameContext, type GameServerModule } from '@up/sdk';
 
 interface Prompt {
@@ -284,7 +285,7 @@ export default {
         ctx.setPlayerView(ans.authorId, { screen: 'duelOutcome', won, points: pts, sweep: won && !!sweep, text: ans.text, total: scores.get(ans.authorId) });
       }
       members().filter((m) => m.id !== a.authorId && m.id !== b.authorId).forEach((m) => ctx.setPlayerView(m.id, { screen: 'lookAtTv' }));
-      ctx.after(7, () => runDuels(pids, i + 1));
+      ctx.after(7 + votersSeconds(ra.players.length + rb.players.length), () => runDuels(pids, i + 1));
     }
 
     function eligibleCount(a: Answer, b: Answer) {
@@ -320,7 +321,7 @@ export default {
       for (const r of rows) ctx.setPlayerView(r.authorId, { screen: 'duelOutcome', won: r.authorId === winnerId, points: r.points, sweep: false, text: r.text, total: scores.get(r.authorId) });
       members().filter((m) => !rows.some((r) => r.authorId === m.id)).forEach((m) => ctx.setPlayerView(m.id, { screen: 'lookAtTv' }));
       void isLast;
-      ctx.after(Math.min(12, 6 + rows.length * 0.6), showScores);
+      ctx.after(Math.min(12, 6 + rows.length * 0.6) + votersSeconds(rows.reduce((n, r) => n + r.voters.length, 0)), showScores);
     }
 
     /* ---------- Turnier für große Gruppen ---------- */

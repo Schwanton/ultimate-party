@@ -2,6 +2,12 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.4.1
+
+- Guess the Clicks!: Die Skala wächst mit der Säule mit und verrät nicht mehr, wie hoch es geht
+- Guess the Clicks!: Nach der echten Zahl fährt die Säule weiter bis zu den höheren Tipps – erst dann steht der Gewinner fest
+- Schlagfertig: Die Abstimmenden erscheinen nacheinander, abwechselnd bei beiden Antworten
+
 ## 0.4.0
 
 - Guess the Clicks!: neue Auflösung als Zahlenstrahl – die Säule fährt hoch, wird nahe an Tipps und der echten Zahl langsamer, und jeder Tipp erscheint mit Bild, sobald er erreicht ist
