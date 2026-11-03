@@ -112,6 +112,7 @@ export default {
 | `ctx.stream(data)` | schnelle Live-Daten an den TV (z. B. Positionen 30× pro Sekunde), ohne die ganze Ansicht neu zu senden – im TV mit `useStream()` aus `@up/ui` lesen. Mit `ctx.stream(data, { phones: true })` geht es zusätzlich an alle Handys. Beispiele: `games/sumo`, `games/montagsmaler` (Live-Zeichnung) |
 | `ctx.lang` | Raumsprache (`de` / `en`) |
 | `ctx.content()` | Einträge aller aktivierten Content-Packs, gemischt, ungespielte zuerst |
+| `ctx.deck()` | **Kartenstapel**: Inhalte wie Karten ziehen (`draw()`, `drawMany(n)`, `putBack(karte)`). Eine gezogene Karte kommt erst wieder, wenn der ganze Stapel durch ist – auch über mehrere Spiele und Neustarts hinweg (gespeichert in `.up-data/decks.json`). Mit `ctx.deck({ filter })` nur passende Karten, z. B. eine Schwierigkeitsstufe. Für alles nehmen, was Spieler nicht doppelt sehen sollen. |
 | `ctx.setHostView(view)` | Ansicht für den TV |
 | `ctx.setPlayerView(id, view)` | Ansicht für ein Handy |
 | `ctx.setAllPlayerViews(p => view)` | Ansicht für alle Mitspieler |

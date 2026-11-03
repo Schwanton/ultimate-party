@@ -25,7 +25,7 @@ export default {
     const scores = new Scores(ids);
     const total = Number(ctx.options.rounds) || 8;
     const guessTime = Number(ctx.options.guessTime) || 30;
-    const items = ctx.content<Item>().filter((it) => Number.isFinite(Number(it.answer)) && Number(it.answer) >= 0).slice(0, total);
+    const items = ctx.deck<Item>({ filter: (it) => Number.isFinite(Number(it.answer)) && Number(it.answer) >= 0 }).drawMany(total);
     let q = -1;
     let guesses = new Map<string, number>();
     /** eingetippt, aber nicht abgeschickt – der neueste Stand zählt bei Zeitablauf */

@@ -40,7 +40,8 @@ export default {
     const scores = new Scores(ids);
     const prompts = ctx.content<Prompt>();
     let promptIndex = 0;
-    const nextPrompt = (): Prompt => prompts[promptIndex++ % Math.max(1, prompts.length)] ?? { id: 'x', prompt: '…' };
+    const deck = ctx.deck<Prompt>();
+    const nextPrompt = (): Prompt => deck.draw() ?? prompts[promptIndex++ % Math.max(1, prompts.length)] ?? { id: 'x', prompt: '…' };
 
     let round = 0; // 1..3
     const totalRounds = Number(ctx.options.rounds) || 3;

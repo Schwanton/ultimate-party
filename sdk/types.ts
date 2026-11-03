@@ -60,6 +60,8 @@ export interface GameManifest {
   autoSounds?: boolean;
   /** Kategorien für das Spielmenü: words, draw, guess, deceive, social, quick (andere landen unter „Weitere“) */
   tags?: string[];
+  /** Inhalte werden nicht als Kartenstapel gezogen (in den Einstellungen nicht als Stapel anzeigen) */
+  noDeck?: boolean;
   /** Nur im Entwicklermodus anzeigen (z. B. Vorlagen) */
   hidden?: boolean;
   version?: string;
@@ -126,6 +128,19 @@ export interface ContentPack {
   items: ContentItem[];
 }
 
+/** Kartenstapel – siehe GameContext.deck() */
+export interface Deck<T> {
+  /** Nächste Karte ziehen (undefined, wenn es gar keine Karten gibt) */
+  draw(): T | undefined;
+  /** Mehrere Karten ziehen */
+  drawMany(n: number): T[];
+  /** Karte zurücklegen, z. B. wenn sie zur Auswahl stand, aber nicht genommen wurde */
+  putBack(card: T): void;
+  /** Karten insgesamt / noch nicht gezogen */
+  readonly size: number;
+  readonly left: number;
+}
+
 export interface RankingEntry {
   playerId: string;
   score: number;
@@ -160,6 +175,12 @@ export interface GameContext {
   stream(data: object, opts?: { phones?: boolean }): void;
   /** Alle aktivierten Content-Einträge dieses Spiels in der Raumsprache, gemischt */
   content<T extends ContentItem = ContentItem>(): T[];
+  /**
+   * Kartenstapel: Content-Einträge wie Karten ziehen. Eine gezogene Karte kommt erst wieder,
+   * wenn alle Karten des Stapels durch sind – auch über mehrere Spiele und Neustarts hinweg.
+   * Für alles, was Spieler nicht doppelt sehen sollen (Begriffe, Fragen …).
+   */
+  deck<T extends ContentItem = ContentItem>(opts?: { filter?: (item: T) => boolean }): Deck<T>;
 
   /** Ansicht für den großen Bildschirm setzen */
   setHostView(view: object): void;

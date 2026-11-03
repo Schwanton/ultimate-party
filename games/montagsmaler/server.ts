@@ -66,8 +66,6 @@ export default {
     const teamScore = [0, 0];
 
     const allWords = ctx.content<Word>();
-    const byLevel = (lvl: number) => allWords.filter((w) => (w.level ?? 2) === lvl);
-    const usedWords = new Set<string>();
 
     let phase: Phase = 'intro';
     let round = 0;
@@ -95,6 +93,10 @@ export default {
     let feedN = 0;
     let toast: { n: number; id: string } | null = null;
     let lastGuessAt = new Map<string, number>();
+    /** Emotes für den Fernseher (die letzten paar) */
+    let emotes: { n: number; id: string; e: number; at: number }[] = [];
+    let emoteN = 0;
+    const lastEmoteAt = new Map<string, number>();
     let roundStartScores = scores.snapshot();
     let lastScoresRound = 0;
     let endPending = false;
@@ -124,17 +126,11 @@ export default {
 
     /* ---------------- Wörter ---------------- */
 
+    // Kartenstapel je Schwierigkeit: kein Begriff kommt doppelt, bis alle durch sind (auch über mehrere Spiele)
+    const decks = [1, 2, 3].map((lvl) => ctx.deck<Word>({ filter: (w) => (w.level ?? 2) === lvl }));
+    const anyDeck = ctx.deck<Word>();
     function takeWord(lvl: number): Word {
-      const fresh = (list: Word[]) => list.filter((w) => !usedWords.has(w.word));
-      let list = fresh(byLevel(lvl));
-      if (!list.length) list = fresh(allWords);
-      if (!list.length) {
-        usedWords.clear();
-        list = byLevel(lvl).length ? byLevel(lvl) : allWords;
-      }
-      const w = list[0] ?? { id: 'x', word: '?' };
-      usedWords.add(w.word);
-      return w;
+      return decks[lvl - 1].draw() ?? anyDeck.draw() ?? { id: 'x', word: '?' };
     }
 
     function slots(full: boolean): string[] {
@@ -194,6 +190,7 @@ export default {
       reporters = new Set();
       myGuesses = new Map();
       feed = [];
+      emotes = [];
       toast = null;
       endPending = false;
       choices = [takeWord(1), takeWord(2), takeWord(3)];
@@ -206,8 +203,6 @@ export default {
     function startDraw(w: Word) {
       if (phase !== 'pick') return;
       timer?.cancel();
-      // nicht gewählte Wörter dürfen später wieder vorkommen
-      choices.filter((c) => c !== w).forEach((c) => usedWords.delete(c.word));
       word = w;
       wordForms = [w.word, ...(w.alt ?? [])].flatMap(forms).filter(Boolean);
       phase = 'draw';
@@ -369,14 +364,14 @@ export default {
         case 'steal':
           return {
             screen: 'draw', ...common(), phase, drawerId: drawer, drawingTeam, strokes, slots: slots(false), letters: slots(true).length,
-            feed, toast, solvedIds: solved.map((s) => s.id), members, scores: scores.snapshot(), reports: reporters.size,
+            feed, toast, emotes, solvedIds: solved.map((s) => s.id), members, scores: scores.snapshot(), reports: reporters.size,
             deadline: timer?.deadline, duration: timer?.duration, stolenBy, teamWon,
           };
         case 'reveal':
           return {
             screen: 'reveal', ...common(), word: word?.word, strokes, drawerId: drawer, drawingTeam,
             solved, missed: (teamMode ? [] : members.filter((id) => id !== drawer && !hasSolved(id))),
-            drawerPoints: revealView.drawerPoints, cheat: revealView.cheat, stolenBy, teamWon,
+            drawerPoints: revealView.drawerPoints, cheat: revealView.cheat, stolenBy, teamWon, emotes,
           };
         case 'scores':
           return { screen: 'scores', ...common(), before: roundStartScores, after: scores.snapshot() };
@@ -424,11 +419,18 @@ export default {
           if (teamMode) points = stolenBy != null ? (teamOf(id) === stolenBy ? solved[0]?.points ?? 0 : 0) : teamWon && teamOf(id) === drawingTeam ? solved[0]?.points ?? 0 : 0;
           return { screen: 'roundResult', ...base, word: word?.word, isDrawer: id === drawer, found: !!mine, points, solvedCount: solved.length, cheat: revealView.cheat };
         }
-        case 'scores':
+        case 'scores': {
+          const ranking = scores.ranking();
+          return { screen: 'scoresMe', ...base, score: scores.get(id), place: ranking.findIndex((r) => r.playerId === id) + 1, of: ranking.length };
+        }
         case 'gallery':
         case 'final': {
+          // Am Ende: alle Bilder aufs Handy – zum Ansehen, Speichern und Teilen
           const ranking = scores.ranking();
-          return { screen: phase === 'final' ? 'finalMe' : 'scoresMe', ...base, score: scores.get(id), place: ranking.findIndex((r) => r.playerId === id) + 1, of: ranking.length };
+          return {
+            screen: 'gallery', ...base, final: phase === 'final', score: scores.get(id), place: ranking.findIndex((r) => r.playerId === id) + 1, of: ranking.length,
+            pics: gallery.map((g) => ({ word: g.word, strokes: g.strokes, drawerId: g.drawerId })),
+          };
         }
       }
     }
@@ -499,6 +501,16 @@ export default {
           return onDraw(action);
         }
         if (action.type === 'guess') return guess(id, action.text);
+        if (action.type === 'emote') {
+          const e = Number(action.e);
+          const now = Date.now();
+          if (!Number.isInteger(e) || e < 0 || e > 4 || now - (lastEmoteAt.get(id) ?? 0) < 500) return;
+          if (phase !== 'draw' && phase !== 'steal' && phase !== 'reveal') return;
+          lastEmoteAt.set(id, now);
+          emotes = [...emotes.filter((x) => now - x.at < 4000), { n: ++emoteN, id, e, at: now }].slice(-14);
+          ctx.setHostView(hostView());
+          return;
+        }
         if (action.type === 'report' && phase === 'draw') {
           if (action.on === false) reporters.delete(id);
           else reporters.add(id);
@@ -510,6 +522,7 @@ export default {
         broadcast();
       },
       bot(_id, view) {
+        if ((view.screen === 'guess' || view.screen === 'watch' || view.screen === 'solved') && Math.random() < 0.12) return { type: 'emote', e: Math.floor(Math.random() * 5) };
         if (view.screen === 'pick') return { type: 'pick', i: Math.floor(Math.random() * 3) };
         if (view.screen === 'draw' && view.input && view.strokes.length < 6) {
           const p: number[] = [];

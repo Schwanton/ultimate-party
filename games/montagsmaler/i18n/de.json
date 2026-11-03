@@ -86,5 +86,21 @@
  "gallery.stolen": "{team} hat geklaut",
  "me.place": "Platz {place} von {of}",
  "me.score": "{n} Punkte",
- "lookAtTv": "Schau auf den Fernseher."
+ "lookAtTv": "Schau auf den Fernseher.",
+ "gallery.byShort": "gemalt von",
+ "gallery.save": "Speichern",
+ "gallery.share": "Teilen",
+ "gallery.saved": "Gespeichert – schau in deinen Downloads oder Fotos.",
+ "gallery.failed": "Das hat leider nicht geklappt.",
+ "gallery.close": "Schließen",
+ "gallery.prev": "Vorheriges Bild",
+ "gallery.next": "Nächstes Bild",
+ "gallery.phoneTitle": "Die Bilder des Abends",
+ "gallery.phoneText": "Tippe auf ein Bild, um es groß zu sehen, zu speichern oder zu teilen.",
+ "emote.label": "Emotes",
+ "emote.0": "Lachen",
+ "emote.1": "Kopf explodiert",
+ "emote.2": "Verliebt",
+ "emote.3": "Applaus",
+ "emote.4": "Ab in den Müll"
 }

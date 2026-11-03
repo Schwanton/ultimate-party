@@ -86,5 +86,21 @@
  "gallery.stolen": "{team} stole it",
  "me.place": "Place {place} of {of}",
  "me.score": "{n} points",
- "lookAtTv": "Look at the TV."
+ "lookAtTv": "Look at the TV.",
+ "gallery.byShort": "drawn by",
+ "gallery.save": "Save",
+ "gallery.share": "Share",
+ "gallery.saved": "Saved – check your downloads or photos.",
+ "gallery.failed": "Sorry, that didn't work.",
+ "gallery.close": "Close",
+ "gallery.prev": "Previous drawing",
+ "gallery.next": "Next drawing",
+ "gallery.phoneTitle": "Tonight's drawings",
+ "gallery.phoneText": "Tap a drawing to see it big, save it or share it.",
+ "emote.label": "Emotes",
+ "emote.0": "Laugh",
+ "emote.1": "Mind blown",
+ "emote.2": "Love it",
+ "emote.3": "Applause",
+ "emote.4": "Straight to the bin"
 }

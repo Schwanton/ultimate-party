@@ -24,7 +24,7 @@ export default {
     const ids = ctx.players.map((p) => p.id);
     const scores = new Scores(ids);
     const count = Number(ctx.options.questions) || 6;
-    const facts = ctx.content<Fact>().slice(0, count);
+    const facts = ctx.deck<Fact>().drawMany(count);
     const half = Math.ceil(facts.length / 2);
     const wf = Number(ctx.options.writeTime) || 1;
     let q = -1;

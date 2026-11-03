@@ -2,6 +2,13 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.8.1
+
+- Neu: Kartenstapel – Begriffe und Fragen werden wie Karten gezogen und kommen erst wieder, wenn alle einmal dran waren, auch über mehrere Spiele und Abende. In den Einstellungen: „noch X von Y“ und „Neu mischen“
+- Montagsmaler: Beim Tippen scrollt der Bildschirm nicht mehr weg, das Eingabefeld sitzt direkt unter der Zeichnung
+- Montagsmaler: Emote-Leiste (😂 🤯 😍 👏 🚮) – fliegt auf dem Fernseher übers Bild, mit leisem Plopp
+- Montagsmaler: Am Ende alle Bilder auf dem Handy ansehen, als Bild speichern und teilen
+
 ## 0.8.0
 
 - Neues Spiel: Montagsmaler – einer malt live, alle anderen raten per Handy (2–100 Spieler)

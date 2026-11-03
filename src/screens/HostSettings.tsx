@@ -58,6 +58,25 @@ export function HostSettings({ onClose }: { onClose: () => void }) {
                 })}
               </div>
             </div>
+            {host.decks?.length ? (
+              <div>
+                <div className="up-label" style={{ marginBottom: 4 }}>{t('settings.decks')}</div>
+                <p className="faint" style={{ fontSize: 14, marginBottom: 8 }}>{t('settings.decksHelp')}</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {host.decks.map((d) => {
+                    const game = host.games.find((g) => g.id === d.game);
+                    return (
+                      <div key={d.game} style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 16 }}>
+                        <span style={{ width: 12, height: 12, borderRadius: 4, background: game?.color }} />
+                        <b style={{ flex: 1 }}>{game?.name[room.lang] ?? d.game}</b>
+                        <span className="faint">{t('settings.deckLeft', { left: d.left, total: d.total })}</span>
+                        <button className="up-btn ghost small" disabled={d.left === d.total} onClick={() => net.send('deck:reset', { gameId: d.game })}>{t('settings.deckShuffle')}</button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : null}
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>

@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type 
 import type { ControllerViewProps, GameClientModule, HostViewProps, PlayerInfo, Translate } from '@up/sdk';
 import {
   Avatar, Confetti, DRAW_COLORS, DRAW_WIDTHS, Drawing, ERASER, HostHeader, HostTimer, PhoneTimer, PhoneWait, Podium, Scoreboard,
-  type Stroke, sfx, useStream, vibrate,
+  type Stroke, sfx, useServerNow, useStream, vibrate,
 } from '@up/ui';
 
 const PINK = '#E8336F';
@@ -83,6 +83,36 @@ function TeamBadge({ t, n, score, active, player, members }: { t: Translate; n: 
 }
 
 /* ================= TV ================= */
+
+/** Emotes der Spieler fliegen über dem Bild hoch – mit leisem Plopp */
+function EmoteLayer({ emotes, player }: { emotes: { n: number; id: string; e: number; at: number }[] | undefined; player: Player }) {
+  const now = useServerNow(250);
+  const lastN = useRef(0);
+  useEffect(() => {
+    const newest = emotes?.length ? emotes[emotes.length - 1].n : 0;
+    if (newest > lastN.current && lastN.current >= 0) {
+      const pitch = 700 + ((newest * 97) % 400);
+      sfx.custom((api) => api.tone(pitch, 0.09, { type: 'sine', vol: 0.05, to: pitch * 1.5 }));
+    }
+    lastN.current = Math.max(lastN.current, newest);
+  }, [emotes]);
+  return (
+    <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden', zIndex: 4 }}>
+      {(emotes ?? []).filter((x) => now - x.at < 3200).map((x) => {
+        const p = player(x.id);
+        return (
+          <span key={x.n} style={{
+            position: 'absolute', bottom: 0, left: `${30 + ((x.n * 37) % 40)}%`, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
+            animation: 'upEmote 3s ease-out forwards',
+          }}>
+            <span style={{ fontSize: 64, lineHeight: 1, filter: 'drop-shadow(0 4px 0 rgba(10,7,22,.6))' }}>{EMOTES[x.e]}</span>
+            {p && <Avatar player={p} size={30} />}
+          </span>
+        );
+      })}
+    </div>
+  );
+}
 
 function Host(props: HostViewProps) {
   const { view, t } = props;
@@ -322,6 +352,7 @@ function HostDraw({ view, t, player, roundInfo }: HostViewProps & { roundInfo?: 
           )}
         </aside>
 
+        <EmoteLayer emotes={view.emotes} player={player} />
         {toastVisible && toastPlayer && (
           <div role="status" className="display" style={{
             position: 'absolute', left: '50%', top: 10, transform: 'translateX(-50%) rotate(-2deg)', zIndex: 5,
@@ -355,7 +386,8 @@ function HostReveal({ view, t, player, roundInfo }: HostViewProps & { roundInfo?
   return (
     <>
       <HostHeader title={t('title')} color={PINK} info={roundInfo} />
-      <div style={{ flex: 1, display: 'flex', gap: 40, minHeight: 0 }}>
+      <div style={{ flex: 1, display: 'flex', gap: 40, minHeight: 0, position: 'relative' }}>
+        <EmoteLayer emotes={view.emotes} player={player} />
         <section style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 18 }}>
           <Drawing strokes={view.strokes} size={420} style={{ transform: 'rotate(-2deg)', boxShadow: '0 10px 0 #0A0716' }} />
           {drawer && <span className="muted" style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 19, fontWeight: 700 }}><Avatar player={drawer} size={36} />{t('reveal.by', { name: drawer.name })}</span>}
@@ -618,18 +650,69 @@ function DrawScreen(props: ControllerViewProps) {
   );
 }
 
+/** Emotes, die auf dem Fernseher hochfliegen */
+const EMOTES = ['😂', '🤯', '😍', '👏', '🚮'];
+
+function EmoteBar({ send, t }: { send: (a: any) => void; t: Translate }) {
+  const last = useRef(0);
+  const [hit, setHit] = useState<number | null>(null);
+  const fire = (i: number) => {
+    const now = Date.now();
+    if (now - last.current < 600) return;
+    last.current = now;
+    send({ type: 'emote', e: i });
+    setHit(i);
+    setTimeout(() => setHit(null), 250);
+  };
+  return (
+    <div role="group" aria-label={t('emote.label')} style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', gap: 6 }}>
+      {EMOTES.map((e, i) => (
+        <button key={e} type="button" aria-label={t(`emote.${i}`)} onMouseDown={(ev) => ev.preventDefault()} onClick={() => fire(i)}
+          style={{ height: 44, border: 0, borderRadius: 14, background: 'var(--surface)', fontSize: 24, lineHeight: 1, padding: 0, transform: hit === i ? 'scale(1.25)' : undefined, transition: 'transform .15s' }}>
+          {e}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/** Bildschirm nicht wegscrollen lassen, wenn die Tastatur aufgeht (iPhone) */
+function useNoScroll() {
+  useEffect(() => {
+    const fix = () => {
+      if (window.scrollY > 0 || (window.visualViewport?.offsetTop ?? 0) > 0) window.scrollTo(0, 0);
+    };
+    const later = () => {
+      fix();
+      setTimeout(fix, 60);
+      setTimeout(fix, 300);
+    };
+    const vv = window.visualViewport;
+    vv?.addEventListener('resize', later);
+    vv?.addEventListener('scroll', fix);
+    window.addEventListener('scroll', fix);
+    document.addEventListener('focusin', later);
+    return () => {
+      vv?.removeEventListener('resize', later);
+      vv?.removeEventListener('scroll', fix);
+      window.removeEventListener('scroll', fix);
+      document.removeEventListener('focusin', later);
+    };
+  }, []);
+}
+
 function GuessInput({ send, t }: { send: (a: any) => void; t: Translate }) {
   const [text, setText] = useState('');
   const ref = useRef<HTMLInputElement>(null);
   useEffect(() => {
-    setTimeout(() => ref.current?.focus(), 80);
+    setTimeout(() => ref.current?.focus({ preventScroll: true }), 80);
   }, []);
   const submit = () => {
     const v = text.trim();
     if (!v) return;
     send({ type: 'guess', text: v });
     setText('');
-    ref.current?.focus();
+    ref.current?.focus({ preventScroll: true });
   };
   return (
     <form onSubmit={(e) => { e.preventDefault(); submit(); }} style={{ display: 'flex', gap: 8 }}>
@@ -650,8 +733,9 @@ function GuessScreen({ view, t, send, player }: ControllerViewProps) {
   const vh = useViewportHeight();
   const guessing = view.screen === 'guess';
   // Tastatur zu (viel Platz): Bild in voller Breite; Tastatur offen: Bild kleiner, Infos daneben
-  const roomy = vh - (guessing ? 330 : 260) >= boxW;
-  const size = roomy ? boxW : Math.max(150, Math.min(boxW - 108, vh - (guessing ? 290 : 220)));
+  const roomy = vh - (guessing ? 400 : 330) >= boxW;
+  const size = roomy ? boxW : Math.max(140, Math.min(boxW - 108, vh - (guessing ? 350 : 290)));
+  useNoScroll();
   const drawer = player(view.drawerId);
   const guesses = (view.guesses ?? []) as { text: string; close: boolean }[];
 
@@ -663,7 +747,7 @@ function GuessScreen({ view, t, send, player }: ControllerViewProps) {
   }, [guesses.length]);
 
   return (
-    <div ref={boxRef} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 10, minHeight: 0 }}>
+    <div ref={boxRef} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
       <PhoneTimer deadline={view.deadline} duration={view.duration} hurryText={guessing ? t('timer.hurry') : undefined} />
       {view.steal && guessing && <p role="status" className="display" style={{ fontWeight: 800, fontSize: 20, color: '#FF8A8E' }}>{t('steal.you')}</p>}
       <div style={{ display: 'flex', flexDirection: roomy ? 'column' : 'row', gap: roomy ? 8 : 12, alignItems: roomy ? 'stretch' : 'flex-start' }}>
@@ -701,21 +785,25 @@ function GuessScreen({ view, t, send, player }: ControllerViewProps) {
               <span key={i} style={{ fontSize: 15, fontWeight: 700, padding: '6px 12px', borderRadius: 999, background: 'var(--surface-2)', color: 'var(--muted)', textDecoration: 'line-through', whiteSpace: 'nowrap' }}>{g.text}</span>
             ))}
           </div>
-          <div style={{ marginTop: 'auto' }}><GuessInput send={send} t={t} /></div>
+          <EmoteBar send={send} t={t} />
+          <GuessInput send={send} t={t} />
         </>
       ) : (
-        <p className="muted" style={{ textAlign: 'center', fontSize: 16, marginTop: 'auto' }}>
-          {view.team && view.myTeam === view.drawingTeam ? t('watch.textOwn') : t('watch.text')}
-        </p>
+        <>
+          <p className="muted" style={{ textAlign: 'center', fontSize: 16 }}>
+            {view.team && view.myTeam === view.drawingTeam ? t('watch.textOwn') : t('watch.text')}
+          </p>
+          <EmoteBar send={send} t={t} />
+        </>
       )}
     </div>
   );
 }
 
-function SolvedScreen({ view, t, player }: ControllerViewProps) {
+function SolvedScreen({ view, t, player, send }: ControllerViewProps) {
   const [boxRef, boxW] = useWidth();
   const vh = useViewportHeight();
-  const size = Math.max(160, Math.min(boxW, vh - 380));
+  const size = Math.max(160, Math.min(boxW, vh - 440));
   useEffect(() => {
     if (view.points > 0) {
       sfx.play('ding');
@@ -750,7 +838,178 @@ function SolvedScreen({ view, t, player }: ControllerViewProps) {
           </div>
         </div>
       )}
-      <p className="faint" style={{ marginTop: 'auto', textAlign: 'center', fontSize: 15 }}>{t('solved.quiet')}</p>
+      <EmoteBar send={send} t={t} />
+      <p className="faint" style={{ textAlign: 'center', fontSize: 15 }}>{t('solved.quiet')}</p>
+    </div>
+  );
+}
+
+/* ---------- Galerie am Ende: ansehen, speichern, teilen ---------- */
+
+interface Pic { word: string; strokes: Stroke[]; drawerId: string }
+
+/** Bild als PNG (mit Wort und Zeichner*in darunter) */
+async function picToPng(pic: Pic, drawerName: string, by: string): Promise<Blob> {
+  const W = 1080, PAD = 60, FOOT = 190;
+  const c = document.createElement('canvas');
+  c.width = W;
+  c.height = W + FOOT;
+  const g = c.getContext('2d')!;
+  g.fillStyle = '#110D24';
+  g.fillRect(0, 0, c.width, c.height);
+  g.fillStyle = '#FFFDF7';
+  g.beginPath();
+  g.roundRect(PAD / 2, PAD / 2, W - PAD, W - PAD, 40);
+  g.fill();
+  const scale = (W - PAD) / 1000;
+  g.save();
+  g.translate(PAD / 2, PAD / 2);
+  g.lineCap = 'round';
+  g.lineJoin = 'round';
+  for (const st of pic.strokes) {
+    g.strokeStyle = DRAW_COLORS[st.c] ?? DRAW_COLORS[0];
+    g.lineWidth = (DRAW_WIDTHS[st.w] ?? DRAW_WIDTHS[0]) * scale;
+    g.beginPath();
+    g.moveTo(st.p[0] * scale, st.p[1] * scale);
+    if (st.p.length === 2) g.lineTo(st.p[0] * scale + 0.1, st.p[1] * scale);
+    for (let i = 2; i < st.p.length; i += 2) g.lineTo(st.p[i] * scale, st.p[i + 1] * scale);
+    g.stroke();
+  }
+  g.restore();
+  try {
+    await document.fonts?.ready;
+  } catch { /* egal */ }
+  g.fillStyle = '#FFD447';
+  g.font = "800 72px 'Bricolage Grotesque', system-ui, sans-serif";
+  g.textBaseline = 'alphabetic';
+  g.fillText(pic.word, PAD / 2 + 10, W + 70, W - 300);
+  g.fillStyle = '#B8B2D9';
+  g.font = "700 36px 'DM Sans', system-ui, sans-serif";
+  g.fillText(`${by} ${drawerName}`, PAD / 2 + 10, W + 130, W - 300);
+  g.fillStyle = PINK;
+  g.beginPath();
+  g.roundRect(W - 250, W + 40, 220, 96, 22);
+  g.fill();
+  g.fillStyle = '#fff';
+  g.font = "800 44px 'Bricolage Grotesque', system-ui, sans-serif";
+  g.textAlign = 'center';
+  g.fillText('UP!', W - 140, W + 104);
+  return new Promise((res, rej) => c.toBlob((b) => (b ? res(b) : rej(new Error('png'))), 'image/png'));
+}
+
+const fileName = (word: string) => `UP-${word.replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-|-$/g, '') || 'bild'}.png`;
+
+function PicViewer({ pic, t, player, onClose, onPrev, onNext }: { pic: Pic; t: Translate; player: Player; onClose: () => void; onPrev?: () => void; onNext?: () => void }) {
+  const [boxRef, boxW] = useWidth();
+  const [busy, setBusy] = useState(false);
+  const [note, setNote] = useState<string | null>(null);
+  const drawer = player(pic.drawerId)?.name ?? '?';
+  const by = t('gallery.byShort');
+  const canShareFiles = typeof navigator !== 'undefined' && !!navigator.canShare && (() => {
+    try {
+      return navigator.canShare({ files: [new File([new Blob()], 'x.png', { type: 'image/png' })] });
+    } catch {
+      return false;
+    }
+  })();
+
+  const save = async () => {
+    setBusy(true);
+    try {
+      const blob = await picToPng(pic, drawer, by);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName(pic.word);
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+      setNote(t('gallery.saved'));
+    } catch {
+      setNote(t('gallery.failed'));
+    }
+    setBusy(false);
+  };
+  const share = async () => {
+    setBusy(true);
+    try {
+      const blob = await picToPng(pic, drawer, by);
+      const file = new File([blob], fileName(pic.word), { type: 'image/png' });
+      await navigator.share({ files: [file], title: pic.word, text: `${pic.word} – ${by} ${drawer} (UP!)` });
+    } catch { /* abgebrochen */ }
+    setBusy(false);
+  };
+
+  const btn: CSSProperties = { flex: 1, minHeight: 56, border: 0, borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, fontWeight: 800, fontSize: 18, padding: '0 12px' };
+  return (
+    <div role="dialog" aria-modal="true" aria-label={pic.word} className="anim-fade"
+      style={{ position: 'fixed', inset: 0, zIndex: 80, background: '#0A0716', display: 'flex', flexDirection: 'column', padding: 'max(16px, env(safe-area-inset-top)) 16px max(18px, env(safe-area-inset-bottom))', gap: 14 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div className="display" style={{ fontWeight: 800, fontSize: 28, color: 'var(--yellow)', lineHeight: 1.05, overflowWrap: 'anywhere' }}>{pic.word}</div>
+          <div className="muted" style={{ fontSize: 15, fontWeight: 700 }}>{by} {drawer}</div>
+        </div>
+        <button type="button" aria-label={t('gallery.close')} onClick={onClose} style={{ width: 48, height: 48, flex: 'none', border: 0, borderRadius: 14, background: 'var(--surface-2)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>
+          <Icon d="M6 6l12 12M18 6L6 18" size={24} />
+        </button>
+      </div>
+      <div ref={boxRef} style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+        <Drawing strokes={pic.strokes} size={Math.max(200, boxW)} style={{ borderRadius: 22 }} />
+      </div>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <button type="button" aria-label={t('gallery.prev')} disabled={!onPrev} onClick={onPrev} style={{ ...btn, flex: 'none', width: 56, background: 'var(--surface)', color: '#fff', opacity: onPrev ? 1 : 0.35 }}>
+          <Icon d="M15 18l-6-6 6-6" />
+        </button>
+        <button type="button" disabled={busy} onClick={save} style={{ ...btn, background: '#fff', color: '#110D24', boxShadow: '0 5px 0 #8F88B8' }}>
+          <Icon d="M12 4v11M7 10l5 5 5-5M5 20h14" size={22} />{t('gallery.save')}
+        </button>
+        {canShareFiles && (
+          <button type="button" disabled={busy} onClick={share} style={{ ...btn, background: PINK, color: '#fff', boxShadow: `0 5px 0 ${PINK_D}` }}>
+            <Icon d="M12 16V4M7 9l5-5 5 5M5 14v6h14v-6" size={22} />{t('gallery.share')}
+          </button>
+        )}
+        <button type="button" aria-label={t('gallery.next')} disabled={!onNext} onClick={onNext} style={{ ...btn, flex: 'none', width: 56, background: 'var(--surface)', color: '#fff', opacity: onNext ? 1 : 0.35 }}>
+          <Icon d="M9 18l6-6-6-6" />
+        </button>
+      </div>
+      {note && <p role="status" className="muted" style={{ textAlign: 'center', fontSize: 14 }}>{note}</p>}
+    </div>
+  );
+}
+
+function PhoneGallery({ view, t, player, me }: ControllerViewProps) {
+  const pics = (view.pics ?? []) as Pic[];
+  const [open, setOpen] = useState<number | null>(null);
+  const [boxRef, boxW] = useWidth();
+  const thumb = Math.floor((boxW - 12) / 2) - 16;
+  return (
+    <div ref={boxRef} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+        <Avatar player={me} size={64} />
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <span className="display" style={{ fontWeight: 800, fontSize: 26 }}>{t('me.place', { place: view.place, of: view.of })}</span>
+          <span className="muted" style={{ fontWeight: 700 }}>{t('me.score', { n: view.score })}</span>
+        </div>
+      </div>
+      <div>
+        <h2 style={{ fontSize: 22 }}>{t('gallery.phoneTitle')}</h2>
+        <p className="muted" style={{ fontSize: 15 }}>{t('gallery.phoneText')}</p>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 12 }}>
+        {pics.map((p, i) => (
+          <button key={i} type="button" onClick={() => setOpen(i)} aria-label={p.word}
+            style={{ border: 0, padding: 8, borderRadius: 16, background: '#FFFDF7', color: '#110D24', display: 'flex', flexDirection: 'column', gap: 6, textAlign: 'left', boxShadow: '0 5px 0 #0A0716' }}>
+            <Drawing strokes={p.strokes} size={Math.max(100, thumb)} style={{ borderRadius: 10, background: '#fff' }} />
+            <span className="display" style={{ fontWeight: 800, fontSize: 17, lineHeight: 1.1, overflowWrap: 'anywhere' }}>{p.word}</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#4A4378' }}>{player(p.drawerId)?.name ?? '?'}</span>
+          </button>
+        ))}
+      </div>
+      {open != null && pics[open] && (
+        <PicViewer pic={pics[open]} t={t} player={player} onClose={() => setOpen(null)}
+          onPrev={open > 0 ? () => setOpen(open - 1) : undefined} onNext={open < pics.length - 1 ? () => setOpen(open + 1) : undefined} />
+      )}
     </div>
   );
 }
@@ -820,6 +1079,8 @@ function Controller(props: ControllerViewProps) {
         </div>
       );
     }
+    case 'gallery':
+      return <PhoneGallery {...props} />;
     case 'scoresMe':
     case 'finalMe':
       return <PhoneWait title={t('me.place', { place: view.place, of: view.of })} text={t('me.score', { n: view.score })} emoji={<Avatar player={me} size={110} />} />;

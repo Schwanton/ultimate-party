@@ -17,6 +17,7 @@
     "guess",
     "quick"
   ],
+  "noDeck": true,
   "sdkVersion": 1,
   "autoSounds": false,
   "contentFields": [

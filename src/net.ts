@@ -16,6 +16,8 @@ export interface PackInfo {
 export interface HostData {
   games: (GameManifest & { warning?: string; secretsSet?: Record<string, boolean> })[];
   packs: PackInfo[];
+  /** Kartenstapel je Spiel (Raumsprache) */
+  decks?: { game: string; total: number; left: number }[];
   notice: string | null;
   results: { gameId: string; ranking: { playerId: string; score: number }[] }[];
   update?: { state: string; current: string; latest?: string; notes?: string[]; error?: string; git?: boolean };

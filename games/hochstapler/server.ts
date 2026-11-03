@@ -65,9 +65,10 @@ export default {
       // Jeder kommt reihum dran; bei mehr Runden als Spielern wird die Reihenfolge neu gemischt
       faker = fakerOrder[(round - 1) % fakerOrder.length];
       category = pickCategory();
+      const deck = ctx.deck<Task>({ filter: (t) => t.category === category });
+      tasks = deck.drawMany(3);
       const pool = byCat.get(category)!;
-      if (pool.length < 3) pool.push(...shuffle(all.filter((t) => t.category === category)));
-      tasks = pool.splice(0, 3);
+      if (tasks.length < 3) tasks.push(...shuffle(pool).slice(0, 3 - tasks.length));
       taskNo = 0;
       startTask();
     }

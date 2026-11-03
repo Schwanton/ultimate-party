@@ -212,6 +212,9 @@ function handle(ws: WebSocket, msg: any) {
     case 'kick':
       if (room && isHost) room.kick(String(msg.playerId));
       return;
+    case 'deck:reset':
+      if (room && isHost) room.shuffleDeck(String(msg.gameId));
+      return;
     case 'bots:add':
       if (room && isHost && DEV) room.addBots(Math.max(1, Math.min(20, Number(msg.count) || 1)));
       return;

@@ -42,6 +42,7 @@ export default {
     const totalRounds = Number(ctx.options.rounds) || (ids.length <= 5 ? 2 : 1);
     const drawTime = Number(ctx.options.drawTime) || T.draw;
     const words = ctx.content<Word>();
+    const deck = ctx.deck<Word>();
     let wordIndex = 0;
     let round = 0;
     let secret = new Map<string, string>();
@@ -69,7 +70,7 @@ export default {
       round++;
       secret = new Map();
       drawings = new Map();
-      ids.forEach((id) => secret.set(id, words[wordIndex++ % words.length]?.word ?? '?'));
+      ids.forEach((id) => secret.set(id, deck.draw()?.word ?? words[wordIndex++ % Math.max(1, words.length)]?.word ?? '?'));
       phase = 'draw';
       timer = ctx.timer(drawTime, endDrawing, { grace: INPUT_GRACE });
       hostDraw();

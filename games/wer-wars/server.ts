@@ -23,7 +23,7 @@ export default {
     const scores = new Scores(ids);
     const totalRounds = Number(ctx.options.rounds) || 3;
     const wf = Number(ctx.options.writeTime) || 1;
-    const questions = ctx.content<Item>().slice(0, totalRounds);
+    const questions = ctx.deck<Item>().drawMany(totalRounds);
     let round = -1;
     let answers = new Map<string, string>();
     /** nicht abgeschickte Antworten – zählen bei Zeitablauf */

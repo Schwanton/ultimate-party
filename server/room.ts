@@ -10,6 +10,7 @@ import { shuffle } from '../sdk/util';
 import { allGames, getGame, type LoadedGame } from './registry';
 import { DEV, QUIET, TIME_SCALE } from './config';
 import { getSecret, secretStatus, setSecret } from './secrets';
+import { deckStatus, drawnSet, markDrawn, refill, resetDeck, unmarkDrawn } from './decks';
 import { updateStatus } from './update';
 
 export const PALETTE = [
@@ -392,6 +393,7 @@ export class Room {
         }
       },
       content: <T,>() => room.contentFor(g) as T[],
+      deck: <T extends { id?: string },>(opts?: { filter?: (item: T) => boolean }) => room.deckFor<T>(g, opts?.filter),
       setHostView(view) {
         if (!alive()) return;
         g.hostView = view;
@@ -468,6 +470,75 @@ export class Room {
     };
   }
 
+  /** Alle Karten (Content-Einträge) der aktivierten Packs in Raumsprache, mit eindeutigem Schlüssel */
+  private cardsFor(g: RunningGame) {
+    const out: { key: string; item: object }[] = [];
+    for (const { info, pack } of g.loaded.packs) {
+      if (!pack || info.lang !== this.lang || this.settings.disabledPacks.includes(info.key)) continue;
+      pack.items.forEach((item, i) => {
+        const key = `${info.key}#${item.id ?? i}`;
+        out.push({ key, item: { ...item, id: key } });
+      });
+    }
+    return out;
+  }
+
+  /** Kartenstapel (siehe server/decks.ts): gezogene Karten kommen erst wieder, wenn der Stapel leer ist. */
+  deckFor<T extends { id?: string }>(g: RunningGame, filter?: (item: T) => boolean) {
+    const deckId = `${g.id}/${this.lang}`;
+    const taken = new Set<string>(); // in diesem Spiel schon gezogen
+    const cards = () => this.cardsFor(g).filter((c) => {
+      try {
+        return !filter || filter(c.item as T);
+      } catch {
+        return false;
+      }
+    });
+    const draw = (): T | undefined => {
+      const all = cards();
+      if (!all.length) return undefined;
+      const drawn = drawnSet(deckId);
+      let fresh = all.filter((c) => !drawn.has(c.key) && !taken.has(c.key));
+      if (!fresh.length) {
+        // Stapel aufgebraucht: wieder auffüllen (außer den Karten aus diesem Spiel)
+        refill(deckId, all.map((c) => c.key));
+        fresh = all.filter((c) => !taken.has(c.key));
+        if (!fresh.length) {
+          taken.clear();
+          fresh = all;
+        }
+      }
+      const c = fresh[Math.floor(Math.random() * fresh.length)];
+      markDrawn(deckId, c.key);
+      taken.add(c.key);
+      return { ...(c.item as T) };
+    };
+    return {
+      draw,
+      drawMany: (n: number) => {
+        const out: T[] = [];
+        for (let i = 0; i < n; i++) {
+          const c = draw();
+          if (!c) break;
+          out.push(c);
+        }
+        return out;
+      },
+      putBack: (card: T) => {
+        if (!card?.id) return;
+        unmarkDrawn(deckId, card.id);
+        taken.delete(card.id);
+      },
+      get size() {
+        return cards().length;
+      },
+      get left() {
+        const drawn = drawnSet(deckId);
+        return cards().filter((c) => !drawn.has(c.key)).length;
+      },
+    };
+  }
+
   /** Content-Einträge: aktivierte Packs in Raumsprache, noch nicht gespielte zuerst. */
   private contentFor(g: RunningGame) {
     const fresh: object[] = [];
@@ -514,10 +585,28 @@ export class Room {
     };
   }
 
+  /** Kartenstapel aller Spiele in Raumsprache: wie viele Karten sind noch nicht gezogen? */
+  deckOverview() {
+    return allGames().filter((g) => !g.manifest.noDeck && (!g.manifest.hidden || DEV)).flatMap((g) => {
+      const keys: string[] = [];
+      for (const { info, pack } of g.packs) {
+        if (!pack || info.lang !== this.lang || this.settings.disabledPacks.includes(info.key)) continue;
+        pack.items.forEach((item, i) => keys.push(`${info.key}#${item.id ?? i}`));
+      }
+      return keys.length ? [{ game: g.manifest.id, ...deckStatus(`${g.manifest.id}/${this.lang}`, keys) }] : [];
+    });
+  }
+
+  shuffleDeck(gameId: string) {
+    resetDeck(`${gameId}/${this.lang}`);
+    this.touch();
+  }
+
   hostPayload() {
     return {
       games: allGames().map((g) => ({ ...g.manifest, warning: g.warning, secretsSet: secretStatus(g.manifest.id, (g.manifest.secrets ?? []).map((x) => x.id)) })),
       packs: allGames().flatMap((g) => g.packs.map((p) => p.info)),
+      decks: this.deckOverview(),
       notice: this.notice,
       results: this.results,
       update: updateStatus(),

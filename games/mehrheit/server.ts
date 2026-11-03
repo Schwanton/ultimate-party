@@ -23,9 +23,7 @@ export default {
     const scores = new Scores(ids);
     const total = Number(ctx.options.rounds) || 8;
     const tf = Number(ctx.options.voteTime) || 1;
-    const items = ctx.content<Item>()
-      .filter((it) => Array.isArray(it.answers) && it.answers.length >= 2 && it.answers.length <= 4)
-      .slice(0, total);
+    const items = ctx.deck<Item>({ filter: (it) => Array.isArray(it.answers) && it.answers.length >= 2 && it.answers.length <= 4 }).drawMany(total);
     let q = -1;
     let own = new Map<string, number>();
     let guess = new Map<string, number>();

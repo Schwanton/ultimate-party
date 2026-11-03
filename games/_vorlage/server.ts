@@ -18,7 +18,8 @@ export default {
   create(ctx: GameContext) {
     const ids = ctx.players.map((p) => p.id);
     const scores = new Scores(ids);
-    const items = ctx.content<Item>().slice(0, Number(ctx.options.rounds) || 3);
+    // Kartenstapel: jede Frage kommt erst wieder, wenn alle durch sind (auch über mehrere Spiele)
+    const items = ctx.deck<Item>().drawMany(Number(ctx.options.rounds) || 3);
     let round = 0;
     let guesses = new Map<string, number>();
     // Entwürfe: was getippt, aber nicht abgeschickt wurde – zählt bei Zeitablauf (siehe useDraft im Client)
