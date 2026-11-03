@@ -5,7 +5,7 @@
  * Kopieren mit:  npm run new-game mein-spiel
  */
 
-import { Scores, type GameContext, type GameServerModule } from '@up/sdk';
+import { INPUT_GRACE, Scores, type GameContext, type GameServerModule } from '@up/sdk';
 
 interface Item {
   id: string;
@@ -21,12 +21,16 @@ export default {
     const items = ctx.content<Item>().slice(0, Number(ctx.options.rounds) || 3);
     let round = 0;
     let guesses = new Map<string, number>();
+    // Entwürfe: was getippt, aber nicht abgeschickt wurde – zählt bei Zeitablauf (siehe useDraft im Client)
+    let drafts = new Map<string, number>();
     let timer: { cancel(): void } | null = null;
 
     function ask() {
       guesses = new Map();
+      drafts = new Map();
       const item = items[round];
-      const t = ctx.timer(30, reveal);
+      // INPUT_GRACE: kurze Nachfrist, damit die letzten Entwürfe noch ankommen
+      const t = ctx.timer(30, reveal, { grace: INPUT_GRACE });
       timer = t;
       ctx.setHostView({ screen: 'ask', n: round + 1, total: items.length, question: item.question, deadline: t.deadline, duration: t.duration, done: [] });
       ctx.setAllPlayerViews(() => ({ screen: 'ask', input: true, question: item.question, deadline: t.deadline, duration: t.duration }));
@@ -34,6 +38,7 @@ export default {
 
     function reveal() {
       timer?.cancel();
+      for (const [id, n] of drafts) if (!guesses.has(id)) guesses.set(id, n);
       const item = items[round];
       const truth = Number(item.answer);
       const ranked = [...guesses.entries()]
@@ -59,6 +64,11 @@ export default {
     return {
       start: ask,
       onAction(playerId, action) {
+        if (action?.type === 'guessDraft' && !guesses.has(playerId)) {
+          const d = Number(action.value);
+          if (Number.isFinite(d)) drafts.set(playerId, d);
+          return;
+        }
         if (action?.type !== 'guess' || guesses.has(playerId)) return;
         const n = Number(action.value);
         if (!Number.isFinite(n)) return;

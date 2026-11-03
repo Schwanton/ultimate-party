@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import type { ControllerViewProps, GameClientModule, HostViewProps } from '@up/sdk';
-import { Avatar, HostHeader, HostPrompt, HostTimer, PhoneTimer, PhoneWait, Podium } from '@up/ui';
+import { Avatar, HostHeader, HostPrompt, HostTimer, PhoneTimer, PhoneWait, Podium, useDraft } from '@up/ui';
 
 const COLOR = '#4BE3A1';
 
@@ -47,6 +47,8 @@ function Host({ view, t, player }: HostViewProps) {
 
 function Controller({ view, t, send }: ControllerViewProps) {
   const [value, setValue] = useState('');
+  // Entwurf automatisch übertragen: zählt bei Zeitablauf, auch wenn niemand „Senden“ drückt
+  useDraft(view.screen === 'ask' && value ? Number(value) : null, (n) => send({ type: 'guessDraft', draft: true, value: n }), view.deadline);
   if (view.screen === 'ask') {
     return (
       <>

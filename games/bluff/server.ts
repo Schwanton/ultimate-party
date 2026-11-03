@@ -3,7 +3,7 @@
  * Nutzt den SDK-Baustein DeceptionRound.
  */
 
-import { DeceptionRound, Scores, pick, type GameContext, type GameServerModule } from '@up/sdk';
+import { DeceptionRound, INPUT_GRACE, Scores, pick, type GameContext, type GameServerModule } from '@up/sdk';
 
 interface Fact {
   id: string;
@@ -34,6 +34,8 @@ export default {
     let phase: 'write' | 'choose' | 'reveal' = 'write';
     let roundStart: Record<string, number> = {};
     let lastScoresAt = 0;
+    /** nicht abgeschickte Entwürfe – zählen bei Zeitablauf */
+    let drafts = new Map<string, string>();
 
     const isPlayer = (id: string) => ids.includes(id);
     const choosers = () => [...ids, ...ctx.audience().map((a) => a.id)];
@@ -57,7 +59,8 @@ export default {
       fact = facts[q];
       round = new DeceptionRound(fact.answer, fact.alternatives ?? [], fact.decoys ?? [], 40);
       phase = 'write';
-      timer = ctx.timer(T.write * wf, startChoose);
+      drafts = new Map();
+      timer = ctx.timer(T.write * wf, startChoose, { grace: INPUT_GRACE });
       hostWrite();
       ids.forEach((id) => writeView(id));
       ctx.setAudienceView({ screen: 'audienceWait' });
@@ -74,6 +77,8 @@ export default {
 
     function startChoose() {
       timer?.cancel();
+      // Wer nicht abgeschickt hat: letzten Entwurf nehmen (wenn er gültig ist)
+      for (const [id, text] of drafts) if (!round.hasLie(id) && text.trim()) round.submitLie(id, text);
       phase = 'choose';
       const minOptions = Math.min(6, Math.max(4, round.lieCount + 2));
       round.buildOptions(minOptions);
@@ -163,6 +168,8 @@ export default {
           writeView(id);
           hostWrite();
           if (ids.every((p) => round.hasLie(p) || !ctx.player(p)?.connected)) startChoose();
+        } else if (action.type === 'lieDraft' && phase === 'write' && isPlayer(id) && !round.hasLie(id)) {
+          drafts.set(id, String(action.text ?? '').slice(0, 200));
         } else if (action.type === 'pick' && phase === 'choose') {
           if (!round.pick(id, action.option)) return;
           chooseView(id);

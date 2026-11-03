@@ -171,6 +171,31 @@ Der TV ist immer eine **1280 × 720 Bühne**, die automatisch auf jeden Bildschi
 | `Confetti` | Konfetti (mit Jubel-Sound, `silent` schaltet ihn ab) |
 | `sfx` | Sounds: `sfx.play('ding')` – u. a. `pop`, `whoosh`, `ding`, `wrong`, `stamp`, `fanfare`, `cheer`, `drumroll`, `beep`, `go`, `reveal`, `sneaky`. Timer-Ticken, Übergänge und Jubel kommen automatisch; mit `"autoSounds": false` im Manifest abschalten und eigene Sounds mit `sfx.play(name, { always: true })` spielen. |
 | `DrawCanvas`, `Drawing` | Zeichnen auf dem Handy, Zeichnung anzeigen |
+| `useDraft` | Entwürfe automatisch übertragen (siehe unten). `TextAnswer` macht das mit `onDraft` und `deadline` schon von selbst. |
+
+### Eingaben gehen nie verloren: Entwürfe + Nachfrist
+
+Wer bei Zeitablauf noch nicht auf „Abschicken“ gedrückt hat, soll trotzdem mit seinem letzten Stand dabei sein – auch bei wackeligem WLAN. Dafür gibt es zwei Bausteine:
+
+**Handy (`client.tsx`)** – den Entwurf laufend mitschicken:
+
+```tsx
+<TextAnswer button="Abschicken" onSubmit={(text) => send({ type: 'answer', text })}
+  onDraft={(text) => send({ type: 'answerDraft', draft: true, text })} deadline={view.deadline} />
+
+// oder für eigene Eingaben (Zahl, Zeichnung …):
+useDraft(value, (v) => send({ type: 'guessDraft', draft: true, value: v }), view.deadline);
+```
+
+`useDraft` schickt kurz nach jeder Änderung, in den letzten Sekunden mehrmals (5 / 3 / 2 / 1 / 0,4 s vorher und kurz danach), beim Wechsel in den Hintergrund und nach einem Verbindungsabbruch erneut (dafür `draft: true` in der Aktion).
+
+**Server (`server.ts`)** – Entwürfe merken, Timer mit Nachfrist starten und bei Ablauf auswerten:
+
+```ts
+const t = ctx.timer(60, endPhase, { grace: INPUT_GRACE }); // angezeigt: 60 s, beendet: 1,5 s später
+// onAction: if (action.type === 'answerDraft' && phase === 'write' && !answers.has(id)) drafts.set(id, action.text);
+// endPhase: for (const [id, text] of drafts) if (!answers.has(id)) answers.set(id, text);
+```
 
 Farben und Schriften kommen aus `src/ui/theme.css` (CSS-Variablen wie `var(--yellow)`). Animationen: Klassen `anim-pop`, `anim-up`, `anim-fade` oder die Keyframes dort.
 
@@ -193,6 +218,7 @@ Achtung: Spiele enthalten Code. Installiere nur Spiele aus Quellen, denen du ver
 
 - Jede Phase hat einen Timer – niemand darf das Spiel aufhalten können.
 - Phasen enden früher, wenn alle fertig sind.
+- Bei Text-, Zahlen- und Zeichen-Eingaben Entwürfe mitschicken (`useDraft` / `onDraft`) und den Timer mit `INPUT_GRACE` starten – bei Zeitablauf zählt der letzte Stand.
 - Eingaben auf dem Server prüfen (Länge, erlaubte Werte, richtige Phase).
 - Für viele Spieler planen: Was zeigt der TV bei 40 Spielern? (`VoterChips` und `Scoreboard` machen das schon automatisch.)
 - Ansichten klein halten: nur schicken, was das jeweilige Gerät braucht.

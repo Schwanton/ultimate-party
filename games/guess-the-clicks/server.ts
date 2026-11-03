@@ -3,7 +3,7 @@
  * Wer am nächsten dran ist (absolute Differenz), bekommt 1 Punkt; bei Gleichstand alle Gleichnahen.
  */
 
-import { Scores, type GameContext, type GameServerModule } from '@up/sdk';
+import { INPUT_GRACE, Scores, type GameContext, type GameServerModule } from '@up/sdk';
 import { YouTubeError, checkKey, fakeVideo, randomVideo, type Video } from './youtube';
 import { revealSeconds } from './reveal';
 
@@ -116,9 +116,10 @@ export default {
     function startGuess() {
       phase = 'guess';
       guesses = new Map();
+      drafts = new Map();
       extendVotes = new Set();
       extensions = 0;
-      timer = ctx.timer(GUESS_TIME, reveal);
+      timer = ctx.timer(GUESS_TIME, reveal, { grace: INPUT_GRACE });
       baseDuration = timer.duration;
       sendGuessViews();
     }
@@ -146,8 +147,12 @@ export default {
       members().forEach(guessView);
     }
 
+    /** eingetippt, aber nicht abgeschickt – der neueste Stand zählt bei Zeitablauf */
+    let drafts = new Map<string, number>();
+
     function reveal() {
       timer?.cancel();
+      for (const [id, n] of drafts) guesses.set(id, n);
       phase = 'reveal';
       const v = videos[round];
       const entries = [...guesses.entries()].map(([playerId, guess]) => ({ playerId, guess, diff: Math.abs(guess - v.views), player: isPlayer(playerId) }));
@@ -189,7 +194,7 @@ export default {
     function hurry() {
       if (!timer || timer.deadline - Date.now() <= LAST_CHANCE * 1200) return;
       timer.cancel();
-      timer = ctx.timer(LAST_CHANCE, reveal);
+      timer = ctx.timer(LAST_CHANCE, reveal, { grace: INPUT_GRACE });
       sendGuessViews();
     }
 
@@ -208,7 +213,7 @@ export default {
             // Zeit verdoppeln: noch einmal die volle Rate-Zeit obendrauf
             const end = timer!.deadline + baseDuration;
             timer?.cancel();
-            timer = ctx.timerAt(end, reveal);
+            timer = ctx.timerAt(end, reveal, { grace: INPUT_GRACE });
             extendVotes = new Set();
             extensions++;
           }
@@ -220,9 +225,16 @@ export default {
           void load();
           return;
         }
+        if (phase === 'guess' && action?.type === 'guessDraft') {
+          const d = Math.round(Number(action.value));
+          if (action.value == null) drafts.delete(id);
+          else if (Number.isFinite(d) && d >= 0 && d <= MAX_GUESS) drafts.set(id, d);
+          return;
+        }
         if (phase !== 'guess' || action?.type !== 'guess') return;
         const n = Math.round(Number(action.value));
         if (!Number.isFinite(n) || n < 0 || n > MAX_GUESS) return;
+        drafts.delete(id);
         guesses.set(id, n);
         guessView(id);
         hostGuess();

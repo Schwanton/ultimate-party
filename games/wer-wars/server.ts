@@ -5,7 +5,7 @@
  * Punkte: richtig geraten 500, als Autor 200 für jeden, der falsch geraten hat. Letzte Runde ×2.
  */
 
-import { Scores, cleanText, pick, shuffle, type GameContext, type GameServerModule } from '@up/sdk';
+import { INPUT_GRACE, Scores, cleanText, pick, shuffle, type GameContext, type GameServerModule } from '@up/sdk';
 import { votersSeconds } from './timing';
 
 interface Item {
@@ -26,6 +26,8 @@ export default {
     const questions = ctx.content<Item>().slice(0, totalRounds);
     let round = -1;
     let answers = new Map<string, string>();
+    /** nicht abgeschickte Antworten – zählen bei Zeitablauf */
+    let drafts = new Map<string, string>();
     let order: { authorId: string; text: string }[] = [];
     let k = 0; // aktuelle Antwort
     let guesses = new Map<string, string>();
@@ -50,8 +52,9 @@ export default {
       if (round >= questions.length) return showScores(true);
       roundStart = scores.snapshot();
       answers = new Map();
+      drafts = new Map();
       phase = 'write';
-      timer = ctx.timer(T.write * wf, startGuessing);
+      timer = ctx.timer(T.write * wf, startGuessing, { grace: INPUT_GRACE });
       hostWrite();
       ids.forEach(writeView);
     }
@@ -67,6 +70,10 @@ export default {
 
     function startGuessing() {
       timer?.cancel();
+      for (const [id, raw] of drafts) {
+        const text = cleanText(raw, MAX_LEN);
+        if (text && !answers.has(id)) answers.set(id, text);
+      }
       order = shuffle([...answers].map(([authorId, text]) => ({ authorId, text })));
       k = -1;
       if (order.length === 0) return showScores(round >= questions.length - 1);
@@ -154,6 +161,8 @@ export default {
           writeView(id);
           hostWrite();
           if (ids.every((p) => answers.has(p) || !ctx.player(p)?.connected)) startGuessing();
+        } else if (action.type === 'answerDraft' && phase === 'write' && !answers.has(id)) {
+          drafts.set(id, String(action.text ?? '').slice(0, 200));
         } else if (action.type === 'guess' && phase === 'guess' && id !== current().authorId) {
           const target = String(action.target);
           if (target === id || !ids.includes(target)) return;

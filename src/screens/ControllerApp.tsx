@@ -9,12 +9,16 @@ import { fitOf, gameDesc, useTagFilter } from './GameLibrary';
 
 const params = new URLSearchParams(location.search);
 
+/** Letzter Entwurf (Aktion mit draft: true) – wird nach einem Verbindungsabbruch erneut geschickt */
+let lastDraft: { action: unknown; at: number } | null = null;
+
 async function tryResume(): Promise<boolean> {
   const saved = loadSession('player');
   const code = params.get('r')?.toUpperCase();
   if (!saved || (code && saved.code !== code)) return false;
   const res = await net.request('resume', saved);
   if (!res.ok) saveSession('player', null);
+  if (res.ok && lastDraft && Date.now() - lastDraft.at < 60_000) net.send('action', { action: lastDraft.action });
   return !!res.ok;
 }
 
@@ -107,7 +111,11 @@ function InRoom() {
   const [picking, setPicking] = useState(false);
   const player = (id: string) => room.players.find((p) => p.id === id);
   const isVip = room.vipId === me.id;
-  const send = useCallback((action: unknown) => net.send('action', { action }), []);
+  const send = useCallback((action: any) => {
+    if (action?.draft === true) lastDraft = { action, at: Date.now() };
+    else if (action && typeof action === 'object') lastDraft = null; // echte Eingabe ersetzt den Entwurf
+    net.send('action', { action });
+  }, []);
 
   // Kurz vibrieren, wenn eine neue Aufgabe kommt
   const lastScreen = useRef<string | null>(null);

@@ -408,9 +408,10 @@ export class Room {
           }
         }
       },
-      timer(seconds, onEnd): TimerHandle {
+      timer(seconds, onEnd, opts): TimerHandle {
         const ms = seconds * 1000 * room.settings.timeFactor * TIME_SCALE;
-        const t = schedule(ms, onEnd);
+        // Nachfrist: angezeigt wird die normale Zeit, beendet wird etwas später (Entwürfe kommen noch an)
+        const t = schedule(ms + (opts?.grace ?? 0) * 1000 * TIME_SCALE, onEnd);
         return {
           deadline: Date.now() + ms,
           duration: ms,
@@ -420,9 +421,9 @@ export class Room {
           },
         };
       },
-      timerAt(deadline, onEnd): TimerHandle {
+      timerAt(deadline, onEnd, opts): TimerHandle {
         const ms = Math.max(0, deadline - Date.now());
-        const t = schedule(ms, onEnd);
+        const t = schedule(ms + (opts?.grace ?? 0) * 1000 * TIME_SCALE, onEnd);
         return {
           deadline: Date.now() + ms,
           duration: ms,

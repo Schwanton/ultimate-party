@@ -422,7 +422,8 @@ function Controller(props: ControllerViewProps) {
           <PhoneTimer deadline={view.deadline} duration={view.duration} hurryText={t('timer.hurry')} />
           <span className="up-label">{view.count > 1 ? t('answer.of', { n: view.index, count: view.count }) : ''}</span>
           <h1 className="anim-up" key={view.promptId} style={{ fontSize: 26, lineHeight: 1.2 }}>{view.prompt}</h1>
-          <TextAnswer key={`in-${view.promptId}`} button={t('answer.send')} placeholder={t('answer.input')} maxLength={view.maxLength} onSubmit={(text) => send({ type: 'answer', promptId: view.promptId, text })} />
+          <TextAnswer key={`in-${view.promptId}`} button={t('answer.send')} placeholder={t('answer.input')} maxLength={view.maxLength} onSubmit={(text) => send({ type: 'answer', promptId: view.promptId, text })}
+            onDraft={(text) => send({ type: 'answerDraft', draft: true, promptId: view.promptId, text })} deadline={view.deadline} />
         </>
       );
     case 'answered':

@@ -2,6 +2,13 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.5.1
+
+- Eingaben gehen nicht mehr verloren: Zeichnungen, Texte und Schätzungen werden laufend übertragen – auch ohne „Abschicken“ zählt bei Zeitablauf der letzte Stand
+- In den letzten Sekunden wird der Stand mehrmals erneut gesendet, nach einem Verbindungsabbruch automatisch noch einmal
+- Kritzelei: Auch ein Strich, der beim Zeitablauf noch gezeichnet wird, kommt mit; „Zurück“ + neu zeichnen wird jetzt richtig übernommen
+- Kurze Nachfrist auf dem Server, damit verspätete Nachrichten noch ankommen
+
 ## 0.5.0
 
 - Neues Spielmenü: gewähltes Spiel mit Kurzbeschreibung in der Lobby, Bibliothek mit Kategorien und Filter für die Spielerzahl

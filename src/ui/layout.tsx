@@ -1,3 +1,4 @@
+import { useDraft } from './draft';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { qrPath } from './qr';
 import { sfx } from './sound';
@@ -103,11 +104,14 @@ export function PhoneWait({ title, text, emoji }: { title: string; text?: string
 
 /** Texteingabe mit Absenden-Button fürs Handy */
 export function TextAnswer({
-  onSubmit, placeholder, button, maxLength = 60, multiline = false, autoFocus = true, error,
+  onSubmit, placeholder, button, maxLength = 60, multiline = false, autoFocus = true, error, onDraft, deadline, initial = '',
 }: {
   onSubmit: (text: string) => void; placeholder?: string; button: string; maxLength?: number; multiline?: boolean; autoFocus?: boolean; error?: string | null;
+  /** Entwurf automatisch übertragen (bei Zeitablauf zählt der letzte Stand) – siehe useDraft */
+  onDraft?: (text: string) => void; deadline?: number; initial?: string;
 }) {
-  const [text, setText] = useState('');
+  const [text, setText] = useState(initial);
+  useDraft(text, onDraft, deadline);
   const ref = useRef<HTMLTextAreaElement & HTMLInputElement>(null);
   useEffect(() => {
     if (autoFocus) setTimeout(() => ref.current?.focus(), 50);

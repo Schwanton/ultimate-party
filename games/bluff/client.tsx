@@ -183,7 +183,8 @@ function Controller({ view, t, send, me }: ControllerViewProps) {
           <Question text={view.question} size={24} />
           <TextAnswer key={view.attempt} button={t('write.send')} placeholder={t('write.input')} maxLength={40}
             error={view.error ? t(view.error === 'tooClose' ? 'write.tooClose' : 'write.duplicate') : null}
-            onSubmit={(text) => send({ type: 'lie', text })} />
+            onSubmit={(text) => send({ type: 'lie', text })}
+            onDraft={(text) => send({ type: 'lieDraft', draft: true, text })} deadline={view.deadline} />
         </>
       );
     case 'written':

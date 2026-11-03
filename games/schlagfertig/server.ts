@@ -6,7 +6,7 @@
  */
 
 import { votersSeconds } from './timing';
-import { Scores, cleanText, pick, shuffle, splitEvenly, type GameContext, type GameServerModule } from '@up/sdk';
+import { INPUT_GRACE, Scores, cleanText, pick, shuffle, splitEvenly, type GameContext, type GameServerModule } from '@up/sdk';
 
 interface Prompt {
   id: string;
@@ -127,8 +127,12 @@ export default {
       });
     }
 
+    /** Entwürfe (noch nicht abgeschickt) – zählen bei Zeitablauf */
+    const drafts = new Map<string, string>();
+
     function askAnswers(seconds: number) {
-      const t = ctx.timer(seconds, endAnswers);
+      drafts.clear();
+      const t = ctx.timer(seconds, endAnswers, { grace: INPUT_GRACE });
       phaseTimer = t;
       answerHostView(t.deadline, t.duration);
       ids.forEach((id) => answerPlayerView(id, t.deadline, t.duration));
@@ -151,7 +155,10 @@ export default {
       cancelTimer();
       // fehlende Antworten eintragen
       for (const [id, pids] of assigned) {
-        for (const pid of pids) if (!answers.some((a) => a.authorId === id && a.promptId === pid)) answers.push({ promptId: pid, authorId: id, text: null });
+        for (const pid of pids) {
+          if (answers.some((a) => a.authorId === id && a.promptId === pid)) continue;
+          answers.push({ promptId: pid, authorId: id, text: cleanText(drafts.get(`${id}|${pid}`) ?? '', MAX_LEN) || null });
+        }
       }
       ctx.setAllPlayerViews(() => ({ screen: 'lookAtTv' }));
       if (duelMode && round < totalRounds) runDuels([...promptsById.keys()], 0);
@@ -388,6 +395,10 @@ export default {
       onAction(id, action) {
         if (!action || typeof action !== 'object') return;
         if (action.type === 'answer') onAnswer(id, String(action.promptId), action.text);
+        else if (action.type === 'answerDraft') {
+          const pid = String(action.promptId);
+          if (assigned.get(id)?.includes(pid) && !answers.some((a) => a.authorId === id && a.promptId === pid)) drafts.set(`${id}|${pid}`, String(action.text ?? '').slice(0, 200));
+        }
         else if (action.type === 'vote') onVote(id, action.choice);
       },
       onAudienceJoin(id) {

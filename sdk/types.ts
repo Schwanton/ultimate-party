@@ -13,6 +13,9 @@
 
 export const SDK_VERSION = 1;
 
+/** Nachfrist (Sekunden) für Eingabephasen: so lange nach Ablauf werden Entwürfe noch angenommen. */
+export const INPUT_GRACE = 1.5;
+
 export type Lang = 'de' | 'en';
 export const LANGS: Lang[] = ['de', 'en'];
 
@@ -159,10 +162,14 @@ export interface GameContext {
   /** Ansicht für alle Publikums-Handys setzen */
   setAudienceView(view: object | ((audience: PlayerInfo) => object)): void;
 
-  /** Countdown starten. Sekunden werden im Testmodus automatisch verkürzt. */
-  timer(seconds: number, onEnd: () => void): TimerHandle;
+  /**
+   * Countdown starten. Sekunden werden im Testmodus automatisch verkürzt.
+   * `grace`: Nachfrist in Sekunden – angezeigt wird die normale Zeit, onEnd kommt erst danach.
+   * Für Eingabephasen INPUT_GRACE nutzen, damit die letzten Entwürfe (useDraft) noch ankommen.
+   */
+  timer(seconds: number, onEnd: () => void, opts?: { grace?: number }): TimerHandle;
   /** Countdown bis zu einem festen Zeitpunkt (ms, Serverzeit) – z. B. um einen Timer zu verlängern */
-  timerAt(deadline: number, onEnd: () => void): TimerHandle;
+  timerAt(deadline: number, onEnd: () => void, opts?: { grace?: number }): TimerHandle;
   /** Kurze Pause (z. B. für Animationen), dann fn ausführen */
   after(seconds: number, fn: () => void): void;
   /** Alle laufenden Timer abbrechen */

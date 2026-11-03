@@ -4,7 +4,7 @@
  * Punkte nach Platz: 1000 / 600 / 300, genau getroffen +500. Letzte Frage ×2. Gleich nah = gleicher Platz.
  */
 
-import { Scores, type GameContext, type GameServerModule } from '@up/sdk';
+import { INPUT_GRACE, Scores, type GameContext, type GameServerModule } from '@up/sdk';
 import { revealSeconds } from './reveal';
 
 interface Item {
@@ -28,6 +28,8 @@ export default {
     const items = ctx.content<Item>().filter((it) => Number.isFinite(Number(it.answer)) && Number(it.answer) >= 0).slice(0, total);
     let q = -1;
     let guesses = new Map<string, number>();
+    /** eingetippt, aber nicht abgeschickt – der neueste Stand zählt bei Zeitablauf */
+    let drafts = new Map<string, number>();
     let timer: { cancel(): void; deadline: number; duration: number } | null = null;
     let phase: 'intro' | 'guess' | 'reveal' | 'scores' = 'intro';
     let roundStart = scores.snapshot();
@@ -52,8 +54,9 @@ export default {
         return showScores(false);
       }
       guesses = new Map();
+      drafts = new Map();
       phase = 'guess';
-      timer = ctx.timer(guessTime, reveal);
+      timer = ctx.timer(guessTime, reveal, { grace: INPUT_GRACE });
       hostGuess();
       ids.forEach(guessView);
     }
@@ -69,13 +72,14 @@ export default {
     function hurry() {
       if (!timer || timer.deadline - Date.now() <= T.lastChance * 1200) return;
       timer.cancel();
-      timer = ctx.timer(T.lastChance, reveal);
+      timer = ctx.timer(T.lastChance, reveal, { grace: INPUT_GRACE });
       hostGuess();
       ids.forEach(guessView);
     }
 
     function reveal() {
       timer?.cancel();
+      for (const [id, n] of drafts) guesses.set(id, n);
       phase = 'reveal';
       const truth = Number(item().answer);
       const entries = [...guesses].map(([playerId, guess]) => ({ playerId, guess, diff: Math.abs(guess - truth) })).sort((a, b) => a.diff - b.diff);
@@ -112,9 +116,16 @@ export default {
     return {
       start: intro,
       onAction(id, action) {
+        if (phase === 'guess' && action?.type === 'guessDraft' && ids.includes(id)) {
+          const d = Math.round(Number(action.value));
+          if (action.value == null) drafts.delete(id);
+          else if (Number.isFinite(d) && d >= 0 && d <= 1e12) drafts.set(id, d);
+          return;
+        }
         if (phase !== 'guess' || action?.type !== 'guess' || !ids.includes(id)) return;
         const n = Math.round(Number(action.value));
         if (!Number.isFinite(n) || n < 0 || n > 1e12) return;
+        drafts.delete(id);
         guesses.set(id, n);
         guessView(id);
         hostGuess();

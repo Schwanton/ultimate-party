@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ControllerViewProps, GameClientModule, HostViewProps, PlayerInfo, Translate } from '@up/sdk';
 import {
-  Avatar, ChoiceList, Confetti, DrawCanvas, Drawing, HostHeader, HostTimer, PhoneTimer, PhoneWait, Podium, Scoreboard, TextAnswer, VoterChips, type Stroke, sfx } from '@up/ui';
+  Avatar, ChoiceList, Confetti, DrawCanvas, Drawing, HostHeader, HostTimer, PhoneTimer, PhoneWait, Podium, Scoreboard, TextAnswer, VoterChips, type Stroke, sfx, useDraft } from '@up/ui';
 
 const YELLOW = '#FFD447';
 
@@ -185,21 +185,14 @@ function HostReveal({ view, t, player }: HostViewProps) {
 /* ================= Handy ================= */
 
 function DrawScreen({ view, t, send }: ControllerViewProps) {
+  const [strokes, setStrokes] = useState<Stroke[]>([]);
   const latest = useRef<Stroke[]>([]);
-  const lastSent = useRef(0);
   const onChange = useCallback((s: Stroke[]) => {
     latest.current = s;
+    setStrokes(s);
   }, []);
-  // Zwischenstand regelmäßig senden, damit bei Zeitablauf nichts verloren geht
-  useEffect(() => {
-    const id = setInterval(() => {
-      if (latest.current.length !== lastSent.current) {
-        lastSent.current = latest.current.length;
-        send({ type: 'sketch', strokes: latest.current });
-      }
-    }, 2000);
-    return () => clearInterval(id);
-  }, [send]);
+  // Zwischenstand automatisch übertragen – auch mehrmals kurz vor Ablauf und mit dem gerade gezeichneten Strich
+  useDraft(strokes, (s) => send({ type: 'sketch', draft: true, strokes: s }), view.deadline, { debounceMs: 800 });
   return (
     <>
       <PhoneTimer deadline={view.deadline} duration={view.duration} hurryText={t('timer.hurry')} />
@@ -237,7 +230,8 @@ function Controller(props: ControllerViewProps) {
           <span className="up-label">{t('title.write')}</span>
           <TextAnswer key={view.attempt} button={t('title.send')} placeholder={t('title.input')} maxLength={40}
             error={view.error ? t(view.error === 'tooClose' ? 'title.tooClose' : 'title.duplicate') : null}
-            onSubmit={(text) => send({ type: 'title', text })} />
+            onSubmit={(text) => send({ type: 'title', text })}
+            onDraft={(text) => send({ type: 'titleDraft', draft: true, text })} deadline={view.deadline} />
         </>
       );
     case 'titled':

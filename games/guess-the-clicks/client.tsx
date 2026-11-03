@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ControllerViewProps, GameClientModule, HostViewProps, PlayerInfo, Translate } from '@up/sdk';
-import { Avatar, Confetti, Crown, HostHeader, HostTimer, PhoneTimer, PhoneWait, Podium, QrCode, Scoreboard, TextAnswer, sfx, useServerNow, vibrate } from '@up/ui';
+import { Avatar, Confetti, Crown, HostHeader, HostTimer, PhoneTimer, PhoneWait, Podium, QrCode, Scoreboard, TextAnswer, sfx, useServerNow, vibrate, useDraft } from '@up/ui';
 import { START_DELAY, buildTimeline, lg, positionAt, scaleTop, unlg } from './reveal';
 
 const RED = '#FF5A4E';
@@ -388,9 +388,11 @@ function HostReveal({ view, t, player, room }: HostViewProps) {
 
 /* ================= Handy ================= */
 
-function Keypad({ lang, t, initial, onSubmit, locked }: { lang: string; t: Translate; initial: number | null; onSubmit: (n: number) => void; locked: boolean }) {
+function Keypad({ lang, t, initial, onSubmit, onDraft, deadline, locked }: { lang: string; t: Translate; initial: number | null; onSubmit: (n: number) => void; onDraft?: (n: number | null) => void; deadline?: number; locked: boolean }) {
   const [digits, setDigits] = useState(initial != null ? String(initial) : '');
   const value = digits ? Number(digits) : 0;
+  // Eingetippte Zahl automatisch übertragen – zählt bei Zeitablauf, auch ohne „Abschicken“
+  useDraft(digits ? value : null, onDraft, deadline);
   const press = (d: string) => {
     vibrate(8);
     setDigits((cur) => {
@@ -445,7 +447,8 @@ function Controller({ view, t, send, me, room }: ControllerViewProps) {
             <p className="display" style={{ fontSize: 17, fontWeight: 700, lineHeight: 1.25, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>{view.title}</p>
           </div>
           <span className="up-label">{t('guess.title')}</span>
-          <Keypad key={view.videoId} lang={lang} t={t} initial={view.guess} locked={false} onSubmit={(n) => send({ type: 'guess', value: n })} />
+          <Keypad key={view.videoId} lang={lang} t={t} initial={view.guess} locked={false} onSubmit={(n) => send({ type: 'guess', value: n })}
+            onDraft={(n) => send({ type: 'guessDraft', draft: true, value: n })} deadline={view.deadline} />
           {view.canExtend && (
             <button type="button" className={`up-btn full ${view.wantsExtend ? 'cyan' : 'ghost'}`} aria-pressed={view.wantsExtend}
               onClick={() => send({ type: 'extend', on: !view.wantsExtend })} style={{ minHeight: 52, fontSize: 17 }}>

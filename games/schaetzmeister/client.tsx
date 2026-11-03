@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { ControllerViewProps, GameClientModule, HostViewProps, PlayerInfo, Translate } from '@up/sdk';
-import { Avatar, Confetti, Crown, HostHeader, HostTimer, PhoneTimer, PhoneWait, Podium, Scoreboard, sfx, useServerNow, vibrate } from '@up/ui';
+import { Avatar, Confetti, Crown, HostHeader, HostTimer, PhoneTimer, PhoneWait, Podium, Scoreboard, sfx, useDraft, useServerNow, vibrate } from '@up/ui';
 import { START_DELAY, buildTimeline, lg, positionAt, scaleTop, unlg } from './reveal';
 
 const GREEN = '#4BE3A1';
@@ -230,9 +230,11 @@ function HostReveal({ view, t, player, room }: HostViewProps) {
 
 /* ================= Handy ================= */
 
-function Keypad({ lang, t, initial, unit, onSubmit }: { lang: string; t: Translate; initial: number | null; unit: string; onSubmit: (n: number) => void }) {
+function Keypad({ lang, t, initial, unit, onSubmit, onDraft, deadline }: { lang: string; t: Translate; initial: number | null; unit: string; onSubmit: (n: number) => void; onDraft?: (n: number | null) => void; deadline?: number }) {
   const [digits, setDigits] = useState(initial != null ? String(initial) : '');
   const value = digits ? Number(digits) : 0;
+  // Eingetippte Zahl automatisch übertragen – zählt bei Zeitablauf, auch ohne „Abschicken“
+  useDraft(digits ? value : null, onDraft, deadline);
   const press = (d: string) => {
     vibrate(8);
     setDigits((cur) => {
@@ -280,7 +282,8 @@ function Controller({ view, t, send, me, room }: ControllerViewProps) {
         <>
           <PhoneTimer deadline={view.deadline} duration={view.duration} hurryText={t('timer.hurry')} />
           <h1 style={{ fontSize: 21, lineHeight: 1.25 }}>{view.question}</h1>
-          <Keypad key={`${view.n}`} lang={lang} t={t} initial={view.guess} unit={view.unit} onSubmit={(n) => send({ type: 'guess', value: n })} />
+          <Keypad key={`${view.n}`} lang={lang} t={t} initial={view.guess} unit={view.unit} onSubmit={(n) => send({ type: 'guess', value: n })}
+            onDraft={(n) => send({ type: 'guessDraft', draft: true, value: n })} deadline={view.deadline} />
         </>
       );
     case 'result':

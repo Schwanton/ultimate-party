@@ -3,7 +3,7 @@
  * Nutzt den SDK-Baustein DeceptionRound.
  */
 
-import { DeceptionRound, Scores, pick, shuffle, type GameContext, type GameServerModule } from '@up/sdk';
+import { DeceptionRound, INPUT_GRACE, Scores, pick, shuffle, type GameContext, type GameServerModule } from '@up/sdk';
 
 interface Word {
   id: string;
@@ -71,7 +71,7 @@ export default {
       drawings = new Map();
       ids.forEach((id) => secret.set(id, words[wordIndex++ % words.length]?.word ?? '?'));
       phase = 'draw';
-      timer = ctx.timer(drawTime, endDrawing);
+      timer = ctx.timer(drawTime, endDrawing, { grace: INPUT_GRACE });
       hostDraw();
       ids.forEach((id) => ctx.setPlayerView(id, { screen: 'draw', input: true, word: secret.get(id), deadline: timer!.deadline, duration: timer!.duration }));
       ctx.setAudienceView({ screen: 'audienceWait' });
@@ -96,7 +96,8 @@ export default {
       const a = artist();
       deception = new DeceptionRound(secret.get(a)!, [], houseWords(), 40);
       phase = 'title';
-      timer = ctx.timer(T.title, startChoose);
+      titleDrafts = new Map();
+      timer = ctx.timer(T.title, startChoose, { grace: INPUT_GRACE });
       hostTitle();
       for (const id of ids) {
         if (id === a) ctx.setPlayerView(id, { screen: 'yours', strokes: drawings.get(a) });
@@ -118,8 +119,12 @@ export default {
       else ctx.setPlayerView(id, { screen: 'title', input: true, strokes: drawings.get(artist()), error: error ?? null, attempt: Math.random(), deadline: timer!.deadline, duration: timer!.duration });
     }
 
+    /** nicht abgeschickte Titel – zählen bei Zeitablauf */
+    let titleDrafts = new Map<string, string>();
+
     function startChoose() {
       timer?.cancel();
+      for (const [id, text] of titleDrafts) if (!deception.hasLie(id) && text.trim()) deception.submitLie(id, text);
       phase = 'choose';
       deception.buildOptions(Math.min(6, Math.max(4, deception.lieCount + 2)));
       timer = ctx.timer(T.choose, startReveal);
@@ -216,6 +221,8 @@ export default {
           titleView(id);
           hostTitle();
           if (guessers().every((p) => deception.hasLie(p) || !ctx.player(p)?.connected)) startChoose();
+        } else if (action.type === 'titleDraft' && phase === 'title' && isPlayer(id) && id !== artist() && !deception.hasLie(id)) {
+          titleDrafts.set(id, String(action.text ?? '').slice(0, 200));
         } else if (action.type === 'pick' && phase === 'choose') {
           if (!deception.pick(id, action.option)) return;
           chooseView(id);

@@ -203,7 +203,8 @@ function Controller({ view, t, send, me, player }: ControllerViewProps) {
           <span className="up-label">{t('write.label')}</span>
           <h1 style={{ fontSize: 24, lineHeight: 1.25 }}>{view.question}</h1>
           <p className="muted" style={{ fontSize: 15 }}>{t('write.phoneHint')}</p>
-          <TextAnswer button={t('write.send')} placeholder={t('write.input')} maxLength={70} onSubmit={(text) => send({ type: 'answer', text })} />
+          <TextAnswer button={t('write.send')} placeholder={t('write.input')} maxLength={70} onSubmit={(text) => send({ type: 'answer', text })}
+            onDraft={(text) => send({ type: 'answerDraft', draft: true, text })} deadline={view.deadline} />
         </>
       );
     case 'written':

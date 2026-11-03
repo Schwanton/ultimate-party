@@ -38,6 +38,7 @@ export function Drawing({ strokes, size = 360, style }: { strokes: Stroke[]; siz
 
 /** Zeichenfläche fürs Handy */
 export function DrawCanvas({ onChange, labels }: {
+  /** Wird bei jeder Änderung aufgerufen – während eines Strichs auch mit dem halb fertigen Strich */
   onChange: (strokes: Stroke[]) => void;
   labels: { undo: string; thin: string; thick: string; clear: string; clearConfirm: string; eraser: string };
 }) {
@@ -86,6 +87,8 @@ export function DrawCanvas({ onChange, labels }: {
     s.p.push(Math.max(0, Math.min(1000, x)), Math.max(0, Math.min(1000, y)));
     if (s.p.length > 1200) return up();
     force((n) => n + 1);
+    // Auch den Strich, der gerade gezeichnet wird, melden – falls die Zeit mittendrin abläuft
+    if (s.p.length % 8 === 0) onChange([...strokes, { ...s, p: [...s.p] }]);
   };
   const up = () => {
     const s = current.current;
