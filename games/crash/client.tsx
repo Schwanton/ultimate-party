@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { ControllerViewProps, GameClientModule, HostViewProps, PlayerInfo, Translate } from '@up/sdk';
 import { Avatar, Confetti, HostHeader, PhoneWait, sfx, useServerNow, vibrate } from '@up/ui';
 import { STEP, fallAt, floor2, multAt } from './curve';
-import { tallyAt, totalAt, type TallyData } from './tally';
+import { allBusted, flowFraction, tallyAt, totalAt, type TallyData } from './tally';
 
 const PINK = '#FF4F7B';
 const PINK_D = '#B8274E';
@@ -306,7 +306,7 @@ function HostTally({ view, t, player, room }: HostViewProps) {
   const at = tallyAt(data, sec);
   const ids = view.players as string[];
   const totals = Object.fromEntries(ids.map((id) => [id, totalAt(data, id, at)]));
-  const finalTotals = Object.fromEntries(ids.map((id) => [id, totalAt(data, id, { stage: 'done', round: data.rounds.length, progress: 1 })]));
+  const finalTotals = Object.fromEntries(ids.map((id) => [id, totalAt(data, id, { stage: 'done', round: data.rounds.length, progress: 1, holdSec: 0 })]));
   const maxTotal = Math.max(1, ...Object.values(finalTotals), ...Object.values(totals));
   const order = [...ids].sort((a, b) => totals[b] - totals[a] || ids.indexOf(a) - ids.indexOf(b));
   const shownRows = order.slice(0, 12);
@@ -321,6 +321,9 @@ function HostTally({ view, t, player, room }: HostViewProps) {
   // Skala: erst bis zum besten 100er-Gewinn, beim Dazukommen der Einsätze wächst sie mit
   const dispScale = baseMax + (scaleMax - baseMax) * ef;
   const winner = order[0];
+  const dead = r ? allBusted(r) : false;
+  // Haltephase: Beträge fließen nacheinander nach links, die Marker rechts verblassen dabei
+  const flow = (id: string) => (r && at.stage === 'hold' ? flowFraction(r, id, at.holdSec) : 0);
 
   // Sounds
   const last = useRef({ round: -1, stage: '', tick: 0 });
@@ -328,15 +331,21 @@ function HostTally({ view, t, player, room }: HostViewProps) {
     const L = last.current;
     if (r && at.round !== L.round) {
       L.round = at.round;
-      sfx.play('whoosh');
+      if (dead) sfx.play('wrong');
+      else sfx.play('whoosh');
     }
+    // Plopp, wenn ein Betrag links ankommt
+    if (r && at.stage === 'hold') {
+      const arrived = ids.filter((id) => flow(id) >= 1).length;
+      if (arrived > (L as any).arrived) sfx.custom((s) => s.tone(700 + arrived * 60, 0.06, { type: 'triangle', vol: 0.08 }));
+      (L as any).arrived = arrived;
+    } else (L as any).arrived = 0;
     if (at.stage === 'fill' && at.progress < 1 && now - L.tick > 120) {
       L.tick = now;
       sfx.custom((s) => s.tone(300 + at.progress * 600, 0.05, { type: 'square', vol: 0.04 }));
     }
     if (at.stage !== L.stage) {
       if (at.stage === 'extra' && r && ids.some((id) => (r.extra[id] ?? 0) !== 0)) sfx.custom((s) => [523, 659, 784].forEach((f, i) => s.tone(f, 0.1, { type: 'triangle', vol: 0.1, at: i * 0.07 })));
-      if (at.stage === 'hold') sfx.play('score');
       if (at.stage === 'done') sfx.play('fanfare');
       L.stage = at.stage;
     }
@@ -362,6 +371,18 @@ function HostTally({ view, t, player, room }: HostViewProps) {
                   <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', fontWeight: 800, fontSize: 17, color: '#fff', textShadow: '0 2px 4px rgba(0,0,0,.6)', whiteSpace: 'nowrap' }}>{p.name}</span>
                 </div>
                 <span className="display" style={{ width: 92, textAlign: 'right', fontWeight: 800, fontSize: 22, fontVariantNumeric: 'tabular-nums' }}>{v.toLocaleString(LOCALE)}</span>
+                {r && at.stage === 'hold' && (() => {
+                  const add = (r.base[id] ?? 0) + (r.extra[id] ?? 0);
+                  const f = flow(id);
+                  if (!add || f <= 0) return null;
+                  return (
+                    <span className="display" style={{
+                      position: 'absolute', right: -6, top: '50%', fontWeight: 800, fontSize: 18, padding: '2px 8px', borderRadius: 10, pointerEvents: 'none',
+                      background: add > 0 ? 'var(--green)' : '#FF3B4E', color: add > 0 ? '#110D24' : '#fff',
+                      transform: `translate(${(1 - f) * 260}px, ${-50 - f * 70}%) scale(${1.2 - f * 0.3})`, opacity: f < 1 ? 1 : 0, transition: 'opacity .4s',
+                    }}>{add > 0 ? '+' : '−'}{Math.abs(add).toLocaleString(LOCALE)}</span>
+                  );
+                })()}
               </div>
             );
           })}
@@ -384,10 +405,16 @@ function HostTally({ view, t, player, room }: HostViewProps) {
                 {at.stage !== 'fill' && <b style={{ color: 'var(--yellow)', marginLeft: 8 }}>{t('tally.plusBets')}</b>}
               </span>
               <div style={{ flex: 1, display: 'flex', gap: 14, minHeight: 0, paddingBottom: 34 }}>
+                {dead ? (
+                  <div style={{ width: 90, borderRadius: 20, background: '#2A2640', position: 'relative', overflow: 'hidden', boxShadow: 'inset 0 0 0 3px #4A4378', animation: 'upShake .5s ease-out', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span className="display" style={{ fontSize: 46, fontWeight: 900, color: '#6E66A0', transform: 'rotate(-90deg)', whiteSpace: 'nowrap', letterSpacing: '.08em' }}>{t('tally.allBusted')}</span>
+                  </div>
+                ) : (
                 <div style={{ width: 90, borderRadius: 20, background: 'var(--surface)', position: 'relative', overflow: 'hidden' }}>
                   <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: `${(fillVal / dispScale) * 100}%`, background: `linear-gradient(0deg, ${PINK}, #FFD447)`, boxShadow: '0 0 30px rgba(255,212,71,.5)' }} />
                   <span className="display" style={{ position: 'absolute', left: 0, right: 0, bottom: `calc(${Math.min(92, (fillVal / dispScale) * 100)}% + 4px)`, textAlign: 'center', fontWeight: 800, fontSize: 20 }}>{Math.round(fillVal)}</span>
                 </div>
+                )}
                 <div style={{ flex: 1, position: 'relative' }}>
                   {ids.map((id, k) => {
                     const p = player(id);
@@ -398,13 +425,20 @@ function HostTally({ view, t, player, room }: HostViewProps) {
                     if (!shownBase || (b <= 0 && ef === 0 && at.stage === 'fill')) return null;
                     const v = Math.max(0, b + e * ef);
                     if (b <= 0 && e === 0) return null;
-                    const y = (v / dispScale) * 100;
+                    const y = Math.min(86, (v / dispScale) * 100);
                     return (
-                      <div key={id} style={{ position: 'absolute', left: (k % 4) * 88, bottom: `calc(${y}% - 18px)`, display: 'flex', alignItems: 'center', gap: 4, animation: 'upPop .35s ease-out both', transition: 'bottom .15s linear', opacity: b + e <= 0 && ef === 1 ? 0.55 : 1 }}>
+                      <div key={id} style={{ position: 'absolute', left: (k % 2) * 170, bottom: `calc(${y}% - 18px)`, display: 'flex', alignItems: 'center', gap: 4, animation: 'upPop .35s ease-out both', transition: 'bottom .15s linear', opacity: (b + e <= 0 && ef === 1 ? 0.55 : 1) * (1 - flow(id) * 0.85), transform: `translateX(${-flow(id) * 40}px)` }}>
                         <Avatar player={p} size={34} />
                         <span style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.05 }}>
                           <b style={{ fontSize: 14, background: '#110D24', padding: '1px 6px', borderRadius: 8 }}>{b}</b>
-                          {e !== 0 && ef > 0 && <b style={{ fontSize: 13, padding: '1px 6px', borderRadius: 8, marginTop: 2, background: e > 0 ? 'var(--green)' : '#FF3B4E', color: e > 0 ? '#110D24' : '#fff', animation: 'upPop .35s ease-out both' }}>{e > 0 ? '+' : '−'}{Math.abs(e).toLocaleString(LOCALE)}</b>}
+                          {e !== 0 && ef > 0 && (
+                            <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 2, animation: 'upPop .35s ease-out both' }}>
+                              <b style={{ fontSize: 13, padding: '1px 6px', borderRadius: 8, background: e > 0 ? 'var(--green)' : '#FF3B4E', color: e > 0 ? '#110D24' : '#fff' }}>{e > 0 ? '+' : '−'}{Math.abs(e).toLocaleString(LOCALE)}</b>
+                              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', whiteSpace: 'nowrap' }}>
+                                {t('tally.betInfo', { pct: r.pct?.[id] ?? 0, m: r.cm?.[id] != null ? fmt(r.cm[id], room.lang) : t('tally.crashed') })}
+                              </span>
+                            </span>
+                          )}
                         </span>
                       </div>
                     );

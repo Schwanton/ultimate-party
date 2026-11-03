@@ -115,8 +115,6 @@ function JoinForm({ onJoined }: { onJoined: () => void }) {
         style={{ fontSize: 32, letterSpacing: '0.4em', textAlign: 'center', fontWeight: 800 }} placeholder="ABCD" />
       <label className="up-label" htmlFor="name">{t('join.name')}</label>
       <input id="name" className="up-input" value={name} maxLength={16} autoComplete="nickname" placeholder={t('join.namePlaceholder')} onChange={(e) => setName(e.target.value)} />
-      {error && <p className="up-error">{error}</p>}
-      <div style={{ flex: 1 }} />
       <button className="up-btn big full" disabled={busy || code.length !== 4 || !name.trim()}>{t('join.button')}</button>
     </form>
   );
@@ -196,7 +194,7 @@ function PhoneLobby({ onEditAvatar }: { onEditAvatar: () => void }) {
   const active = room.players.filter((p) => p.connected || p.isBot).length;
   const all = useGames();
   const { tag, setTag, present, shown: list } = useTagFilter(all);
-  const selected = list.find((g) => g.id === room.selectedGameId);
+  const selected = all.find((g) => g.id === room.selectedGameId);
 
   const start = async () => {
     setError(null);
@@ -227,6 +225,33 @@ function PhoneLobby({ onEditAvatar }: { onEditAvatar: () => void }) {
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" /></svg>
         </button>
       </section>
+
+      {/* Für den VIP: Start und Einstellungen ganz oben, darunter die Spielsammlung */}
+      {isVip && selected && (
+        <>
+          <button className="up-btn big full" disabled={active < selected.minPlayers} onClick={start}>{t('lobby.start')}</button>
+          <p className="muted" style={{ textAlign: 'center', fontSize: 14, marginTop: -4 }}>
+            {active < selected.minPlayers ? t('lobby.needPlayers', { n: selected.minPlayers - active })
+              : active > selected.maxPlayers ? t('lobby.tooMany', { n: selected.maxPlayers })
+              : t('lobby.startsOnTv', { game: selected.name[room.lang] ?? selected.name.en })}
+          </p>
+        </>
+      )}
+      {selected?.options?.length ? (
+        isVip ? (
+          <details className="up-card" style={{ padding: '14px 16px' }}>
+            <summary style={{ fontWeight: 700, cursor: 'pointer', fontSize: 16 }}>{t('lobby.gameSettings')}
+              <span className="faint" style={{ display: 'block', fontWeight: 500, fontSize: 13, marginTop: 4 }}>{optionsSummary(selected, room.settings.gameOptions?.[selected.id], room.lang)}</span>
+            </summary>
+            <div style={{ marginTop: 14 }}>
+              <GameOptionsForm game={selected} values={room.settings.gameOptions?.[selected.id]} lang={room.lang} compact />
+            </div>
+          </details>
+        ) : (
+          <p className="faint" style={{ fontSize: 13 }}>{optionsSummary(selected, room.settings.gameOptions?.[selected.id], room.lang)}</p>
+        )
+      ) : null}
+      {error && <p className="up-error">{error}</p>}
 
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
         <h2 style={{ fontSize: 22, fontWeight: 700 }}>{t('lobby.pickGame')}</h2>
@@ -261,32 +286,7 @@ function PhoneLobby({ onEditAvatar }: { onEditAvatar: () => void }) {
         })}
       </div>
 
-      {selected?.options?.length ? (
-        isVip ? (
-          <details className="up-card" style={{ padding: '14px 16px' }}>
-            <summary style={{ fontWeight: 700, cursor: 'pointer', fontSize: 16 }}>{t('lobby.gameSettings')}
-              <span className="faint" style={{ display: 'block', fontWeight: 500, fontSize: 13, marginTop: 4 }}>{optionsSummary(selected, room.settings.gameOptions?.[selected.id], room.lang)}</span>
-            </summary>
-            <div style={{ marginTop: 14 }}>
-              <GameOptionsForm game={selected} values={room.settings.gameOptions?.[selected.id]} lang={room.lang} compact />
-            </div>
-          </details>
-        ) : (
-          <p className="faint" style={{ fontSize: 13 }}>{optionsSummary(selected, room.settings.gameOptions?.[selected.id], room.lang)}</p>
-        )
-      ) : null}
-      {error && <p className="up-error">{error}</p>}
-      <div style={{ flex: 1 }} />
-      {isVip && selected && (
-        <>
-          <button className="up-btn big full" disabled={active < selected.minPlayers} onClick={start}>{t('lobby.start')}</button>
-          <p className="muted" style={{ textAlign: 'center', fontSize: 14, marginTop: -4 }}>
-            {active < selected.minPlayers ? t('lobby.needPlayers', { n: selected.minPlayers - active })
-              : active > selected.maxPlayers ? t('lobby.tooMany', { n: selected.maxPlayers })
-              : t('lobby.startsOnTv', { game: selected.name[room.lang] ?? selected.name.en })}
-          </p>
-        </>
-      )}
+
     </>
   );
 }

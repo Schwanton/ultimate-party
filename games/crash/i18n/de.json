@@ -47,5 +47,8 @@
  "tally.winner": "{name} gewinnt!",
  "tally.extraShort": "Einsätze: {n}",
  "phone.cashedPot": "Dein Topf jetzt: {n}",
- "tally.plusBets": "+ Einsätze"
+ "tally.plusBets": "+ Einsätze",
+ "tally.allBusted": "ALLE WEG",
+ "tally.betInfo": "Einsatz +{pct} % · {m}",
+ "tally.crashed": "gecrasht"
 }

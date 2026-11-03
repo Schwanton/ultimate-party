@@ -120,7 +120,11 @@ export default {
         money.add(id, b + e);
         results.set(id, { base: b, extra: e });
       }
-      tally.rounds.push({ crashAt, mult: m, base: roundBase, extra: roundExtra });
+      tally.rounds.push({
+        crashAt, mult: m, base: roundBase, extra: roundExtra,
+        pct: Object.fromEntries(ids.map((id) => [id, bets.get(id) ?? 0])),
+        cm: Object.fromEntries([...cashed]),
+      });
       const busted = ids.filter((id) => !cashed.has(id));
       ctx.setHostView({
         screen: 'crash', ...base(), startAt, crashTime, crashAt, allOut, players: ids, lastT: Math.max(0, ...cashedT.values()),

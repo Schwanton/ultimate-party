@@ -2,6 +2,11 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.8.7
+
+- Handy des VIP: „Los geht's!“ und die Spiel-Einstellungen stehen jetzt über der Spielsammlung
+- Crash-Auszählung: schneller, bei jedem Einsatz steht der Prozentsatz und der Kurs beim Aussteigen, die Beträge fliegen nacheinander in die Balken links, und wenn es alle erwischt hat, ist der Balken sofort grau mit Fehlerton
+
 ## 0.8.6
 
 - Nach einem Update oder Neustart bleibt der Raumcode gleich – und die Handys treten automatisch wieder bei
