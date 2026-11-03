@@ -2,6 +2,11 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.9.2
+
+- Kronenduell: Auf dem TV stehen Angriff und Verteidigung jetzt als großes Schwert/Schild mit großem Wert (statt Überschrift) – immer der aktuelle liegende Wert
+- Kronenduell: Wer dran ist, sieht auf dem Handy einen leuchtenden gelben Rand; das Handy vibriert kräftig (Android)
+
 ## 0.9.1
 
 - Kronenduell: Beim Aufdecken fliegen nur Waffen/Rüstungen raus, die schon vorher lagen – neu gelegte bleiben alle liegen (z. B. Schild 5 und 8 neu = Block 9)

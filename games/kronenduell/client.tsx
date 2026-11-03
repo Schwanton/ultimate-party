@@ -171,6 +171,7 @@ function KdStyles() {
 @keyframes kdBubble { 0% { opacity: 0; transform: translate(-50%, 14px) scale(.4); } 14% { opacity: 1; transform: translate(-50%, -8px) scale(1.18); } 24% { transform: translate(-50%, -6px) scale(1); } 78% { opacity: 1; transform: translate(-50%, -14px); } 100% { opacity: 0; transform: translate(-50%, -38px); } }
 @keyframes kdBanner { 0% { opacity: 0; transform: translate(-50%, -50%) scale(.5) rotate(-4deg); } 22% { opacity: 1; transform: translate(-50%, -50%) scale(1.1) rotate(1deg); } 34% { transform: translate(-50%, -50%) scale(1) rotate(0); } 78% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.06); } }
 @keyframes kdGlow { 0%,100% { box-shadow: 0 0 0 0 transparent; } 40% { box-shadow: 0 0 34px 8px var(--kd-glow); } }
+@keyframes kdTurn { 0%,100% { opacity: 1; } 50% { opacity: .55; } }
 @keyframes kdPop { 0% { transform: scale(.3); } 60% { transform: scale(1.35); } 100% { transform: scale(1); } }
 @keyframes kdRoyal { 0% { transform: scale(.2) rotate(-25deg); opacity: 0; } 65% { transform: scale(1.2) rotate(6deg); opacity: 1; } 100% { transform: none; } }
 @keyframes kdFlash { 0% { box-shadow: inset 0 0 0 3px var(--kd-glow), 0 0 0 0 var(--kd-glow); } 30% { box-shadow: inset 0 0 0 3px var(--kd-glow), 0 0 30px 6px var(--kd-glow); } 100% { box-shadow: inset 0 0 0 3px var(--kd-glow), 0 0 0 0 transparent; } }
@@ -399,6 +400,36 @@ function HostIntro({ view, t, player }: HostViewProps) {
 
 interface Ghosts { key: string; cards: AnyCard[]; kind: 'out' | 'shatter' }
 
+/** Angriff/Verteidigung auf dem TV: großes Symbol + großer Wert statt Überschrift */
+function StatZone({ zone, cards, w, hl, value, cardMax, scope, ghosts, flash, statRight }: {
+  zone: 'atk' | 'def'; cards: AnyCard[]; w: number; hl?: boolean; value: number; cardMax: number; scope?: string; ghosts?: Ghosts; flash?: string; statRight?: boolean;
+}) {
+  const col = ZONE_COLOR[zone];
+  const stat = (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 0, width: 78, flex: 'none', color: col }}>
+      <Icon k={zone} size={34} />
+      <span key={value} className="display" style={{ fontSize: 46, fontWeight: 800, lineHeight: 1, color: value ? '#fff' : '#6F68A0', animation: 'kdPop .45s ease-out' }}>{value}</span>
+    </div>
+  );
+  return (
+    <div key={flash} style={{
+      position: 'relative', borderRadius: 14, background: SURF, padding: '6px 8px', display: 'flex', flexDirection: statRight ? 'row-reverse' : 'row', alignItems: 'center', gap: 4,
+      boxSizing: 'border-box', minWidth: 0, boxShadow: hl ? `inset 0 0 0 3px ${GOLD}, 0 0 24px rgba(255,212,71,.35)` : `inset 0 0 0 2px ${col}22`, transition: 'box-shadow .3s',
+      ...(flash ? { ['--kd-glow' as any]: col, animation: 'kdFlash 1.2s ease-out both' } : {}),
+    }}>
+      {stat}
+      <Row cards={cards} w={w} max={cardMax} scope={scope} />
+      {ghosts && ghosts.cards.length > 0 && (
+        <div key={ghosts.key} style={{ position: 'absolute', left: 0, right: 0, bottom: 6, display: 'flex', justifyContent: 'center', gap: 6, pointerEvents: 'none', zIndex: 4 }}>
+          {ghosts.cards.map((c, i) => (
+            <div key={c.id ?? i} style={{ animation: `${ghosts.kind === 'shatter' ? 'kdShatter 1s' : 'kdOut .95s'} ease-in ${i * 0.08}s forwards` }}><CardFace c={c} w={w} /></div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ZoneBox({ zone, cards, t, w, hl, value, locked, extra, style, cardMax, scope, ghosts, flash }: {
   zone: Zone; cards: AnyCard[]; t: Translate; w: number; hl?: boolean; value?: number; locked?: boolean; extra?: ReactNode; style?: CSSProperties; cardMax: number;
   scope?: string; ghosts?: Ghosts; flash?: string;
@@ -488,8 +519,9 @@ function Side({ p, player, t, top, active, values, narrow, sfx: e }: { p: any; p
       <ZoneBox zone="spell" cards={p.zones.spell} t={t} w={w} hl={h('spell')} cardMax={300} style={{ width: 330, height: 92 }} scope={scope('spell')} ghosts={ghosts('spell')} flash={flash('spell')} />
     </div>
   );
-  const atk = <ZoneBox zone="atk" cards={p.zones.atk} t={t} w={w} hl={h('atk')} value={values ? values.str : undefined} cardMax={sideMax} scope={scope('atk')} ghosts={ghosts('atk')} flash={flash('atk')} />;
-  const def = <ZoneBox zone="def" cards={p.zones.def} t={t} w={w} hl={h('def')} value={values ? values.blk : undefined} cardMax={sideMax} scope={scope('def')} ghosts={ghosts('def')} flash={flash('def')} />;
+  // Werte stehen jeweils außen: unten Verteidigung links/Angriff rechts, oben gespiegelt
+  const atk = <StatZone zone="atk" cards={p.zones.atk} w={w} hl={h('atk')} value={values?.str ?? 0} cardMax={sideMax - 80} scope={scope('atk')} ghosts={ghosts('atk')} flash={flash('atk')} statRight={!top} />;
+  const def = <StatZone zone="def" cards={p.zones.def} w={w} hl={h('def')} value={values?.blk ?? 0} cardMax={sideMax - 80} scope={scope('def')} ghosts={ghosts('def')} flash={flash('def')} statRight={!!top} />;
   const mid = (
     <div style={{ display: 'grid', gridTemplateColumns: `1fr ${royalW}px 1fr`, gap: 10, height: 108 }}>
       {top ? atk : def}
@@ -509,7 +541,11 @@ function Table({ board, prev, player, t, hl, turn, values, narrow, fx, ghostKey,
   fx?: Record<string, Fx>; ghostKey?: string; ghostKind?: Ghosts['kind']; flash?: { p: string; z: Zone; key: string } | null; banner?: { key: string; text: string } | null;
 }) {
   const [bottom, top] = board;
-  const v = (p: any) => (values ? visibleStats(p.zones) : null);
+  // liegende (aufgedeckte) Werte immer zeigen; im Kampf inkl. „Alles auf Angriff/Abwehr“
+  const v = (p: any) => {
+    const st = visibleStats(p.zones);
+    return values ? { str: st.str, blk: st.blk } : { str: st.baseStr, blk: st.baseBlk };
+  };
   const se = (p: any): SideFx => ({
     hl, fx: fx?.[p.id], prev: prev?.find((x) => x.id === p.id), ghostKey, ghostKind, flash: flash && flash.p === p.id ? flash : null,
   });
@@ -843,7 +879,8 @@ function PhonePlan({ view, t, me, send, player, room }: ControllerViewProps) {
   const canConfirm = view.myTurn && view.canPlace && planList.length === 1;
   const selCard = hand.find((c) => c.id === sel) ?? null;
 
-  useEffect(() => { if (view.myTurn) vibrate([30, 60, 30]); }, [view.myTurn]);
+  // Du bist dran: kräftig vibrieren (Android; iPhones erlauben Websites kein Vibrieren)
+  useEffect(() => { if (view.myTurn && view.canPlace) vibrate([120, 80, 120]); }, [view.myTurn]);
 
   function tapCard(c: Card) {
     if (plan[c.id]) {
@@ -916,6 +953,12 @@ function PhonePlan({ view, t, me, send, player, room }: ControllerViewProps) {
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
       {rules && <RulesOverlay t={t} onClose={() => setRules(false)} />}
+      {view.myTurn && view.canPlace && (
+        <div aria-hidden="true" style={{
+          position: 'fixed', inset: 0, zIndex: 40, pointerEvents: 'none', border: `7px solid ${GOLD}`, borderRadius: 'max(0px, env(safe-area-inset-top))',
+          boxShadow: `inset 0 0 40px rgba(255,212,71,.45)`, animation: 'kdTurn 1.6s ease-in-out infinite',
+        }} />
+      )}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
         <span className="display" style={{
           fontWeight: 800, fontSize: 17, padding: '5px 12px', borderRadius: 999,
