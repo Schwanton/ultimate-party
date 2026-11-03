@@ -82,9 +82,9 @@ export function fallAt(seed: number, t: number): number {
 /** auf zwei Nachkommastellen abrunden (so wird ausgezahlt) */
 export const floor2 = (m: number) => Math.floor(m * 100) / 100;
 
-/** Absturzzeit (nur Server): mindestens 1,5 s, im Mittel ca. 13 s, selten sehr lang */
-export function crashTime(u: number) {
-  return Math.min(MAX_T - 1, 1.5 + -Math.log(1 - u) * 11.5);
+/** Absturzzeit (nur Server): frühestens `min` Sekunden (pro Partie 2–6 s), danach im Mittel ca. 10 s später, selten sehr lang */
+export function crashTime(u: number, min = 1.5) {
+  return Math.min(MAX_T - 1, min + -Math.log(1 - u) * 10.5);
 }
 
 export const newSeed = () => Math.floor(Math.random() * 2 ** 31);

@@ -1,6 +1,9 @@
 {
   "id": "crash",
-  "name": { "de": "Crash", "en": "Crash" },
+  "name": {
+    "de": "Crash",
+    "en": "Crash"
+  },
   "description": {
     "de": "Der Kurs schwankt wie eine Aktie und steigt meist – bis er abstürzt. Steig rechtzeitig aus! Wer zu gierig ist, verliert alles.",
     "en": "The price swings like a stock and mostly climbs – until it crashes. Cash out in time! Get greedy and lose it all."
@@ -10,11 +13,57 @@
   "audience": false,
   "minutes": 8,
   "color": "#FF4F7B",
-  "tags": ["quick"],
+  "tags": [
+    "quick"
+  ],
   "sdkVersion": 1,
   "version": "1.0.0",
   "author": "UP!",
   "options": [
-    { "id": "rounds", "label": { "de": "Runden", "en": "Rounds" }, "default": 8, "min": 4, "max": 15 }
+    {
+      "id": "rounds",
+      "label": {
+        "de": "Runden",
+        "en": "Rounds"
+      },
+      "default": 8,
+      "min": 4,
+      "max": 15
+    },
+    {
+      "id": "mode",
+      "label": {
+        "de": "Wer ausgestiegen ist",
+        "en": "Who cashed out"
+      },
+      "default": "open",
+      "choices": [
+        {
+          "value": "open",
+          "label": {
+            "de": "Sichtbar",
+            "en": "Visible"
+          }
+        },
+        {
+          "value": "half",
+          "label": {
+            "de": "Halbgeheim – nur die Anzahl",
+            "en": "Half secret – only the count"
+          }
+        },
+        {
+          "value": "secret",
+          "label": {
+            "de": "Geheim",
+            "en": "Secret"
+          }
+        }
+      ],
+      "help": {
+        "de": "Halbgeheim: Man sieht, dass jemand aussteigt und wie viele noch drin sind, aber nicht wer. Geheim: Man sieht während der Runden gar nichts.",
+        "en": "Half secret: you see that someone cashed out and how many are still in, but not who. Secret: nothing is shown during the rounds."
+      }
+    }
   ]
 }

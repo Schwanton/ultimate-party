@@ -2,6 +2,13 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.8.5
+
+- Crash: Einsätze – vor jeder Runde kann man +10 %, +25 % oder +100 % seines Geldes zu den 100 Gratis-Punkten in den Topf legen. Wer crasht, verliert den Einsatz
+- Crash: Spannende Auszählung am Ende – Runde für Runde, und zum Schluss die Einsätze vom Letzten zum Ersten
+- Crash: Neue Modi „halbgeheim“ (man sieht nur, wie viele noch drin sind) und „geheim“
+- Crash: Frühester Absturz ist pro Partie zufällig zwischen 2 und 6 Sekunden
+
 ## 0.8.4
 
 - Crash: Am Anfang steigt der Kurs fast immer schnell (ca. 2× nach 3 Sekunden) – Runden unter 1× sind jetzt selten

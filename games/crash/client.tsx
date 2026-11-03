@@ -1,7 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ControllerViewProps, GameClientModule, HostViewProps, PlayerInfo, Translate } from '@up/sdk';
-import { Avatar, Confetti, HostHeader, PhoneWait, Podium, sfx, useServerNow, vibrate } from '@up/ui';
+import { Avatar, Confetti, HostHeader, PhoneWait, sfx, useServerNow, vibrate } from '@up/ui';
 import { STEP, fallAt, floor2, multAt } from './curve';
+import { tallyAt, totalAt, type TallyData } from './tally';
 
 const PINK = '#FF4F7B';
 const PINK_D = '#B8274E';
@@ -9,6 +10,8 @@ const PINK_D = '#B8274E';
 const fmt = (m: number, lang: string) => `${floor2(m).toLocaleString(lang === 'de' ? 'de-DE' : 'en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}×`;
 const multColor = (m: number) => (m < 1 ? '#FF8A8E' : m < 1.5 ? '#FFFFFF' : m < 3 ? '#FFD447' : m < 8 ? '#FF9F43' : '#FF4F7B');
 const FALL = '#FF3B4E';
+/** Zahlenformat (wird beim Rendern aus der Raumsprache gesetzt) */
+let LOCALE = 'de-DE';
 /** Farbe zwischen a und b mischen (f = 0…1) */
 function mix(a: string, b: string, f: number) {
   const p = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
@@ -23,7 +26,8 @@ function info(view: any, t: Translate) {
 /* ================= TV ================= */
 
 function Host(props: HostViewProps) {
-  const { view, t, player } = props;
+  const { view, t } = props;
+  LOCALE = props.room.lang === 'de' ? 'de-DE' : 'en-US';
   switch (view.screen) {
     case 'intro':
       return (
@@ -38,13 +42,8 @@ function Host(props: HostViewProps) {
     case 'run':
     case 'crash':
       return <HostGraph {...props} />;
-    case 'final':
-      return (
-        <>
-          <HostHeader title={t('title')} color={PINK} info={t('final.title')} right={view.best ? <span className="up-chip" style={{ fontSize: 16 }}>{t('final.best', { name: player(view.best.id)?.name ?? '?', m: fmt(view.best.m, props.room.lang) })}</span> : null} />
-          <Podium ranking={view.ranking} player={player} pointsLabel={t('common.points')} />
-        </>
-      );
+    case 'tally':
+      return <HostTally {...props} />;
   }
   return null;
 }
@@ -61,7 +60,7 @@ function HostReady({ view, t }: HostViewProps) {
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
         {view.mult > 1 && <span className="up-tag anim-pop" style={{ background: 'var(--yellow)', color: '#110D24', fontSize: 28 }}>{t('double')}</span>}
         <span key={s} className="display anim-pop" style={{ fontSize: 170, fontWeight: 800 }}>{s || '…'}</span>
-        <p className="muted" style={{ fontSize: 26 }}>{t('ready.text')}</p>
+        <p className="muted" style={{ fontSize: 26 }}>{t('ready.bet')}</p>
       </div>
     </>
   );
@@ -74,7 +73,7 @@ function HostGraph({ view, t, player, room }: HostViewProps) {
   const now = useServerNow(40);
   const seed: number = view.seed;
   const cashed = view.cashed as { id: string; m: number; t: number }[];
-  const lastT = Math.max(0, ...cashed.map((c) => c.t));
+  const lastT = view.lastT ?? Math.max(0, ...cashed.map((c) => c.t));
   // tNow: bis wohin die Linie durchgezogen ist
   const tNow = !crashed ? Math.max(0, (now - view.startAt) / 1000) : view.allOut ? lastT : view.crashTime;
   const tEnd = crashed ? view.crashTime : tNow;
@@ -215,6 +214,7 @@ function HostGraph({ view, t, player, room }: HostViewProps) {
           </div>
         </div>
 
+        {view.mode !== 'open' ? <AnonSide view={view} t={t} crashed={crashed} fall={fall} /> : (
         <aside style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
           <section className="up-card" style={{ padding: 14, borderRadius: 22 }}>
             <h2 style={{ fontSize: 18, marginBottom: 8 }}>{crashed ? t('side.busted', { n: view.busted.length }) : t('side.in', { n: inIds.length })}</h2>
@@ -243,10 +243,214 @@ function HostGraph({ view, t, player, room }: HostViewProps) {
             </div>
           </section>
         </aside>
+        )}
       </div>
     </>
   );
 }
+
+/** Halbgeheim: nur Anzahlen; geheim: gar nichts */
+function AnonSide({ view, t, crashed, fall }: { view: any; t: Translate; crashed: boolean; fall: number }) {
+  const half = view.mode === 'half';
+  const [ping, setPing] = useState(0);
+  const lastOut = useRef(view.outCount ?? 0);
+  useEffect(() => {
+    if (!half || crashed) return;
+    if ((view.outCount ?? 0) > lastOut.current) {
+      setPing((n) => n + 1);
+      sfx.custom((s) => [1319, 1760].forEach((f, i) => s.tone(f, 0.12, { type: 'triangle', vol: 0.12, at: i * 0.06 })));
+    }
+    lastOut.current = view.outCount ?? 0;
+  }, [view.outCount, half, crashed]);
+  const total = (view.players as string[]).length;
+  return (
+    <aside style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <section className="up-card" style={{ padding: 18, borderRadius: 22, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, textAlign: 'center' }}>
+        {half ? (
+          crashed ? (
+            <>
+              <span className="display" style={{ fontSize: 80, fontWeight: 800, lineHeight: 1, color: view.bustedCount ? '#FF3B4E' : 'var(--green)' }}>{view.bustedCount}</span>
+              <b style={{ fontSize: 20 }}>{t('anon.busted', { n: view.bustedCount, total })}</b>
+              <span className="muted" style={{ fontSize: 16 }}>{t('anon.who')}</span>
+            </>
+          ) : (
+            <>
+              <span className="muted" style={{ fontSize: 18, fontWeight: 700 }}>{t('anon.in')}</span>
+              <span key={view.inCount} className="display" style={{ fontSize: 96, fontWeight: 800, lineHeight: 1, animation: `upPop .4s ease-out, upFloat ${fall > 0.2 ? '.5s' : '1.6s'} ease-in-out .4s infinite` }}>{view.inCount}</span>
+              <span className="muted" style={{ fontSize: 16 }}>{t('anon.of', { total })}</span>
+            </>
+          )
+        ) : (
+          <>
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#8F88B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 3l18 18M10.6 6.1A9.8 9.8 0 0 1 12 6c6.5 0 10 6 10 6a17 17 0 0 1-3.2 3.9M6.6 6.6C3.8 8.3 2 12 2 12s3.5 6 10 6c1.7 0 3.2-.4 4.5-1" /><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" /></svg>
+            <b style={{ fontSize: 22 }}>{t('anon.secret')}</b>
+            <span className="muted" style={{ fontSize: 16 }}>{t('anon.secretText')}</span>
+          </>
+        )}
+      </section>
+      {half && !crashed && ping > 0 && (
+        <div key={ping} role="status" className="display" style={{ alignSelf: 'center', background: 'var(--green)', color: '#110D24', fontWeight: 800, fontSize: 22, padding: '10px 18px', borderRadius: 16, boxShadow: '0 5px 0 var(--green-d)', animation: 'upPop .4s ease-out both, upFade 1s ease-in 2.2s reverse forwards' }}>
+          {t('anon.someone')}
+        </div>
+      )}
+    </aside>
+  );
+}
+
+/* ---------------- Auszählung am Ende ---------------- */
+
+function HostTally({ view, t, player, room }: HostViewProps) {
+  const data = view.tally as TallyData;
+  const now = useServerNow(50);
+  const sec = Math.max(0, (now - view.startAt) / 1000);
+  const at = tallyAt(data, sec);
+  const ids = view.players as string[];
+  const totals = Object.fromEntries(ids.map((id) => [id, totalAt(data, id, at)]));
+  const finalTotals = Object.fromEntries(ids.map((id) => [id, totalAt(data, id, { stage: 'done', round: data.rounds.length, progress: 1, extrasDone: data.extraOrder.length, extraProgress: 1 })]));
+  const maxTotal = Math.max(1, ...Object.values(finalTotals), ...Object.values(totals));
+  const order = [...ids].sort((a, b) => totals[b] - totals[a] || ids.indexOf(a) - ids.indexOf(b));
+  const shownRows = order.slice(0, 12);
+  const rowH = Math.min(46, Math.floor(560 / Math.max(1, shownRows.length)));
+
+  // Sounds
+  const lastRound = useRef(-1);
+  const lastExtra = useRef(-1);
+  const lastTick = useRef(0);
+  useEffect(() => {
+    if (at.stage === 'rounds' && at.round !== lastRound.current) {
+      lastRound.current = at.round;
+      sfx.play('whoosh');
+    }
+    if (at.stage === 'rounds' && at.progress < 1 && now - lastTick.current > 120) {
+      lastTick.current = now;
+      sfx.custom((s) => s.tone(300 + at.progress * 600, 0.05, { type: 'square', vol: 0.04 }));
+    }
+    if (at.stage === 'extrasIntro' && lastExtra.current === -1) {
+      lastExtra.current = -2;
+      sfx.play('drumroll');
+    }
+    if (at.stage === 'extras' && at.extrasDone !== lastExtra.current) {
+      lastExtra.current = at.extrasDone;
+      const id = data.extraOrder[at.extrasDone];
+      sfx.play((data.extra[id] ?? 0) >= 0 ? 'score' : 'wrong');
+    }
+    if (at.stage === 'done' && lastExtra.current !== 999) {
+      lastExtra.current = 999;
+      sfx.play('fanfare');
+    }
+  }, [at.stage, at.round, at.extrasDone, now]);
+
+  const r = at.stage === 'rounds' ? data.rounds[at.round] : null;
+  const roundMax = r ? Math.max(1, ...Object.values(r.base)) : 1;
+  const fillVal = r ? roundMax * easeOut(at.progress) : 0;
+  const extraId = at.stage === 'extras' ? data.extraOrder[at.extrasDone] : null;
+  const winner = order[0];
+
+  return (
+    <>
+      {at.stage === 'done' && <Confetti />}
+      <HostHeader title={t('title')} color={PINK} info={t('tally.title')} />
+      <div style={{ flex: 1, display: 'flex', gap: 24, minHeight: 0 }}>
+        {/* links: Balken pro Spieler */}
+        <section style={{ flex: 1.25, position: 'relative', minWidth: 0 }}>
+          {shownRows.map((id, i) => {
+            const p = player(id);
+            if (!p) return null;
+            const v = totals[id];
+            const hot = id === extraId;
+            return (
+              <div key={id} style={{ position: 'absolute', left: 0, right: 0, top: i * (rowH + 6), height: rowH, display: 'flex', alignItems: 'center', gap: 10, transition: 'top .6s cubic-bezier(.3,1.3,.5,1)' }}>
+                <span className="display" style={{ width: 26, textAlign: 'right', fontWeight: 800, color: 'var(--faint)' }}>{i + 1}</span>
+                <Avatar player={p} size={Math.min(40, rowH - 4)} />
+                <div style={{ flex: 1, height: rowH - 10, borderRadius: 12, background: 'var(--surface)', position: 'relative', overflow: 'hidden', boxShadow: hot ? '0 0 0 3px #fff' : undefined }}>
+                  <div style={{ position: 'absolute', inset: 0, width: `${Math.max(0, (v / maxTotal) * 100)}%`, background: at.stage === 'done' && id === winner ? 'var(--yellow)' : p.color, transition: 'width .5s ease-out', borderRadius: 12 }} />
+                  <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', fontWeight: 800, fontSize: 17, color: '#fff', textShadow: '0 2px 4px rgba(0,0,0,.6)', whiteSpace: 'nowrap' }}>{p.name}</span>
+                </div>
+                <span className="display" style={{ width: 92, textAlign: 'right', fontWeight: 800, fontSize: 22, fontVariantNumeric: 'tabular-nums' }}>{v.toLocaleString(LOCALE)}</span>
+              </div>
+            );
+          })}
+          {order.length > 12 && <span className="faint" style={{ position: 'absolute', bottom: 0, left: 36 }}>+{order.length - 12}</span>}
+        </section>
+
+        {/* rechts: aktuelle Runde oder Extras */}
+        <section style={{ width: 430, display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {at.stage === 'intro' && (
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 12, textAlign: 'center' }}>
+              <h1 className="anim-pop" style={{ fontSize: 46 }}>{t('tally.title')}</h1>
+              <p className="muted" style={{ fontSize: 20 }}>{t('tally.intro')}</p>
+            </div>
+          )}
+          {r && (
+            <>
+              <h2 style={{ fontSize: 28 }}>{t('round', { n: at.round + 1, total: data.rounds.length })}</h2>
+              <span className="muted" style={{ fontSize: 17, fontWeight: 700 }}>{t('tally.crashAt', { m: fmt(r.crashAt, room.lang) })}{r.mult > 1 ? ` · ${t('double')}` : ''}</span>
+              <div style={{ flex: 1, display: 'flex', gap: 14, minHeight: 0 }}>
+                <div style={{ width: 110, borderRadius: 20, background: 'var(--surface)', position: 'relative', overflow: 'hidden' }}>
+                  <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: `${(fillVal / roundMax) * 100}%`, background: `linear-gradient(0deg, ${PINK}, #FFD447)`, boxShadow: '0 0 30px rgba(255,212,71,.5)' }} />
+                  <span className="display" style={{ position: 'absolute', left: 0, right: 0, bottom: `calc(${(fillVal / roundMax) * 100}% + 4px)`, textAlign: 'center', fontWeight: 800, fontSize: 22 }}>{Math.round(fillVal)}</span>
+                </div>
+                <div style={{ flex: 1, position: 'relative' }}>
+                  {ids.filter((id) => (r.base[id] ?? 0) > 0 && (r.base[id] ?? 0) <= fillVal + 0.5).map((id, k) => {
+                    const p = player(id);
+                    if (!p) return null;
+                    const y = ((r.base[id] ?? 0) / roundMax) * 100;
+                    return (
+                      <div key={id} style={{ position: 'absolute', left: (k % 4) * 70, bottom: `calc(${y}% - 18px)`, display: 'flex', alignItems: 'center', gap: 4, animation: 'upPop .35s ease-out both' }}>
+                        <Avatar player={p} size={34} />
+                        <b style={{ fontSize: 14, background: '#110D24', padding: '1px 6px', borderRadius: 8 }}>{r.base[id]}</b>
+                      </div>
+                    );
+                  })}
+                  {at.progress >= 1 && ids.some((id) => !(r.base[id] > 0)) && (
+                    <div style={{ position: 'absolute', left: 0, bottom: -4, display: 'flex', gap: 4, alignItems: 'center', flexWrap: 'wrap', animation: 'upFade .4s both' }}>
+                      {ids.filter((id) => !(r.base[id] > 0)).slice(0, 10).map((id) => {
+                        const p = player(id);
+                        return p ? <span key={id} style={{ filter: 'grayscale(1)', opacity: 0.6 }}><Avatar player={p} size={26} /></span> : null;
+                      })}
+                      <span style={{ fontSize: 14, fontWeight: 800, color: '#FF3B4E' }}>{t('tally.busted')}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+          {(at.stage === 'extrasIntro' || at.stage === 'extras' || at.stage === 'done') && (
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 16, textAlign: 'center' }}>
+              {at.stage === 'extrasIntro' && (
+                <>
+                  <h1 className="anim-pop" style={{ fontSize: 44 }}>{t('tally.extrasTitle')}</h1>
+                  <p className="muted" style={{ fontSize: 20 }}>{t('tally.extrasText')}</p>
+                </>
+              )}
+              {extraId && (() => {
+                const p = player(extraId);
+                const e = data.extra[extraId] ?? 0;
+                return p ? (
+                  <div key={extraId} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, animation: 'upPop .45s ease-out both' }}>
+                    <Avatar player={p} size={120} />
+                    <b style={{ fontSize: 28 }}>{p.name}</b>
+                    <span className="display" style={{ fontSize: 76, fontWeight: 800, color: e > 0 ? 'var(--green)' : e < 0 ? '#FF3B4E' : 'var(--muted)' }}>{e > 0 ? '+' : ''}{e.toLocaleString(LOCALE)}</span>
+                    <span className="muted" style={{ fontSize: 17 }}>{e === 0 ? t('tally.noExtra') : e > 0 ? t('tally.extraWon') : t('tally.extraLost')}</span>
+                  </div>
+                ) : null;
+              })()}
+              {at.stage === 'done' && player(winner) && (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, animation: 'upPop .5s ease-out both' }}>
+                  <Avatar player={player(winner)!} size={140} />
+                  <h1 style={{ fontSize: 42, color: 'var(--yellow)' }}>{t('tally.winner', { name: player(winner)!.name })}</h1>
+                  <span className="display" style={{ fontSize: 34, fontWeight: 800 }}>{totals[winner].toLocaleString(LOCALE)}</span>
+                </div>
+              )}
+            </div>
+          )}
+        </section>
+      </div>
+    </>
+  );
+}
+
+const easeOut = (x: number) => 1 - Math.pow(1 - x, 2.2);
 
 /* ================= Handy ================= */
 
@@ -261,19 +465,61 @@ function FallBuzz({ fall }: { fall: number }) {
   return null;
 }
 
+/** Einsatz wählen: drei schmale Knöpfe oben, „+0 %“ breit darunter */
+function BetPicker({ view, t, send, now }: { view: any; t: Translate; send: (a: any) => void; now: number }) {
+  const s = Math.max(0, Math.ceil((view.startAt - now) / 1000));
+  const opts = view.options as { pct: number; amount: number }[];
+  const btn = (o: { pct: number; amount: number }, wide = false) => {
+    const sel = view.bet === o.pct;
+    const disabled = o.pct > 0 && o.amount <= 0;
+    return (
+      <button key={o.pct} type="button" disabled={disabled} aria-pressed={sel} onClick={() => send({ type: 'bet', pct: o.pct })}
+        style={{
+          gridColumn: wide ? '1 / 4' : undefined, minHeight: wide ? 76 : 96, border: 0, borderRadius: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2,
+          background: sel ? (o.pct ? '#FFD447' : '#fff') : 'var(--surface-2)', color: sel ? '#110D24' : '#fff', opacity: disabled ? 0.4 : 1,
+          boxShadow: sel ? `0 0 0 3px #fff, 0 6px 0 ${o.pct ? '#C79E1A' : '#8F88B8'}` : '0 5px 0 #0A0716', transition: 'transform .1s', transform: sel ? 'translateY(-2px)' : undefined,
+        }}>
+        <span className="display" style={{ fontSize: wide ? 30 : o.pct >= 100 ? 23 : 27, fontWeight: 800, whiteSpace: 'nowrap' }}>+{o.pct}&nbsp;%</span>
+        <span style={{ fontSize: 14, fontWeight: 700, opacity: 0.85 }}>{o.pct ? `${o.amount.toLocaleString(LOCALE)}` : t('bet.free')}</span>
+      </button>
+    );
+  };
+  const chosen = opts.find((o) => o.pct === view.bet) ?? opts[0];
+  return (
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div>
+          <span className="muted" style={{ fontSize: 14, fontWeight: 700 }}>{t('bet.money')}</span>
+          <div className="display" style={{ fontSize: 30, fontWeight: 800 }}>{view.money.toLocaleString(LOCALE)}</div>
+        </div>
+        <span key={s} className="display anim-pop" style={{ fontSize: 56, fontWeight: 800, color: s <= 2 ? '#FF3B4E' : '#fff' }}>{s || '…'}</span>
+      </div>
+      {view.mult > 1 && <span className="up-tag" style={{ alignSelf: 'flex-start', background: 'var(--yellow)', color: '#110D24' }}>{t('double')}</span>}
+      <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <h2 style={{ fontSize: 24 }}>{t('bet.title')}</h2>
+        <p className="muted" style={{ fontSize: 15 }}>{t('bet.text')}</p>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 10 }}>
+        {opts.filter((o) => o.pct > 0).map((o) => btn(o))}
+        {btn(opts[0], true)}
+      </div>
+      <p style={{ textAlign: 'center', fontWeight: 700 }}>{t('bet.pot', { pot: (100 + chosen.amount).toLocaleString(LOCALE) })}</p>
+    </div>
+  );
+}
+
 function Controller({ view, t, send, me, room }: ControllerViewProps) {
+  LOCALE = room.lang === 'de' ? 'de-DE' : 'en-US';
   const now = useServerNow(50);
   const lang = room.lang;
   switch (view.screen) {
     case 'intro':
       return <PhoneWait title={t('title')} text={t('lookAtTv')} emoji={<Avatar player={me} size={96} />} />;
-    case 'ready': {
-      const s = Math.max(0, Math.ceil((view.startAt - now) / 1000));
-      return <PhoneWait title={t('ready.phone')} text={view.mult > 1 ? t('double') : undefined} emoji={<span className="display" style={{ fontSize: 90, fontWeight: 800 }}>{s || '…'}</span>} />;
-    }
+    case 'ready':
+      return <BetPicker view={view} t={t} send={send} now={now} />;
     case 'run': {
       if (view.cashed != null) {
-        return <PhoneWait title={t('phone.cashed', { m: fmt(view.cashed, lang) })} text={`+${Math.round(100 * view.cashed * view.mult)}`} emoji={<Avatar player={me} size={96} />} />;
+        return <PhoneWait title={t('phone.cashed', { m: fmt(view.cashed, lang) })} text={t('phone.cashedPot', { n: Math.round(view.pot * view.cashed * view.mult).toLocaleString(LOCALE) })} emoji={<Avatar player={me} size={96} />} />;
       }
       const sec = (now - view.startAt) / 1000;
       const m = multAt(view.seed, sec);
@@ -285,9 +531,9 @@ function Controller({ view, t, send, me, room }: ControllerViewProps) {
           <button type="button" onPointerDown={(e) => { e.preventDefault(); vibrate(30); send({ type: 'cash' }); }}
             style={{ width: 280, height: 280, borderRadius: '50%', border: 0, background: PINK, color: '#fff', boxShadow: `0 10px 0 ${PINK_D}, 0 0 40px ${PINK}88`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, touchAction: 'manipulation' }}>
             <span className="display" style={{ fontSize: 34, fontWeight: 800 }}>{t('phone.cash')}</span>
-            <span className="display" style={{ fontSize: 28, fontWeight: 800, color: '#FFD447' }}>+{Math.floor(100 * m * view.mult)}</span>
+            <span className="display" style={{ fontSize: 28, fontWeight: 800, color: '#FFD447' }}>+{Math.floor(view.pot * m * view.mult).toLocaleString(LOCALE)}</span>
           </button>
-          <p className="muted" style={{ textAlign: 'center' }}>{t('phone.hint')}</p>
+          <p className="muted" style={{ textAlign: 'center' }}>{view.stake > 0 ? t('phone.pot', { pot: view.pot, stake: view.stake }) : t('phone.hint')}</p>
         </div>
       );
     }
@@ -297,12 +543,15 @@ function Controller({ view, t, send, me, room }: ControllerViewProps) {
           {view.m != null && <Confetti pieces={12} />}
           <Avatar player={me} size={100} />
           <h1 style={{ fontSize: 30 }}>{view.m != null ? t('phone.safe', { m: fmt(view.m, lang) }) : t('phone.busted', { m: fmt(view.crashAt, lang) })}</h1>
-          <span className="display" style={{ fontSize: 56, fontWeight: 800, color: view.m != null ? 'var(--yellow)' : '#FF3B4E' }}>+{view.points}</span>
-          <p className="muted">{t('phone.total', { n: view.total })}</p>
+          <span className="display" style={{ fontSize: 56, fontWeight: 800, color: view.gain >= 0 ? 'var(--yellow)' : '#FF3B4E' }}>{view.gain >= 0 ? '+' : ''}{view.gain.toLocaleString(LOCALE)}</span>
+          {view.stake > 0 && <p style={{ fontWeight: 700 }}>{view.m != null ? t('phone.potWon', { pot: view.pot }) : t('phone.stakeLost', { stake: view.stake })}</p>}
+          <p className="muted">{t('phone.total', { n: view.total.toLocaleString(LOCALE) })}</p>
         </div>
       );
+    case 'tallyWait':
+      return <PhoneWait title={t('tally.title')} text={t('lookAtTv')} emoji={<Avatar player={me} size={110} />} />;
     case 'finalMe':
-      return <PhoneWait title={t('me.place', { place: view.place, of: view.of })} text={t('me.score', { n: view.score })} emoji={<Avatar player={me} size={110} />} />;
+      return <PhoneWait title={t('me.place', { place: view.place, of: view.of })} text={`${t('me.score', { n: view.score.toLocaleString(LOCALE) })} · ${t('tally.extraShort', { n: (view.extra >= 0 ? '+' : '') + view.extra.toLocaleString(LOCALE) })}`} emoji={<Avatar player={me} size={110} />} />;
     default:
       return <PhoneWait title={t('lookAtTv')} emoji={<Avatar player={me} size={96} />} />;
   }
