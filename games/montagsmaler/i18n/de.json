@@ -17,7 +17,7 @@
  "pick.level2": "Mittel",
  "pick.level3": "Schwer",
  "pick.points": "bis {n} Punkte",
- "pick.rule": "Keine Buchstaben oder Zahlen malen – sonst kann man dich melden.",
+ "pick.rule": "Keine Buchstaben oder Zahlen malen!",
  "waitPick.title": "{name} sucht ein Wort aus",
  "waitPick.text": "Gleich geht's los – halt die Finger bereit!",
  "draws": "{name} malt",
@@ -96,11 +96,13 @@
  "gallery.prev": "Vorheriges Bild",
  "gallery.next": "Nächstes Bild",
  "gallery.phoneTitle": "Die Bilder des Abends",
- "gallery.phoneText": "Tippe auf ein Bild, um es groß zu sehen, zu speichern oder zu teilen.",
+ "gallery.phoneText": "Gib deinen Lieblingsbildern Herzen – tippe ein Bild an, um es groß zu sehen und zu teilen.",
  "emote.label": "Emotes",
  "emote.0": "Lachen",
  "emote.1": "Kopf explodiert",
  "emote.2": "Verliebt",
  "emote.3": "Applaus",
- "emote.4": "Ab in den Müll"
+ "emote.4": "Ab in den Müll",
+ "gallery.heart": "Herz geben",
+ "gallery.shareAll": "Alle teilen"
 }

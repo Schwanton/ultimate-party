@@ -22,6 +22,12 @@ export interface UpdateStatus {
   error?: string;
   /** Git-Checkout: Update per „git pull“ */
   git?: boolean;
+  /** Suche läuft gerade */
+  checking?: boolean;
+  /** Zeitpunkt der letzten erfolgreichen Suche */
+  checkedAt?: number;
+  /** Letzte Suche fehlgeschlagen (z. B. offline) */
+  checkFailed?: boolean;
 }
 
 const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
@@ -83,17 +89,19 @@ function notesFor(changelog: string, version: string): string[] {
 }
 
 export async function checkForUpdate() {
-  if (['downloading', 'installing', 'restarting'].includes(status.state)) return;
+  if (['downloading', 'installing', 'restarting'].includes(status.state) || status.checking) return;
+  set({ checking: true });
   try {
     const remote = JSON.parse(await fetchText(`${RAW}/package.json`));
-    if (!remote.version || !newer(remote.version, CURRENT)) return set({ state: 'idle', latest: remote.version });
+    if (!remote.version || !newer(remote.version, CURRENT)) return set({ state: 'idle', latest: remote.version, checking: false, checkedAt: Date.now(), checkFailed: false });
     let notes: string[] = [];
     try {
       notes = notesFor(await fetchText(`${RAW}/CHANGELOG.md`), remote.version);
     } catch { /* ohne Notizen */ }
-    set({ state: status.git ? 'manual' : 'available', latest: remote.version, notes, error: undefined });
+    set({ state: status.git ? 'manual' : 'available', latest: remote.version, notes, error: undefined, checking: false, checkedAt: Date.now(), checkFailed: false });
   } catch {
     // offline – kein Problem, später erneut versuchen
+    set({ checking: false, checkFailed: true });
   }
 }
 

@@ -2,6 +2,14 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.8.2
+
+- Montagsmaler: Beim Raten bleibt das Bild auch mit offener Tastatur groß – Maler*in und eigene Tipps liegen jetzt klein über dem Bild, weniger Abstände, Emotes daneben
+- Montagsmaler: Schummel-Knopf entfernt
+- Montagsmaler: Emotes bis zu 10× pro Sekunde – Spam erlaubt
+- Montagsmaler: Herzen für Bilder in der Galerie, die Galerie sortiert sich danach; Teilen-Knopf öffnet direkt das Teilen-Menü (z. B. auf dem iPhone), „Alle teilen“ für alle Bilder auf einmal
+- Einstellungen: „Nach Updates suchen“ mit aktueller Version und Installieren-Knopf
+
 ## 0.8.1
 
 - Neu: Kartenstapel – Begriffe und Fragen werden wie Karten gezogen und kommen erst wieder, wenn alle einmal dran waren, auch über mehrere Spiele und Abende. In den Einstellungen: „noch X von Y“ und „Neu mischen“

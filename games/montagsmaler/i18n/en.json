@@ -17,7 +17,7 @@
  "pick.level2": "Medium",
  "pick.level3": "Hard",
  "pick.points": "up to {n} points",
- "pick.rule": "No letters or numbers – or you can be reported.",
+ "pick.rule": "No letters or numbers in your drawing!",
  "waitPick.title": "{name} is picking a word",
  "waitPick.text": "Here we go – get your fingers ready!",
  "draws": "{name} is drawing",
@@ -96,11 +96,13 @@
  "gallery.prev": "Previous drawing",
  "gallery.next": "Next drawing",
  "gallery.phoneTitle": "Tonight's drawings",
- "gallery.phoneText": "Tap a drawing to see it big, save it or share it.",
+ "gallery.phoneText": "Give your favourite drawings a heart – tap one to see it big and share it.",
  "emote.label": "Emotes",
  "emote.0": "Laugh",
  "emote.1": "Mind blown",
  "emote.2": "Love it",
  "emote.3": "Applause",
- "emote.4": "Straight to the bin"
+ "emote.4": "Straight to the bin",
+ "gallery.heart": "Give a heart",
+ "gallery.shareAll": "Share all"
 }

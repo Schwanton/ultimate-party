@@ -88,9 +88,11 @@ function TeamBadge({ t, n, score, active, player, members }: { t: Translate; n: 
 function EmoteLayer({ emotes, player }: { emotes: { n: number; id: string; e: number; at: number }[] | undefined; player: Player }) {
   const now = useServerNow(250);
   const lastN = useRef(0);
+  const lastSound = useRef(0);
   useEffect(() => {
     const newest = emotes?.length ? emotes[emotes.length - 1].n : 0;
-    if (newest > lastN.current && lastN.current >= 0) {
+    if (newest > lastN.current && performance.now() - lastSound.current > 70) {
+      lastSound.current = performance.now();
       const pitch = 700 + ((newest * 97) % 400);
       sfx.custom((api) => api.tone(pitch, 0.09, { type: 'sine', vol: 0.05, to: pitch * 1.5 }));
     }
@@ -345,11 +347,6 @@ function HostDraw({ view, t, player, roundInfo }: HostViewProps & { roundInfo?: 
               </div>
             </>
           )}
-          {view.reports > 0 && (
-            <span style={{ marginTop: 'auto', alignSelf: 'flex-start', fontSize: 15, fontWeight: 700, padding: '6px 12px', borderRadius: 999, background: 'var(--surface-2)', color: 'var(--orange)' }}>
-              {t('reports', { n: view.reports })}
-            </span>
-          )}
         </aside>
 
         <EmoteLayer emotes={view.emotes} player={player} />
@@ -432,7 +429,10 @@ function HostReveal({ view, t, player, roundInfo }: HostViewProps & { roundInfo?
 }
 
 function HostGallery({ view, t, player }: HostViewProps) {
-  const pics = view.pics as { word: string; strokes: Stroke[]; drawerId: string; firstId: string | null; firstMs: number | null; stolen: number | null }[];
+  const raw = view.pics as { word: string; strokes: Stroke[]; drawerId: string; firstId: string | null; firstMs: number | null; stolen: number | null }[];
+  const live = useStream<{ g?: string; h?: number[] }>();
+  const counts: number[] = live?.g === 'hearts' && live.h?.length === raw.length ? live.h : (view.hearts ?? raw.map(() => 0));
+  const pics = raw.map((p, i) => ({ ...p, i, hearts: counts[i] ?? 0 })).sort((a, b) => b.hearts - a.hearts || a.i - b.i);
   const cols = pics.length <= 4 ? pics.length : pics.length <= 8 ? 4 : 5;
   const rowsN = Math.ceil(pics.length / cols);
   const size = Math.min(rowsN > 2 ? 120 : rowsN === 2 ? 190 : 300, Math.floor((1180 - (cols - 1) * 20) / cols) - 24);
@@ -446,11 +446,14 @@ function HostGallery({ view, t, player }: HostViewProps) {
           const f = p.firstId ? player(p.firstId) : null;
           const meta = p.stolen != null ? t('gallery.stolen', { team: teamName(t, p.stolen) }) : f && p.firstMs != null ? t('gallery.first', { name: f.name, time: fmtTime(p.firstMs) }) : t('gallery.nobody');
           return (
-            <figure key={i} style={{
+            <figure key={p.i} style={{ position: 'relative',
               margin: 0, background: '#FFFDF7', borderRadius: 16, padding: '10px 10px 12px', boxShadow: '0 7px 0 #0A0716', display: 'flex', flexDirection: 'column', gap: 6, color: '#110D24',
               transform: `rotate(${((i * 37) % 5) - 2}deg)`, animation: `upPop .5s ease-out ${(i * 0.18).toFixed(2)}s both`,
             }}>
               <Drawing strokes={p.strokes} size={size} style={{ alignSelf: 'center', borderRadius: 10, background: '#fff' }} />
+              {p.hearts > 0 && (
+                <span className="display" style={{ position: 'absolute', top: -12, right: -10, background: PINK, color: '#fff', fontWeight: 800, fontSize: 20, padding: '4px 12px', borderRadius: 999, boxShadow: `0 4px 0 ${PINK_D}`, animation: 'upPop .4s ease-out both' }}>♥ {p.hearts}</span>
+              )}
               <figcaption style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 <span className="display" style={{ fontWeight: 800, fontSize: 22, lineHeight: 1.05 }}>{p.word}</span>
                 <span style={{ fontSize: 13, fontWeight: 700, color: '#4A4378' }}>{d?.name ?? '?'} · {meta}</span>
@@ -653,22 +656,25 @@ function DrawScreen(props: ControllerViewProps) {
 /** Emotes, die auf dem Fernseher hochfliegen */
 const EMOTES = ['😂', '🤯', '😍', '👏', '🚮'];
 
-function EmoteBar({ send, t }: { send: (a: any) => void; t: Translate }) {
+function EmoteBar({ send, t, vertical, size }: { send: (a: any) => void; t: Translate; vertical?: boolean; size?: number }) {
   const last = useRef(0);
   const [hit, setHit] = useState<number | null>(null);
   const fire = (i: number) => {
     const now = Date.now();
-    if (now - last.current < 600) return;
+    if (now - last.current < 100) return;
     last.current = now;
     send({ type: 'emote', e: i });
     setHit(i);
-    setTimeout(() => setHit(null), 250);
+    setTimeout(() => setHit(null), 150);
   };
+  const h = size ?? 44;
   return (
-    <div role="group" aria-label={t('emote.label')} style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', gap: 6 }}>
+    <div role="group" aria-label={t('emote.label')} style={vertical
+      ? { display: 'flex', flexDirection: 'column', gap: 4, width: 46 }
+      : { display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', gap: 6 }}>
       {EMOTES.map((e, i) => (
         <button key={e} type="button" aria-label={t(`emote.${i}`)} onMouseDown={(ev) => ev.preventDefault()} onClick={() => fire(i)}
-          style={{ height: 44, border: 0, borderRadius: 14, background: 'var(--surface)', fontSize: 24, lineHeight: 1, padding: 0, transform: hit === i ? 'scale(1.25)' : undefined, transition: 'transform .15s' }}>
+          style={{ height: h, border: 0, borderRadius: 12, background: 'var(--surface)', fontSize: Math.min(24, h * 0.55), lineHeight: 1, padding: 0, transform: hit === i ? 'scale(1.2)' : undefined, transition: 'transform .1s', touchAction: 'manipulation' }}>
           {e}
         </button>
       ))}
@@ -727,15 +733,17 @@ function GuessInput({ send, t }: { send: (a: any) => void; t: Translate }) {
   );
 }
 
-/** Raten (oder zuschauen) mit Live-Zeichnung */
+/** Raten (oder zuschauen) mit Live-Zeichnung – alles kompakt, damit das Bild auch bei offener Tastatur groß bleibt */
 function GuessScreen({ view, t, send, player }: ControllerViewProps) {
   const [boxRef, boxW] = useWidth();
   const vh = useViewportHeight();
   const guessing = view.screen === 'guess';
-  // Tastatur zu (viel Platz): Bild in voller Breite; Tastatur offen: Bild kleiner, Infos daneben
-  const roomy = vh - (guessing ? 400 : 330) >= boxW;
-  const size = roomy ? boxW : Math.max(140, Math.min(boxW - 108, vh - (guessing ? 350 : 290)));
   useNoScroll();
+  // Platz für alles außer dem Bild: Timer, Buchstaben-Zeile, Eingabe, Ränder des Handy-Bildschirms
+  const rest = (guessing ? 150 : 95) + (view.steal ? 28 : 0);
+  // Viel Platz (Tastatur zu): Emotes als Zeile unter dem Bild; wenig Platz: Emotes als Spalte daneben
+  const roomy = vh - rest - 50 >= boxW;
+  const size = roomy ? boxW : Math.max(140, Math.min(boxW - 52, vh - rest));
   const drawer = player(view.drawerId);
   const guesses = (view.guesses ?? []) as { text: string; close: boolean }[];
 
@@ -746,55 +754,42 @@ function GuessScreen({ view, t, send, player }: ControllerViewProps) {
     lastLen.current = guesses.length;
   }, [guesses.length]);
 
+  const recent = guesses.slice(-3).reverse();
   return (
-    <div ref={boxRef} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <PhoneTimer deadline={view.deadline} duration={view.duration} hurryText={guessing ? t('timer.hurry') : undefined} />
-      {view.steal && guessing && <p role="status" className="display" style={{ fontWeight: 800, fontSize: 20, color: '#FF8A8E' }}>{t('steal.you')}</p>}
-      <div style={{ display: 'flex', flexDirection: roomy ? 'column' : 'row', gap: roomy ? 8 : 12, alignItems: roomy ? 'stretch' : 'flex-start' }}>
-        <div style={{ position: 'relative', flex: 'none' }}>
-          <LiveDrawing strokes={view.strokes} round={view.round} size={size} style={{ borderRadius: 18 }} />
-          <span style={{ position: 'absolute', left: 8, top: 8, fontSize: 12, fontWeight: 800, background: PINK, color: '#fff', padding: '3px 8px', borderRadius: 999, letterSpacing: '.06em' }}>{t('guess.live')}</span>
-        </div>
-        <div style={{ flex: 1, display: 'flex', flexDirection: roomy ? 'row' : 'column', gap: roomy ? 8 : 10, minWidth: 0 }}>
+    <div ref={boxRef} style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: -6 }}>
+      <PhoneTimer deadline={view.deadline} duration={view.duration} />
+      {view.steal && guessing && <p role="status" className="display" style={{ fontWeight: 800, fontSize: 18, color: '#FF8A8E', lineHeight: 1.2 }}>{t('steal.you')}</p>}
+      <div style={{ display: 'flex', flexDirection: roomy ? 'column' : 'row', gap: 6 }}>
+        <div style={{ position: 'relative', flex: 'none', alignSelf: 'flex-start' }}>
+          <LiveDrawing strokes={view.strokes} round={view.round} size={size} style={{ borderRadius: 16 }} />
+          <span style={{ position: 'absolute', left: 6, top: 6, fontSize: 11, fontWeight: 800, background: PINK, color: '#fff', padding: '2px 7px', borderRadius: 999, letterSpacing: '.06em' }}>{t('guess.live')}</span>
           {drawer && (
-            <div style={{ display: 'flex', flexDirection: roomy ? 'row' : 'column', alignItems: 'center', gap: roomy ? 10 : 4, padding: roomy ? '6px 12px' : '10px 4px', borderRadius: 14, background: 'var(--surface)', flex: roomy ? 1 : undefined, minWidth: 0 }}>
-              {!roomy && <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--muted)' }}>{t('guess.drawer')}</span>}
-              <Avatar player={drawer} size={roomy ? 34 : 38} />
-              <span style={{ fontSize: 14, fontWeight: 700, maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{roomy ? t('draws', { name: drawer.name }) : drawer.name}</span>
+            <span style={{ position: 'absolute', right: 6, top: 6, display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 700, background: 'rgba(17,13,36,.75)', color: '#fff', padding: '2px 8px 2px 2px', borderRadius: 999, maxWidth: '60%' }}>
+              <Avatar player={drawer} size={20} /><span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{drawer.name}</span>
+            </span>
+          )}
+          {recent.length > 0 && (
+            <div style={{ position: 'absolute', left: 6, right: 6, bottom: 6, display: 'flex', gap: 4, overflow: 'hidden' }}>
+              {recent.map((g, i) => g.close ? (
+                <span key={guesses.length - i} style={{ fontSize: 13, fontWeight: 800, padding: '3px 9px', borderRadius: 999, background: 'var(--yellow)', color: '#110D24', whiteSpace: 'nowrap', animation: i === 0 ? 'upPop .4s ease-out both' : undefined }}>{g.text} – {t('guess.close')}</span>
+              ) : (
+                <span key={guesses.length - i} style={{ fontSize: 13, fontWeight: 700, padding: '3px 9px', borderRadius: 999, background: 'rgba(17,13,36,.78)', color: '#B8B2D9', textDecoration: 'line-through', whiteSpace: 'nowrap' }}>{g.text}</span>
+              ))}
             </div>
           )}
-          {view.canReport && (
-            <button type="button" aria-label={t('guess.reportLabel')} aria-pressed={view.reported} onClick={() => send({ type: 'report', on: !view.reported })}
-              style={{ height: roomy ? 50 : 58, width: roomy ? 96 : undefined, border: 0, borderRadius: 14, background: view.reported ? 'var(--orange)' : 'var(--surface-2)', color: view.reported ? '#110D24' : 'var(--muted)', boxShadow: '0 4px 0 #0A0716', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, fontSize: 12, fontWeight: 700, padding: 0 }}>
-              <Icon d="M17 3H7.5a2 2 0 00-2 1.6L4 12a2 2 0 002 2.4h4.5L9.6 19a1.7 1.7 0 003.2 1L17 14V3zM17 3h3v11h-3" size={22} width={2} />
-              {view.reported ? t('guess.reported') : t('guess.report')}
-            </button>
-          )}
         </div>
+        <EmoteBar send={send} t={t} vertical={!roomy} size={roomy ? undefined : Math.min(46, Math.floor((size - 16) / 5))} />
       </div>
       <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8 }}>
         <Slots slots={view.slots} size="small" />
-        <span className="faint" style={{ marginLeft: 'auto', fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap' }}>{t('letters', { n: view.slots.filter((s: string) => s !== ' ' && s !== '-').length })}</span>
+        <span className="faint" style={{ marginLeft: 'auto', fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap' }}>{t('letters', { n: view.slots.filter((s: string) => s !== ' ' && s !== '-').length })}</span>
       </div>
       {guessing ? (
-        <>
-          <div style={{ display: 'flex', gap: 6, overflow: 'hidden', flexWrap: 'nowrap', minHeight: 32 }}>
-            {guesses.slice(-4).reverse().map((g, i) => g.close ? (
-              <span key={i} style={{ fontSize: 15, fontWeight: 800, padding: '6px 12px', borderRadius: 999, background: 'var(--yellow)', color: '#110D24', whiteSpace: 'nowrap', animation: i === 0 ? 'upPop .4s ease-out both' : undefined }}>{g.text} – {t('guess.close')}</span>
-            ) : (
-              <span key={i} style={{ fontSize: 15, fontWeight: 700, padding: '6px 12px', borderRadius: 999, background: 'var(--surface-2)', color: 'var(--muted)', textDecoration: 'line-through', whiteSpace: 'nowrap' }}>{g.text}</span>
-            ))}
-          </div>
-          <EmoteBar send={send} t={t} />
-          <GuessInput send={send} t={t} />
-        </>
+        <GuessInput send={send} t={t} />
       ) : (
-        <>
-          <p className="muted" style={{ textAlign: 'center', fontSize: 16 }}>
-            {view.team && view.myTeam === view.drawingTeam ? t('watch.textOwn') : t('watch.text')}
-          </p>
-          <EmoteBar send={send} t={t} />
-        </>
+        <p className="muted" style={{ textAlign: 'center', fontSize: 15 }}>
+          {view.team && view.myTeam === view.drawingTeam ? t('watch.textOwn') : t('watch.text')}
+        </p>
       )}
     </div>
   );
@@ -899,28 +894,79 @@ async function picToPng(pic: Pic, drawerName: string, by: string): Promise<Blob>
 
 const fileName = (word: string) => `UP-${word.replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-|-$/g, '') || 'bild'}.png`;
 
-function PicViewer({ pic, t, player, onClose, onPrev, onNext }: { pic: Pic; t: Translate; player: Player; onClose: () => void; onPrev?: () => void; onNext?: () => void }) {
+const canShare = () => typeof navigator !== 'undefined' && typeof navigator.share === 'function';
+
+/** PNG-Dateien schon vorher erzeugen: iPhone öffnet das Teilen-Menü nur direkt nach dem Antippen */
+function usePngFiles(pics: Pic[], player: Player, by: string) {
+  const [files, setFiles] = useState<(File | null)[]>(() => pics.map(() => null));
+  const key = pics.map((p) => p.word).join('|');
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      const out: (File | null)[] = [];
+      for (const p of pics) {
+        try {
+          const blob = await picToPng(p, player(p.drawerId)?.name ?? '?', by);
+          out.push(new File([blob], fileName(p.word), { type: 'image/png' }));
+        } catch {
+          out.push(null);
+        }
+        if (!alive) return;
+        setFiles([...out, ...pics.slice(out.length).map(() => null)]);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [key]);
+  return files;
+}
+
+function shareFiles(files: File[], title: string, text: string) {
+  try {
+    if (files.length && navigator.canShare?.({ files })) {
+      void navigator.share({ files, title }).catch(() => {});
+    } else {
+      void navigator.share({ title, text }).catch(() => {});
+    }
+  } catch { /* nicht unterstützt */ }
+}
+
+function HeartButton({ count, mine, onToggle, label, big }: { count: number; mine: boolean; onToggle: () => void; label: string; big?: boolean }) {
+  const [pop, setPop] = useState(false);
+  return (
+    <button type="button" aria-label={label} aria-pressed={mine}
+      onClick={(e) => { e.stopPropagation(); onToggle(); if (!mine) { setPop(true); setTimeout(() => setPop(false), 300); vibrate(15); } }}
+      style={{
+        display: 'flex', alignItems: 'center', gap: 5, border: 0, borderRadius: 999, padding: big ? '0 18px' : '0 10px', height: big ? 56 : 36,
+        background: mine ? PINK : 'rgba(17,13,36,.08)', color: mine ? '#fff' : '#E8336F', fontWeight: 800, fontSize: big ? 20 : 15,
+        boxShadow: mine && big ? `0 5px 0 ${PINK_D}` : undefined, transform: pop ? 'scale(1.25)' : undefined, transition: 'transform .15s', flex: 'none',
+        ...(big && !mine ? { background: 'var(--surface)', color: '#FF7AA3' } : {}),
+      }}>
+      <svg width={big ? 24 : 18} height={big ? 24 : 18} viewBox="0 0 24 24" fill={mine ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2.4" strokeLinejoin="round" aria-hidden="true">
+        <path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.7 4.5c2.2 0 3.6 1.2 5.3 3.1 1.7-1.9 3.1-3.1 5.3-3.1 3.7 0 5.8 3.9 4.3 7.3C19.5 16.4 12 21 12 21z" />
+      </svg>
+      {count}
+    </button>
+  );
+}
+
+function PicViewer({ pic, file, t, player, onClose, onPrev, onNext, hearts, mine, onHeart }: {
+  pic: Pic; file: File | null; t: Translate; player: Player; onClose: () => void; onPrev?: () => void; onNext?: () => void;
+  hearts: number; mine: boolean; onHeart: () => void;
+}) {
   const [boxRef, boxW] = useWidth();
-  const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const drawer = player(pic.drawerId)?.name ?? '?';
   const by = t('gallery.byShort');
-  const canShareFiles = typeof navigator !== 'undefined' && !!navigator.canShare && (() => {
-    try {
-      return navigator.canShare({ files: [new File([new Blob()], 'x.png', { type: 'image/png' })] });
-    } catch {
-      return false;
-    }
-  })();
 
-  const save = async () => {
-    setBusy(true);
+  const save = () => {
+    if (!file) return;
     try {
-      const blob = await picToPng(pic, drawer, by);
-      const url = URL.createObjectURL(blob);
+      const url = URL.createObjectURL(file);
       const a = document.createElement('a');
       a.href = url;
-      a.download = fileName(pic.word);
+      a.download = file.name;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -929,22 +975,13 @@ function PicViewer({ pic, t, player, onClose, onPrev, onNext }: { pic: Pic; t: T
     } catch {
       setNote(t('gallery.failed'));
     }
-    setBusy(false);
-  };
-  const share = async () => {
-    setBusy(true);
-    try {
-      const blob = await picToPng(pic, drawer, by);
-      const file = new File([blob], fileName(pic.word), { type: 'image/png' });
-      await navigator.share({ files: [file], title: pic.word, text: `${pic.word} – ${by} ${drawer} (UP!)` });
-    } catch { /* abgebrochen */ }
-    setBusy(false);
   };
 
-  const btn: CSSProperties = { flex: 1, minHeight: 56, border: 0, borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, fontWeight: 800, fontSize: 18, padding: '0 12px' };
+  const btn: CSSProperties = { flex: 1, minHeight: 56, border: 0, borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, fontWeight: 800, fontSize: 17, padding: '0 10px' };
+  const share = canShare();
   return (
     <div role="dialog" aria-modal="true" aria-label={pic.word} className="anim-fade"
-      style={{ position: 'fixed', inset: 0, zIndex: 80, background: '#0A0716', display: 'flex', flexDirection: 'column', padding: 'max(16px, env(safe-area-inset-top)) 16px max(18px, env(safe-area-inset-bottom))', gap: 14 }}>
+      style={{ position: 'fixed', inset: 0, zIndex: 80, background: '#0A0716', display: 'flex', flexDirection: 'column', padding: 'max(16px, env(safe-area-inset-top)) 16px max(18px, env(safe-area-inset-bottom))', gap: 12 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div className="display" style={{ fontWeight: 800, fontSize: 28, color: 'var(--yellow)', lineHeight: 1.05, overflowWrap: 'anywhere' }}>{pic.word}</div>
@@ -954,61 +991,101 @@ function PicViewer({ pic, t, player, onClose, onPrev, onNext }: { pic: Pic; t: T
           <Icon d="M6 6l12 12M18 6L6 18" size={24} />
         </button>
       </div>
-      <div ref={boxRef} style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+      <div ref={boxRef} style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <Drawing strokes={pic.strokes} size={Math.max(200, boxW)} style={{ borderRadius: 22 }} />
       </div>
-      <div style={{ display: 'flex', gap: 8 }}>
-        <button type="button" aria-label={t('gallery.prev')} disabled={!onPrev} onClick={onPrev} style={{ ...btn, flex: 'none', width: 56, background: 'var(--surface)', color: '#fff', opacity: onPrev ? 1 : 0.35 }}>
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <button type="button" aria-label={t('gallery.prev')} disabled={!onPrev} onClick={onPrev} style={{ ...btn, flex: 'none', width: 48, background: 'var(--surface)', color: '#fff', opacity: onPrev ? 1 : 0.35 }}>
           <Icon d="M15 18l-6-6 6-6" />
         </button>
-        <button type="button" disabled={busy} onClick={save} style={{ ...btn, background: '#fff', color: '#110D24', boxShadow: '0 5px 0 #8F88B8' }}>
-          <Icon d="M12 4v11M7 10l5 5 5-5M5 20h14" size={22} />{t('gallery.save')}
-        </button>
-        {canShareFiles && (
-          <button type="button" disabled={busy} onClick={share} style={{ ...btn, background: PINK, color: '#fff', boxShadow: `0 5px 0 ${PINK_D}` }}>
-            <Icon d="M12 16V4M7 9l5-5 5 5M5 14v6h14v-6" size={22} />{t('gallery.share')}
+        <HeartButton big count={hearts} mine={mine} onToggle={onHeart} label={t('gallery.heart')} />
+        {share ? (
+          <button type="button" disabled={!file} onClick={() => file && shareFiles([file], pic.word, `${pic.word} – ${by} ${drawer} (UP!)`)}
+            style={{ ...btn, background: PINK, color: '#fff', boxShadow: `0 5px 0 ${PINK_D}`, opacity: file ? 1 : 0.6 }}>
+            <Icon d="M12 15V3M7 8l5-5 5 5M5 13v8h14v-8" size={22} />{t('gallery.share')}
+          </button>
+        ) : (
+          <button type="button" disabled={!file} onClick={save} style={{ ...btn, background: '#fff', color: '#110D24', boxShadow: '0 5px 0 #8F88B8', opacity: file ? 1 : 0.6 }}>
+            <Icon d="M12 4v11M7 10l5 5 5-5M5 20h14" size={22} />{t('gallery.save')}
           </button>
         )}
-        <button type="button" aria-label={t('gallery.next')} disabled={!onNext} onClick={onNext} style={{ ...btn, flex: 'none', width: 56, background: 'var(--surface)', color: '#fff', opacity: onNext ? 1 : 0.35 }}>
+        <button type="button" aria-label={t('gallery.next')} disabled={!onNext} onClick={onNext} style={{ ...btn, flex: 'none', width: 48, background: 'var(--surface)', color: '#fff', opacity: onNext ? 1 : 0.35 }}>
           <Icon d="M9 18l6-6-6-6" />
         </button>
       </div>
+      {share && (
+        <button type="button" disabled={!file} onClick={save} className="up-btn ghost small" style={{ alignSelf: 'center' }}>{t('gallery.save')}</button>
+      )}
       {note && <p role="status" className="muted" style={{ textAlign: 'center', fontSize: 14 }}>{note}</p>}
     </div>
   );
 }
 
-function PhoneGallery({ view, t, player, me }: ControllerViewProps) {
+function PhoneGallery({ view, t, player, me, send }: ControllerViewProps) {
   const pics = (view.pics ?? []) as Pic[];
   const [open, setOpen] = useState<number | null>(null);
   const [boxRef, boxW] = useWidth();
   const thumb = Math.floor((boxW - 12) / 2) - 16;
+  const by = t('gallery.byShort');
+  const files = usePngFiles(pics, player, by);
+
+  // Herzen: eigene merken wir sofort, die Zahlen kommen live vom Server
+  const live = useStream<{ g?: string; h?: number[] }>();
+  const [mine, setMine] = useState<boolean[]>(() => (view.mine as boolean[] | undefined) ?? pics.map(() => false));
+  const serverCounts: number[] = live?.g === 'hearts' && live.h?.length === pics.length ? live.h : (view.hearts ?? pics.map(() => 0));
+  const toggle = (i: number) => {
+    const on = !mine[i];
+    setMine((m) => m.map((x, k) => (k === i ? on : x)));
+    send({ type: 'heart', i, on });
+  };
+  // Sortierung nach Herzen (bei Gleichstand Reihenfolge des Abends)
+  const order = pics.map((_, i) => i).sort((a, b) => serverCounts[b] - serverCounts[a] || a - b);
+  const pos = open == null ? -1 : order.indexOf(open);
+
+  const ready = files.filter(Boolean) as File[];
   return (
-    <div ref={boxRef} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+    <div ref={boxRef} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-        <Avatar player={me} size={64} />
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <span className="display" style={{ fontWeight: 800, fontSize: 26 }}>{t('me.place', { place: view.place, of: view.of })}</span>
+        <Avatar player={me} size={56} />
+        <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+          <span className="display" style={{ fontWeight: 800, fontSize: 24 }}>{t('me.place', { place: view.place, of: view.of })}</span>
           <span className="muted" style={{ fontWeight: 700 }}>{t('me.score', { n: view.score })}</span>
         </div>
       </div>
-      <div>
-        <h2 style={{ fontSize: 22 }}>{t('gallery.phoneTitle')}</h2>
-        <p className="muted" style={{ fontSize: 15 }}>{t('gallery.phoneText')}</p>
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10 }}>
+        <div style={{ flex: 1 }}>
+          <h2 style={{ fontSize: 22 }}>{t('gallery.phoneTitle')}</h2>
+          <p className="muted" style={{ fontSize: 14 }}>{t('gallery.phoneText')}</p>
+        </div>
+        {canShare() && pics.length > 1 && (
+          <button type="button" className="up-btn small" disabled={ready.length < pics.length}
+            onClick={() => shareFiles(ready, t('gallery.phoneTitle'), t('gallery.phoneTitle'))} style={{ flex: 'none' }}>
+            {t('gallery.shareAll')}
+          </button>
+        )}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 12 }}>
-        {pics.map((p, i) => (
-          <button key={i} type="button" onClick={() => setOpen(i)} aria-label={p.word}
-            style={{ border: 0, padding: 8, borderRadius: 16, background: '#FFFDF7', color: '#110D24', display: 'flex', flexDirection: 'column', gap: 6, textAlign: 'left', boxShadow: '0 5px 0 #0A0716' }}>
-            <Drawing strokes={p.strokes} size={Math.max(100, thumb)} style={{ borderRadius: 10, background: '#fff' }} />
-            <span className="display" style={{ fontWeight: 800, fontSize: 17, lineHeight: 1.1, overflowWrap: 'anywhere' }}>{p.word}</span>
-            <span style={{ fontSize: 12, fontWeight: 700, color: '#4A4378' }}>{player(p.drawerId)?.name ?? '?'}</span>
-          </button>
-        ))}
+        {order.map((i) => {
+          const p = pics[i];
+          return (
+            <div key={i} role="button" tabIndex={0} onClick={() => setOpen(i)} onKeyDown={(e) => e.key === 'Enter' && setOpen(i)} aria-label={p.word}
+              style={{ padding: 8, borderRadius: 16, background: '#FFFDF7', color: '#110D24', display: 'flex', flexDirection: 'column', gap: 6, boxShadow: '0 5px 0 #0A0716', cursor: 'pointer' }}>
+              <Drawing strokes={p.strokes} size={Math.max(100, thumb)} style={{ borderRadius: 10, background: '#fff' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div className="display" style={{ fontWeight: 800, fontSize: 16, lineHeight: 1.1, overflowWrap: 'anywhere' }}>{p.word}</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#4A4378', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{player(p.drawerId)?.name ?? '?'}</div>
+                </div>
+                <HeartButton count={serverCounts[i] ?? 0} mine={!!mine[i]} onToggle={() => toggle(i)} label={t('gallery.heart')} />
+              </div>
+            </div>
+          );
+        })}
       </div>
       {open != null && pics[open] && (
-        <PicViewer pic={pics[open]} t={t} player={player} onClose={() => setOpen(null)}
-          onPrev={open > 0 ? () => setOpen(open - 1) : undefined} onNext={open < pics.length - 1 ? () => setOpen(open + 1) : undefined} />
+        <PicViewer pic={pics[open]} file={files[open]} t={t} player={player} onClose={() => setOpen(null)}
+          hearts={serverCounts[open] ?? 0} mine={!!mine[open]} onHeart={() => toggle(open)}
+          onPrev={pos > 0 ? () => setOpen(order[pos - 1]) : undefined} onNext={pos >= 0 && pos < order.length - 1 ? () => setOpen(order[pos + 1]) : undefined} />
       )}
     </div>
   );

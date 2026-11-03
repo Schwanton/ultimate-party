@@ -97,6 +97,10 @@ export default {
     let emotes: { n: number; id: string; e: number; at: number }[] = [];
     let emoteN = 0;
     const lastEmoteAt = new Map<string, number>();
+    let emoteFlush: ReturnType<typeof setTimeout> | null = null;
+    /** Herzen für die Bilder in der Galerie (Bild-Nummer → wer) */
+    const hearts = new Map<number, Set<string>>();
+    const heartCounts = () => gallery.map((_, i) => hearts.get(i)?.size ?? 0);
     let roundStartScores = scores.snapshot();
     let lastScoresRound = 0;
     let endPending = false;
@@ -376,7 +380,7 @@ export default {
         case 'scores':
           return { screen: 'scores', ...common(), before: roundStartScores, after: scores.snapshot() };
         case 'gallery':
-          return { screen: 'gallery', ...common(), pics: gallery };
+          return { screen: 'gallery', ...common(), pics: gallery, hearts: heartCounts() };
         case 'final':
           return { screen: 'final', ...common(), ranking: scores.ranking() };
       }
@@ -430,6 +434,7 @@ export default {
           return {
             screen: 'gallery', ...base, final: phase === 'final', score: scores.get(id), place: ranking.findIndex((r) => r.playerId === id) + 1, of: ranking.length,
             pics: gallery.map((g) => ({ word: g.word, strokes: g.strokes, drawerId: g.drawerId })),
+            hearts: heartCounts(), mine: gallery.map((_, i) => !!hearts.get(i)?.has(id)),
           };
         }
       }
@@ -490,6 +495,9 @@ export default {
 
     return {
       start: intro,
+      dispose() {
+        if (emoteFlush) clearTimeout(emoteFlush);
+      },
       onAction(id, action) {
         if (!action || typeof action !== 'object' || !members.includes(id)) return;
         if (id === drawer) {
@@ -504,11 +512,27 @@ export default {
         if (action.type === 'emote') {
           const e = Number(action.e);
           const now = Date.now();
-          if (!Number.isInteger(e) || e < 0 || e > 4 || now - (lastEmoteAt.get(id) ?? 0) < 500) return;
+          if (!Number.isInteger(e) || e < 0 || e > 4 || now - (lastEmoteAt.get(id) ?? 0) < 100) return;
           if (phase !== 'draw' && phase !== 'steal' && phase !== 'reveal') return;
           lastEmoteAt.set(id, now);
-          emotes = [...emotes.filter((x) => now - x.at < 4000), { n: ++emoteN, id, e, at: now }].slice(-14);
-          ctx.setHostView(hostView());
+          emotes = [...emotes.filter((x) => now - x.at < 4000), { n: ++emoteN, id, e, at: now }].slice(-40);
+          // gebündelt an den TV (bei viel Emote-Spam nicht jedes Mal die ganze Ansicht)
+          if (!emoteFlush) {
+            emoteFlush = setTimeout(() => {
+              emoteFlush = null;
+              if (phase === 'draw' || phase === 'steal' || phase === 'reveal') ctx.setHostView(hostView());
+            }, 120);
+          }
+          return;
+        }
+        if (action.type === 'heart' && (phase === 'gallery' || phase === 'final')) {
+          const i = Number(action.i);
+          if (!Number.isInteger(i) || i < 0 || i >= gallery.length) return;
+          const set = hearts.get(i) ?? new Set<string>();
+          if (action.on === false) set.delete(id);
+          else set.add(id);
+          hearts.set(i, set);
+          ctx.stream({ g: 'hearts', h: heartCounts() }, { phones: true });
           return;
         }
         if (action.type === 'report' && phase === 'draw') {
@@ -522,6 +546,7 @@ export default {
         broadcast();
       },
       bot(_id, view) {
+        if (view.screen === 'gallery' && view.pics?.length && Math.random() < 0.6) return { type: 'heart', i: Math.floor(Math.random() * view.pics.length) };
         if ((view.screen === 'guess' || view.screen === 'watch' || view.screen === 'solved') && Math.random() < 0.12) return { type: 'emote', e: Math.floor(Math.random() * 5) };
         if (view.screen === 'pick') return { type: 'pick', i: Math.floor(Math.random() * 3) };
         if (view.screen === 'draw' && view.input && view.strokes.length < 6) {

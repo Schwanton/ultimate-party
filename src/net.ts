@@ -20,7 +20,7 @@ export interface HostData {
   decks?: { game: string; total: number; left: number }[];
   notice: string | null;
   results: { gameId: string; ranking: { playerId: string; score: number }[] }[];
-  update?: { state: string; current: string; latest?: string; notes?: string[]; error?: string; git?: boolean };
+  update?: { state: string; current: string; latest?: string; notes?: string[]; error?: string; git?: boolean; checking?: boolean; checkedAt?: number; checkFailed?: boolean };
   view: any;
 }
 

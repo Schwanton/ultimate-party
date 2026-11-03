@@ -58,6 +58,7 @@ export function HostSettings({ onClose }: { onClose: () => void }) {
                 })}
               </div>
             </div>
+            <UpdateSection t={t} />
             {host.decks?.length ? (
               <div>
                 <div className="up-label" style={{ marginBottom: 4 }}>{t('settings.decks')}</div>
@@ -144,6 +145,39 @@ function SoundSettings({ t }: { t: (k: string) => string }) {
       <div className="up-label" style={{ marginBottom: 8 }}>{t('settings.sound')}</div>
       {row(t('settings.fx'), fx, setFx, (v) => { sfx.setVolumes(v, sfx.musicVolume); sfx.play('ding'); })}
       {row(t('settings.music'), music, setMusic, (v) => sfx.setVolumes(sfx.fxVolume, v))}
+    </div>
+  );
+}
+
+/** Updates: aktuelle Version, „Nach Updates suchen“, ggf. installieren */
+function UpdateSection({ t }: { t: (k: string, v?: Record<string, string | number>) => string }) {
+  const s = useNet();
+  const u = s.host?.update;
+  const [confirm, setConfirm] = useState(false);
+  if (!u) return null;
+  const players = s.room?.players.filter((p) => !p.isBot).length ?? 0;
+  const busy = u.state === 'downloading' || u.state === 'installing' || u.state === 'restarting';
+  let status = '';
+  if (u.checking) status = t('update.checking');
+  else if (busy) status = t(u.state === 'downloading' ? 'update.downloading' : u.state === 'installing' ? 'update.installing' : 'update.restarting');
+  else if (u.state === 'available') status = t('update.available', { version: u.latest ?? '' });
+  else if (u.state === 'manual' && u.git) status = `${t('update.available', { version: u.latest ?? '' })} – ${t('update.git')}`;
+  else if (u.state === 'manual') status = t('update.restartManually');
+  else if (u.state === 'error') status = `${t('update.failed')}: ${u.error ?? ''}`;
+  else if (u.checkFailed) status = t('update.offline');
+  else if (u.checkedAt) status = t('update.upToDate');
+  const install = () => (players > 0 && !confirm ? setConfirm(true) : (setConfirm(false), net.send('update:install')));
+  return (
+    <div>
+      <div className="up-label" style={{ marginBottom: 6 }}>{t('update.title')}</div>
+      <p style={{ fontSize: 16, marginBottom: 8 }}>{t('update.version', { version: u.current })}{status ? <> · <b style={{ color: u.state === 'available' ? 'var(--green)' : undefined }}>{status}</b></> : null}</p>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+        <button className="up-btn ghost small" disabled={u.checking || busy} onClick={() => net.send('update:check')}>{u.checking ? t('update.checking') : t('update.check')}</button>
+        {(u.state === 'available' || u.state === 'error') && (
+          <button className="up-btn small" disabled={busy} onClick={install}>{confirm ? t('update.confirmShort') : u.state === 'error' ? t('update.retry') : t('update.install')}</button>
+        )}
+      </div>
+      {confirm && <p className="faint" style={{ fontSize: 14, marginTop: 6 }}>{t('update.confirm')}</p>}
     </div>
   );
 }
