@@ -1,0 +1,396 @@
+{
+ "name": "Extra",
+ "author": "UP!",
+ "version": "1.0.0",
+ "description": "Even more weird but true facts",
+ "items": [
+  {
+   "question": "The Eiffel Tower can be up to ___ centimetres taller in summer than in winter.",
+   "answer": "15",
+   "alternatives": [
+    "fifteen"
+   ],
+   "decoys": [
+    "40",
+    "3",
+    "70"
+   ],
+   "source": "Wikipedia: Eiffel Tower (thermal expansion)"
+  },
+  {
+   "question": "Thousands-of-years-old honey that was still edible was found in ancient ___ tombs.",
+   "answer": "Egyptian",
+   "alternatives": [
+    "Egypt",
+    "pharaohs'"
+   ],
+   "decoys": [
+    "Roman",
+    "Chinese",
+    "Viking"
+   ],
+   "source": "Smithsonian Magazine: The Science Behind Honey's Eternal Shelf Life"
+  },
+  {
+   "question": "A blue whale's tongue weighs about as much as an ___.",
+   "answer": "elephant",
+   "alternatives": [
+    "an elephant"
+   ],
+   "decoys": [
+    "horse",
+    "SUV",
+    "ox"
+   ],
+   "source": "NOAA Fisheries: Blue Whale"
+  },
+  {
+   "question": "The Statue of Liberty was a gift from ___.",
+   "answer": "France",
+   "alternatives": [
+    "the French"
+   ],
+   "decoys": [
+    "England",
+    "Spain",
+    "Italy"
+   ],
+   "source": "National Park Service: Statue of Liberty"
+  },
+  {
+   "question": "Kangaroos basically can't hop ___.",
+   "answer": "backwards",
+   "alternatives": [
+    "backward"
+   ],
+   "decoys": [
+    "sideways",
+    "in water",
+    "downhill"
+   ],
+   "source": "Australian Geographic: kangaroo facts"
+  },
+  {
+   "question": "The planet with the most known moons is ___.",
+   "answer": "Saturn",
+   "alternatives": [],
+   "decoys": [
+    "Jupiter",
+    "Neptune",
+    "Uranus"
+   ],
+   "source": "NASA: Saturn Moons"
+  },
+  {
+   "question": "The smallest bone in the human body is in the ___.",
+   "answer": "ear",
+   "alternatives": [
+    "middle ear",
+    "inner ear"
+   ],
+   "decoys": [
+    "little toe",
+    "finger",
+    "nose"
+   ],
+   "source": "Wikipedia: Stapes"
+  },
+  {
+   "question": "The name LEGO comes from the Danish “leg godt”, meaning ___.",
+   "answer": "play well",
+   "alternatives": [
+    "play good"
+   ],
+   "decoys": [
+    "build more",
+    "little bricks",
+    "colourful world"
+   ],
+   "source": "LEGO Group: The LEGO Group History"
+  },
+  {
+   "question": "Flamingos are pink because of their ___.",
+   "answer": "food",
+   "alternatives": [
+    "diet",
+    "shrimp",
+    "algae"
+   ],
+   "decoys": [
+    "sunburn",
+    "blood",
+    "feather oil"
+   ],
+   "source": "National Geographic: Flamingo"
+  },
+  {
+   "question": "Wild penguins live almost exclusively in the ___ Hemisphere.",
+   "answer": "Southern",
+   "alternatives": [
+    "south"
+   ],
+   "decoys": [
+    "Northern",
+    "Eastern",
+    "Western"
+   ],
+   "source": "Wikipedia: Penguin"
+  },
+  {
+   "question": "Manatees are most closely related to ___.",
+   "answer": "elephants",
+   "alternatives": [
+    "elephant"
+   ],
+   "decoys": [
+    "seals",
+    "whales",
+    "walruses"
+   ],
+   "source": "Wikipedia: Sirenia"
+  },
+  {
+   "question": "The closest living relatives of whales are ___.",
+   "answer": "hippos",
+   "alternatives": [
+    "hippopotamuses",
+    "hippopotami"
+   ],
+   "decoys": [
+    "seals",
+    "sharks",
+    "manatees"
+   ],
+   "source": "Wikipedia: Whippomorpha"
+  },
+  {
+   "question": "Fanta was originally invented in ___.",
+   "answer": "Germany",
+   "alternatives": [],
+   "decoys": [
+    "Italy",
+    "Spain",
+    "Brazil"
+   ],
+   "source": "Wikipedia: Fanta"
+  },
+  {
+   "question": "The video game Tetris was created in the ___.",
+   "answer": "Soviet Union",
+   "alternatives": [
+    "USSR",
+    "Russia"
+   ],
+   "decoys": [
+    "Japan",
+    "East Germany",
+    "Finland"
+   ],
+   "source": "Wikipedia: Tetris"
+  },
+  {
+   "question": "The tallest mountain in the solar system, Olympus Mons, is on ___.",
+   "answer": "Mars",
+   "alternatives": [],
+   "decoys": [
+    "the Moon",
+    "Venus",
+    "Io"
+   ],
+   "source": "NASA: Olympus Mons"
+  },
+  {
+   "question": "A lightning bolt is about ___ times hotter than the surface of the sun.",
+   "answer": "five",
+   "alternatives": [
+    "5"
+   ],
+   "decoys": [
+    "two",
+    "ten",
+    "a hundred"
+   ],
+   "source": "NOAA National Weather Service: Lightning facts"
+  },
+  {
+   "question": "Butterflies taste with their ___.",
+   "answer": "feet",
+   "alternatives": [
+    "legs"
+   ],
+   "decoys": [
+    "wings",
+    "antennae",
+    "eyes"
+   ],
+   "source": "Library of Congress: How do butterflies taste?"
+  },
+  {
+   "question": "Sharks existed long before the first ___.",
+   "answer": "trees",
+   "alternatives": [
+    "tree"
+   ],
+   "decoys": [
+    "insects",
+    "fish",
+    "corals"
+   ],
+   "source": "Natural History Museum: sharks older than trees"
+  },
+  {
+   "question": "Only two countries have a square flag: Vatican City and ___.",
+   "answer": "Switzerland",
+   "alternatives": [],
+   "decoys": [
+    "Monaco",
+    "Malta",
+    "Nepal"
+   ],
+   "source": "Wikipedia: Flag of Switzerland"
+  },
+  {
+   "question": "The word “muscle” comes from the Latin word for ___.",
+   "answer": "little mouse",
+   "alternatives": [
+    "mouse"
+   ],
+   "decoys": [
+    "strength",
+    "knot",
+    "rope"
+   ],
+   "source": "Etymonline: muscle"
+  },
+  {
+   "question": "Rats make laughter-like sounds when you ___ them.",
+   "answer": "tickle",
+   "alternatives": [
+    "tickle them"
+   ],
+   "decoys": [
+    "feed",
+    "pet",
+    "sing to"
+   ],
+   "source": "Science (2016): Rats laugh when tickled"
+  },
+  {
+   "question": "One year on Neptune lasts about ___ Earth years.",
+   "answer": "165",
+   "alternatives": [
+    "one hundred sixty-five"
+   ],
+   "decoys": [
+    "12",
+    "84",
+    "500"
+   ],
+   "source": "NASA: Neptune facts"
+  },
+  {
+   "question": "The world's first webcam pointed at a ___.",
+   "answer": "coffee pot",
+   "alternatives": [
+    "coffee machine",
+    "coffee maker"
+   ],
+   "decoys": [
+    "cat",
+    "traffic light",
+    "fish tank"
+   ],
+   "source": "Wikipedia: Trojan Room coffee pot"
+  },
+  {
+   "question": "Elephants are one of the few mammals that cannot ___.",
+   "answer": "jump",
+   "alternatives": [
+    "leap"
+   ],
+   "decoys": [
+    "swim",
+    "walk backwards",
+    "lie down"
+   ],
+   "source": "Smithsonian's National Zoo: elephant facts"
+  },
+  {
+   "question": "Under their white fur, polar bears have ___ skin.",
+   "answer": "black",
+   "alternatives": [
+    "dark"
+   ],
+   "decoys": [
+    "pink",
+    "blue",
+    "transparent"
+   ],
+   "source": "Polar Bears International: Polar bear facts"
+  },
+  {
+   "question": "An apple floats because it is about one quarter ___.",
+   "answer": "air",
+   "alternatives": [],
+   "decoys": [
+    "fat",
+    "sugar",
+    "foam"
+   ],
+   "source": "Library of Congress: Why do apples float?"
+  },
+  {
+   "question": "A sloth can hold its breath for up to ___ minutes.",
+   "answer": "40",
+   "alternatives": [
+    "forty"
+   ],
+   "decoys": [
+    "5",
+    "15",
+    "90"
+   ],
+   "source": "WWF: Sloth facts"
+  },
+  {
+   "question": "Giraffes have the same number of neck bones as ___.",
+   "answer": "humans",
+   "alternatives": [
+    "people",
+    "us"
+   ],
+   "decoys": [
+    "swans",
+    "horses",
+    "snakes"
+   ],
+   "source": "Smithsonian's National Zoo: Giraffe"
+  },
+  {
+   "question": "The kiwifruit used to be called the “Chinese ___”.",
+   "answer": "gooseberry",
+   "alternatives": [
+    "gooseberries"
+   ],
+   "decoys": [
+    "plum",
+    "fig",
+    "potato"
+   ],
+   "source": "Wikipedia: Kiwifruit"
+  },
+  {
+   "question": "American Charles Osborne had the ___ for 68 years.",
+   "answer": "hiccups",
+   "alternatives": [
+    "hiccup"
+   ],
+   "decoys": [
+    "giggles",
+    "flu",
+    "yawns"
+   ],
+   "source": "Guinness World Records: Longest attack of hiccups"
+  }
+ ]
+}

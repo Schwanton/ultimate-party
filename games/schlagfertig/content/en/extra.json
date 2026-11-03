@@ -1,0 +1,365 @@
+{
+ "name": "Extra",
+ "author": "UP!",
+ "version": "1.0.0",
+ "description": "Even more odd prompts",
+ "items": [
+  {
+   "prompt": "The worst name for a fancy restaurant"
+  },
+  {
+   "prompt": "What a vacuum cleaner dreams about"
+  },
+  {
+   "prompt": "The first thing you'd say if you met a unicorn"
+  },
+  {
+   "prompt": "An ad slogan for flavorless water"
+  },
+  {
+   "prompt": "What your pet tells others about you behind your back"
+  },
+  {
+   "prompt": "A sign you never want to see on a front door"
+  },
+  {
+   "prompt": "The worst announcement on a plane"
+  },
+  {
+   "prompt": "A new name for broccoli so kids will eat it"
+  },
+  {
+   "prompt": "What the instruction manual for Mondays says"
+  },
+  {
+   "prompt": "The real reason zebras have stripes"
+  },
+  {
+   "prompt": "A song you should never play at a wedding"
+  },
+  {
+   "prompt": "What a cactus says when it wants a hug"
+  },
+  {
+   "prompt": "The most awkward thing to say at a goldfish funeral"
+  },
+  {
+   "prompt": "The worst business idea of all time"
+  },
+  {
+   "prompt": "What your neighbor is really doing in the garage"
+  },
+  {
+   "prompt": "A title for an action movie about retirees"
+  },
+  {
+   "prompt": "The most embarrassing thing that could happen in a job interview"
+  },
+  {
+   "prompt": "What snowmen do in summer"
+  },
+  {
+   "prompt": "A new toothpaste flavor"
+  },
+  {
+   "prompt": "What a supervillain's vacation T-shirt says"
+  },
+  {
+   "prompt": "The worst password in the world"
+  },
+  {
+   "prompt": "Proof that the Earth is actually flat"
+  },
+  {
+   "prompt": "Something you should never write in a dating profile"
+  },
+  {
+   "prompt": "The first question a baby would ask if it could talk"
+  },
+  {
+   "prompt": "What a shark says at the dentist"
+  },
+  {
+   "prompt": "A name for a boy band made of grandpas"
+  },
+  {
+   "prompt": "What the Knights of the Round Table actually talked about"
+  },
+  {
+   "prompt": "A fancy name for a dish made only of leftovers"
+  },
+  {
+   "prompt": "What you say when a bear asks you for directions"
+  },
+  {
+   "prompt": "The most boring roller coaster in the world is called …"
+  },
+  {
+   "prompt": "A new Olympic sport for couch potatoes"
+  },
+  {
+   "prompt": "What a Viking says at IKEA"
+  },
+  {
+   "prompt": "The most honest review of a one-star hotel"
+  },
+  {
+   "prompt": "What's in your primary school teacher's secret file"
+  },
+  {
+   "prompt": "A fridge magnet slogan that confuses people"
+  },
+  {
+   "prompt": "The worst moment to get hiccups"
+  },
+  {
+   "prompt": "What the tooth fairy does with all those teeth"
+  },
+  {
+   "prompt": "A name for a sauna for penguins"
+  },
+  {
+   "prompt": "What your smartphone would say if it could quit"
+  },
+  {
+   "prompt": "The strangest pet you could walk on a leash"
+  },
+  {
+   "prompt": "An ad slogan for an umbrella with a hole"
+  },
+  {
+   "prompt": "What knights wear under their armor"
+  },
+  {
+   "prompt": "The worst punchline for a joke"
+  },
+  {
+   "prompt": "The real reason the bus is never on time"
+  },
+  {
+   "prompt": "What sock monsters do with the stolen socks"
+  },
+  {
+   "prompt": "A pizza only aliens would order"
+  },
+  {
+   "prompt": "Something you should never write on a birthday cake"
+  },
+  {
+   "prompt": "The first law in a country run by kids"
+  },
+  {
+   "prompt": "What a lighthouse keeper does for fun"
+  },
+  {
+   "prompt": "The worst name for an airline"
+  },
+  {
+   "prompt": "A dance that will never go viral"
+  },
+  {
+   "prompt": "What your pillow knows about your dreams"
+  },
+  {
+   "prompt": "A rumor about the Easter Bunny"
+  },
+  {
+   "prompt": "What's written on the back of the Mona Lisa"
+  },
+  {
+   "prompt": "The worst song choice for karaoke night"
+  },
+  {
+   "prompt": "A sentence that instantly ends any video call"
+  },
+  {
+   "prompt": "What a dinosaur orders for breakfast"
+  },
+  {
+   "prompt": "A name for a workout program for lazy people"
+  },
+  {
+   "prompt": "Something you never want to find in an escape room"
+  },
+  {
+   "prompt": "The real reason cats knock things off tables"
+  },
+  {
+   "prompt": "An ad slogan for a time machine with a return ticket"
+  },
+  {
+   "prompt": "What's in a vampire's nightstand"
+  },
+  {
+   "prompt": "A hobby for someone who's immortal"
+  },
+  {
+   "prompt": "The rudest way to say goodbye"
+  },
+  {
+   "prompt": "What the Statue of Liberty really wanted to hold"
+  },
+  {
+   "prompt": "A new name for Monday"
+  },
+  {
+   "prompt": "The worst advice from a fortune cookie"
+  },
+  {
+   "prompt": "What a chef secretly puts in every dish"
+  },
+  {
+   "prompt": "An invention that makes getting up easier"
+  },
+  {
+   "prompt": "What a penguin wants on its gravestone"
+  },
+  {
+   "prompt": "A construction worker's favorite saying"
+  },
+  {
+   "prompt": "Why there are no fridges in the desert"
+  },
+  {
+   "prompt": "What a knight says when the dragon is on vacation"
+  },
+  {
+   "prompt": "A name for a restaurant that only serves soup"
+  },
+  {
+   "prompt": "What your GPS says when it's had enough"
+  },
+  {
+   "prompt": "A talk show where only pets are guests"
+  },
+  {
+   "prompt": "The newspaper headline when aliens land"
+  },
+  {
+   "prompt": "A bad idea for a tattoo"
+  },
+  {
+   "prompt": "What a sheep orders at the hairdresser"
+  },
+  {
+   "prompt": "The strangest excuse for calling in sick"
+  },
+  {
+   "prompt": "A song that makes plants grow faster"
+  },
+  {
+   "prompt": "What a detective finds in the fridge"
+  },
+  {
+   "prompt": "The name of a superhero whose only power is great parking"
+  },
+  {
+   "prompt": "What the captain of the Titanic actually meant to say"
+  },
+  {
+   "prompt": "The reason bananas are curved"
+  },
+  {
+   "prompt": "What the small print says when you build a house"
+  },
+  {
+   "prompt": "A new sport played with rubber ducks"
+  },
+  {
+   "prompt": "What you say to a ghost that won't move out"
+  },
+  {
+   "prompt": "A new school subject everyone would love"
+  },
+  {
+   "prompt": "What a toaster whispers to the bread"
+  },
+  {
+   "prompt": "The most inappropriate costume for a kid's birthday party"
+  },
+  {
+   "prompt": "A name for a hamster running for office"
+  },
+  {
+   "prompt": "What an astronaut forgot on the moon"
+  },
+  {
+   "prompt": "The worst reward for a hero"
+  },
+  {
+   "prompt": "What grandparents secretly do on the internet"
+  },
+  {
+   "prompt": "A new holiday just for cats"
+  },
+  {
+   "prompt": "Something a mountain climber must never forget to pack"
+  },
+  {
+   "prompt": "A sentence that saves any party"
+  },
+  {
+   "prompt": "What clouds think of each other"
+  },
+  {
+   "prompt": "An ad slogan for invisible paint"
+  },
+  {
+   "prompt": "The worst music for a horror movie"
+  },
+  {
+   "prompt": "What's in a letter to your future self"
+  },
+  {
+   "prompt": "A name for a band made entirely of kitchen appliances"
+  },
+  {
+   "prompt": "What a ghost says when negotiating a raise"
+  },
+  {
+   "prompt": "The strangest rule at a swimming pool"
+  },
+  {
+   "prompt": "What a parrot reveals after hearing too much"
+  },
+  {
+   "prompt": "A bad idea for a honeymoon"
+  },
+  {
+   "prompt": "A dish that's only served in fairy tales"
+  },
+  {
+   "prompt": "What your bicycle says about you"
+  },
+  {
+   "prompt": "The name of a beard shampoo for Santa"
+  },
+  {
+   "prompt": "Something you shouldn't say in a doctor's waiting room"
+  },
+  {
+   "prompt": "A tip for an unforgettable first date at the supermarket"
+  },
+  {
+   "prompt": "The most honest label on a chocolate bar"
+  },
+  {
+   "prompt": "What whales are actually singing about"
+  },
+  {
+   "prompt": "Why you should never bet against a squirrel"
+  },
+  {
+   "prompt": "The last line of a really bad detective novel"
+  },
+  {
+   "prompt": "A new party game that causes total chaos"
+  },
+  {
+   "prompt": "What dragons collect when they can't find gold"
+  },
+  {
+   "prompt": "The worst thing you can say to a chef"
+  }
+ ]
+}

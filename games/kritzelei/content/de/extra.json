@@ -1,0 +1,338 @@
+{
+ "name": "Extra",
+ "author": "UP!",
+ "version": "1.0.0",
+ "description": "Noch mehr schräge Zeichen-Aufgaben",
+ "items": [
+  {
+   "word": "Ein Löwe beim Friseur"
+  },
+  {
+   "word": "Fliegendes Sofa"
+  },
+  {
+   "word": "Ein Oktopus beim Abwaschen"
+  },
+  {
+   "word": "Gestresste Zitrone"
+  },
+  {
+   "word": "Ein Mammut auf Rollschuhen"
+  },
+  {
+   "word": "Schneemann im Hochsommer"
+  },
+  {
+   "word": "Ein Ritter, der Angst vor einer Maus hat"
+  },
+  {
+   "word": "Eine Kuh im Fahrstuhl"
+  },
+  {
+   "word": "Ein Flamingo beim Eishockey"
+  },
+  {
+   "word": "Mürrisches Croissant"
+  },
+  {
+   "word": "Ein Bagger beim Ballett"
+  },
+  {
+   "word": "Ein Kaninchen als Zauberer"
+  },
+  {
+   "word": "Eine Wolke, die Durst hat"
+  },
+  {
+   "word": "Ein Roboter, der Blumen gießt"
+  },
+  {
+   "word": "Ein Seepferdchen-Rennen"
+  },
+  {
+   "word": "Pommes beim Sonnenbaden"
+  },
+  {
+   "word": "Ein Bär, der Honig klaut"
+  },
+  {
+   "word": "Eine Eule mit Brille liest Zeitung"
+  },
+  {
+   "word": "Ein Kühlschrank mit Fernweh"
+  },
+  {
+   "word": "Ein Gorilla beim Stricken"
+  },
+  {
+   "word": "Ein Schloss aus Pudding"
+  },
+  {
+   "word": "Eine Ameise trägt ein Sandwich"
+  },
+  {
+   "word": "Ein Tintenfisch mit acht Kaffeebechern"
+  },
+  {
+   "word": "Wackelpudding im Erdbeben"
+  },
+  {
+   "word": "Eine Mumie beim Shoppen"
+  },
+  {
+   "word": "Ein Hahn mit Wecker"
+  },
+  {
+   "word": "Ein Kamel in der Antarktis"
+  },
+  {
+   "word": "Ein Zauberer, dessen Trick schiefgeht"
+  },
+  {
+   "word": "Eine Gitarre mit Zahnschmerzen"
+  },
+  {
+   "word": "Ein Hund jagt seinen Schwanz"
+  },
+  {
+   "word": "Eine Rakete aus Gemüse"
+  },
+  {
+   "word": "Ein Clown im Büro"
+  },
+  {
+   "word": "Ein Nilpferd im Tutu"
+  },
+  {
+   "word": "Eine Kerze beim Geburtstag, die nicht ausgehen will"
+  },
+  {
+   "word": "Ein Leuchtturm mit Sonnenbrand"
+  },
+  {
+   "word": "Ein Tiger, der sich vor einer Gurke erschreckt"
+  },
+  {
+   "word": "Ein Fahrrad mit Flügeln"
+  },
+  {
+   "word": "Ein Waschbär im Supermarkt"
+  },
+  {
+   "word": "Eine Kaffeetasse am Montagmorgen"
+  },
+  {
+   "word": "Ein Elch mit Lichterkette"
+  },
+  {
+   "word": "Ein Astronaut beim Angeln"
+  },
+  {
+   "word": "Ein Haus aus Büchern"
+  },
+  {
+   "word": "Eine Schnecke mit Wohnwagen"
+  },
+  {
+   "word": "Ein Papagei als Pilot"
+  },
+  {
+   "word": "Ein Hotdog im Schlafsack"
+  },
+  {
+   "word": "Ein Kängurubaby im Einkaufswagen"
+  },
+  {
+   "word": "Ein Gespenst mit Bettlaken-Problem"
+  },
+  {
+   "word": "Eine Biene im Stau"
+  },
+  {
+   "word": "Ein Riese, der Tee trinkt"
+  },
+  {
+   "word": "Ein Zebra ohne Streifen"
+  },
+  {
+   "word": "Ein U-Boot im Pool"
+  },
+  {
+   "word": "Ein Hamster im Laufrad-Wettkampf"
+  },
+  {
+   "word": "Ein Monster unter dem Bett, das Angst hat"
+  },
+  {
+   "word": "Ein Dackel, der sehr, sehr lang ist"
+  },
+  {
+   "word": "Ein Pinguin, der fliegen will"
+  },
+  {
+   "word": "Eine Glühbirne hat eine Idee"
+  },
+  {
+   "word": "Ein Vulkan, der niest"
+  },
+  {
+   "word": "Ein Taco auf Reisen"
+  },
+  {
+   "word": "Ein Huhn überquert die Straße"
+  },
+  {
+   "word": "Eine Mikrowelle beim Karaoke"
+  },
+  {
+   "word": "Ein Koala, der sich an eine Laterne klammert"
+  },
+  {
+   "word": "Ein Lama spuckt in die Kamera"
+  },
+  {
+   "word": "Ein Schneemann mit Föhn"
+  },
+  {
+   "word": "Ein Wurm mit Rucksack"
+  },
+  {
+   "word": "Ein Bauarbeiter baut eine Sandburg"
+  },
+  {
+   "word": "Eine Ente im Schaumbad"
+  },
+  {
+   "word": "Ein Feuerwehrauto, das Eis verkauft"
+  },
+  {
+   "word": "Ein Schaf zählt Menschen"
+  },
+  {
+   "word": "Ein Riesenkürbis als Kutsche"
+  },
+  {
+   "word": "Ein Hai mit Zahnseide"
+  },
+  {
+   "word": "Eine Bibliothek für Hunde"
+  },
+  {
+   "word": "Ein Gummibärchen im Fitnessstudio"
+  },
+  {
+   "word": "Ein Wikinger auf dem Tretboot"
+  },
+  {
+   "word": "Ein Seestern als Sheriff"
+  },
+  {
+   "word": "Ein Bett, das wegläuft"
+  },
+  {
+   "word": "Ein Marienkäfer mit zu vielen Punkten"
+  },
+  {
+   "word": "Ein Teekessel, der pfeift wie ein Schiedsrichter"
+  },
+  {
+   "word": "Ein Pirat mit Gummiente"
+  },
+  {
+   "word": "Ein Igel umarmt einen Luftballon"
+  },
+  {
+   "word": "Eine Mondlandung auf einem Käse"
+  },
+  {
+   "word": "Ein Elefant versteckt sich hinter einem Baum"
+  },
+  {
+   "word": "Ein Kuchen, der Kerzen ausbläst"
+  },
+  {
+   "word": "Ein Detektiv mit Lupe sucht seine Brille"
+  },
+  {
+   "word": "Ein Stuhl mit Muskelkater"
+  },
+  {
+   "word": "Ein Tukan mit Zahnbürste"
+  },
+  {
+   "word": "Eine Spinne strickt einen Pullover"
+  },
+  {
+   "word": "Ein Waffeleisen beim Tanzen"
+  },
+  {
+   "word": "Ein Delfin beim Seilspringen"
+  },
+  {
+   "word": "Ein Schornsteinfeger auf dem Regenbogen"
+  },
+  {
+   "word": "Ein Krake spielt Schlagzeug"
+  },
+  {
+   "word": "Ein Bär im Pyjama"
+  },
+  {
+   "word": "Ein fliegender Fisch mit Fallschirm"
+  },
+  {
+   "word": "Eine Wassermelone im Liegestuhl"
+  },
+  {
+   "word": "Ein Fuchs als Kellner"
+  },
+  {
+   "word": "Ein Wecker, der verschlafen hat"
+  },
+  {
+   "word": "Ein Turm aus Katzen"
+  },
+  {
+   "word": "Ein Dinosaurier im Museum, der lebt"
+  },
+  {
+   "word": "Ein Rentier mit Sonnenbrille"
+  },
+  {
+   "word": "Ein Sandwich mit Superkräften"
+  },
+  {
+   "word": "Eine Hexe mit Staubsauger statt Besen"
+  },
+  {
+   "word": "Ein Maulwurf mit Taschenlampe"
+  },
+  {
+   "word": "Ein Igel mit Luftmatratze"
+  },
+  {
+   "word": "Eine Brezel macht Yoga"
+  },
+  {
+   "word": "Ein Schwein, das fliegen kann"
+  },
+  {
+   "word": "Ein Eisbär mit Ventilator"
+  },
+  {
+   "word": "Ein Postbote, der vor einem Hund flieht"
+  },
+  {
+   "word": "Ein Zahn, der in den Urlaub fährt"
+  },
+  {
+   "word": "Ein Karton, der ein Raumschiff ist"
+  },
+  {
+   "word": "Eine Kuh springt über den Mond"
+  },
+  {
+   "word": "Ein Riesenrad aus Donuts"
+  }
+ ]
+}

@@ -2,6 +2,15 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.7.1
+
+- Deutlich mehr Inhalte (neues Paket „Extra“, Deutsch und Englisch):
+  - Schlagfertig: +119 Fragen (jetzt 199)
+  - Kritzelei: +110 Zeichen-Aufgaben (jetzt 180)
+  - Wer war's?: +60 Fragen (jetzt 100)
+  - Bluff: +30 wahre Fakten mit Quelle (jetzt 58)
+- Die Pakete lassen sich in den Einstellungen einzeln abschalten
+
 ## 0.7.0
 
 - Neues Spiel: Crash – rechtzeitig aussteigen, bevor der Multiplikator abstürzt (2–100 Spieler)

@@ -1,0 +1,403 @@
+{
+ "name": "Extra",
+ "author": "UP!",
+ "version": "1.0.0",
+ "description": "Noch mehr verrückte, aber wahre Fakten",
+ "items": [
+  {
+   "question": "Der Eiffelturm ist im Sommer bis zu ___ Zentimeter höher als im Winter.",
+   "answer": "15",
+   "alternatives": [
+    "fünfzehn"
+   ],
+   "decoys": [
+    "40",
+    "3",
+    "70"
+   ],
+   "source": "Wikipedia: Eiffel Tower (thermal expansion)"
+  },
+  {
+   "question": "In alten ___ Gräbern fand man jahrtausendealten Honig, der noch essbar war.",
+   "answer": "ägyptischen",
+   "alternatives": [
+    "Ägypten",
+    "pharaonischen"
+   ],
+   "decoys": [
+    "römischen",
+    "chinesischen",
+    "Wikinger-"
+   ],
+   "source": "Smithsonian Magazine: The Science Behind Honey's Eternal Shelf Life"
+  },
+  {
+   "question": "Die Zunge eines Blauwals wiegt ungefähr so viel wie ein ___.",
+   "answer": "Elefant",
+   "alternatives": [
+    "Elefanten"
+   ],
+   "decoys": [
+    "Pferd",
+    "Kleinwagen",
+    "Gorilla"
+   ],
+   "source": "NOAA Fisheries: Blue Whale"
+  },
+  {
+   "question": "Die Freiheitsstatue in New York war ein Geschenk aus ___.",
+   "answer": "Frankreich",
+   "alternatives": [
+    "France"
+   ],
+   "decoys": [
+    "England",
+    "Spanien",
+    "Italien"
+   ],
+   "source": "National Park Service: Statue of Liberty"
+  },
+  {
+   "question": "Kängurus können praktisch nicht ___ hüpfen.",
+   "answer": "rückwärts",
+   "alternatives": [
+    "nach hinten"
+   ],
+   "decoys": [
+    "seitwärts",
+    "im Wasser",
+    "bergab"
+   ],
+   "source": "Australian Geographic: kangaroo facts"
+  },
+  {
+   "question": "Der Planet mit den meisten bekannten Monden ist der ___.",
+   "answer": "Saturn",
+   "alternatives": [],
+   "decoys": [
+    "Jupiter",
+    "Neptun",
+    "Uranus"
+   ],
+   "source": "NASA: Saturn Moons"
+  },
+  {
+   "question": "Der kleinste Knochen des Menschen sitzt im ___.",
+   "answer": "Ohr",
+   "alternatives": [
+    "Mittelohr",
+    "Innenohr"
+   ],
+   "decoys": [
+    "kleinen Zeh",
+    "Finger",
+    "Nase"
+   ],
+   "source": "Wikipedia: Stapes"
+  },
+  {
+   "question": "Der Name LEGO kommt vom dänischen „leg godt“ und bedeutet ___.",
+   "answer": "spiel gut",
+   "alternatives": [
+    "spiel schön",
+    "gut spielen"
+   ],
+   "decoys": [
+    "bau mehr",
+    "kleine Steine",
+    "bunte Welt"
+   ],
+   "source": "LEGO Group: The LEGO Group History"
+  },
+  {
+   "question": "Flamingos sind rosa wegen ihres ___.",
+   "answer": "Futters",
+   "alternatives": [
+    "Essens",
+    "Futter",
+    "Nahrung",
+    "Krebstiere"
+   ],
+   "decoys": [
+    "Sonnenbrands",
+    "Blutes",
+    "Gefieder-Öls"
+   ],
+   "source": "National Geographic: Flamingo"
+  },
+  {
+   "question": "Wild lebende Pinguine gibt es fast nur auf der ___.",
+   "answer": "Südhalbkugel",
+   "alternatives": [
+    "Süd-Halbkugel",
+    "südlichen Halbkugel"
+   ],
+   "decoys": [
+    "Nordhalbkugel",
+    "Arktis",
+    "Westhalbkugel"
+   ],
+   "source": "Wikipedia: Penguin"
+  },
+  {
+   "question": "Seekühe sind am nächsten mit ___ verwandt.",
+   "answer": "Elefanten",
+   "alternatives": [
+    "Elefant"
+   ],
+   "decoys": [
+    "Robben",
+    "Walen",
+    "Flusspferden"
+   ],
+   "source": "Wikipedia: Sirenia"
+  },
+  {
+   "question": "Die nächsten lebenden Verwandten der Wale sind die ___.",
+   "answer": "Flusspferde",
+   "alternatives": [
+    "Nilpferde",
+    "Flusspferd"
+   ],
+   "decoys": [
+    "Robben",
+    "Haie",
+    "Seekühe"
+   ],
+   "source": "Wikipedia: Whippomorpha"
+  },
+  {
+   "question": "Die Limonade Fanta wurde ursprünglich in ___ erfunden.",
+   "answer": "Deutschland",
+   "alternatives": [
+    "Germany"
+   ],
+   "decoys": [
+    "Italien",
+    "Spanien",
+    "den USA"
+   ],
+   "source": "Wikipedia: Fanta"
+  },
+  {
+   "question": "Das Spiel Tetris wurde in der ___ entwickelt.",
+   "answer": "Sowjetunion",
+   "alternatives": [
+    "UdSSR",
+    "Russland"
+   ],
+   "decoys": [
+    "DDR",
+    "Japan",
+    "Schweiz"
+   ],
+   "source": "Wikipedia: Tetris"
+  },
+  {
+   "question": "Der höchste Berg im Sonnensystem, Olympus Mons, steht auf dem ___.",
+   "answer": "Mars",
+   "alternatives": [],
+   "decoys": [
+    "Mond",
+    "Venus",
+    "Jupitermond Io"
+   ],
+   "source": "NASA: Olympus Mons"
+  },
+  {
+   "question": "Ein Blitz ist etwa ___ Mal heißer als die Oberfläche der Sonne.",
+   "answer": "fünf",
+   "alternatives": [
+    "5"
+   ],
+   "decoys": [
+    "zwei",
+    "zehn",
+    "hundert"
+   ],
+   "source": "NOAA National Weather Service: Lightning facts"
+  },
+  {
+   "question": "Schmetterlinge schmecken mit ihren ___.",
+   "answer": "Füßen",
+   "alternatives": [
+    "Beinen",
+    "Füssen"
+   ],
+   "decoys": [
+    "Flügeln",
+    "Fühlern",
+    "Augen"
+   ],
+   "source": "Library of Congress: How do butterflies taste?"
+  },
+  {
+   "question": "Haie gab es schon lange vor den ersten ___.",
+   "answer": "Bäumen",
+   "alternatives": [
+    "Baum"
+   ],
+   "decoys": [
+    "Insekten",
+    "Fischen",
+    "Korallen"
+   ],
+   "source": "Natural History Museum: sharks older than trees"
+  },
+  {
+   "question": "Nur zwei Länder haben eine quadratische Flagge: der Vatikan und die ___.",
+   "answer": "Schweiz",
+   "alternatives": [],
+   "decoys": [
+    "Mongolei",
+    "Niederlande",
+    "Malediven"
+   ],
+   "source": "Wikipedia: Flag of Switzerland"
+  },
+  {
+   "question": "Das Wort „Muskel“ kommt vom lateinischen Wort für ___.",
+   "answer": "Mäuschen",
+   "alternatives": [
+    "kleine Maus",
+    "Maus"
+   ],
+   "decoys": [
+    "Stärke",
+    "Knoten",
+    "Faden"
+   ],
+   "source": "Etymonline: muscle"
+  },
+  {
+   "question": "Ratten geben lachähnliche Laute von sich, wenn man sie ___.",
+   "answer": "kitzelt",
+   "alternatives": [
+    "kitzeln"
+   ],
+   "decoys": [
+    "füttert",
+    "streichelt",
+    "anschreit"
+   ],
+   "source": "Science (2016): Rats laugh when tickled"
+  },
+  {
+   "question": "Ein Jahr auf dem Neptun dauert ungefähr ___ Erdjahre.",
+   "answer": "165",
+   "alternatives": [
+    "hundertfünfundsechzig"
+   ],
+   "decoys": [
+    "12",
+    "84",
+    "500"
+   ],
+   "source": "NASA: Neptune facts"
+  },
+  {
+   "question": "Die erste Webcam der Welt filmte eine ___.",
+   "answer": "Kaffeemaschine",
+   "alternatives": [
+    "Kaffeekanne"
+   ],
+   "decoys": [
+    "Katze",
+    "Ampel",
+    "Aquarium"
+   ],
+   "source": "Wikipedia: Trojan Room coffee pot"
+  },
+  {
+   "question": "Elefanten gehören zu den wenigen Säugetieren, die nicht ___ können.",
+   "answer": "springen",
+   "alternatives": [
+    "hüpfen"
+   ],
+   "decoys": [
+    "schwimmen",
+    "rückwärts gehen",
+    "liegen"
+   ],
+   "source": "Smithsonian's National Zoo: elephant facts"
+  },
+  {
+   "question": "Unter ihrem weißen Fell haben Eisbären ___ Haut.",
+   "answer": "schwarze",
+   "alternatives": [
+    "schwarz",
+    "dunkle"
+   ],
+   "decoys": [
+    "rosa",
+    "blaue",
+    "durchsichtige"
+   ],
+   "source": "Polar Bears International: Polar bear facts"
+  },
+  {
+   "question": "Ein Apfel schwimmt im Wasser, weil er etwa zu einem Viertel aus ___ besteht.",
+   "answer": "Luft",
+   "alternatives": [],
+   "decoys": [
+    "Fett",
+    "Zucker",
+    "Schaum"
+   ],
+   "source": "Library of Congress: Why do apples float?"
+  },
+  {
+   "question": "Ein Faultier kann bis zu ___ Minuten lang die Luft anhalten.",
+   "answer": "40",
+   "alternatives": [
+    "vierzig"
+   ],
+   "decoys": [
+    "5",
+    "15",
+    "90"
+   ],
+   "source": "WWF: Sloth facts"
+  },
+  {
+   "question": "Giraffen haben genauso viele Halswirbel wie ___.",
+   "answer": "Menschen",
+   "alternatives": [
+    "der Mensch",
+    "wir"
+   ],
+   "decoys": [
+    "Schwäne",
+    "Pferde",
+    "Schlangen"
+   ],
+   "source": "Smithsonian's National Zoo: Giraffe"
+  },
+  {
+   "question": "Die Kiwi hieß früher „Chinesische ___“.",
+   "answer": "Stachelbeere",
+   "alternatives": [
+    "Stachelbeeren"
+   ],
+   "decoys": [
+    "Pflaume",
+    "Feige",
+    "Kartoffel"
+   ],
+   "source": "Wikipedia: Kiwifruit"
+  },
+  {
+   "question": "Der US-Amerikaner Charles Osborne hatte 68 Jahre lang ___.",
+   "answer": "Schluckauf",
+   "alternatives": [
+    "einen Schluckauf"
+   ],
+   "decoys": [
+    "Bauchweh",
+    "Pech",
+    "Heimweh"
+   ],
+   "source": "Guinness World Records: Longest attack of hiccups"
+  }
+ ]
+}

@@ -1,0 +1,365 @@
+{
+ "name": "Extra",
+ "author": "UP!",
+ "version": "1.0.0",
+ "description": "Noch mehr schräge Fragen",
+ "items": [
+  {
+   "prompt": "Der schlechteste Name für ein Restaurant mit Sternekoch"
+  },
+  {
+   "prompt": "Was ein Staubsauger träumt"
+  },
+  {
+   "prompt": "Das Erste, was du sagst, wenn du einem Einhorn begegnest"
+  },
+  {
+   "prompt": "Ein Werbespruch für Wasser ohne Geschmack"
+  },
+  {
+   "prompt": "Was dein Haustier hinter deinem Rücken über dich erzählt"
+  },
+  {
+   "prompt": "Ein Schild, das man nie an einer Haustür sehen will"
+  },
+  {
+   "prompt": "Die schlechteste Durchsage im Flugzeug"
+  },
+  {
+   "prompt": "Ein neuer Name für Brokkoli, damit Kinder ihn essen"
+  },
+  {
+   "prompt": "Was in der Gebrauchsanweisung für Montage steht"
+  },
+  {
+   "prompt": "Der wahre Grund, warum Zebras gestreift sind"
+  },
+  {
+   "prompt": "Ein Song, den man nie bei einer Hochzeit spielen sollte"
+  },
+  {
+   "prompt": "Was ein Kaktus sagt, wenn er umarmt werden will"
+  },
+  {
+   "prompt": "Der unpassendste Satz bei einer Beerdigung eines Goldfischs"
+  },
+  {
+   "prompt": "Die schlechteste Geschäftsidee aller Zeiten"
+  },
+  {
+   "prompt": "Was der Nachbar wirklich in seiner Garage macht"
+  },
+  {
+   "prompt": "Ein Titel für einen Actionfilm über Rentner"
+  },
+  {
+   "prompt": "Das peinlichste, was dir beim Bewerbungsgespräch passieren kann"
+  },
+  {
+   "prompt": "Was Schneemänner im Sommer machen"
+  },
+  {
+   "prompt": "Ein neuer Geschmack für Zahnpasta"
+  },
+  {
+   "prompt": "Was auf dem T-Shirt eines Superschurken im Urlaub steht"
+  },
+  {
+   "prompt": "Das schlechteste Passwort der Welt"
+  },
+  {
+   "prompt": "Ein Grund, warum die Erde eigentlich eine Scheibe ist"
+  },
+  {
+   "prompt": "Was man auf keinen Fall in eine Kontaktanzeige schreiben sollte"
+  },
+  {
+   "prompt": "Die erste Frage, die ein Baby stellen würde, wenn es sprechen könnte"
+  },
+  {
+   "prompt": "Was ein Hai beim Zahnarzt sagt"
+  },
+  {
+   "prompt": "Ein Name für eine Boyband aus Opas"
+  },
+  {
+   "prompt": "Was die Ritter der Tafelrunde wirklich besprochen haben"
+  },
+  {
+   "prompt": "Ein Gericht, das nur aus Resten besteht, mit einem schicken Namen"
+  },
+  {
+   "prompt": "Was du sagst, wenn dich ein Bär im Wald nach dem Weg fragt"
+  },
+  {
+   "prompt": "Die langweiligste Achterbahn der Welt heißt …"
+  },
+  {
+   "prompt": "Ein neues olympisches Fach für Couch-Potatoes"
+  },
+  {
+   "prompt": "Was ein Wikinger bei IKEA sagt"
+  },
+  {
+   "prompt": "Die ehrlichste Bewertung für ein Hotel mit einem Stern"
+  },
+  {
+   "prompt": "Was in der Geheimakte deiner Grundschullehrerin steht"
+  },
+  {
+   "prompt": "Ein Spruch für einen Kühlschrankmagneten, der Leute verwirrt"
+  },
+  {
+   "prompt": "Der schlechteste Moment, um Schluckauf zu bekommen"
+  },
+  {
+   "prompt": "Was die Zahnfee mit all den Zähnen macht"
+  },
+  {
+   "prompt": "Ein Name für eine Sauna für Pinguine"
+  },
+  {
+   "prompt": "Was ein Smartphone sagen würde, wenn es kündigen könnte"
+  },
+  {
+   "prompt": "Das seltsamste Haustier, das man an der Leine ausführen kann"
+  },
+  {
+   "prompt": "Ein Werbeslogan für einen Regenschirm mit Loch"
+  },
+  {
+   "prompt": "Was Ritter unter ihrer Rüstung tragen"
+  },
+  {
+   "prompt": "Die schlechteste Pointe für einen Witz"
+  },
+  {
+   "prompt": "Ein Grund, warum der Bus nie pünktlich kommt"
+  },
+  {
+   "prompt": "Was Sockenmonster mit den geklauten Socken machen"
+  },
+  {
+   "prompt": "Eine Pizza, die nur Außerirdische bestellen würden"
+  },
+  {
+   "prompt": "Was man nie auf einen Geburtstagskuchen schreiben sollte"
+  },
+  {
+   "prompt": "Das erste Gesetz in einem Land, das von Kindern regiert wird"
+  },
+  {
+   "prompt": "Was ein Leuchtturmwärter in seiner Freizeit macht"
+  },
+  {
+   "prompt": "Der schlechteste Name für eine Fluggesellschaft"
+  },
+  {
+   "prompt": "Ein Tanz, der garantiert nie viral geht"
+  },
+  {
+   "prompt": "Was dein Kopfkissen über deine Träume weiß"
+  },
+  {
+   "prompt": "Ein Gerücht über den Osterhasen"
+  },
+  {
+   "prompt": "Was auf der Rückseite der Mona Lisa steht"
+  },
+  {
+   "prompt": "Die schlimmste Wahl für eine Karaoke-Nacht"
+  },
+  {
+   "prompt": "Ein Satz, der jede Videokonferenz sofort beendet"
+  },
+  {
+   "prompt": "Was ein Dinosaurier zum Frühstück bestellt"
+  },
+  {
+   "prompt": "Ein Name für ein Fitnessprogramm für Faule"
+  },
+  {
+   "prompt": "Was man in einem Escape Room nie finden möchte"
+  },
+  {
+   "prompt": "Der wahre Grund, warum Katzen Dinge vom Tisch werfen"
+  },
+  {
+   "prompt": "Ein Werbeslogan für eine Zeitmaschine mit Rückfahrschein"
+  },
+  {
+   "prompt": "Was im Nachtschrank eines Vampirs liegt"
+  },
+  {
+   "prompt": "Ein Hobby für jemanden, der unsterblich ist"
+  },
+  {
+   "prompt": "Die unhöflichste Art, sich zu verabschieden"
+  },
+  {
+   "prompt": "Was die Freiheitsstatue wirklich in der Hand halten wollte"
+  },
+  {
+   "prompt": "Ein neuer Name für den Montag"
+  },
+  {
+   "prompt": "Der schlechteste Ratschlag von einem Glückskeks"
+  },
+  {
+   "prompt": "Was ein Koch heimlich in jedes Gericht tut"
+  },
+  {
+   "prompt": "Eine Erfindung, die das Aufstehen leichter macht"
+  },
+  {
+   "prompt": "Was ein Pinguin auf seinen Grabstein schreiben lässt"
+  },
+  {
+   "prompt": "Ein Lieblingssatz von Bauarbeitern"
+  },
+  {
+   "prompt": "Der Grund, warum es keine Kühlschränke in der Wüste gibt"
+  },
+  {
+   "prompt": "Was ein Ritter sagt, wenn der Drache Urlaub hat"
+  },
+  {
+   "prompt": "Ein Name für ein Restaurant, in dem nur Suppe serviert wird"
+  },
+  {
+   "prompt": "Was dein Navi sagt, wenn es keine Lust mehr hat"
+  },
+  {
+   "prompt": "Eine Talkshow, in der nur Haustiere zu Gast sind"
+  },
+  {
+   "prompt": "Was in der Zeitung steht, wenn Aliens landen"
+  },
+  {
+   "prompt": "Eine schlechte Idee für ein Tattoo"
+  },
+  {
+   "prompt": "Was ein Schaf beim Friseur bestellt"
+  },
+  {
+   "prompt": "Der seltsamste Grund für eine Krankmeldung"
+  },
+  {
+   "prompt": "Ein Lied, das Pflanzen schneller wachsen lässt"
+  },
+  {
+   "prompt": "Was ein Detektiv im Kühlschrank findet"
+  },
+  {
+   "prompt": "Der Name eines Superhelden, dessen einzige Kraft gutes Parken ist"
+  },
+  {
+   "prompt": "Was der Kapitän der Titanic eigentlich sagen wollte"
+  },
+  {
+   "prompt": "Ein Grund, warum Bananen krumm sind"
+  },
+  {
+   "prompt": "Was im Kleingedruckten beim Hausbau steht"
+  },
+  {
+   "prompt": "Eine neue Sportart mit Gummienten"
+  },
+  {
+   "prompt": "Was man zu einem Geist sagt, der nicht ausziehen will"
+  },
+  {
+   "prompt": "Ein neues Schulfach, das alle lieben würden"
+  },
+  {
+   "prompt": "Was ein Toaster einem Brot ins Ohr flüstert"
+  },
+  {
+   "prompt": "Das unpassendste Kostüm für einen Kindergeburtstag"
+  },
+  {
+   "prompt": "Ein Name für einen Hamster, der in die Politik geht"
+  },
+  {
+   "prompt": "Was ein Astronaut auf dem Mond vergessen hat"
+  },
+  {
+   "prompt": "Die schlechteste Belohnung für einen Helden"
+  },
+  {
+   "prompt": "Was die Großeltern heimlich im Internet machen"
+  },
+  {
+   "prompt": "Ein neuer Feiertag nur für Katzen"
+  },
+  {
+   "prompt": "Was im Rucksack eines Bergsteigers auf keinen Fall fehlen darf"
+  },
+  {
+   "prompt": "Ein Satz, mit dem man jede Party rettet"
+  },
+  {
+   "prompt": "Was Wolken voneinander denken"
+  },
+  {
+   "prompt": "Ein Werbespruch für unsichtbare Farbe"
+  },
+  {
+   "prompt": "Die schlechteste Musik für einen Horrorfilm"
+  },
+  {
+   "prompt": "Was in einem Brief an dein zukünftiges Ich steht"
+  },
+  {
+   "prompt": "Ein Name für eine Band, die nur aus Küchengeräten besteht"
+  },
+  {
+   "prompt": "Was ein Gespenst bei einer Gehaltsverhandlung sagt"
+  },
+  {
+   "prompt": "Die seltsamste Regel in einem Schwimmbad"
+  },
+  {
+   "prompt": "Was ein Papagei verrät, wenn er zu viel gehört hat"
+  },
+  {
+   "prompt": "Eine schlechte Idee für eine Hochzeitsreise"
+  },
+  {
+   "prompt": "Ein Gericht, das nur in Märchen serviert wird"
+  },
+  {
+   "prompt": "Was dein Fahrrad über dich erzählt"
+  },
+  {
+   "prompt": "Der Name eines Shampoos für Bärte von Weihnachtsmännern"
+  },
+  {
+   "prompt": "Was man im Wartezimmer beim Arzt besser nicht sagt"
+  },
+  {
+   "prompt": "Ein Tipp für ein unvergessliches erstes Date im Supermarkt"
+  },
+  {
+   "prompt": "Das ehrlichste Etikett auf einer Schokoladentafel"
+  },
+  {
+   "prompt": "Was ein Wal beim Singen eigentlich singt"
+  },
+  {
+   "prompt": "Ein Grund, warum man nie mit Eichhörnchen wetten sollte"
+  },
+  {
+   "prompt": "Was der letzte Satz in einem sehr schlechten Krimi ist"
+  },
+  {
+   "prompt": "Ein neues Spiel für den Kindergeburtstag mit großem Chaos"
+  },
+  {
+   "prompt": "Was Drachen sammeln, wenn sie kein Gold finden"
+  },
+  {
+   "prompt": "Der schlimmste Satz, den man einem Koch sagen kann"
+  }
+ ]
+}

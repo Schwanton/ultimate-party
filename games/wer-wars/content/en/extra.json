@@ -1,0 +1,248 @@
+{
+ "name": "Extra",
+ "author": "UP!",
+ "version": "1.0.0",
+ "description": "Even more personal questions",
+ "items": [
+  {
+   "id": "wx1",
+   "question": "What's the strangest thing you've ever eaten?"
+  },
+  {
+   "id": "wx2",
+   "question": "Which movie can you quote word for word?"
+  },
+  {
+   "id": "wx3",
+   "question": "What was your favorite toy as a kid?"
+  },
+  {
+   "id": "wx4",
+   "question": "What would you get up at 4 a.m. for?"
+  },
+  {
+   "id": "wx5",
+   "question": "What's your weirdest habit?"
+  },
+  {
+   "id": "wx6",
+   "question": "What song do you sing in the shower?"
+  },
+  {
+   "id": "wx7",
+   "question": "What was your worst vacation?"
+  },
+  {
+   "id": "wx8",
+   "question": "What item do you constantly lose?"
+  },
+  {
+   "id": "wx9",
+   "question": "What's your favorite midnight snack?"
+  },
+  {
+   "id": "wx10",
+   "question": "Which useless superpower would you like to have?"
+  },
+  {
+   "id": "wx11",
+   "question": "What's the first thing you do in the morning?"
+  },
+  {
+   "id": "wx12",
+   "question": "Which smell reminds you of your childhood?"
+  },
+  {
+   "id": "wx13",
+   "question": "What's the weirdest gift you've ever received?"
+  },
+  {
+   "id": "wx14",
+   "question": "What do you have way too many of at home?"
+  },
+  {
+   "id": "wx15",
+   "question": "What's your worst joke?"
+  },
+  {
+   "id": "wx16",
+   "question": "What piece of clothing do you still wear even though it's worn out?"
+  },
+  {
+   "id": "wx17",
+   "question": "What food do you hate that everyone else loves?"
+  },
+  {
+   "id": "wx18",
+   "question": "What was your first concert?"
+  },
+  {
+   "id": "wx19",
+   "question": "What's your Wi-Fi called – or what would you call it?"
+  },
+  {
+   "id": "wx20",
+   "question": "What's your favorite emoji?"
+  },
+  {
+   "id": "wx21",
+   "question": "What's the longest you've gone without your phone?"
+  },
+  {
+   "id": "wx22",
+   "question": "Which game did you always win as a kid?"
+  },
+  {
+   "id": "wx23",
+   "question": "What would you do if you were invisible for a day?"
+  },
+  {
+   "id": "wx24",
+   "question": "What's your favorite word?"
+  },
+  {
+   "id": "wx25",
+   "question": "Which pet did you have – or always want?"
+  },
+  {
+   "id": "wx26",
+   "question": "What's the craziest thing you've done for love?"
+  },
+  {
+   "id": "wx27",
+   "question": "Which mistake do you keep making?"
+  },
+  {
+   "id": "wx28",
+   "question": "What's your favorite place in your town?"
+  },
+  {
+   "id": "wx29",
+   "question": "What did you last google?"
+  },
+  {
+   "id": "wx30",
+   "question": "Which talent do you wish you had?"
+  },
+  {
+   "id": "wx31",
+   "question": "What was your most unusual side job?"
+  },
+  {
+   "id": "wx32",
+   "question": "What do you do wrong on purpose?"
+  },
+  {
+   "id": "wx33",
+   "question": "What invention is the world still missing?"
+  },
+  {
+   "id": "wx34",
+   "question": "What has been the best day of your life so far?"
+  },
+  {
+   "id": "wx35",
+   "question": "What could you talk about for hours?"
+  },
+  {
+   "id": "wx36",
+   "question": "What's your best money-saving tip?"
+  },
+  {
+   "id": "wx37",
+   "question": "Which plant have you killed?"
+  },
+  {
+   "id": "wx38",
+   "question": "What's at the top of your bucket list?"
+  },
+  {
+   "id": "wx39",
+   "question": "What do you eat when you're sad?"
+  },
+  {
+   "id": "wx40",
+   "question": "Which teacher do you remember most – and why?"
+  },
+  {
+   "id": "wx41",
+   "question": "What's your silliest accident?"
+  },
+  {
+   "id": "wx42",
+   "question": "What's your favorite smell?"
+  },
+  {
+   "id": "wx43",
+   "question": "Which celebrity have you met (or almost met)?"
+  },
+  {
+   "id": "wx44",
+   "question": "How would you spend a free day with no obligations?"
+  },
+  {
+   "id": "wx45",
+   "question": "Which word can you never pronounce right?"
+  },
+  {
+   "id": "wx46",
+   "question": "What's your favorite board game?"
+  },
+  {
+   "id": "wx47",
+   "question": "Which household chore do you hate most?"
+  },
+  {
+   "id": "wx48",
+   "question": "What did you collect as a kid?"
+  },
+  {
+   "id": "wx49",
+   "question": "What was your most expensive bad purchase?"
+  },
+  {
+   "id": "wx50",
+   "question": "What's your oddest superstition?"
+  },
+  {
+   "id": "wx51",
+   "question": "Which place disappointed you the most?"
+  },
+  {
+   "id": "wx52",
+   "question": "Which song makes you dance instantly?"
+  },
+  {
+   "id": "wx53",
+   "question": "What would you never eat again?"
+  },
+  {
+   "id": "wx54",
+   "question": "What would you name a boat?"
+  },
+  {
+   "id": "wx55",
+   "question": "What's the most childish thing you still do?"
+  },
+  {
+   "id": "wx56",
+   "question": "What was your first thought this morning?"
+  },
+  {
+   "id": "wx57",
+   "question": "Which TV show would you like to live in?"
+  },
+  {
+   "id": "wx58",
+   "question": "Which sound do you hate?"
+  },
+  {
+   "id": "wx59",
+   "question": "What's your best life advice in one sentence?"
+  },
+  {
+   "id": "wx60",
+   "question": "What would you hide in a time capsule?"
+  }
+ ]
+}

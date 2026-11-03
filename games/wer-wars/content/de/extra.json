@@ -1,0 +1,248 @@
+{
+ "name": "Extra",
+ "author": "UP!",
+ "version": "1.0.0",
+ "description": "Noch mehr persönliche Fragen",
+ "items": [
+  {
+   "id": "wx1",
+   "question": "Was ist das Seltsamste, das du je gegessen hast?"
+  },
+  {
+   "id": "wx2",
+   "question": "Welchen Film kannst du mitsprechen?"
+  },
+  {
+   "id": "wx3",
+   "question": "Was war dein liebstes Spielzeug als Kind?"
+  },
+  {
+   "id": "wx4",
+   "question": "Wofür würdest du um 4 Uhr nachts aufstehen?"
+  },
+  {
+   "id": "wx5",
+   "question": "Was ist deine merkwürdigste Angewohnheit?"
+  },
+  {
+   "id": "wx6",
+   "question": "Welches Lied singst du unter der Dusche?"
+  },
+  {
+   "id": "wx7",
+   "question": "Was war dein schlimmster Urlaub?"
+  },
+  {
+   "id": "wx8",
+   "question": "Welchen Gegenstand verlierst du ständig?"
+  },
+  {
+   "id": "wx9",
+   "question": "Was ist dein Lieblingssnack um Mitternacht?"
+  },
+  {
+   "id": "wx10",
+   "question": "Welche Superkraft hättest du gerne – aber eine nutzlose?"
+  },
+  {
+   "id": "wx11",
+   "question": "Was ist das Erste, das du morgens machst?"
+  },
+  {
+   "id": "wx12",
+   "question": "Welcher Geruch erinnert dich an deine Kindheit?"
+  },
+  {
+   "id": "wx13",
+   "question": "Was ist dein seltsamstes Geschenk, das du bekommen hast?"
+  },
+  {
+   "id": "wx14",
+   "question": "Wovon hast du viel zu viele zu Hause?"
+  },
+  {
+   "id": "wx15",
+   "question": "Was ist dein schlechtester Witz?"
+  },
+  {
+   "id": "wx16",
+   "question": "Welche Kleidung trägst du, obwohl sie längst kaputt ist?"
+  },
+  {
+   "id": "wx17",
+   "question": "Welches Essen hasst du, obwohl es alle lieben?"
+  },
+  {
+   "id": "wx18",
+   "question": "Was war dein erstes Konzert?"
+  },
+  {
+   "id": "wx19",
+   "question": "Wie heißt dein WLAN – oder wie würde es heißen?"
+  },
+  {
+   "id": "wx20",
+   "question": "Was ist dein liebstes Emoji?"
+  },
+  {
+   "id": "wx21",
+   "question": "Was ist die längste Zeit, die du ohne Handy warst?"
+  },
+  {
+   "id": "wx22",
+   "question": "Welches Spiel hast du als Kind immer gewonnen?"
+  },
+  {
+   "id": "wx23",
+   "question": "Was würdest du tun, wenn du einen Tag unsichtbar wärst?"
+  },
+  {
+   "id": "wx24",
+   "question": "Was ist dein Lieblingswort?"
+  },
+  {
+   "id": "wx25",
+   "question": "Welches Tier hattest du – oder wolltest du immer haben?"
+  },
+  {
+   "id": "wx26",
+   "question": "Was ist das Verrückteste, das du für Liebe getan hast?"
+  },
+  {
+   "id": "wx27",
+   "question": "Welchen Fehler machst du immer wieder?"
+  },
+  {
+   "id": "wx28",
+   "question": "Was ist dein Lieblingsort in deiner Stadt?"
+  },
+  {
+   "id": "wx29",
+   "question": "Was hast du zuletzt gegoogelt?"
+  },
+  {
+   "id": "wx30",
+   "question": "Welches Talent hättest du gerne?"
+  },
+  {
+   "id": "wx31",
+   "question": "Was war dein ungewöhnlichster Nebenjob?"
+  },
+  {
+   "id": "wx32",
+   "question": "Welche Sache machst du absichtlich falsch?"
+  },
+  {
+   "id": "wx33",
+   "question": "Welche Erfindung fehlt der Welt noch?"
+  },
+  {
+   "id": "wx34",
+   "question": "Was war der schönste Tag deines Lebens bisher?"
+  },
+  {
+   "id": "wx35",
+   "question": "Worüber kannst du stundenlang reden?"
+  },
+  {
+   "id": "wx36",
+   "question": "Was ist dein bester Spartipp?"
+  },
+  {
+   "id": "wx37",
+   "question": "Welche Pflanze hast du schon umgebracht?"
+  },
+  {
+   "id": "wx38",
+   "question": "Was steht ganz oben auf deiner Löffelliste?"
+  },
+  {
+   "id": "wx39",
+   "question": "Was isst du, wenn du traurig bist?"
+  },
+  {
+   "id": "wx40",
+   "question": "Welcher Lehrer ist dir am meisten in Erinnerung geblieben – und warum?"
+  },
+  {
+   "id": "wx41",
+   "question": "Was ist dein dümmster Unfall?"
+  },
+  {
+   "id": "wx42",
+   "question": "Was ist dein Lieblingsgeruch?"
+  },
+  {
+   "id": "wx43",
+   "question": "Welchen Promi hast du schon mal getroffen (oder fast)?"
+  },
+  {
+   "id": "wx44",
+   "question": "Wie würdest du einen freien Tag ohne Pflichten verbringen?"
+  },
+  {
+   "id": "wx45",
+   "question": "Welches Wort kannst du einfach nicht richtig aussprechen?"
+  },
+  {
+   "id": "wx46",
+   "question": "Was ist dein Lieblings-Brettspiel?"
+  },
+  {
+   "id": "wx47",
+   "question": "Welche Aufgabe im Haushalt hasst du am meisten?"
+  },
+  {
+   "id": "wx48",
+   "question": "Was hast du als Kind gesammelt?"
+  },
+  {
+   "id": "wx49",
+   "question": "Was war deine teuerste Fehlinvestition?"
+  },
+  {
+   "id": "wx50",
+   "question": "Was ist dein seltsamster Aberglaube?"
+  },
+  {
+   "id": "wx51",
+   "question": "Welcher Ort hat dich am meisten enttäuscht?"
+  },
+  {
+   "id": "wx52",
+   "question": "Welches Lied bringt dich sofort zum Tanzen?"
+  },
+  {
+   "id": "wx53",
+   "question": "Was würdest du nie wieder essen?"
+  },
+  {
+   "id": "wx54",
+   "question": "Welchen Namen würdest du einem Boot geben?"
+  },
+  {
+   "id": "wx55",
+   "question": "Was ist das Kindischste, das du immer noch machst?"
+  },
+  {
+   "id": "wx56",
+   "question": "Was war dein erster Gedanke heute Morgen?"
+  },
+  {
+   "id": "wx57",
+   "question": "Welche Fernsehserie würdest du gern betreten?"
+  },
+  {
+   "id": "wx58",
+   "question": "Welches Geräusch hasst du?"
+  },
+  {
+   "id": "wx59",
+   "question": "Was ist dein bester Lebensrat in einem Satz?"
+  },
+  {
+   "id": "wx60",
+   "question": "Was würdest du in einer Zeitkapsel verstecken?"
+  }
+ ]
+}
