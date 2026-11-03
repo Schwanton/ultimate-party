@@ -103,14 +103,39 @@ function HostGraph({ view, t, player, room }: HostViewProps) {
   const many = view.players.length > 12;
   const color = boom ? FALL : mix(multColor(m).startsWith('#') ? multColor(m) : '#FFFFFF', FALL, Math.min(1, fall * 1.4));
 
-  // Klänge: Puls (steigt mit dem Kurs, beim Fallen tief und bedrohlich), Klingeln beim Aussteigen, Knall beim Crash
-  const lastBlip = useRef(0);
+  // Klänge: Spannung, die immer weiter steigt – Herzschlag wird schneller, nach und nach kommen
+  // Hi-Hat, Bass und eine hohe Melodie dazu. Fällt der Kurs: tiefes, schiefes Dröhnen.
+  const lastBeat = useRef(0);
+  const beat = useRef(0);
   useEffect(() => {
-    if (crashed || now - lastBlip.current < (fall > 0.2 ? 180 : 260)) return;
-    lastBlip.current = now;
-    if (fall > 0.2) sfx.custom((s) => s.tone(160 - fall * 60, 0.16, { type: 'sawtooth', vol: 0.05 + fall * 0.08, to: 70 }));
-    else sfx.custom((s) => s.tone(200 * Math.sqrt(Math.max(0.5, m)), 0.07, { type: 'square', vol: 0.05 }));
-  }, [now, crashed, m, fall]);
+    if (crashed) return;
+    const sec = tNow;
+    const tension = Math.min(1, sec / 20); // 0 … 1 nach 20 s
+    const gap = Math.max(115, 540 - sec * 20) * (fall > 0.2 ? 0.75 : 1);
+    if (now - lastBeat.current < gap) return;
+    lastBeat.current = now;
+    const n = beat.current++;
+    sfx.custom((s) => {
+      // Herzschlag (doppelt: bumm-bumm)
+      s.tone(70 + tension * 30, 0.12, { type: 'sine', vol: 0.22 + tension * 0.1, to: 40 });
+      if (n % 2 === 0) s.tone(62 + tension * 25, 0.1, { type: 'sine', vol: 0.14 + tension * 0.08, to: 38, at: 0.11 });
+      // ab 3 s: Hi-Hat
+      if (sec > 3) s.noise(0.035, { filter: 7500, type: 'highpass', vol: 0.03 + tension * 0.05 });
+      // ab 6 s: Bass, der langsam höher steigt
+      if (sec > 6 && n % 2 === 0) s.tone(55 * Math.pow(2, Math.min(1, (sec - 6) / 20)), 0.22, { type: 'sawtooth', vol: 0.05 + tension * 0.05 });
+      // ab 11 s: hohe Melodie im Wechsel, immer höher
+      if (sec > 11) {
+        const steps = [0, 3, 7, 12, 7, 3];
+        const f = 440 * Math.pow(2, (steps[n % steps.length] + Math.min(12, (sec - 11) * 0.6)) / 12);
+        s.tone(f, 0.08, { type: 'square', vol: 0.03 + tension * 0.03 });
+      }
+      // Kurs fällt: dissonantes Dröhnen, umso lauter, je heftiger
+      if (fall > 0.2) {
+        s.tone(110 - fall * 40, 0.25, { type: 'sawtooth', vol: 0.05 + fall * 0.1, to: 55 });
+        s.tone(116 - fall * 40, 0.25, { type: 'sawtooth', vol: 0.04 + fall * 0.08, to: 58 });
+      }
+    });
+  }, [now, crashed, tNow, fall]);
   const lastCount = useRef(cashed.length);
   useEffect(() => {
     if (cashed.length > lastCount.current) sfx.custom((s) => [1319, 1760].forEach((f, i) => s.tone(f, 0.12, { type: 'triangle', vol: 0.12, at: i * 0.06 })));

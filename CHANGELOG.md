@@ -2,6 +2,11 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.8.4
+
+- Crash: Am Anfang steigt der Kurs fast immer schnell (ca. 2× nach 3 Sekunden) – Runden unter 1× sind jetzt selten
+- Crash: Die Musik wird immer dramatischer: schnellerer Herzschlag, dann Hi-Hat, steigender Bass und eine immer höhere Melodie; beim Fallen ein bedrohliches Dröhnen
+
 ## 0.8.3
 
 - Crash: Der Kurs verläuft jetzt wie eine Aktie – meist aufwärts, aber mit Rücksetzern, Einbrüchen und seltenen Runden, in denen es bergab geht. Fällt der Kurs, wird es rot, wackelt und brummt

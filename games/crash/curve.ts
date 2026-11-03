@@ -40,9 +40,13 @@ export function pathOf(seed: number): number[] {
   for (let i = 1; i <= n; i++) {
     // ab etwa 10× flacht der Aufwärtstrend ab, damit es nicht ins Absurde wächst
     const damp = 0.05 * Math.max(0, x - Math.log(10));
-    x += (drift - damp) * STEP + vol * Math.sqrt(STEP) * gauss();
+    // Start-Schub: in den ersten Sekunden geht es fast immer zügig aufwärts (ca. 2× nach 3 s)
+    const t = i * STEP;
+    const boost = 0.32 * Math.exp(-t / 2.6);
+    const calm = Math.min(1, 0.35 + t / 6);
+    x += (drift + boost - damp) * STEP + vol * calm * Math.sqrt(STEP) * gauss();
     // ab und zu ein Einbruch über ein paar Schritte (wird danach meist wieder aufgeholt)
-    if (shock <= 0 && i > 8 && r() < 0.018) shock = -(0.05 + r() * 0.07);
+    if (shock <= 0 && i > 16 && r() < 0.018) shock = -(0.05 + r() * 0.07);
     if (shock < 0) {
       x += shock;
       shock = r() < 0.3 ? 0 : shock * 0.8;
