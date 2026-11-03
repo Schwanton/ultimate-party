@@ -2,6 +2,13 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.8.3
+
+- Crash: Der Kurs verläuft jetzt wie eine Aktie – meist aufwärts, aber mit Rücksetzern, Einbrüchen und seltenen Runden, in denen es bergab geht. Fällt der Kurs, wird es rot, wackelt und brummt
+- Crash: Beim Absturz fällt die Linie senkrecht auf null
+- Crash: Werden alle erwischt, geht die nächste Runde sofort los
+- Crash: Kein Zwischenstand mehr – jeder sieht nur seine eigenen Punkte, die Rangliste gibt es erst am Ende
+
 ## 0.8.2
 
 - Montagsmaler: Beim Raten bleibt das Bild auch mit offener Tastatur groß – Maler*in und eigene Tipps liegen jetzt klein über dem Bild, weniger Abstände, Emotes daneben

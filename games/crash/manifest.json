@@ -2,8 +2,8 @@
   "id": "crash",
   "name": { "de": "Crash", "en": "Crash" },
   "description": {
-    "de": "Der Multiplikator steigt und steigt – bis er abstürzt. Steig rechtzeitig aus! Wer zu gierig ist, verliert alles.",
-    "en": "The multiplier climbs and climbs – until it crashes. Cash out in time! Get greedy and lose it all."
+    "de": "Der Kurs schwankt wie eine Aktie und steigt meist – bis er abstürzt. Steig rechtzeitig aus! Wer zu gierig ist, verliert alles.",
+    "en": "The price swings like a stock and mostly climbs – until it crashes. Cash out in time! Get greedy and lose it all."
   },
   "minPlayers": 2,
   "maxPlayers": 100,
