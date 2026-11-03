@@ -16,7 +16,20 @@ async function tryResume(): Promise<boolean> {
   const saved = loadSession('player');
   const code = params.get('r')?.toUpperCase();
   if (!saved || (code && saved.code !== code)) return false;
-  const res = await net.request('resume', saved);
+  let res = await net.request('resume', saved);
+  // UP! wurde neu gestartet (z. B. Update): mit gleichem Namen und Tier automatisch wieder beitreten
+  if (!res.ok && (res.error === 'room_not_found' || res.error === 'room_restarted') && saved.name) {
+    for (let i = 0; i < 8; i++) {
+      const j = await net.request('join', { code: saved.code, name: saved.name, avatar: saved.avatar });
+      if (j.ok) {
+        saveSession('player', { code: j.code, token: j.token, name: saved.name, avatar: saved.avatar });
+        return true;
+      }
+      if (j.error !== 'room_not_found') break;
+      await new Promise((r) => setTimeout(r, 2000)); // Fernseher ist evtl. noch nicht wieder da
+    }
+    res = { ok: false };
+  }
   if (!res.ok) saveSession('player', null);
   if (res.ok && lastDraft && Date.now() - lastDraft.at < 60_000) net.send('action', { action: lastDraft.action });
   return !!res.ok;
@@ -34,6 +47,14 @@ export function ControllerApp() {
     };
     net.start();
   }, []);
+
+  // Name und Tier fürs automatische Wieder-Beitreten aktuell halten
+  const meKey = s.me ? `${s.me.name}|${JSON.stringify(s.me.avatar)}` : '';
+  useEffect(() => {
+    const cur = loadSession('player');
+    if (!s.me || !cur) return;
+    saveSession('player', { ...cur, name: s.me.name, avatar: s.me.avatar.kind === 'animal' ? s.me.avatar : undefined });
+  }, [meKey]);
 
   const lang = s.room?.lang ?? guessLang();
   const t = useT(lang, s.room?.phase === 'game' ? s.room.gameId : null);
@@ -68,7 +89,7 @@ function JoinForm({ onJoined }: { onJoined: () => void }) {
     setBusy(false);
     if (!res.ok) return setError(t(`error.${res.error}`));
     try { localStorage.setItem('up:name', name.trim()); } catch { /* egal */ }
-    saveSession('player', { code: res.code, token: res.token });
+    saveSession('player', { code: res.code, token: res.token, name: name.trim(), avatar: { kind: 'animal', animal } });
     onJoined();
   };
 

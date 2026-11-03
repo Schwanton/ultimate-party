@@ -41,15 +41,11 @@
  "anon.secret": "Geheim-Modus",
  "anon.secretText": "Wer drin ist und wer raus, verrät erst die Auszählung.",
  "tally.title": "Die Auszählung",
- "tally.intro": "Runde für Runde – und am Ende die Einsätze …",
+ "tally.intro": "Runde für Runde – erst die 100er, dann kommen die Einsätze dazu …",
  "tally.crashAt": "Gekracht bei {m}",
  "tally.busted": "erwischt",
- "tally.extrasTitle": "Und jetzt: die Einsätze!",
- "tally.extrasText": "Wer hat mit seinem eigenen Geld gezockt?",
- "tally.noExtra": "nichts eingesetzt",
- "tally.extraWon": "mit Einsätzen gewonnen",
- "tally.extraLost": "mit Einsätzen verloren",
  "tally.winner": "{name} gewinnt!",
  "tally.extraShort": "Einsätze: {n}",
- "phone.cashedPot": "Dein Topf jetzt: {n}"
+ "phone.cashedPot": "Dein Topf jetzt: {n}",
+ "tally.plusBets": "+ Einsätze"
 }

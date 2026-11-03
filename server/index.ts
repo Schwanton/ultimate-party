@@ -10,7 +10,7 @@ import { lanAddress } from './network';
 import { getGame, loadGames } from './registry';
 import { setSecret } from './secrets';
 import { installUpdate, onUpdateChange, startUpdateChecks, updateStatus } from './update';
-import { allRooms, createRoom, getRoom, type Room } from './room';
+import { allRooms, createRoom, getRoom, restoreRoom, type Room } from './room';
 import { buildClient, watchClient } from './build';
 
 const MIME: Record<string, string> = {
@@ -139,7 +139,7 @@ function handle(ws: WebSocket, msg: any) {
       return r.touch();
     }
     case 'host:resume': {
-      const r = getRoom(msg.code);
+      const r = getRoom(msg.code) ?? restoreRoom(msg.code, msg.token, baseUrl);
       if (!r || r.hostToken !== msg.token) return reply(ws, msg, { ok: false, error: 'room_not_found' });
       r.hosts.add(ws);
       Object.assign(s, { room: r, role: 'host' });
@@ -160,7 +160,9 @@ function handle(ws: WebSocket, msg: any) {
     case 'resume': {
       const r = getRoom(msg.code);
       const p = r?.resume(String(msg.token ?? ''), ws);
-      if (!r || !p) return reply(ws, msg, { ok: false, error: 'session_expired' });
+      if (!r) return reply(ws, msg, { ok: false, error: 'room_not_found' });
+      // Raum wurde nach einem Neustart wiederhergestellt: Handy darf automatisch neu beitreten
+      if (!p) return reply(ws, msg, { ok: false, error: r.restored ? 'room_restarted' : 'session_expired' });
       Object.assign(s, { room: r, role: 'player', playerId: p.info.id });
       return reply(ws, msg, { ok: true, code: r.code, token: p.token, playerId: p.info.id });
     }

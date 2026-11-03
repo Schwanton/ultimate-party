@@ -2,6 +2,11 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.8.6
+
+- Nach einem Update oder Neustart bleibt der Raumcode gleich – und die Handys treten automatisch wieder bei
+- Crash: In der Auszählung kommen die Einsätze jetzt in jeder Runde dazu – erst die 100er, dann bei jedem sein Einsatz, dann geht's in die Balken
+
 ## 0.8.5
 
 - Crash: Einsätze – vor jeder Runde kann man +10 %, +25 % oder +100 % seines Geldes zu den 100 Gratis-Punkten in den Topf legen. Wer crasht, verliert den Einsatz

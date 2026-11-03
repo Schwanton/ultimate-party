@@ -41,15 +41,11 @@
  "anon.secret": "Secret mode",
  "anon.secretText": "Who's in and who's out stays hidden until the final count.",
  "tally.title": "The final count",
- "tally.intro": "Round by round – and the bets at the very end …",
+ "tally.intro": "Round by round – first the free 100, then the bets on top …",
  "tally.crashAt": "Crashed at {m}",
  "tally.busted": "caught",
- "tally.extrasTitle": "And now: the bets!",
- "tally.extrasText": "Who gambled with their own money?",
- "tally.noExtra": "no bets",
- "tally.extraWon": "won with bets",
- "tally.extraLost": "lost with bets",
  "tally.winner": "{name} wins!",
  "tally.extraShort": "Bets: {n}",
- "phone.cashedPot": "Your pot now: {n}"
+ "phone.cashedPot": "Your pot now: {n}",
+ "tally.plusBets": "+ bets"
 }

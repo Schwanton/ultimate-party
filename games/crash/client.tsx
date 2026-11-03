@@ -306,45 +306,41 @@ function HostTally({ view, t, player, room }: HostViewProps) {
   const at = tallyAt(data, sec);
   const ids = view.players as string[];
   const totals = Object.fromEntries(ids.map((id) => [id, totalAt(data, id, at)]));
-  const finalTotals = Object.fromEntries(ids.map((id) => [id, totalAt(data, id, { stage: 'done', round: data.rounds.length, progress: 1, extrasDone: data.extraOrder.length, extraProgress: 1 })]));
+  const finalTotals = Object.fromEntries(ids.map((id) => [id, totalAt(data, id, { stage: 'done', round: data.rounds.length, progress: 1 })]));
   const maxTotal = Math.max(1, ...Object.values(finalTotals), ...Object.values(totals));
   const order = [...ids].sort((a, b) => totals[b] - totals[a] || ids.indexOf(a) - ids.indexOf(b));
   const shownRows = order.slice(0, 12);
   const rowH = Math.min(46, Math.floor(560 / Math.max(1, shownRows.length)));
 
+  const r = at.stage === 'fill' || at.stage === 'extra' || at.stage === 'hold' ? data.rounds[at.round] : null;
+  const baseMax = r ? Math.max(1, ...ids.map((id) => r.base[id] ?? 0)) : 1;
+  const sumOf = (id: string) => (r ? (r.base[id] ?? 0) + (r.extra[id] ?? 0) : 0);
+  const scaleMax = r ? Math.max(baseMax, ...ids.map(sumOf)) : 1;
+  const ef = at.stage === 'extra' ? easeOut(Math.min(1, at.progress * 1.4)) : at.stage === 'hold' ? 1 : 0;
+  const fillVal = !r ? 0 : at.stage === 'fill' ? baseMax * easeOut(at.progress) : baseMax + (Math.max(baseMax, ...ids.map(sumOf)) - baseMax) * ef;
+  // Skala: erst bis zum besten 100er-Gewinn, beim Dazukommen der Einsätze wächst sie mit
+  const dispScale = baseMax + (scaleMax - baseMax) * ef;
+  const winner = order[0];
+
   // Sounds
-  const lastRound = useRef(-1);
-  const lastExtra = useRef(-1);
-  const lastTick = useRef(0);
+  const last = useRef({ round: -1, stage: '', tick: 0 });
   useEffect(() => {
-    if (at.stage === 'rounds' && at.round !== lastRound.current) {
-      lastRound.current = at.round;
+    const L = last.current;
+    if (r && at.round !== L.round) {
+      L.round = at.round;
       sfx.play('whoosh');
     }
-    if (at.stage === 'rounds' && at.progress < 1 && now - lastTick.current > 120) {
-      lastTick.current = now;
+    if (at.stage === 'fill' && at.progress < 1 && now - L.tick > 120) {
+      L.tick = now;
       sfx.custom((s) => s.tone(300 + at.progress * 600, 0.05, { type: 'square', vol: 0.04 }));
     }
-    if (at.stage === 'extrasIntro' && lastExtra.current === -1) {
-      lastExtra.current = -2;
-      sfx.play('drumroll');
+    if (at.stage !== L.stage) {
+      if (at.stage === 'extra' && r && ids.some((id) => (r.extra[id] ?? 0) !== 0)) sfx.custom((s) => [523, 659, 784].forEach((f, i) => s.tone(f, 0.1, { type: 'triangle', vol: 0.1, at: i * 0.07 })));
+      if (at.stage === 'hold') sfx.play('score');
+      if (at.stage === 'done') sfx.play('fanfare');
+      L.stage = at.stage;
     }
-    if (at.stage === 'extras' && at.extrasDone !== lastExtra.current) {
-      lastExtra.current = at.extrasDone;
-      const id = data.extraOrder[at.extrasDone];
-      sfx.play((data.extra[id] ?? 0) >= 0 ? 'score' : 'wrong');
-    }
-    if (at.stage === 'done' && lastExtra.current !== 999) {
-      lastExtra.current = 999;
-      sfx.play('fanfare');
-    }
-  }, [at.stage, at.round, at.extrasDone, now]);
-
-  const r = at.stage === 'rounds' ? data.rounds[at.round] : null;
-  const roundMax = r ? Math.max(1, ...Object.values(r.base)) : 1;
-  const fillVal = r ? roundMax * easeOut(at.progress) : 0;
-  const extraId = at.stage === 'extras' ? data.extraOrder[at.extrasDone] : null;
-  const winner = order[0];
+  }, [at.stage, at.round, now]);
 
   return (
     <>
@@ -357,12 +353,11 @@ function HostTally({ view, t, player, room }: HostViewProps) {
             const p = player(id);
             if (!p) return null;
             const v = totals[id];
-            const hot = id === extraId;
             return (
               <div key={id} style={{ position: 'absolute', left: 0, right: 0, top: i * (rowH + 6), height: rowH, display: 'flex', alignItems: 'center', gap: 10, transition: 'top .6s cubic-bezier(.3,1.3,.5,1)' }}>
                 <span className="display" style={{ width: 26, textAlign: 'right', fontWeight: 800, color: 'var(--faint)' }}>{i + 1}</span>
                 <Avatar player={p} size={Math.min(40, rowH - 4)} />
-                <div style={{ flex: 1, height: rowH - 10, borderRadius: 12, background: 'var(--surface)', position: 'relative', overflow: 'hidden', boxShadow: hot ? '0 0 0 3px #fff' : undefined }}>
+                <div style={{ flex: 1, height: rowH - 10, borderRadius: 12, background: 'var(--surface)', position: 'relative', overflow: 'hidden' }}>
                   <div style={{ position: 'absolute', inset: 0, width: `${Math.max(0, (v / maxTotal) * 100)}%`, background: at.stage === 'done' && id === winner ? 'var(--yellow)' : p.color, transition: 'width .5s ease-out', borderRadius: 12 }} />
                   <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', fontWeight: 800, fontSize: 17, color: '#fff', textShadow: '0 2px 4px rgba(0,0,0,.6)', whiteSpace: 'nowrap' }}>{p.name}</span>
                 </div>
@@ -373,8 +368,8 @@ function HostTally({ view, t, player, room }: HostViewProps) {
           {order.length > 12 && <span className="faint" style={{ position: 'absolute', bottom: 0, left: 36 }}>+{order.length - 12}</span>}
         </section>
 
-        {/* rechts: aktuelle Runde oder Extras */}
-        <section style={{ width: 430, display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {/* rechts: aktuelle Runde */}
+        <section style={{ width: 460, display: 'flex', flexDirection: 'column', gap: 10 }}>
           {at.stage === 'intro' && (
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 12, textAlign: 'center' }}>
               <h1 className="anim-pop" style={{ fontSize: 46 }}>{t('tally.title')}</h1>
@@ -384,27 +379,39 @@ function HostTally({ view, t, player, room }: HostViewProps) {
           {r && (
             <>
               <h2 style={{ fontSize: 28 }}>{t('round', { n: at.round + 1, total: data.rounds.length })}</h2>
-              <span className="muted" style={{ fontSize: 17, fontWeight: 700 }}>{t('tally.crashAt', { m: fmt(r.crashAt, room.lang) })}{r.mult > 1 ? ` · ${t('double')}` : ''}</span>
-              <div style={{ flex: 1, display: 'flex', gap: 14, minHeight: 0 }}>
-                <div style={{ width: 110, borderRadius: 20, background: 'var(--surface)', position: 'relative', overflow: 'hidden' }}>
-                  <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: `${(fillVal / roundMax) * 100}%`, background: `linear-gradient(0deg, ${PINK}, #FFD447)`, boxShadow: '0 0 30px rgba(255,212,71,.5)' }} />
-                  <span className="display" style={{ position: 'absolute', left: 0, right: 0, bottom: `calc(${(fillVal / roundMax) * 100}% + 4px)`, textAlign: 'center', fontWeight: 800, fontSize: 22 }}>{Math.round(fillVal)}</span>
+              <span className="muted" style={{ fontSize: 17, fontWeight: 700 }}>
+                {t('tally.crashAt', { m: fmt(r.crashAt, room.lang) })}{r.mult > 1 ? ` · ${t('double')}` : ''}
+                {at.stage !== 'fill' && <b style={{ color: 'var(--yellow)', marginLeft: 8 }}>{t('tally.plusBets')}</b>}
+              </span>
+              <div style={{ flex: 1, display: 'flex', gap: 14, minHeight: 0, paddingBottom: 34 }}>
+                <div style={{ width: 90, borderRadius: 20, background: 'var(--surface)', position: 'relative', overflow: 'hidden' }}>
+                  <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: `${(fillVal / dispScale) * 100}%`, background: `linear-gradient(0deg, ${PINK}, #FFD447)`, boxShadow: '0 0 30px rgba(255,212,71,.5)' }} />
+                  <span className="display" style={{ position: 'absolute', left: 0, right: 0, bottom: `calc(${Math.min(92, (fillVal / dispScale) * 100)}% + 4px)`, textAlign: 'center', fontWeight: 800, fontSize: 20 }}>{Math.round(fillVal)}</span>
                 </div>
                 <div style={{ flex: 1, position: 'relative' }}>
-                  {ids.filter((id) => (r.base[id] ?? 0) > 0 && (r.base[id] ?? 0) <= fillVal + 0.5).map((id, k) => {
+                  {ids.map((id, k) => {
                     const p = player(id);
                     if (!p) return null;
-                    const y = ((r.base[id] ?? 0) / roundMax) * 100;
+                    const b = r.base[id] ?? 0;
+                    const e = r.extra[id] ?? 0;
+                    const shownBase = at.stage === 'fill' ? b <= fillVal + 0.5 : true;
+                    if (!shownBase || (b <= 0 && ef === 0 && at.stage === 'fill')) return null;
+                    const v = Math.max(0, b + e * ef);
+                    if (b <= 0 && e === 0) return null;
+                    const y = (v / dispScale) * 100;
                     return (
-                      <div key={id} style={{ position: 'absolute', left: (k % 4) * 70, bottom: `calc(${y}% - 18px)`, display: 'flex', alignItems: 'center', gap: 4, animation: 'upPop .35s ease-out both' }}>
+                      <div key={id} style={{ position: 'absolute', left: (k % 4) * 88, bottom: `calc(${y}% - 18px)`, display: 'flex', alignItems: 'center', gap: 4, animation: 'upPop .35s ease-out both', transition: 'bottom .15s linear', opacity: b + e <= 0 && ef === 1 ? 0.55 : 1 }}>
                         <Avatar player={p} size={34} />
-                        <b style={{ fontSize: 14, background: '#110D24', padding: '1px 6px', borderRadius: 8 }}>{r.base[id]}</b>
+                        <span style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.05 }}>
+                          <b style={{ fontSize: 14, background: '#110D24', padding: '1px 6px', borderRadius: 8 }}>{b}</b>
+                          {e !== 0 && ef > 0 && <b style={{ fontSize: 13, padding: '1px 6px', borderRadius: 8, marginTop: 2, background: e > 0 ? 'var(--green)' : '#FF3B4E', color: e > 0 ? '#110D24' : '#fff', animation: 'upPop .35s ease-out both' }}>{e > 0 ? '+' : '−'}{Math.abs(e).toLocaleString(LOCALE)}</b>}
+                        </span>
                       </div>
                     );
                   })}
-                  {at.progress >= 1 && ids.some((id) => !(r.base[id] > 0)) && (
-                    <div style={{ position: 'absolute', left: 0, bottom: -4, display: 'flex', gap: 4, alignItems: 'center', flexWrap: 'wrap', animation: 'upFade .4s both' }}>
-                      {ids.filter((id) => !(r.base[id] > 0)).slice(0, 10).map((id) => {
+                  {at.progress >= 1 && ids.some((id) => !((r.base[id] ?? 0) > 0)) && (
+                    <div style={{ position: 'absolute', left: 0, bottom: -34, display: 'flex', gap: 4, alignItems: 'center', flexWrap: 'wrap', animation: 'upFade .4s both' }}>
+                      {ids.filter((id) => !((r.base[id] ?? 0) > 0) && !((r.extra[id] ?? 0) < 0 && ef > 0)).slice(0, 10).map((id) => {
                         const p = player(id);
                         return p ? <span key={id} style={{ filter: 'grayscale(1)', opacity: 0.6 }}><Avatar player={p} size={26} /></span> : null;
                       })}
@@ -415,33 +422,11 @@ function HostTally({ view, t, player, room }: HostViewProps) {
               </div>
             </>
           )}
-          {(at.stage === 'extrasIntro' || at.stage === 'extras' || at.stage === 'done') && (
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 16, textAlign: 'center' }}>
-              {at.stage === 'extrasIntro' && (
-                <>
-                  <h1 className="anim-pop" style={{ fontSize: 44 }}>{t('tally.extrasTitle')}</h1>
-                  <p className="muted" style={{ fontSize: 20 }}>{t('tally.extrasText')}</p>
-                </>
-              )}
-              {extraId && (() => {
-                const p = player(extraId);
-                const e = data.extra[extraId] ?? 0;
-                return p ? (
-                  <div key={extraId} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, animation: 'upPop .45s ease-out both' }}>
-                    <Avatar player={p} size={120} />
-                    <b style={{ fontSize: 28 }}>{p.name}</b>
-                    <span className="display" style={{ fontSize: 76, fontWeight: 800, color: e > 0 ? 'var(--green)' : e < 0 ? '#FF3B4E' : 'var(--muted)' }}>{e > 0 ? '+' : ''}{e.toLocaleString(LOCALE)}</span>
-                    <span className="muted" style={{ fontSize: 17 }}>{e === 0 ? t('tally.noExtra') : e > 0 ? t('tally.extraWon') : t('tally.extraLost')}</span>
-                  </div>
-                ) : null;
-              })()}
-              {at.stage === 'done' && player(winner) && (
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, animation: 'upPop .5s ease-out both' }}>
-                  <Avatar player={player(winner)!} size={140} />
-                  <h1 style={{ fontSize: 42, color: 'var(--yellow)' }}>{t('tally.winner', { name: player(winner)!.name })}</h1>
-                  <span className="display" style={{ fontSize: 34, fontWeight: 800 }}>{totals[winner].toLocaleString(LOCALE)}</span>
-                </div>
-              )}
+          {at.stage === 'done' && player(winner) && (
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, animation: 'upPop .5s ease-out both', textAlign: 'center' }}>
+              <Avatar player={player(winner)!} size={140} />
+              <h1 style={{ fontSize: 42, color: 'var(--yellow)' }}>{t('tally.winner', { name: player(winner)!.name })}</h1>
+              <span className="display" style={{ fontSize: 34, fontWeight: 800 }}>{totals[winner].toLocaleString(LOCALE)}</span>
             </div>
           )}
         </section>

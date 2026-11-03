@@ -33,7 +33,8 @@ export default {
     let cashed = new Map<string, number>();
     let cashedT = new Map<string, number>();
     let crashTimer: { cancel(): void } | null = null;
-    const tally: TallyData = { rounds: [], extra: Object.fromEntries(ids.map((id) => [id, 0])), extraOrder: [] };
+    const tally: TallyData = { rounds: [] };
+    const extraSum = new Map<string, number>(ids.map((id) => [id, 0]));
 
     const mult = () => (round === total ? 2 : 1);
     const base = () => ({ round, total, mult: mult(), seed, mode });
@@ -106,6 +107,7 @@ export default {
       const crashAt = floor2(multAt(seed, crashTime));
       const m = mult();
       const roundBase: Record<string, number> = {};
+      const roundExtra: Record<string, number> = {};
       const results = new Map<string, { base: number; extra: number }>();
       for (const id of ids) {
         const x = cashed.get(id);
@@ -113,11 +115,12 @@ export default {
         const b = x != null ? Math.round(BASE * x * m) : 0;
         const e = x != null ? Math.round(stake * x * m) - stake : -stake;
         roundBase[id] = b;
-        tally.extra[id] += e;
+        roundExtra[id] = e;
+        extraSum.set(id, (extraSum.get(id) ?? 0) + e);
         money.add(id, b + e);
         results.set(id, { base: b, extra: e });
       }
-      tally.rounds.push({ crashAt, mult: m, base: roundBase });
+      tally.rounds.push({ crashAt, mult: m, base: roundBase, extra: roundExtra });
       const busted = ids.filter((id) => !cashed.has(id));
       ctx.setHostView({
         screen: 'crash', ...base(), startAt, crashTime, crashAt, allOut, players: ids, lastT: Math.max(0, ...cashedT.values()),
@@ -135,9 +138,6 @@ export default {
 
     function showTally() {
       phase = 'tally';
-      // Extras vom Letzten zum Ersten (nach dem Stand ohne Extras)
-      const baseSum = (id: string) => tally.rounds.reduce((a, r) => a + (r.base[id] ?? 0), 0);
-      tally.extraOrder = [...ids].sort((a, b) => baseSum(a) - baseSum(b));
       const startTally = Date.now() + 500;
       const ranking = money.ranking();
       ctx.setHostView({ screen: 'tally', startAt: startTally, tally, players: ids });
@@ -145,7 +145,7 @@ export default {
       ctx.after(tallyDuration(tally) + 0.5, () => {
         ctx.setAllPlayerViews((p) => ({
           screen: 'finalMe', score: money.get(p.id), place: ranking.filter((r) => r.score > money.get(p.id)).length + 1, of: ranking.length,
-          extra: tally.extra[p.id] ?? 0,
+          extra: extraSum.get(p.id) ?? 0,
         }));
         ctx.finish(ranking);
       });

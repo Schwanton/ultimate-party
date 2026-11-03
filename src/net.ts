@@ -178,7 +178,15 @@ export function storageKey(kind: 'host' | 'player') {
   return slot ? `up:${kind}:${slot}` : `up:${kind}`;
 }
 
-export function loadSession(kind: 'host' | 'player'): { code: string; token: string } | null {
+export interface Session {
+  code: string;
+  token: string;
+  /** fürs automatische Wieder-Beitreten nach einem Neustart */
+  name?: string;
+  avatar?: unknown;
+}
+
+export function loadSession(kind: 'host' | 'player'): Session | null {
   try {
     const raw = (new URLSearchParams(location.search).get('slot') ? sessionStorage : localStorage).getItem(storageKey(kind));
     return raw ? JSON.parse(raw) : null;
@@ -187,7 +195,7 @@ export function loadSession(kind: 'host' | 'player'): { code: string; token: str
   }
 }
 
-export function saveSession(kind: 'host' | 'player', data: { code: string; token: string } | null) {
+export function saveSession(kind: 'host' | 'player', data: Session | null) {
   try {
     const store = new URLSearchParams(location.search).get('slot') ? sessionStorage : localStorage;
     if (data) store.setItem(storageKey(kind), JSON.stringify(data));

@@ -12,6 +12,7 @@ import { DEV, QUIET, TIME_SCALE } from './config';
 import { getSecret, secretStatus, setSecret } from './secrets';
 import { deckStatus, drawnSet, markDrawn, refill, resetDeck, unmarkDrawn } from './decks';
 import { updateStatus } from './update';
+import { rememberRoom, rememberedRoom } from './roomstore';
 
 export const PALETTE = [
   '#E8336F', '#36D6F5', '#FFD447', '#9B7BFF', '#4BE3A1', '#FF9F43',
@@ -50,7 +51,7 @@ export interface ServerMessage {
 
 export class Room {
   readonly code: string;
-  readonly hostToken = randomUUID();
+  readonly hostToken: string;
   lang: Lang;
   settings: RoomSettings = { allowPhotos: true, disabledPacks: [], timeFactor: 1, gameOptions: {} };
   players = new Map<string, PlayerState>();
@@ -63,13 +64,16 @@ export class Room {
   results: { gameId: string; ranking: RankingEntry[] }[] = [];
   usedContent = new Set<string>();
   lastActivity = Date.now();
+  /** nach einem Neustart wiederhergestellt (alte Handys dürfen automatisch neu beitreten) */
+  restored = false;
   private order = 0;
   private flushQueued = false;
   private lastHostSent = new WeakMap<WebSocket, string>();
 
-  constructor(code: string, lang: Lang, readonly joinUrl: string) {
+  constructor(code: string, lang: Lang, readonly joinUrl: string, hostToken: string = randomUUID()) {
     this.code = code;
     this.lang = lang;
+    this.hostToken = hostToken;
     this.selectedGameId = allGames().find((g) => !g.manifest.hidden)?.manifest.id ?? null;
   }
 
@@ -228,6 +232,11 @@ export class Room {
 
   /* ---------------- Einstellungen ---------------- */
 
+  /** Raum merken, damit er nach einem Neustart (z. B. Update) mit gleichem Code weiterläuft */
+  remember() {
+    rememberRoom(this.code, { token: this.hostToken, lang: this.lang, settings: this.settings });
+  }
+
   updateSettings(patch: Partial<RoomSettings> & { lang?: Lang }) {
     if (patch.lang === 'de' || patch.lang === 'en') this.lang = patch.lang;
     if (typeof patch.allowPhotos === 'boolean') {
@@ -241,6 +250,7 @@ export class Room {
     }
     if (Array.isArray(patch.disabledPacks)) this.settings.disabledPacks = patch.disabledPacks.filter((k) => typeof k === 'string');
     if (typeof patch.timeFactor === 'number' && patch.timeFactor >= 0.5 && patch.timeFactor <= 3) this.settings.timeFactor = patch.timeFactor;
+    this.remember();
     this.touch();
   }
 
@@ -250,6 +260,7 @@ export class Room {
     if (!g || !def || this.phase !== 'lobby') return;
     const next = resolveOptions(g.manifest.options, { ...this.settings.gameOptions[gameId], [id]: value });
     this.settings.gameOptions = { ...this.settings.gameOptions, [gameId]: next };
+    this.remember();
     this.touch();
   }
 
@@ -658,6 +669,25 @@ export function createRoom(lang: Lang, joinUrl: string): Room {
   } while (rooms.has(code));
   const room = new Room(code, lang, joinUrl);
   rooms.set(code, room);
+  room.remember();
+  return room;
+}
+
+/**
+ * Nach einem Neustart: Der Fernseher meldet sich mit seinem alten Code und Schlüssel –
+ * dann gibt es den Raum mit genau diesem Code wieder (Einstellungen inklusive).
+ */
+export function restoreRoom(code: unknown, token: unknown, joinUrl: string): Room | undefined {
+  if (typeof code !== 'string' || typeof token !== 'string') return undefined;
+  const c = code.toUpperCase().trim();
+  if (!/^[BCDFGHJKLMNPQRSTVWXZ]{4}$/.test(c) || rooms.has(c) || token.length < 8 || token.length > 64) return undefined;
+  const saved = rememberedRoom(c);
+  if (saved && saved.token !== token) return undefined;
+  const room = new Room(c, saved?.lang === 'en' ? 'en' : 'de', joinUrl, token);
+  if (saved?.settings) room.settings = { ...room.settings, ...saved.settings };
+  room.restored = true;
+  rooms.set(c, room);
+  room.remember();
   return room;
 }
 
