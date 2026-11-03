@@ -155,8 +155,9 @@ export interface GameContext {
   /**
    * Schnelle Live-Daten an den TV (z. B. Positionen 20× pro Sekunde in Echtzeit-Spielen).
    * Geht am normalen Zustand vorbei; im Client mit useStream() aus '@up/ui' lesen.
+   * `phones: true` schickt die Daten zusätzlich an alle Handys des Spiels (z. B. Live-Zeichnung).
    */
-  stream(data: object): void;
+  stream(data: object, opts?: { phones?: boolean }): void;
   /** Alle aktivierten Content-Einträge dieses Spiels in der Raumsprache, gemischt */
   content<T extends ContentItem = ContentItem>(): T[];
 

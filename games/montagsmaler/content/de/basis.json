@@ -1,0 +1,1690 @@
+{
+ "name": "Basis",
+ "author": "UP!",
+ "version": "1.0.0",
+ "description": "Malbare Begriffe in drei Schwierigkeitsstufen",
+ "items": [
+  {
+   "id": "m1",
+   "word": "Haus",
+   "level": 1
+  },
+  {
+   "id": "m2",
+   "word": "Katze",
+   "level": 1
+  },
+  {
+   "id": "m3",
+   "word": "Hund",
+   "level": 1
+  },
+  {
+   "id": "m4",
+   "word": "Sonne",
+   "level": 1
+  },
+  {
+   "id": "m5",
+   "word": "Mond",
+   "level": 1
+  },
+  {
+   "id": "m6",
+   "word": "Baum",
+   "level": 1
+  },
+  {
+   "id": "m7",
+   "word": "Blume",
+   "level": 1
+  },
+  {
+   "id": "m8",
+   "word": "Auto",
+   "level": 1
+  },
+  {
+   "id": "m9",
+   "word": "Fisch",
+   "level": 1
+  },
+  {
+   "id": "m10",
+   "word": "Apfel",
+   "level": 1
+  },
+  {
+   "id": "m11",
+   "word": "Banane",
+   "level": 1
+  },
+  {
+   "id": "m12",
+   "word": "Ball",
+   "level": 1
+  },
+  {
+   "id": "m13",
+   "word": "Stern",
+   "level": 1
+  },
+  {
+   "id": "m14",
+   "word": "Herz",
+   "level": 1
+  },
+  {
+   "id": "m15",
+   "word": "Schiff",
+   "level": 1
+  },
+  {
+   "id": "m16",
+   "word": "Boot",
+   "level": 1
+  },
+  {
+   "id": "m17",
+   "word": "Vogel",
+   "level": 1
+  },
+  {
+   "id": "m18",
+   "word": "Brille",
+   "level": 1
+  },
+  {
+   "id": "m19",
+   "word": "Hut",
+   "level": 1
+  },
+  {
+   "id": "m20",
+   "word": "Schuh",
+   "level": 1
+  },
+  {
+   "id": "m21",
+   "word": "Socke",
+   "level": 1
+  },
+  {
+   "id": "m22",
+   "word": "Uhr",
+   "level": 1
+  },
+  {
+   "id": "m23",
+   "word": "Schlüssel",
+   "level": 1
+  },
+  {
+   "id": "m24",
+   "word": "Tür",
+   "level": 1
+  },
+  {
+   "id": "m25",
+   "word": "Fenster",
+   "level": 1
+  },
+  {
+   "id": "m26",
+   "word": "Bett",
+   "level": 1
+  },
+  {
+   "id": "m27",
+   "word": "Stuhl",
+   "level": 1
+  },
+  {
+   "id": "m28",
+   "word": "Tisch",
+   "level": 1
+  },
+  {
+   "id": "m29",
+   "word": "Lampe",
+   "level": 1
+  },
+  {
+   "id": "m30",
+   "word": "Buch",
+   "level": 1
+  },
+  {
+   "id": "m31",
+   "word": "Stift",
+   "level": 1
+  },
+  {
+   "id": "m32",
+   "word": "Schere",
+   "level": 1
+  },
+  {
+   "id": "m33",
+   "word": "Löffel",
+   "level": 1
+  },
+  {
+   "id": "m34",
+   "word": "Gabel",
+   "level": 1
+  },
+  {
+   "id": "m35",
+   "word": "Messer",
+   "level": 1
+  },
+  {
+   "id": "m36",
+   "word": "Tasse",
+   "level": 1
+  },
+  {
+   "id": "m37",
+   "word": "Kerze",
+   "level": 1
+  },
+  {
+   "id": "m38",
+   "word": "Regenschirm",
+   "level": 1
+  },
+  {
+   "id": "m39",
+   "word": "Wolke",
+   "level": 1
+  },
+  {
+   "id": "m40",
+   "word": "Regen",
+   "level": 1
+  },
+  {
+   "id": "m41",
+   "word": "Schneemann",
+   "level": 1
+  },
+  {
+   "id": "m42",
+   "word": "Eis",
+   "level": 1,
+   "alt": [
+    "Eiscreme"
+   ]
+  },
+  {
+   "id": "m43",
+   "word": "Pizza",
+   "level": 1
+  },
+  {
+   "id": "m44",
+   "word": "Kuchen",
+   "level": 1
+  },
+  {
+   "id": "m45",
+   "word": "Ei",
+   "level": 1
+  },
+  {
+   "id": "m46",
+   "word": "Käse",
+   "level": 1
+  },
+  {
+   "id": "m47",
+   "word": "Karotte",
+   "level": 1
+  },
+  {
+   "id": "m48",
+   "word": "Pilz",
+   "level": 1
+  },
+  {
+   "id": "m49",
+   "word": "Erdbeere",
+   "level": 1
+  },
+  {
+   "id": "m50",
+   "word": "Kirsche",
+   "level": 1
+  },
+  {
+   "id": "m51",
+   "word": "Schnecke",
+   "level": 1
+  },
+  {
+   "id": "m52",
+   "word": "Spinne",
+   "level": 1
+  },
+  {
+   "id": "m53",
+   "word": "Biene",
+   "level": 1
+  },
+  {
+   "id": "m54",
+   "word": "Schmetterling",
+   "level": 1
+  },
+  {
+   "id": "m55",
+   "word": "Maus",
+   "level": 1
+  },
+  {
+   "id": "m56",
+   "word": "Schwein",
+   "level": 1
+  },
+  {
+   "id": "m57",
+   "word": "Kuh",
+   "level": 1
+  },
+  {
+   "id": "m58",
+   "word": "Pferd",
+   "level": 1
+  },
+  {
+   "id": "m59",
+   "word": "Ente",
+   "level": 1
+  },
+  {
+   "id": "m60",
+   "word": "Schlange",
+   "level": 1
+  },
+  {
+   "id": "m61",
+   "word": "Elefant",
+   "level": 1
+  },
+  {
+   "id": "m62",
+   "word": "Giraffe",
+   "level": 1
+  },
+  {
+   "id": "m63",
+   "word": "Krone",
+   "level": 1
+  },
+  {
+   "id": "m64",
+   "word": "Rakete",
+   "level": 1
+  },
+  {
+   "id": "m65",
+   "word": "Flugzeug",
+   "level": 1
+  },
+  {
+   "id": "m66",
+   "word": "Fahrrad",
+   "level": 1
+  },
+  {
+   "id": "m67",
+   "word": "Zug",
+   "level": 1
+  },
+  {
+   "id": "m68",
+   "word": "Ampel",
+   "level": 1
+  },
+  {
+   "id": "m69",
+   "word": "Brücke",
+   "level": 1
+  },
+  {
+   "id": "m70",
+   "word": "Berg",
+   "level": 1
+  },
+  {
+   "id": "m71",
+   "word": "Insel",
+   "level": 1
+  },
+  {
+   "id": "m72",
+   "word": "Zelt",
+   "level": 1
+  },
+  {
+   "id": "m73",
+   "word": "Kaktus",
+   "level": 1
+  },
+  {
+   "id": "m74",
+   "word": "Gitarre",
+   "level": 1
+  },
+  {
+   "id": "m75",
+   "word": "Trommel",
+   "level": 1
+  },
+  {
+   "id": "m76",
+   "word": "Glocke",
+   "level": 1
+  },
+  {
+   "id": "m77",
+   "word": "Geschenk",
+   "level": 1
+  },
+  {
+   "id": "m78",
+   "word": "Ballon",
+   "level": 1
+  },
+  {
+   "id": "m79",
+   "word": "Drachen",
+   "level": 1,
+   "alt": [
+    "Flugdrache"
+   ]
+  },
+  {
+   "id": "m80",
+   "word": "Hammer",
+   "level": 1
+  },
+  {
+   "id": "m81",
+   "word": "Leiter",
+   "level": 1
+  },
+  {
+   "id": "m82",
+   "word": "Zahnbürste",
+   "level": 1
+  },
+  {
+   "id": "m83",
+   "word": "Handy",
+   "level": 1,
+   "alt": [
+    "Smartphone",
+    "Telefon"
+   ]
+  },
+  {
+   "id": "m84",
+   "word": "Fernseher",
+   "level": 1,
+   "alt": [
+    "TV",
+    "Fernsehen"
+   ]
+  },
+  {
+   "id": "m85",
+   "word": "Computer",
+   "level": 1
+  },
+  {
+   "id": "m86",
+   "word": "Kamera",
+   "level": 1
+  },
+  {
+   "id": "m87",
+   "word": "Brief",
+   "level": 1
+  },
+  {
+   "id": "m88",
+   "word": "Burger",
+   "level": 1
+  },
+  {
+   "id": "m89",
+   "word": "Pommes",
+   "level": 1,
+   "alt": [
+    "Pommes frites"
+   ]
+  },
+  {
+   "id": "m90",
+   "word": "Bonbon",
+   "level": 1,
+   "alt": [
+    "Süßigkeit"
+   ]
+  },
+  {
+   "id": "m91",
+   "word": "Teddybär",
+   "level": 1,
+   "alt": [
+    "Teddy"
+   ]
+  },
+  {
+   "id": "m92",
+   "word": "Roboter",
+   "level": 1
+  },
+  {
+   "id": "m93",
+   "word": "Geist",
+   "level": 1
+  },
+  {
+   "id": "m94",
+   "word": "Monster",
+   "level": 1
+  },
+  {
+   "id": "m95",
+   "word": "Zahn",
+   "level": 1
+  },
+  {
+   "id": "m96",
+   "word": "Auge",
+   "level": 1
+  },
+  {
+   "id": "m97",
+   "word": "Nase",
+   "level": 1
+  },
+  {
+   "id": "m98",
+   "word": "Hand",
+   "level": 1
+  },
+  {
+   "id": "m99",
+   "word": "Fuß",
+   "level": 1
+  },
+  {
+   "id": "m100",
+   "word": "Ohr",
+   "level": 1
+  },
+  {
+   "id": "m101",
+   "word": "Leuchtturm",
+   "level": 2
+  },
+  {
+   "id": "m102",
+   "word": "Vulkan",
+   "level": 2
+  },
+  {
+   "id": "m103",
+   "word": "Schatzkiste",
+   "level": 2
+  },
+  {
+   "id": "m104",
+   "word": "Piratenschiff",
+   "level": 2
+  },
+  {
+   "id": "m105",
+   "word": "Ritter",
+   "level": 2
+  },
+  {
+   "id": "m106",
+   "word": "Drache",
+   "level": 2,
+   "alt": [
+    "Drachen"
+   ]
+  },
+  {
+   "id": "m107",
+   "word": "Einhorn",
+   "level": 2
+  },
+  {
+   "id": "m108",
+   "word": "Meerjungfrau",
+   "level": 2
+  },
+  {
+   "id": "m109",
+   "word": "Zauberer",
+   "level": 2
+  },
+  {
+   "id": "m110",
+   "word": "Hexe",
+   "level": 2
+  },
+  {
+   "id": "m111",
+   "word": "Vampir",
+   "level": 2
+  },
+  {
+   "id": "m112",
+   "word": "Mumie",
+   "level": 2
+  },
+  {
+   "id": "m113",
+   "word": "Astronaut",
+   "level": 2
+  },
+  {
+   "id": "m114",
+   "word": "Ufo",
+   "level": 2,
+   "alt": [
+    "UFO"
+   ]
+  },
+  {
+   "id": "m115",
+   "word": "Taucher",
+   "level": 2
+  },
+  {
+   "id": "m116",
+   "word": "Feuerwehr",
+   "level": 2,
+   "alt": [
+    "Feuerwehrauto"
+   ]
+  },
+  {
+   "id": "m117",
+   "word": "Krankenwagen",
+   "level": 2
+  },
+  {
+   "id": "m118",
+   "word": "Polizist",
+   "level": 2,
+   "alt": [
+    "Polizei"
+   ]
+  },
+  {
+   "id": "m119",
+   "word": "Koch",
+   "level": 2
+  },
+  {
+   "id": "m120",
+   "word": "Clown",
+   "level": 2
+  },
+  {
+   "id": "m121",
+   "word": "Pinguin",
+   "level": 2
+  },
+  {
+   "id": "m122",
+   "word": "Krokodil",
+   "level": 2
+  },
+  {
+   "id": "m123",
+   "word": "Känguru",
+   "level": 2
+  },
+  {
+   "id": "m124",
+   "word": "Eule",
+   "level": 2
+  },
+  {
+   "id": "m125",
+   "word": "Igel",
+   "level": 2
+  },
+  {
+   "id": "m126",
+   "word": "Frosch",
+   "level": 2
+  },
+  {
+   "id": "m127",
+   "word": "Krake",
+   "level": 2,
+   "alt": [
+    "Oktopus",
+    "Tintenfisch"
+   ]
+  },
+  {
+   "id": "m128",
+   "word": "Hai",
+   "level": 2,
+   "alt": [
+    "Haifisch"
+   ]
+  },
+  {
+   "id": "m129",
+   "word": "Wal",
+   "level": 2,
+   "alt": [
+    "Walfisch"
+   ]
+  },
+  {
+   "id": "m130",
+   "word": "Qualle",
+   "level": 2
+  },
+  {
+   "id": "m131",
+   "word": "Seestern",
+   "level": 2
+  },
+  {
+   "id": "m132",
+   "word": "Schildkröte",
+   "level": 2
+  },
+  {
+   "id": "m133",
+   "word": "Faultier",
+   "level": 2
+  },
+  {
+   "id": "m134",
+   "word": "Flamingo",
+   "level": 2
+  },
+  {
+   "id": "m135",
+   "word": "Papagei",
+   "level": 2
+  },
+  {
+   "id": "m136",
+   "word": "Kamel",
+   "level": 2
+  },
+  {
+   "id": "m137",
+   "word": "Dinosaurier",
+   "level": 2,
+   "alt": [
+    "Dino"
+   ]
+  },
+  {
+   "id": "m138",
+   "word": "Sandburg",
+   "level": 2
+  },
+  {
+   "id": "m139",
+   "word": "Iglu",
+   "level": 2
+  },
+  {
+   "id": "m140",
+   "word": "Burg",
+   "level": 2
+  },
+  {
+   "id": "m141",
+   "word": "Pyramide",
+   "level": 2
+  },
+  {
+   "id": "m142",
+   "word": "Windmühle",
+   "level": 2
+  },
+  {
+   "id": "m143",
+   "word": "Riesenrad",
+   "level": 2
+  },
+  {
+   "id": "m144",
+   "word": "Achterbahn",
+   "level": 2
+  },
+  {
+   "id": "m145",
+   "word": "Karussell",
+   "level": 2
+  },
+  {
+   "id": "m146",
+   "word": "Wippe",
+   "level": 2
+  },
+  {
+   "id": "m147",
+   "word": "Rutsche",
+   "level": 2
+  },
+  {
+   "id": "m148",
+   "word": "Schaukel",
+   "level": 2
+  },
+  {
+   "id": "m149",
+   "word": "Trampolin",
+   "level": 2
+  },
+  {
+   "id": "m150",
+   "word": "Hängematte",
+   "level": 2
+  },
+  {
+   "id": "m151",
+   "word": "Lagerfeuer",
+   "level": 2
+  },
+  {
+   "id": "m152",
+   "word": "Grill",
+   "level": 2
+  },
+  {
+   "id": "m153",
+   "word": "Picknick",
+   "level": 2
+  },
+  {
+   "id": "m154",
+   "word": "Kühlschrank",
+   "level": 2,
+   "alt": [
+    "Kuehlschrank"
+   ]
+  },
+  {
+   "id": "m155",
+   "word": "Waschmaschine",
+   "level": 2
+  },
+  {
+   "id": "m156",
+   "word": "Staubsauger",
+   "level": 2
+  },
+  {
+   "id": "m157",
+   "word": "Toaster",
+   "level": 2
+  },
+  {
+   "id": "m158",
+   "word": "Wecker",
+   "level": 2
+  },
+  {
+   "id": "m159",
+   "word": "Badewanne",
+   "level": 2
+  },
+  {
+   "id": "m160",
+   "word": "Dusche",
+   "level": 2
+  },
+  {
+   "id": "m161",
+   "word": "Toilette",
+   "level": 2,
+   "alt": [
+    "Klo",
+    "WC"
+   ]
+  },
+  {
+   "id": "m162",
+   "word": "Spiegel",
+   "level": 2
+  },
+  {
+   "id": "m163",
+   "word": "Kopfhörer",
+   "level": 2
+  },
+  {
+   "id": "m164",
+   "word": "Mikrofon",
+   "level": 2
+  },
+  {
+   "id": "m165",
+   "word": "Klavier",
+   "level": 2
+  },
+  {
+   "id": "m166",
+   "word": "Geige",
+   "level": 2
+  },
+  {
+   "id": "m167",
+   "word": "Trompete",
+   "level": 2
+  },
+  {
+   "id": "m168",
+   "word": "Fußball",
+   "level": 2,
+   "alt": [
+    "Fussball"
+   ]
+  },
+  {
+   "id": "m169",
+   "word": "Basketball",
+   "level": 2
+  },
+  {
+   "id": "m170",
+   "word": "Tennis",
+   "level": 2
+  },
+  {
+   "id": "m171",
+   "word": "Skateboard",
+   "level": 2
+  },
+  {
+   "id": "m172",
+   "word": "Ski",
+   "level": 2,
+   "alt": [
+    "Skier"
+   ]
+  },
+  {
+   "id": "m173",
+   "word": "Schlitten",
+   "level": 2
+  },
+  {
+   "id": "m174",
+   "word": "Surfbrett",
+   "level": 2
+  },
+  {
+   "id": "m175",
+   "word": "Angel",
+   "level": 2,
+   "alt": [
+    "Angelrute"
+   ]
+  },
+  {
+   "id": "m176",
+   "word": "Zahnarzt",
+   "level": 2
+  },
+  {
+   "id": "m177",
+   "word": "Friseur",
+   "level": 2
+  },
+  {
+   "id": "m178",
+   "word": "Schornstein",
+   "level": 2
+  },
+  {
+   "id": "m179",
+   "word": "Briefkasten",
+   "level": 2
+  },
+  {
+   "id": "m180",
+   "word": "Gartenzwerg",
+   "level": 2
+  },
+  {
+   "id": "m181",
+   "word": "Vogelscheuche",
+   "level": 2
+  },
+  {
+   "id": "m182",
+   "word": "Spinnennetz",
+   "level": 2
+  },
+  {
+   "id": "m183",
+   "word": "Regenbogen",
+   "level": 2
+  },
+  {
+   "id": "m184",
+   "word": "Blitz",
+   "level": 2
+  },
+  {
+   "id": "m185",
+   "word": "Tornado",
+   "level": 2
+  },
+  {
+   "id": "m186",
+   "word": "Schneeflocke",
+   "level": 2
+  },
+  {
+   "id": "m187",
+   "word": "Sonnenblume",
+   "level": 2
+  },
+  {
+   "id": "m188",
+   "word": "Palme",
+   "level": 2
+  },
+  {
+   "id": "m189",
+   "word": "Weihnachtsbaum",
+   "level": 2
+  },
+  {
+   "id": "m190",
+   "word": "Osterei",
+   "level": 2
+  },
+  {
+   "id": "m191",
+   "word": "Kürbis",
+   "level": 2
+  },
+  {
+   "id": "m192",
+   "word": "Popcorn",
+   "level": 2
+  },
+  {
+   "id": "m193",
+   "word": "Spaghetti",
+   "level": 2
+  },
+  {
+   "id": "m194",
+   "word": "Sushi",
+   "level": 2
+  },
+  {
+   "id": "m195",
+   "word": "Brezel",
+   "level": 2
+  },
+  {
+   "id": "m196",
+   "word": "Hotdog",
+   "level": 2,
+   "alt": [
+    "Hot Dog"
+   ]
+  },
+  {
+   "id": "m197",
+   "word": "Donut",
+   "level": 2,
+   "alt": [
+    "Doughnut"
+   ]
+  },
+  {
+   "id": "m198",
+   "word": "Wassermelone",
+   "level": 2
+  },
+  {
+   "id": "m199",
+   "word": "Ananas",
+   "level": 2
+  },
+  {
+   "id": "m200",
+   "word": "Zitrone",
+   "level": 2
+  },
+  {
+   "id": "m201",
+   "word": "Lutscher",
+   "level": 2
+  },
+  {
+   "id": "m202",
+   "word": "Fallschirm",
+   "level": 2
+  },
+  {
+   "id": "m203",
+   "word": "Heißluftballon",
+   "level": 2
+  },
+  {
+   "id": "m204",
+   "word": "Hubschrauber",
+   "level": 2
+  },
+  {
+   "id": "m205",
+   "word": "U-Boot",
+   "level": 2,
+   "alt": [
+    "Uboot"
+   ]
+  },
+  {
+   "id": "m206",
+   "word": "Traktor",
+   "level": 2
+  },
+  {
+   "id": "m207",
+   "word": "Bagger",
+   "level": 2
+  },
+  {
+   "id": "m208",
+   "word": "Rollstuhl",
+   "level": 2
+  },
+  {
+   "id": "m209",
+   "word": "Kinderwagen",
+   "level": 2
+  },
+  {
+   "id": "m210",
+   "word": "Einkaufswagen",
+   "level": 2
+  },
+  {
+   "id": "m211",
+   "word": "Koffer",
+   "level": 2
+  },
+  {
+   "id": "m212",
+   "word": "Rucksack",
+   "level": 2
+  },
+  {
+   "id": "m213",
+   "word": "Krawatte",
+   "level": 2
+  },
+  {
+   "id": "m214",
+   "word": "Handschuh",
+   "level": 2
+  },
+  {
+   "id": "m215",
+   "word": "Bikini",
+   "level": 2
+  },
+  {
+   "id": "m216",
+   "word": "Taschenlampe",
+   "level": 2
+  },
+  {
+   "id": "m217",
+   "word": "Lupe",
+   "level": 2
+  },
+  {
+   "id": "m218",
+   "word": "Kompass",
+   "level": 2
+  },
+  {
+   "id": "m219",
+   "word": "Anker",
+   "level": 2
+  },
+  {
+   "id": "m220",
+   "word": "Glühbirne",
+   "level": 2
+  },
+  {
+   "id": "m221",
+   "word": "Batterie",
+   "level": 2
+  },
+  {
+   "id": "m222",
+   "word": "Magnet",
+   "level": 2
+  },
+  {
+   "id": "m223",
+   "word": "Sanduhr",
+   "level": 2
+  },
+  {
+   "id": "m224",
+   "word": "Sonnenfinsternis",
+   "level": 3
+  },
+  {
+   "id": "m225",
+   "word": "Erdbeben",
+   "level": 3
+  },
+  {
+   "id": "m226",
+   "word": "Schwerkraft",
+   "level": 3
+  },
+  {
+   "id": "m227",
+   "word": "Echo",
+   "level": 3
+  },
+  {
+   "id": "m228",
+   "word": "Schatten",
+   "level": 3
+  },
+  {
+   "id": "m229",
+   "word": "Spiegelbild",
+   "level": 3
+  },
+  {
+   "id": "m230",
+   "word": "Albtraum",
+   "level": 3
+  },
+  {
+   "id": "m231",
+   "word": "Schlafwandler",
+   "level": 3
+  },
+  {
+   "id": "m232",
+   "word": "Heimweh",
+   "level": 3
+  },
+  {
+   "id": "m233",
+   "word": "Muskelkater",
+   "level": 3
+  },
+  {
+   "id": "m234",
+   "word": "Schluckauf",
+   "level": 3
+  },
+  {
+   "id": "m235",
+   "word": "Sonnenbrand",
+   "level": 3
+  },
+  {
+   "id": "m236",
+   "word": "Gänsehaut",
+   "level": 3
+  },
+  {
+   "id": "m237",
+   "word": "Ohrwurm",
+   "level": 3
+  },
+  {
+   "id": "m238",
+   "word": "Lampenfieber",
+   "level": 3
+  },
+  {
+   "id": "m239",
+   "word": "Stau",
+   "level": 3
+  },
+  {
+   "id": "m240",
+   "word": "Feueralarm",
+   "level": 3
+  },
+  {
+   "id": "m241",
+   "word": "Stromausfall",
+   "level": 3
+  },
+  {
+   "id": "m242",
+   "word": "Geburtstagsparty",
+   "level": 3
+  },
+  {
+   "id": "m243",
+   "word": "Hochzeit",
+   "level": 3
+  },
+  {
+   "id": "m244",
+   "word": "Flitterwochen",
+   "level": 3
+  },
+  {
+   "id": "m245",
+   "word": "Zeitreise",
+   "level": 3
+  },
+  {
+   "id": "m246",
+   "word": "Wettervorhersage",
+   "level": 3
+  },
+  {
+   "id": "m247",
+   "word": "Weltraum",
+   "level": 3
+  },
+  {
+   "id": "m248",
+   "word": "Schwarzes Loch",
+   "level": 3
+  },
+  {
+   "id": "m249",
+   "word": "Sternschnuppe",
+   "level": 3
+  },
+  {
+   "id": "m250",
+   "word": "Nordlicht",
+   "level": 3
+  },
+  {
+   "id": "m251",
+   "word": "Ebbe und Flut",
+   "level": 3,
+   "alt": [
+    "Gezeiten"
+   ]
+  },
+  {
+   "id": "m252",
+   "word": "Wüste",
+   "level": 3
+  },
+  {
+   "id": "m253",
+   "word": "Dschungel",
+   "level": 3
+  },
+  {
+   "id": "m254",
+   "word": "Wasserfall",
+   "level": 3
+  },
+  {
+   "id": "m255",
+   "word": "Gletscher",
+   "level": 3
+  },
+  {
+   "id": "m256",
+   "word": "Bermudadreieck",
+   "level": 3
+  },
+  {
+   "id": "m257",
+   "word": "Freiheitsstatue",
+   "level": 3
+  },
+  {
+   "id": "m258",
+   "word": "Eiffelturm",
+   "level": 3
+  },
+  {
+   "id": "m259",
+   "word": "Mona Lisa",
+   "level": 3
+  },
+  {
+   "id": "m260",
+   "word": "Schneewittchen",
+   "level": 3
+  },
+  {
+   "id": "m261",
+   "word": "Rotkäppchen",
+   "level": 3
+  },
+  {
+   "id": "m262",
+   "word": "Weihnachtsmann",
+   "level": 3,
+   "alt": [
+    "Nikolaus"
+   ]
+  },
+  {
+   "id": "m263",
+   "word": "Osterhase",
+   "level": 3
+  },
+  {
+   "id": "m264",
+   "word": "Zahnfee",
+   "level": 3
+  },
+  {
+   "id": "m265",
+   "word": "Dornröschen",
+   "level": 3
+  },
+  {
+   "id": "m266",
+   "word": "Superheld",
+   "level": 3
+  },
+  {
+   "id": "m267",
+   "word": "Detektiv",
+   "level": 3
+  },
+  {
+   "id": "m268",
+   "word": "Bankraub",
+   "level": 3
+  },
+  {
+   "id": "m269",
+   "word": "Gefängnis",
+   "level": 3
+  },
+  {
+   "id": "m270",
+   "word": "Gericht",
+   "level": 3
+  },
+  {
+   "id": "m271",
+   "word": "Zirkus",
+   "level": 3
+  },
+  {
+   "id": "m272",
+   "word": "Zauberwürfel",
+   "level": 3,
+   "alt": [
+    "Rubiks Cube"
+   ]
+  },
+  {
+   "id": "m273",
+   "word": "Puzzle",
+   "level": 3
+  },
+  {
+   "id": "m274",
+   "word": "Domino",
+   "level": 3
+  },
+  {
+   "id": "m275",
+   "word": "Schach",
+   "level": 3
+  },
+  {
+   "id": "m276",
+   "word": "Versteckspiel",
+   "level": 3
+  },
+  {
+   "id": "m277",
+   "word": "Seilspringen",
+   "level": 3
+  },
+  {
+   "id": "m278",
+   "word": "Tauziehen",
+   "level": 3
+  },
+  {
+   "id": "m279",
+   "word": "Kissenschlacht",
+   "level": 3
+  },
+  {
+   "id": "m280",
+   "word": "Schneeballschlacht",
+   "level": 3
+  },
+  {
+   "id": "m281",
+   "word": "Bauchklatscher",
+   "level": 3
+  },
+  {
+   "id": "m282",
+   "word": "Kopfstand",
+   "level": 3
+  },
+  {
+   "id": "m283",
+   "word": "Spagat",
+   "level": 3
+  },
+  {
+   "id": "m284",
+   "word": "Purzelbaum",
+   "level": 3
+  },
+  {
+   "id": "m285",
+   "word": "Selfie",
+   "level": 3
+  },
+  {
+   "id": "m286",
+   "word": "Videoanruf",
+   "level": 3
+  },
+  {
+   "id": "m287",
+   "word": "Passwort",
+   "level": 3
+  },
+  {
+   "id": "m288",
+   "word": "Akku leer",
+   "level": 3,
+   "alt": [
+    "leerer Akku"
+   ]
+  },
+  {
+   "id": "m289",
+   "word": "WLAN",
+   "level": 3,
+   "alt": [
+    "WiFi",
+    "Wifi"
+   ]
+  },
+  {
+   "id": "m290",
+   "word": "Einkaufsliste",
+   "level": 3
+  },
+  {
+   "id": "m291",
+   "word": "Hausaufgaben",
+   "level": 3
+  },
+  {
+   "id": "m292",
+   "word": "Zeugnis",
+   "level": 3
+  },
+  {
+   "id": "m293",
+   "word": "Fahrprüfung",
+   "level": 3
+  },
+  {
+   "id": "m294",
+   "word": "Bewerbungsgespräch",
+   "level": 3
+  },
+  {
+   "id": "m295",
+   "word": "Montagmorgen",
+   "level": 3,
+   "alt": [
+    "Montag"
+   ]
+  },
+  {
+   "id": "m296",
+   "word": "Mittagsschlaf",
+   "level": 3,
+   "alt": [
+    "Nickerchen"
+   ]
+  },
+  {
+   "id": "m297",
+   "word": "Frühjahrsputz",
+   "level": 3
+  },
+  {
+   "id": "m298",
+   "word": "Umzug",
+   "level": 3
+  },
+  {
+   "id": "m299",
+   "word": "Flohmarkt",
+   "level": 3
+  },
+  {
+   "id": "m300",
+   "word": "Kassenschlange",
+   "level": 3
+  },
+  {
+   "id": "m301",
+   "word": "Rolltreppe",
+   "level": 3
+  },
+  {
+   "id": "m302",
+   "word": "Aufzug",
+   "level": 3,
+   "alt": [
+    "Fahrstuhl",
+    "Lift"
+   ]
+  },
+  {
+   "id": "m303",
+   "word": "Drehtür",
+   "level": 3
+  },
+  {
+   "id": "m304",
+   "word": "Parkhaus",
+   "level": 3
+  },
+  {
+   "id": "m305",
+   "word": "Tankstelle",
+   "level": 3
+  },
+  {
+   "id": "m306",
+   "word": "Autowaschanlage",
+   "level": 3
+  },
+  {
+   "id": "m307",
+   "word": "Kläranlage",
+   "level": 3
+  },
+  {
+   "id": "m308",
+   "word": "Windrad",
+   "level": 3
+  },
+  {
+   "id": "m309",
+   "word": "Solarzelle",
+   "level": 3
+  },
+  {
+   "id": "m310",
+   "word": "Recycling",
+   "level": 3
+  },
+  {
+   "id": "m311",
+   "word": "Fingerabdruck",
+   "level": 3
+  },
+  {
+   "id": "m312",
+   "word": "Röntgenbild",
+   "level": 3
+  },
+  {
+   "id": "m313",
+   "word": "Gips",
+   "level": 3
+  },
+  {
+   "id": "m314",
+   "word": "Pflaster",
+   "level": 3,
+   "alt": [
+    "Heftpflaster"
+   ]
+  },
+  {
+   "id": "m315",
+   "word": "Fieberthermometer",
+   "level": 3
+  },
+  {
+   "id": "m316",
+   "word": "Zahnspange",
+   "level": 3
+  }
+ ]
+}

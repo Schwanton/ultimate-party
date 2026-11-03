@@ -383,10 +383,13 @@ export class Room {
         return p ? { ...p.info } : undefined;
       },
       vip: () => room.vipId,
-      stream: (data) => {
+      stream: (data, opts) => {
         if (!alive()) return;
         const msg = JSON.stringify({ t: 'stream', now: Date.now(), d: data });
         for (const ws of room.hosts) send(ws, msg);
+        if (opts?.phones) {
+          for (const p of room.players.values()) if (g.memberIds.has(p.info.id)) for (const ws of p.sockets) send(ws, msg);
+        }
       },
       content: <T,>() => room.contentFor(g) as T[],
       setHostView(view) {

@@ -109,7 +109,7 @@ export default {
 | `ctx.audience()` | aktuelles Publikum |
 | `ctx.player(id)` | aktuelle Infos zu einem Spieler (z. B. ob verbunden) |
 | `ctx.vip()` | aktuelle*r VIP – z. B. wer im Spiel entscheidet, wie es weitergeht |
-| `ctx.stream(data)` | schnelle Live-Daten an den TV (z. B. Positionen 30× pro Sekunde), ohne die ganze Ansicht neu zu senden – im TV mit `useStream()` aus `@up/ui` lesen. Beispiel: `games/sumo` |
+| `ctx.stream(data)` | schnelle Live-Daten an den TV (z. B. Positionen 30× pro Sekunde), ohne die ganze Ansicht neu zu senden – im TV mit `useStream()` aus `@up/ui` lesen. Mit `ctx.stream(data, { phones: true })` geht es zusätzlich an alle Handys. Beispiele: `games/sumo`, `games/montagsmaler` (Live-Zeichnung) |
 | `ctx.lang` | Raumsprache (`de` / `en`) |
 | `ctx.content()` | Einträge aller aktivierten Content-Packs, gemischt, ungespielte zuerst |
 | `ctx.setHostView(view)` | Ansicht für den TV |

@@ -109,6 +109,7 @@ textarea.up-input { resize: none; line-height: 1.3; }
 @keyframes upFade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes upChip { 0% { transform: scale(0) translateY(-20px); opacity: 0; } 70% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
 @keyframes upSpin { to { transform: rotate(360deg); } }
+@keyframes upFlyIn { 0% { opacity: 0; transform: translateX(-90px) scale(.6); } 70% { opacity: 1; } }
 
 .anim-pop { animation: upPop .5s ease-out both; }
 .anim-up { animation: upSlideUp .45s ease-out both; }

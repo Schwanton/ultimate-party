@@ -52,6 +52,9 @@ const scenarios: { game: string; players: number; options?: Record<string, numbe
   { game: 'sumo', players: 2 },
   { game: 'sumo', players: 12 },
   { game: 'sumo', players: 60 },
+  { game: 'montagsmaler', players: 2 },
+  { game: 'montagsmaler', players: 7 },
+  { game: 'montagsmaler', players: 30 },
   // mit Spiel-Einstellungen
   { game: 'schlagfertig', players: 4, options: { rounds: 5, answerTime: 0.75 } },
   { game: 'bluff', players: 4, options: { questions: 3 } },
@@ -65,6 +68,8 @@ const scenarios: { game: string; players: number; options?: Record<string, numbe
   { game: 'crash', players: 4, options: { rounds: 4 } },
   { game: 'kartoffel', players: 5, options: { lives: 2 } },
   { game: 'sumo', players: 4, options: { rounds: 1 } },
+  { game: 'montagsmaler', players: 5, options: { mode: 'team', rounds: 4 } },
+  { game: 'montagsmaler', players: 3, options: { mode: 'team' } },
 ];
 // Nur bestimmte Spiele testen:  npm test -- mehrheit wer-wars
 const only = process.argv.slice(2);

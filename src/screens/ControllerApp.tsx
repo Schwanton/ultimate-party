@@ -3,7 +3,7 @@ import { ANIMALS, type Animal, type Avatar as AvatarData } from '@up/sdk';
 import { net, useNet, loadSession, saveSession } from '../net';
 import { guessLang, useT } from '../i18n';
 import registry, { clientGame } from '../registry';
-import { Avatar, Crown, Logo, isLight, shade, vibrate } from '../ui';
+import { Avatar, Crown, FullscreenButton, Logo, isLight, shade, vibrate } from '../ui';
 import { GameOptionsForm, optionsSummary } from './GameOptions';
 import { fitOf, gameDesc, useTagFilter } from './GameLibrary';
 
@@ -187,7 +187,10 @@ function PhoneLobby({ onEditAvatar }: { onEditAvatar: () => void }) {
     <>
       <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Logo size={24} />
-        <span className="up-chip">{t('lobby.room')} <b>{room.code}</b></span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span className="up-chip">{t('lobby.room')} <b>{room.code}</b></span>
+          <FullscreenButton enter={t('fullscreen.enter')} exit={t('fullscreen.exit')} size={44} />
+        </span>
       </header>
 
       <section style={{ background: me.color, borderRadius: 24, padding: 20, display: 'flex', alignItems: 'center', gap: 16, boxShadow: `0 6px 0 ${shade(me.color)}`, color: isLight(me.color) ? '#110D24' : '#fff' }}>

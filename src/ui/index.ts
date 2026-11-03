@@ -11,3 +11,4 @@ export { sfx } from './sound';
 export type { SoundName, SynthApi, MusicTrack } from './sound';
 export { useDraft } from './draft';
 export { useStream } from '../net';
+export { FullscreenButton, useFullscreen, toggleFullscreen, fullscreenSupported } from './fullscreen';

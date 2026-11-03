@@ -1,0 +1,1732 @@
+{
+ "name": "Basics",
+ "author": "UP!",
+ "version": "1.0.0",
+ "description": "Drawable words in three difficulty levels",
+ "items": [
+  {
+   "id": "m1",
+   "word": "house",
+   "level": 1
+  },
+  {
+   "id": "m2",
+   "word": "cat",
+   "level": 1
+  },
+  {
+   "id": "m3",
+   "word": "dog",
+   "level": 1
+  },
+  {
+   "id": "m4",
+   "word": "sun",
+   "level": 1
+  },
+  {
+   "id": "m5",
+   "word": "moon",
+   "level": 1
+  },
+  {
+   "id": "m6",
+   "word": "tree",
+   "level": 1
+  },
+  {
+   "id": "m7",
+   "word": "flower",
+   "level": 1
+  },
+  {
+   "id": "m8",
+   "word": "car",
+   "level": 1
+  },
+  {
+   "id": "m9",
+   "word": "fish",
+   "level": 1
+  },
+  {
+   "id": "m10",
+   "word": "apple",
+   "level": 1
+  },
+  {
+   "id": "m11",
+   "word": "banana",
+   "level": 1
+  },
+  {
+   "id": "m12",
+   "word": "ball",
+   "level": 1
+  },
+  {
+   "id": "m13",
+   "word": "star",
+   "level": 1
+  },
+  {
+   "id": "m14",
+   "word": "heart",
+   "level": 1
+  },
+  {
+   "id": "m15",
+   "word": "ship",
+   "level": 1
+  },
+  {
+   "id": "m16",
+   "word": "boat",
+   "level": 1
+  },
+  {
+   "id": "m17",
+   "word": "bird",
+   "level": 1
+  },
+  {
+   "id": "m18",
+   "word": "glasses",
+   "level": 1,
+   "alt": [
+    "spectacles"
+   ]
+  },
+  {
+   "id": "m19",
+   "word": "hat",
+   "level": 1
+  },
+  {
+   "id": "m20",
+   "word": "shoe",
+   "level": 1
+  },
+  {
+   "id": "m21",
+   "word": "sock",
+   "level": 1
+  },
+  {
+   "id": "m22",
+   "word": "clock",
+   "level": 1
+  },
+  {
+   "id": "m23",
+   "word": "key",
+   "level": 1
+  },
+  {
+   "id": "m24",
+   "word": "door",
+   "level": 1
+  },
+  {
+   "id": "m25",
+   "word": "window",
+   "level": 1
+  },
+  {
+   "id": "m26",
+   "word": "bed",
+   "level": 1
+  },
+  {
+   "id": "m27",
+   "word": "chair",
+   "level": 1
+  },
+  {
+   "id": "m28",
+   "word": "table",
+   "level": 1
+  },
+  {
+   "id": "m29",
+   "word": "lamp",
+   "level": 1
+  },
+  {
+   "id": "m30",
+   "word": "book",
+   "level": 1
+  },
+  {
+   "id": "m31",
+   "word": "pencil",
+   "level": 1
+  },
+  {
+   "id": "m32",
+   "word": "scissors",
+   "level": 1
+  },
+  {
+   "id": "m33",
+   "word": "spoon",
+   "level": 1
+  },
+  {
+   "id": "m34",
+   "word": "fork",
+   "level": 1
+  },
+  {
+   "id": "m35",
+   "word": "knife",
+   "level": 1
+  },
+  {
+   "id": "m36",
+   "word": "cup",
+   "level": 1
+  },
+  {
+   "id": "m37",
+   "word": "candle",
+   "level": 1
+  },
+  {
+   "id": "m38",
+   "word": "umbrella",
+   "level": 1
+  },
+  {
+   "id": "m39",
+   "word": "cloud",
+   "level": 1
+  },
+  {
+   "id": "m40",
+   "word": "rain",
+   "level": 1
+  },
+  {
+   "id": "m41",
+   "word": "snowman",
+   "level": 1
+  },
+  {
+   "id": "m42",
+   "word": "ice cream",
+   "level": 1
+  },
+  {
+   "id": "m43",
+   "word": "pizza",
+   "level": 1
+  },
+  {
+   "id": "m44",
+   "word": "cake",
+   "level": 1
+  },
+  {
+   "id": "m45",
+   "word": "egg",
+   "level": 1
+  },
+  {
+   "id": "m46",
+   "word": "cheese",
+   "level": 1
+  },
+  {
+   "id": "m47",
+   "word": "carrot",
+   "level": 1
+  },
+  {
+   "id": "m48",
+   "word": "mushroom",
+   "level": 1
+  },
+  {
+   "id": "m49",
+   "word": "strawberry",
+   "level": 1
+  },
+  {
+   "id": "m50",
+   "word": "cherry",
+   "level": 1
+  },
+  {
+   "id": "m51",
+   "word": "snail",
+   "level": 1
+  },
+  {
+   "id": "m52",
+   "word": "spider",
+   "level": 1
+  },
+  {
+   "id": "m53",
+   "word": "bee",
+   "level": 1
+  },
+  {
+   "id": "m54",
+   "word": "butterfly",
+   "level": 1
+  },
+  {
+   "id": "m55",
+   "word": "mouse",
+   "level": 1
+  },
+  {
+   "id": "m56",
+   "word": "pig",
+   "level": 1
+  },
+  {
+   "id": "m57",
+   "word": "cow",
+   "level": 1
+  },
+  {
+   "id": "m58",
+   "word": "horse",
+   "level": 1
+  },
+  {
+   "id": "m59",
+   "word": "duck",
+   "level": 1
+  },
+  {
+   "id": "m60",
+   "word": "snake",
+   "level": 1
+  },
+  {
+   "id": "m61",
+   "word": "elephant",
+   "level": 1
+  },
+  {
+   "id": "m62",
+   "word": "giraffe",
+   "level": 1
+  },
+  {
+   "id": "m63",
+   "word": "crown",
+   "level": 1
+  },
+  {
+   "id": "m64",
+   "word": "rocket",
+   "level": 1
+  },
+  {
+   "id": "m65",
+   "word": "plane",
+   "level": 1,
+   "alt": [
+    "airplane",
+    "aeroplane"
+   ]
+  },
+  {
+   "id": "m66",
+   "word": "bicycle",
+   "level": 1,
+   "alt": [
+    "bike"
+   ]
+  },
+  {
+   "id": "m67",
+   "word": "train",
+   "level": 1
+  },
+  {
+   "id": "m68",
+   "word": "traffic light",
+   "level": 1,
+   "alt": [
+    "traffic lights"
+   ]
+  },
+  {
+   "id": "m69",
+   "word": "bridge",
+   "level": 1
+  },
+  {
+   "id": "m70",
+   "word": "mountain",
+   "level": 1
+  },
+  {
+   "id": "m71",
+   "word": "island",
+   "level": 1
+  },
+  {
+   "id": "m72",
+   "word": "tent",
+   "level": 1
+  },
+  {
+   "id": "m73",
+   "word": "cactus",
+   "level": 1
+  },
+  {
+   "id": "m74",
+   "word": "guitar",
+   "level": 1
+  },
+  {
+   "id": "m75",
+   "word": "drum",
+   "level": 1
+  },
+  {
+   "id": "m76",
+   "word": "bell",
+   "level": 1
+  },
+  {
+   "id": "m77",
+   "word": "present",
+   "level": 1,
+   "alt": [
+    "gift"
+   ]
+  },
+  {
+   "id": "m78",
+   "word": "balloon",
+   "level": 1
+  },
+  {
+   "id": "m79",
+   "word": "kite",
+   "level": 1
+  },
+  {
+   "id": "m80",
+   "word": "hammer",
+   "level": 1
+  },
+  {
+   "id": "m81",
+   "word": "ladder",
+   "level": 1
+  },
+  {
+   "id": "m82",
+   "word": "toothbrush",
+   "level": 1
+  },
+  {
+   "id": "m83",
+   "word": "phone",
+   "level": 1,
+   "alt": [
+    "smartphone",
+    "cell phone",
+    "mobile"
+   ]
+  },
+  {
+   "id": "m84",
+   "word": "TV",
+   "level": 1,
+   "alt": [
+    "television"
+   ]
+  },
+  {
+   "id": "m85",
+   "word": "computer",
+   "level": 1
+  },
+  {
+   "id": "m86",
+   "word": "camera",
+   "level": 1
+  },
+  {
+   "id": "m87",
+   "word": "letter",
+   "level": 1
+  },
+  {
+   "id": "m88",
+   "word": "burger",
+   "level": 1
+  },
+  {
+   "id": "m89",
+   "word": "fries",
+   "level": 1,
+   "alt": [
+    "french fries",
+    "chips"
+   ]
+  },
+  {
+   "id": "m90",
+   "word": "candy",
+   "level": 1,
+   "alt": [
+    "sweet",
+    "sweets"
+   ]
+  },
+  {
+   "id": "m91",
+   "word": "teddy bear",
+   "level": 1,
+   "alt": [
+    "teddy"
+   ]
+  },
+  {
+   "id": "m92",
+   "word": "robot",
+   "level": 1
+  },
+  {
+   "id": "m93",
+   "word": "ghost",
+   "level": 1
+  },
+  {
+   "id": "m94",
+   "word": "monster",
+   "level": 1
+  },
+  {
+   "id": "m95",
+   "word": "tooth",
+   "level": 1
+  },
+  {
+   "id": "m96",
+   "word": "eye",
+   "level": 1
+  },
+  {
+   "id": "m97",
+   "word": "nose",
+   "level": 1
+  },
+  {
+   "id": "m98",
+   "word": "hand",
+   "level": 1
+  },
+  {
+   "id": "m99",
+   "word": "foot",
+   "level": 1
+  },
+  {
+   "id": "m100",
+   "word": "ear",
+   "level": 1
+  },
+  {
+   "id": "m101",
+   "word": "lighthouse",
+   "level": 2
+  },
+  {
+   "id": "m102",
+   "word": "volcano",
+   "level": 2
+  },
+  {
+   "id": "m103",
+   "word": "treasure chest",
+   "level": 2
+  },
+  {
+   "id": "m104",
+   "word": "pirate ship",
+   "level": 2
+  },
+  {
+   "id": "m105",
+   "word": "knight",
+   "level": 2
+  },
+  {
+   "id": "m106",
+   "word": "dragon",
+   "level": 2
+  },
+  {
+   "id": "m107",
+   "word": "unicorn",
+   "level": 2
+  },
+  {
+   "id": "m108",
+   "word": "mermaid",
+   "level": 2
+  },
+  {
+   "id": "m109",
+   "word": "wizard",
+   "level": 2
+  },
+  {
+   "id": "m110",
+   "word": "witch",
+   "level": 2
+  },
+  {
+   "id": "m111",
+   "word": "vampire",
+   "level": 2
+  },
+  {
+   "id": "m112",
+   "word": "mummy",
+   "level": 2
+  },
+  {
+   "id": "m113",
+   "word": "astronaut",
+   "level": 2
+  },
+  {
+   "id": "m114",
+   "word": "UFO",
+   "level": 2,
+   "alt": [
+    "flying saucer"
+   ]
+  },
+  {
+   "id": "m115",
+   "word": "diver",
+   "level": 2
+  },
+  {
+   "id": "m116",
+   "word": "fire truck",
+   "level": 2,
+   "alt": [
+    "fire engine"
+   ]
+  },
+  {
+   "id": "m117",
+   "word": "ambulance",
+   "level": 2
+  },
+  {
+   "id": "m118",
+   "word": "police officer",
+   "level": 2,
+   "alt": [
+    "policeman",
+    "police",
+    "cop"
+   ]
+  },
+  {
+   "id": "m119",
+   "word": "chef",
+   "level": 2
+  },
+  {
+   "id": "m120",
+   "word": "clown",
+   "level": 2
+  },
+  {
+   "id": "m121",
+   "word": "penguin",
+   "level": 2
+  },
+  {
+   "id": "m122",
+   "word": "crocodile",
+   "level": 2
+  },
+  {
+   "id": "m123",
+   "word": "kangaroo",
+   "level": 2
+  },
+  {
+   "id": "m124",
+   "word": "owl",
+   "level": 2
+  },
+  {
+   "id": "m125",
+   "word": "hedgehog",
+   "level": 2
+  },
+  {
+   "id": "m126",
+   "word": "frog",
+   "level": 2
+  },
+  {
+   "id": "m127",
+   "word": "octopus",
+   "level": 2,
+   "alt": [
+    "squid"
+   ]
+  },
+  {
+   "id": "m128",
+   "word": "shark",
+   "level": 2
+  },
+  {
+   "id": "m129",
+   "word": "whale",
+   "level": 2
+  },
+  {
+   "id": "m130",
+   "word": "jellyfish",
+   "level": 2
+  },
+  {
+   "id": "m131",
+   "word": "starfish",
+   "level": 2
+  },
+  {
+   "id": "m132",
+   "word": "turtle",
+   "level": 2
+  },
+  {
+   "id": "m133",
+   "word": "sloth",
+   "level": 2
+  },
+  {
+   "id": "m134",
+   "word": "flamingo",
+   "level": 2
+  },
+  {
+   "id": "m135",
+   "word": "parrot",
+   "level": 2
+  },
+  {
+   "id": "m136",
+   "word": "camel",
+   "level": 2
+  },
+  {
+   "id": "m137",
+   "word": "dinosaur",
+   "level": 2,
+   "alt": [
+    "dino"
+   ]
+  },
+  {
+   "id": "m138",
+   "word": "sandcastle",
+   "level": 2
+  },
+  {
+   "id": "m139",
+   "word": "igloo",
+   "level": 2
+  },
+  {
+   "id": "m140",
+   "word": "castle",
+   "level": 2
+  },
+  {
+   "id": "m141",
+   "word": "pyramid",
+   "level": 2
+  },
+  {
+   "id": "m142",
+   "word": "windmill",
+   "level": 2
+  },
+  {
+   "id": "m143",
+   "word": "Ferris wheel",
+   "level": 2
+  },
+  {
+   "id": "m144",
+   "word": "roller coaster",
+   "level": 2
+  },
+  {
+   "id": "m145",
+   "word": "carousel",
+   "level": 2
+  },
+  {
+   "id": "m146",
+   "word": "seesaw",
+   "level": 2
+  },
+  {
+   "id": "m147",
+   "word": "slide",
+   "level": 2
+  },
+  {
+   "id": "m148",
+   "word": "swing",
+   "level": 2,
+   "alt": [
+    "swings"
+   ]
+  },
+  {
+   "id": "m149",
+   "word": "trampoline",
+   "level": 2
+  },
+  {
+   "id": "m150",
+   "word": "hammock",
+   "level": 2
+  },
+  {
+   "id": "m151",
+   "word": "campfire",
+   "level": 2
+  },
+  {
+   "id": "m152",
+   "word": "barbecue",
+   "level": 2
+  },
+  {
+   "id": "m153",
+   "word": "picnic",
+   "level": 2
+  },
+  {
+   "id": "m154",
+   "word": "fridge",
+   "level": 2
+  },
+  {
+   "id": "m155",
+   "word": "washing machine",
+   "level": 2
+  },
+  {
+   "id": "m156",
+   "word": "vacuum cleaner",
+   "level": 2
+  },
+  {
+   "id": "m157",
+   "word": "toaster",
+   "level": 2
+  },
+  {
+   "id": "m158",
+   "word": "alarm clock",
+   "level": 2
+  },
+  {
+   "id": "m159",
+   "word": "bathtub",
+   "level": 2
+  },
+  {
+   "id": "m160",
+   "word": "shower",
+   "level": 2
+  },
+  {
+   "id": "m161",
+   "word": "toilet",
+   "level": 2,
+   "alt": [
+    "loo"
+   ]
+  },
+  {
+   "id": "m162",
+   "word": "mirror",
+   "level": 2
+  },
+  {
+   "id": "m163",
+   "word": "headphones",
+   "level": 2
+  },
+  {
+   "id": "m164",
+   "word": "microphone",
+   "level": 2
+  },
+  {
+   "id": "m165",
+   "word": "piano",
+   "level": 2
+  },
+  {
+   "id": "m166",
+   "word": "violin",
+   "level": 2
+  },
+  {
+   "id": "m167",
+   "word": "trumpet",
+   "level": 2
+  },
+  {
+   "id": "m168",
+   "word": "football",
+   "level": 2,
+   "alt": [
+    "soccer"
+   ]
+  },
+  {
+   "id": "m169",
+   "word": "basketball",
+   "level": 2
+  },
+  {
+   "id": "m170",
+   "word": "tennis",
+   "level": 2
+  },
+  {
+   "id": "m171",
+   "word": "skateboard",
+   "level": 2
+  },
+  {
+   "id": "m172",
+   "word": "skis",
+   "level": 2,
+   "alt": [
+    "ski"
+   ]
+  },
+  {
+   "id": "m173",
+   "word": "sled",
+   "level": 2,
+   "alt": [
+    "sledge"
+   ]
+  },
+  {
+   "id": "m174",
+   "word": "surfboard",
+   "level": 2
+  },
+  {
+   "id": "m175",
+   "word": "fishing rod",
+   "level": 2,
+   "alt": [
+    "fishing pole"
+   ]
+  },
+  {
+   "id": "m176",
+   "word": "dentist",
+   "level": 2
+  },
+  {
+   "id": "m177",
+   "word": "hairdresser",
+   "level": 2,
+   "alt": [
+    "barber"
+   ]
+  },
+  {
+   "id": "m178",
+   "word": "chimney",
+   "level": 2
+  },
+  {
+   "id": "m179",
+   "word": "mailbox",
+   "level": 2,
+   "alt": [
+    "postbox"
+   ]
+  },
+  {
+   "id": "m180",
+   "word": "garden gnome",
+   "level": 2
+  },
+  {
+   "id": "m181",
+   "word": "scarecrow",
+   "level": 2
+  },
+  {
+   "id": "m182",
+   "word": "spider web",
+   "level": 2,
+   "alt": [
+    "cobweb"
+   ]
+  },
+  {
+   "id": "m183",
+   "word": "rainbow",
+   "level": 2
+  },
+  {
+   "id": "m184",
+   "word": "lightning",
+   "level": 2
+  },
+  {
+   "id": "m185",
+   "word": "tornado",
+   "level": 2
+  },
+  {
+   "id": "m186",
+   "word": "snowflake",
+   "level": 2
+  },
+  {
+   "id": "m187",
+   "word": "sunflower",
+   "level": 2
+  },
+  {
+   "id": "m188",
+   "word": "palm tree",
+   "level": 2
+  },
+  {
+   "id": "m189",
+   "word": "Christmas tree",
+   "level": 2,
+   "alt": [
+    "xmas tree"
+   ]
+  },
+  {
+   "id": "m190",
+   "word": "Easter egg",
+   "level": 2
+  },
+  {
+   "id": "m191",
+   "word": "pumpkin",
+   "level": 2
+  },
+  {
+   "id": "m192",
+   "word": "popcorn",
+   "level": 2
+  },
+  {
+   "id": "m193",
+   "word": "spaghetti",
+   "level": 2
+  },
+  {
+   "id": "m194",
+   "word": "sushi",
+   "level": 2
+  },
+  {
+   "id": "m195",
+   "word": "pretzel",
+   "level": 2
+  },
+  {
+   "id": "m196",
+   "word": "hot dog",
+   "level": 2
+  },
+  {
+   "id": "m197",
+   "word": "doughnut",
+   "level": 2,
+   "alt": [
+    "donut"
+   ]
+  },
+  {
+   "id": "m198",
+   "word": "watermelon",
+   "level": 2
+  },
+  {
+   "id": "m199",
+   "word": "pineapple",
+   "level": 2
+  },
+  {
+   "id": "m200",
+   "word": "lemon",
+   "level": 2
+  },
+  {
+   "id": "m201",
+   "word": "lollipop",
+   "level": 2
+  },
+  {
+   "id": "m202",
+   "word": "parachute",
+   "level": 2
+  },
+  {
+   "id": "m203",
+   "word": "hot air balloon",
+   "level": 2
+  },
+  {
+   "id": "m204",
+   "word": "helicopter",
+   "level": 2
+  },
+  {
+   "id": "m205",
+   "word": "submarine",
+   "level": 2
+  },
+  {
+   "id": "m206",
+   "word": "tractor",
+   "level": 2
+  },
+  {
+   "id": "m207",
+   "word": "digger",
+   "level": 2,
+   "alt": [
+    "excavator"
+   ]
+  },
+  {
+   "id": "m208",
+   "word": "wheelchair",
+   "level": 2
+  },
+  {
+   "id": "m209",
+   "word": "stroller",
+   "level": 2,
+   "alt": [
+    "pram",
+    "buggy"
+   ]
+  },
+  {
+   "id": "m210",
+   "word": "shopping cart",
+   "level": 2,
+   "alt": [
+    "shopping trolley",
+    "trolley"
+   ]
+  },
+  {
+   "id": "m211",
+   "word": "suitcase",
+   "level": 2
+  },
+  {
+   "id": "m212",
+   "word": "backpack",
+   "level": 2
+  },
+  {
+   "id": "m213",
+   "word": "tie",
+   "level": 2
+  },
+  {
+   "id": "m214",
+   "word": "glove",
+   "level": 2
+  },
+  {
+   "id": "m215",
+   "word": "bikini",
+   "level": 2
+  },
+  {
+   "id": "m216",
+   "word": "flashlight",
+   "level": 2,
+   "alt": [
+    "torch"
+   ]
+  },
+  {
+   "id": "m217",
+   "word": "magnifying glass",
+   "level": 2
+  },
+  {
+   "id": "m218",
+   "word": "compass",
+   "level": 2
+  },
+  {
+   "id": "m219",
+   "word": "anchor",
+   "level": 2
+  },
+  {
+   "id": "m220",
+   "word": "light bulb",
+   "level": 2
+  },
+  {
+   "id": "m221",
+   "word": "battery",
+   "level": 2
+  },
+  {
+   "id": "m222",
+   "word": "magnet",
+   "level": 2
+  },
+  {
+   "id": "m223",
+   "word": "hourglass",
+   "level": 2
+  },
+  {
+   "id": "m224",
+   "word": "solar eclipse",
+   "level": 3
+  },
+  {
+   "id": "m225",
+   "word": "earthquake",
+   "level": 3
+  },
+  {
+   "id": "m226",
+   "word": "gravity",
+   "level": 3
+  },
+  {
+   "id": "m227",
+   "word": "echo",
+   "level": 3
+  },
+  {
+   "id": "m228",
+   "word": "shadow",
+   "level": 3
+  },
+  {
+   "id": "m229",
+   "word": "reflection",
+   "level": 3
+  },
+  {
+   "id": "m230",
+   "word": "nightmare",
+   "level": 3
+  },
+  {
+   "id": "m231",
+   "word": "sleepwalker",
+   "level": 3
+  },
+  {
+   "id": "m232",
+   "word": "homesickness",
+   "level": 3,
+   "alt": [
+    "homesick"
+   ]
+  },
+  {
+   "id": "m233",
+   "word": "sore muscles",
+   "level": 3,
+   "alt": [
+    "muscle ache"
+   ]
+  },
+  {
+   "id": "m234",
+   "word": "hiccups",
+   "level": 3
+  },
+  {
+   "id": "m235",
+   "word": "sunburn",
+   "level": 3
+  },
+  {
+   "id": "m236",
+   "word": "goosebumps",
+   "level": 3
+  },
+  {
+   "id": "m237",
+   "word": "earworm",
+   "level": 3
+  },
+  {
+   "id": "m238",
+   "word": "stage fright",
+   "level": 3
+  },
+  {
+   "id": "m239",
+   "word": "traffic jam",
+   "level": 3
+  },
+  {
+   "id": "m240",
+   "word": "fire alarm",
+   "level": 3
+  },
+  {
+   "id": "m241",
+   "word": "power outage",
+   "level": 3
+  },
+  {
+   "id": "m242",
+   "word": "birthday party",
+   "level": 3
+  },
+  {
+   "id": "m243",
+   "word": "wedding",
+   "level": 3
+  },
+  {
+   "id": "m244",
+   "word": "honeymoon",
+   "level": 3
+  },
+  {
+   "id": "m245",
+   "word": "time travel",
+   "level": 3
+  },
+  {
+   "id": "m246",
+   "word": "weather forecast",
+   "level": 3
+  },
+  {
+   "id": "m247",
+   "word": "outer space",
+   "level": 3
+  },
+  {
+   "id": "m248",
+   "word": "black hole",
+   "level": 3
+  },
+  {
+   "id": "m249",
+   "word": "shooting star",
+   "level": 3
+  },
+  {
+   "id": "m250",
+   "word": "northern lights",
+   "level": 3
+  },
+  {
+   "id": "m251",
+   "word": "tides",
+   "level": 3,
+   "alt": [
+    "tide"
+   ]
+  },
+  {
+   "id": "m252",
+   "word": "desert",
+   "level": 3
+  },
+  {
+   "id": "m253",
+   "word": "jungle",
+   "level": 3
+  },
+  {
+   "id": "m254",
+   "word": "waterfall",
+   "level": 3
+  },
+  {
+   "id": "m255",
+   "word": "glacier",
+   "level": 3
+  },
+  {
+   "id": "m256",
+   "word": "Bermuda Triangle",
+   "level": 3
+  },
+  {
+   "id": "m257",
+   "word": "Statue of Liberty",
+   "level": 3
+  },
+  {
+   "id": "m258",
+   "word": "Eiffel Tower",
+   "level": 3
+  },
+  {
+   "id": "m259",
+   "word": "Mona Lisa",
+   "level": 3
+  },
+  {
+   "id": "m260",
+   "word": "Snow White",
+   "level": 3
+  },
+  {
+   "id": "m261",
+   "word": "Little Red Riding Hood",
+   "level": 3
+  },
+  {
+   "id": "m262",
+   "word": "Santa Claus",
+   "level": 3,
+   "alt": [
+    "Santa"
+   ]
+  },
+  {
+   "id": "m263",
+   "word": "Easter Bunny",
+   "level": 3
+  },
+  {
+   "id": "m264",
+   "word": "tooth fairy",
+   "level": 3
+  },
+  {
+   "id": "m265",
+   "word": "Sleeping Beauty",
+   "level": 3
+  },
+  {
+   "id": "m266",
+   "word": "superhero",
+   "level": 3
+  },
+  {
+   "id": "m267",
+   "word": "detective",
+   "level": 3
+  },
+  {
+   "id": "m268",
+   "word": "bank robbery",
+   "level": 3
+  },
+  {
+   "id": "m269",
+   "word": "prison",
+   "level": 3
+  },
+  {
+   "id": "m270",
+   "word": "courtroom",
+   "level": 3
+  },
+  {
+   "id": "m271",
+   "word": "circus",
+   "level": 3
+  },
+  {
+   "id": "m272",
+   "word": "Rubik's Cube",
+   "level": 3,
+   "alt": [
+    "rubiks cube"
+   ]
+  },
+  {
+   "id": "m273",
+   "word": "jigsaw puzzle",
+   "level": 3,
+   "alt": [
+    "puzzle"
+   ]
+  },
+  {
+   "id": "m274",
+   "word": "dominoes",
+   "level": 3
+  },
+  {
+   "id": "m275",
+   "word": "chess",
+   "level": 3
+  },
+  {
+   "id": "m276",
+   "word": "hide and seek",
+   "level": 3
+  },
+  {
+   "id": "m277",
+   "word": "jump rope",
+   "level": 3
+  },
+  {
+   "id": "m278",
+   "word": "tug of war",
+   "level": 3
+  },
+  {
+   "id": "m279",
+   "word": "pillow fight",
+   "level": 3
+  },
+  {
+   "id": "m280",
+   "word": "snowball fight",
+   "level": 3
+  },
+  {
+   "id": "m281",
+   "word": "belly flop",
+   "level": 3
+  },
+  {
+   "id": "m282",
+   "word": "headstand",
+   "level": 3
+  },
+  {
+   "id": "m283",
+   "word": "splits",
+   "level": 3
+  },
+  {
+   "id": "m284",
+   "word": "somersault",
+   "level": 3
+  },
+  {
+   "id": "m285",
+   "word": "selfie",
+   "level": 3
+  },
+  {
+   "id": "m286",
+   "word": "video call",
+   "level": 3
+  },
+  {
+   "id": "m287",
+   "word": "password",
+   "level": 3
+  },
+  {
+   "id": "m288",
+   "word": "low battery",
+   "level": 3,
+   "alt": [
+    "empty battery"
+   ]
+  },
+  {
+   "id": "m289",
+   "word": "Wi-Fi",
+   "level": 3,
+   "alt": [
+    "wifi"
+   ]
+  },
+  {
+   "id": "m290",
+   "word": "shopping list",
+   "level": 3
+  },
+  {
+   "id": "m291",
+   "word": "homework",
+   "level": 3
+  },
+  {
+   "id": "m292",
+   "word": "report card",
+   "level": 3
+  },
+  {
+   "id": "m293",
+   "word": "driving test",
+   "level": 3
+  },
+  {
+   "id": "m294",
+   "word": "job interview",
+   "level": 3
+  },
+  {
+   "id": "m295",
+   "word": "Monday morning",
+   "level": 3
+  },
+  {
+   "id": "m296",
+   "word": "nap",
+   "level": 3,
+   "alt": [
+    "power nap"
+   ]
+  },
+  {
+   "id": "m297",
+   "word": "spring cleaning",
+   "level": 3
+  },
+  {
+   "id": "m298",
+   "word": "moving house",
+   "level": 3
+  },
+  {
+   "id": "m299",
+   "word": "flea market",
+   "level": 3
+  },
+  {
+   "id": "m300",
+   "word": "checkout line",
+   "level": 3,
+   "alt": [
+    "queue"
+   ]
+  },
+  {
+   "id": "m301",
+   "word": "escalator",
+   "level": 3
+  },
+  {
+   "id": "m302",
+   "word": "elevator",
+   "level": 3,
+   "alt": [
+    "lift"
+   ]
+  },
+  {
+   "id": "m303",
+   "word": "revolving door",
+   "level": 3
+  },
+  {
+   "id": "m304",
+   "word": "parking garage",
+   "level": 3,
+   "alt": [
+    "car park"
+   ]
+  },
+  {
+   "id": "m305",
+   "word": "gas station",
+   "level": 3,
+   "alt": [
+    "petrol station"
+   ]
+  },
+  {
+   "id": "m306",
+   "word": "car wash",
+   "level": 3
+  },
+  {
+   "id": "m307",
+   "word": "sewage plant",
+   "level": 3
+  },
+  {
+   "id": "m308",
+   "word": "wind turbine",
+   "level": 3
+  },
+  {
+   "id": "m309",
+   "word": "solar panel",
+   "level": 3
+  },
+  {
+   "id": "m310",
+   "word": "recycling",
+   "level": 3
+  },
+  {
+   "id": "m311",
+   "word": "fingerprint",
+   "level": 3
+  },
+  {
+   "id": "m312",
+   "word": "X-ray",
+   "level": 3
+  },
+  {
+   "id": "m313",
+   "word": "plaster cast",
+   "level": 3,
+   "alt": [
+    "cast"
+   ]
+  },
+  {
+   "id": "m314",
+   "word": "band-aid",
+   "level": 3,
+   "alt": [
+    "plaster"
+   ]
+  },
+  {
+   "id": "m315",
+   "word": "thermometer",
+   "level": 3
+  },
+  {
+   "id": "m316",
+   "word": "braces",
+   "level": 3
+  }
+ ]
+}

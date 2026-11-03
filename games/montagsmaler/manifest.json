@@ -1,0 +1,59 @@
+{
+  "id": "montagsmaler",
+  "name": { "de": "Montagsmaler", "en": "Sketch & Guess" },
+  "description": {
+    "de": "Eine Person malt live aufs Handy, alle anderen raten um die Wette. Mit Team-Modus und Klau-Versuch.",
+    "en": "One player draws live on their phone, everyone else races to guess. With a team mode and steal attempts."
+  },
+  "minPlayers": 2,
+  "maxPlayers": 100,
+  "audience": true,
+  "minutes": 15,
+  "color": "#E8336F",
+  "tags": ["draw", "guess"],
+  "sdkVersion": 1,
+  "contentFields": ["word"],
+  "version": "1.0.0",
+  "author": "UP!",
+  "options": [
+    {
+      "id": "mode",
+      "label": { "de": "Spielart", "en": "Mode" },
+      "default": "ffa",
+      "choices": [
+        { "value": "ffa", "label": { "de": "Jeder gegen jeden", "en": "Free for all" } },
+        { "value": "team", "label": { "de": "Zwei Teams", "en": "Two teams" } }
+      ],
+      "help": {
+        "de": "Teams ab 4 Spielern: Das malende Team rät, schafft es das nicht, darf das andere Team 15 Sekunden lang klauen.",
+        "en": "Teams need 4+ players: the drawing team guesses; if they fail, the other team gets 15 seconds to steal."
+      }
+    },
+    {
+      "id": "rounds",
+      "label": { "de": "Runden", "en": "Rounds" },
+      "default": 0,
+      "choices": [
+        { "value": 0, "label": { "de": "Jeder malt einmal", "en": "Everyone draws once" } },
+        { "value": 4, "label": { "de": "4", "en": "4" } },
+        { "value": 6, "label": { "de": "6", "en": "6" } },
+        { "value": 8, "label": { "de": "8", "en": "8" } },
+        { "value": 12, "label": { "de": "12", "en": "12" } }
+      ],
+      "help": {
+        "de": "„Jeder malt einmal“ geht bis höchstens 10 Runden.",
+        "en": "“Everyone draws once” stops at 10 rounds at most."
+      }
+    },
+    {
+      "id": "drawTime",
+      "label": { "de": "Zeit zum Malen", "en": "Drawing time" },
+      "default": 80,
+      "choices": [
+        { "value": 60, "label": { "de": "60 s", "en": "60 s" } },
+        { "value": 80, "label": { "de": "80 s", "en": "80 s" } },
+        { "value": 100, "label": { "de": "100 s", "en": "100 s" } }
+      ]
+    }
+  ]
+}

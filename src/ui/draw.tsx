@@ -13,7 +13,8 @@ export const DRAW_COLORS = [
   '#9B7BFF', '#8A5A2B', '#F2B48A', '#8F88B8', '#FFFDF7',
 ];
 export const ERASER = DRAW_COLORS.length - 1;
-export const DRAW_WIDTHS = [7, 18];
+/** Strichstärken (Index im Strich). Kritzelei nutzt 0–1, Montagsmaler 0–2. */
+export const DRAW_WIDTHS = [7, 18, 38];
 
 function strokePath(s: Stroke): string {
   const p = s.p;

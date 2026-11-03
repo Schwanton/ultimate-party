@@ -2,6 +2,17 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.8.0
+
+- Neues Spiel: Montagsmaler – einer malt live, alle anderen raten per Handy (2–100 Spieler)
+  - Zeichnung live auf dem Fernseher und auf allen Handys
+  - Wortwahl leicht / mittel / schwer, Buchstaben-Hilfe, „ganz knapp!“-Hinweis, Schummel-Knopf
+  - Optional zwei Teams mit 15-Sekunden-Klau-Versuch
+  - Galerie aller Bilder am Ende; später Dazukommende malen und raten voll mit
+  - 316 Begriffe pro Sprache
+- Vollbild-Knopf auf dem Fernseher (Lobby und während des Spiels) und auf dem Handy (wo der Browser es kann)
+- Live-Daten können jetzt auch an die Handys gehen (ctx.stream mit phones: true)
+
 ## 0.7.1
 
 - Deutlich mehr Inhalte (neues Paket „Extra“, Deutsch und Englisch):
