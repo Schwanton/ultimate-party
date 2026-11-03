@@ -1,0 +1,18 @@
+{
+  "id": "kronenduell",
+  "name": { "de": "Kronenduell", "en": "Crown Duel" },
+  "description": {
+    "de": "Taktisches Kartenduell für zwei: Legt abwechselnd verdeckt Waffen, Rüstungen, Tränke und Kristalle und stürzt Bube, Dame und König des anderen. Nach den Regeln von „Regicide: Crown Duels“ (Badgers from Mars).",
+    "en": "A tactical card duel for two: take turns placing weapons, armour, potions and crystals face down and topple your rival's Jack, Queen and King. Based on the rules of “Regicide: Crown Duels” (Badgers from Mars)."
+  },
+  "minPlayers": 2,
+  "maxPlayers": 2,
+  "audience": true,
+  "minutes": 25,
+  "color": "#FFD447",
+  "tags": ["duel"],
+  "sdkVersion": 1,
+  "autoSounds": false,
+  "version": "1.0.0",
+  "author": "UP!"
+}

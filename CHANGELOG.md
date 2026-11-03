@@ -2,6 +2,11 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.9.0
+
+- Neues Spiel: **Kronenduell** – taktisches Kartenduell für zwei nach den Regeln von „Regicide: Crown Duels“. Auf dem TV liegt der Tisch wie im echten Spiel, auf dem Handy plant ihr eure Karten (auch schon, wenn der andere dran ist) und legt sie mit „Karte legen“. Die Auflösung läuft Schritt für Schritt, am Ende jeder Phase drücken beide „Weiter“. Spickzettel jederzeit auf dem Handy
+- Spielsammlung: neues Etikett „Duell zu zweit“
+
 ## 0.8.7
 
 - Handy des VIP: „Los geht's!“ und die Spiel-Einstellungen stehen jetzt über der Spielsammlung

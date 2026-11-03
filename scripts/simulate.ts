@@ -55,6 +55,8 @@ const scenarios: { game: string; players: number; options?: Record<string, numbe
   { game: 'montagsmaler', players: 2 },
   { game: 'montagsmaler', players: 7 },
   { game: 'montagsmaler', players: 30 },
+  { game: 'kronenduell', players: 2 },
+  { game: 'kronenduell', players: 4 }, // 2 davon Publikum
   // mit Spiel-Einstellungen
   { game: 'schlagfertig', players: 4, options: { rounds: 5, answerTime: 0.75 } },
   { game: 'bluff', players: 4, options: { questions: 3 } },

@@ -19,6 +19,7 @@ Party-Spiele für zu Hause: Ein Bildschirm (Fernseher, Laptop, Beamer) zeigt das
 | **Heiße Kartoffel** | 3–20 | Eine Bombe mit geheimer Zündschnur wandert von Handy zu Handy. Weiterwerfen darf nur, wer eine Mini-Aufgabe löst. Wer sie beim Knall hat, fliegt raus. |
 | **Sumo** | 2–100 | Echtzeit: Jeder steuert eine Kugel per Handy-Joystick auf einer schrumpfenden Plattform und schubst die anderen runter. |
 | **Montagsmaler** | 2–100 | Einer malt live aufs Handy, alle anderen raten per Tipp um die Wette – die Zeichnung erscheint auf dem TV und allen Handys. Optional zwei Teams mit Klau-Versuch. |
+| **Kronenduell** | 2 | Taktisches Kartenduell zu zweit nach den Regeln von *Regicide: Crown Duels*: abwechselnd verdeckt Waffen, Rüstungen, Tränke und Kristalle legen und Bube, Dame und König des anderen stürzen. Spickzettel auf dem Handy. |
 | **Verräter-Team** | 5–30 | Heimliche Verräter sabotieren Missionen. Diskutiert, werft die Richtigen raus – oder gewinnt als Verräter. |
 
 Neue Spiele lassen sich mit wenig Code hinzufügen und teilen – siehe [Spiele entwickeln](docs/SPIELE-ENTWICKELN.md).

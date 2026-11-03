@@ -8,7 +8,7 @@ import type { GameManifest, Translate } from '@up/sdk';
 import { isLight, shade } from '../ui';
 
 /** Bekannte Kategorien (Reihenfolge der Reiter). Unbekannte Tags landen unter „Weitere“. */
-export const GAME_TAGS = ['words', 'draw', 'guess', 'deceive', 'social', 'team', 'quick'] as const;
+export const GAME_TAGS = ['words', 'draw', 'guess', 'deceive', 'social', 'team', 'quick', 'duel'] as const;
 
 export function gameTags(g: GameManifest): string[] {
   const tags = (g.tags ?? []).filter((x) => (GAME_TAGS as readonly string[]).includes(x));
