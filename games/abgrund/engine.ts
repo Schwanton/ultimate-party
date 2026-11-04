@@ -196,6 +196,14 @@ function drawCards(h: Hero, n: number) {
 
 const livingMinions = (f: Fight) => f.enemies.filter((e) => e.minion && !e.dead).length;
 
+/** Wie viel Brut ein Gegner wirklich herbeiruft (allein weniger, höchstens so viel lebende Brut wie erlaubt) */
+export function spawnCount(f: Fight, m: EnemyMove) {
+  if (!m.spawn) return 0;
+  const cap = f.heroes.length === 1 ? 2 : 3 + Math.floor((f.heroes.length - 1) / 3);
+  const want = f.heroes.length === 1 ? 1 : m.spawn.n + Math.floor((f.heroes.length - 1) / 3);
+  return Math.max(0, Math.min(want, cap - livingMinions(f)));
+}
+
 function nextMove(f: Fight, e: Enemy): EnemyMove {
   const def = ENEMIES[e.id];
   if (def.phase2 && !e.p2 && e.hp < e.maxHp / 2) { e.p2 = true; e.moveIdx = 0; }
@@ -233,7 +241,7 @@ export function startRound(f: Fight) {
     else if (move.weakest) {
       const t = [...alive].sort((a, b) => a.hp - b.hp)[0];
       targets = t ? [t.id] : [];
-    } else if (move.dmg || move.vuln || move.poison) {
+    } else if (move.dmg || move.vuln || move.poison || move.curse) {
       // zufällig, möglichst nicht dasselbe Ziel wie letzte Runde und möglichst verteilt
       let pool = alive.filter((h) => h.id !== e.lastTarget);
       if (!pool.length) pool = alive;
@@ -364,7 +372,7 @@ export type Ev =
   | { k: 'support'; items: SupportItem[] }
   | { k: 'hits'; enemy: number; parts: { from: string; card: string; dmg: number }[]; total: number; blocked: number; status?: Partial<Status>; killed: boolean; self?: { id: string; dmg: number }[] }
   | { k: 'fizzle'; from: string; card: string }
-  | { k: 'enemy'; enemy: number; move: string; results: { id: string; dmg: number; blocked: number; loss: number; covered?: string; saved?: string; talisman?: boolean }[]; block?: number; buff?: number; weakAll?: number; vulnAll?: number; vuln?: string; thorns?: number; killed?: boolean; charge?: boolean; spawned?: number; heal?: { enemy: number; amount: number }; blockAll?: number; poison?: number }
+  | { k: 'enemy'; enemy: number; move: string; results: { id: string; dmg: number; blocked: number; loss: number; covered?: string; saved?: string; talisman?: boolean }[]; block?: number; buff?: number; weakAll?: number; vulnAll?: number; vuln?: string; thorns?: number; killed?: boolean; charge?: boolean; curse?: string; spawned?: number; heal?: { enemy: number; amount: number }; blockAll?: number; poison?: number }
   | { k: 'stunned'; enemy: number }
   | { k: 'poison'; items: { who: string; dmg: number; killed: boolean; src?: 'kerze'; saved?: string }[] }
   | { k: 'result'; result: 'win' | 'lose' };
@@ -561,9 +569,7 @@ function enemyPhase(f: Fight, push: (e: Ev) => void) {
       ev.heal = { enemy: f.enemies.indexOf(t), amount: g };
     }
     if (m.spawn) {
-      const cap = f.heroes.length === 1 ? 2 : 3 + Math.floor((f.heroes.length - 1) / 3);
-      const want = f.heroes.length === 1 ? 1 : m.spawn.n + Math.floor((f.heroes.length - 1) / 3);
-      const n = Math.max(0, Math.min(want, cap - livingMinions(f)));
+      const n = spawnCount(f, m);
       const mul = Math.max(1, hpScale(f.heroes.length) / 2);
       for (let k = 0; k < n; k++) {
         const x = makeEnemy(m.spawn.id, mul);
@@ -574,7 +580,7 @@ function enemyPhase(f: Fight, push: (e: Ev) => void) {
     }
     // Ziele für Angriffe und Zustände
     let targets: string[] = [];
-    if (m.dmg || m.vuln || m.poison) {
+    if (m.dmg || m.vuln || m.poison || m.curse) {
       targets = m.all ? living().map((h) => h.id) : e.intent!.targets.filter((id) => living().some((h) => h.id === id));
       if (!m.all) {
         const taunter = living().find((h) => h.taunt);
@@ -609,6 +615,13 @@ function enemyPhase(f: Fight, push: (e: Ev) => void) {
       }
       if (m.vuln) h.st.vuln += m.vuln;
       if (m.poison) { h.st.poison += m.poison; ev.poison = m.poison; }
+      if (m.curse) {
+        const c = pick(['weak', 'vuln', 'poison'] as const);
+        if (c === 'weak') h.st.weak += 2;
+        if (c === 'vuln') h.st.vuln += 2;
+        if (c === 'poison') h.st.poison += 3;
+        ev.curse = c === 'weak' ? 'Schwächung 2' : c === 'vuln' ? 'Verwundbar 2' : '3 Gift';
+      }
       ev.results.push({ id: h.id, dmg: dmgSum, blocked: blockedSum, loss: lossSum, covered, saved, talisman: talisman || undefined });
     }
     if (thorns > 0) {

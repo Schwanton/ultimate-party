@@ -83,7 +83,7 @@ const CARDS: CardDef[] = [
   { id: 'schildstoss', name: 'Schildstoß', cls: 'schildwacht', rarity: 'basis', cost: [1, 1], speed: 'normal', target: 'enemy', fx: [{ k: 'dmg', v: [5, 7] }], text: '{dmg} Schaden', img: 'karte-schildstoss-2' },
   { id: 'deckung', name: 'Deckung', cls: 'schildwacht', rarity: 'basis', cost: [1, 1], speed: 'normal', target: 'self', fx: [{ k: 'block', v: [6, 9] }], text: '{block} Block', img: 'karte-deckung-2' },
   { id: 'abfangen', name: 'Abfangen', cls: 'schildwacht', rarity: 'basis', cost: [1, 1], speed: 'fast', target: 'ally', otherAlly: true, fx: [{ k: 'redirect' }, { k: 'block', v: [4, 7], solo: [8, 12] }], text: 'Angriffe auf einen Verbündeten treffen diese Runde dich. {block} Block', img: 'karte-abfangen-2' },
-  { id: 'schildwall', name: 'Schildwall', cls: 'schildwacht', rarity: 'basis', cost: [2, 2], speed: 'normal', target: 'allAllies', fx: [{ k: 'blockAll', v: [4, 6], solo: [8, 12] }], text: 'Alle Spieler erhalten {blockAll} Block', img: 'karte-schildwall-2' },
+  { id: 'schildwall', name: 'Schildwall', cls: 'schildwacht', rarity: 'basis', cost: [2, 2], speed: 'normal', target: 'allAllies', fx: [{ k: 'blockAll', v: [6, 8], solo: [13, 17] }], text: 'Alle Spieler erhalten {blockAll} Block', img: 'karte-schildwall-2' },
   { id: 'schildramme', name: 'Schildramme', cls: 'schildwacht', rarity: 'common', cost: [1, 1], speed: 'normal', target: 'enemy', fx: [{ k: 'dmg', v: [4, 6] }, { k: 'block', v: [4, 6] }], text: '{dmg} Schaden, {block} Block', img: 'karte-schildstoss-2' },
   { id: 'wachsam', name: 'Wachsam', cls: 'schildwacht', rarity: 'common', cost: [1, 1], speed: 'fast', target: 'self', fx: [{ k: 'block', v: [7, 10] }], text: '{block} Block', img: 'karte-deckung-2' },
   { id: 'herausfordern', name: 'Herausfordern', cls: 'schildwacht', rarity: 'common', cost: [1, 1], speed: 'fast', target: 'self', fx: [{ k: 'taunt' }, { k: 'block', v: [3, 6] }], text: 'Alle Gegner greifen diese Runde dich an. {block} Block', img: 'karte-abfangen-2' },
@@ -201,6 +201,7 @@ export interface EnemyMove {
   spawn?: { id: string; n: number }; // ruft Gegner herbei
   charge?: boolean; // lädt auf (nächste Aktion ist gewaltig)
   ifMinions?: boolean; // nur, solange herbeigerufene Gegner leben (sonst nichts)
+  curse?: boolean; // unbekannter Fluch auf ein Ziel (Schwächung, Verwundbar oder Gift) – erst bei der Auflösung sichtbar
 }
 
 export interface EnemyDef {
@@ -242,7 +243,7 @@ export const ENEMIES: Record<string, EnemyDef> = {
   },
   knochenpriester: {
     id: 'knochenpriester', name: 'Knochenpriester', hp: 26, img: 'gegner-knochenpriester', fallback: 'gegner-aschenkultist', size: 1.05,
-    moves: [{ name: 'Dunkle Gnade', healAlly: 8 }, { name: 'Fluch', vuln: 2 }, { name: 'Knochenschild', blockAllies: 6 }],
+    moves: [{ name: 'Dunkle Gnade', healAlly: 8 }, { name: 'Fluch', vuln: 2 }, { name: 'Knochenschild', blockAllies: 6 }, { name: 'Dunkles Omen', curse: true }],
   },
   gruftwaechter: {
     id: 'gruftwaechter', name: 'Gruftwächter', hp: 40, img: 'gegner-gruftwaechter', fallback: 'gegner-knochenkoloss', size: 1.15,

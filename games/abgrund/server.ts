@@ -12,7 +12,7 @@ import {
 import {
   addCard, addRelic, afterFight, botPlan, cardOf, cardText, cost, fixHero, goldGain, heal, legendaryOffer, newFight, newHero, planCard,
   plannedCost, previewDamage, randomRelic, rareOffer, removeCard, resolveRound, rewardOffer, shopCards, shuffle, startRound,
-  totalDuration, unplan, upgradeCard, type Fight, type Hero, type TimedEv,
+  spawnCount, totalDuration, unplan, upgradeCard, type Fight, type Hero, type TimedEv,
 } from './engine';
 import { generateMap, nodeById, type ActMap } from './map';
 
@@ -21,7 +21,6 @@ interface Comp { id: string; name: string; color: string }
 const COMP_NAMES = ['Alrik', 'Brann', 'Cora', 'Dorn', 'Elva', 'Fenn', 'Hagen', 'Ilsa', 'Jorin', 'Kara', 'Lute'];
 const COMP_COLORS = ['#c9a26b', '#9fb8a0', '#b79bc4', '#d08f6c', '#8fb2c9', '#c4b26b', '#a8a8a8', '#c98f9f', '#8fc9b7', '#b9a58a', '#9f9fd0'];
 const MAX_HEROES = 12;
-const VOTE_TIME = 20;
 
 interface SavedRun {
   v: 2;
@@ -196,8 +195,15 @@ export default {
         ctx.after(options.length === 1 ? 3 : 2, () => t === token && finishVote());
         return;
       }
-      vote.timer = ctx.timer(VOTE_TIME, () => t === token && finishVote());
-      vote.deadline = Date.now() + VOTE_TIME * 1000;
+      // Kein Zeitlimit: es geht weiter, sobald alle (verbundenen) Spieler abgestimmt haben.
+      // Regelmäßig prüfen, falls jemand die Verbindung verliert.
+      const poll = () => {
+        if (t !== token || !vote || vote.winner) return;
+        const vs = voters();
+        if (!vs.length || (vote.votes.size > 0 && vs.every((v) => vote!.votes.has(v)))) return finishVote();
+        ctx.after(2, poll);
+      };
+      ctx.after(2, poll);
       broadcast();
     }
 
@@ -575,7 +581,7 @@ export default {
       const dmg = m.dmg ? Math.floor((m.dmg + e.buff) * f.dmgMul * (e.st.weak > 0 ? 0.75 : 1)) : 0;
       return {
         name: m.name, dmg, hits: m.hits ?? 1, all: !!m.all, block: m.block ?? 0, weakAll: m.weakAll ?? 0, vuln: m.vuln ?? 0, buff: m.buff ?? 0, targets: e.intent!.targets,
-        poison: m.poison ?? 0, vulnAll: m.vulnAll ?? 0, healAlly: m.healAlly ?? 0, blockAllies: m.blockAllies ?? 0, spawn: m.spawn?.n ?? 0, charge: !!m.charge, weakest: !!m.weakest,
+        poison: m.poison ?? 0, vulnAll: m.vulnAll ?? 0, healAlly: m.healAlly ?? 0, blockAllies: m.blockAllies ?? 0, spawn: spawnCount(f, m), charge: !!m.charge, weakest: !!m.weakest, curse: !!m.curse,
       };
     }
 
@@ -609,7 +615,7 @@ export default {
     function voteView() {
       if (!vote) return null;
       return {
-        kind: vote.kind, options: vote.options, winner: vote.winner ?? null, deadline: vote.deadline || undefined, duration: vote.deadline ? VOTE_TIME * 1000 : undefined,
+        kind: vote.kind, options: vote.options, winner: vote.winner ?? null, 
         votes: Object.fromEntries(vote.options.map((o) => [o, [...vote!.votes.entries()].filter(([, v]) => v === o).map(([k]) => k)])), voters: voters(),
       };
     }
@@ -669,6 +675,7 @@ export default {
     function meView(h: Hero) {
       return {
         cls: h.cls, img: CLASSES[h.cls].img, name: CLASSES[h.cls].name, hp: h.hp, maxHp: h.maxHp, block: h.block, st: h.st, str: h.str,
+        powers: h.powers, roundStr: h.roundStr, undying: h.undying, keepBlock: h.keepBlock, thorns: h.thorns, revive: !!fight?.revive && phase !== 'map',
         gold: h.gold, relics: h.relics.map(relicView), deckSize: h.deck.length,
       };
     }

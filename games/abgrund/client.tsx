@@ -11,6 +11,10 @@ const C = {
 };
 /** Seltenheit als kleiner Edelstein unten auf der Karte (Basis: keiner) */
 const RARITY: Record<string, string> = { common: '#8a8172', uncommon: '#c9d2d8', rare: C.gold, legendary: '#e0702a' };
+/** Kartenrahmen nach Seltenheit: Basis dunkel, gewöhnlich Eisen, ungewöhnlich Silber, selten Gold, legendär Glut */
+const FRAME: Record<string, string> = { basis: '#4a3b29', common: '#8a8172', uncommon: '#cfd8de', rare: '#d4a640', legendary: '#e0702a' };
+const frameOf = (r?: string) => FRAME[r ?? 'basis'] ?? FRAME.basis;
+const frameGlow = (r?: string) => (r === 'legendary' ? '0 0 14px 2px rgba(224,112,42,.7), ' : r === 'rare' ? '0 0 10px 1px rgba(212,166,64,.45), ' : '');
 const RARITY_NAME: Record<string, string> = { common: 'gewöhnlich', uncommon: 'ungewöhnlich', rare: 'selten', legendary: 'legendär' };
 /** Klassenfarben (Stahlblau, Nachtviolett, Moosgrün) */
 const CLASS_COLOR: Record<string, string> = { schildwacht: '#3A5A78', klingenlaeufer: '#5B3A6E', kraeuterkundige: '#4F6B35' };
@@ -21,6 +25,7 @@ const darker = (hex: string, f = 0.7) => {
   const ch = (x: number) => Math.round(x * f).toString(16).padStart(2, '0');
   return `#${ch((n >> 16) & 255)}${ch((n >> 8) & 255)}${ch(n & 255)}`;
 };
+/** (früher: Edelstein für die Seltenheit – jetzt zeigt der Rahmen sie) */
 function RarityGem({ r, size = 10 }: { r?: string; size?: number }) {
   if (!r || !RARITY[r]) return null;
   return <span role="img" aria-label={RARITY_NAME[r]} style={{ width: size, height: size, transform: 'rotate(45deg)', background: RARITY[r], boxShadow: '0 0 0 1.5px rgba(28,20,13,.75), inset -2px -2px 0 rgba(0,0,0,.2)', flexShrink: 0 }} />;
@@ -182,6 +187,7 @@ function IntentIcons({ it, size = 20, font = 22 }: { it: any; size?: number; fon
       {it.blockAllies > 0 && seg('ba', <ShieldIcon size={size} />, `${it.blockAllies} alle`)}
       {it.spawn > 0 && seg('sp', <SkullIcon size={size} />, `Brut ×${it.spawn}`)}
       {it.charge && seg('c', <FlameIcon size={size} />, 'lädt auf!', C.blood)}
+      {it.curse && seg('cu', <MiniSeal l="?" col="#4a2a5a" size={size} />, 'Fluch', '#4a2a5a')}
     </span>
   );
 }
@@ -233,6 +239,7 @@ function intentText(it: any, name: (id: string) => string, short = false) {
   if (it.vulnAll) parts.push('alle verwundbar');
   if (it.healAlly) parts.push(`heilt ${it.healAlly}`);
   if (it.charge) parts.push('lädt auf');
+  if (it.curse) parts.push('unbekannter Fluch');
   const everyone = it.all || it.weakAll || it.vulnAll;
   const who = everyone ? 'alle' : it.targets?.length ? name(it.targets[0]) : '';
   return { main: parts.join(' · '), who: short ? who : who ? (everyone ? 'auf alle' : `auf ${who}`) : '' };
@@ -556,7 +563,7 @@ function HostFight({ view, player }: HostViewProps) {
             {sup?.str > 0 && <Floater x={hx[k]} y={500} text={<><StrengthIcon size={24} color="#f3c06a" /> +{sup.str}</>} color="#f3c06a" k={key + 's'} />}
             {sup?.note && <Floater x={hx[k]} y={470} text={sup.note} color={C.paper} k={key + 'n'} />}
             {hit && hit.dmg > 0 && <Floater x={hx[k]} y={520} text={hit.loss > 0 ? `−${hit.loss}` : 'geblockt'} color={hit.loss > 0 ? '#ff5d4e' : '#c9d6e8'} k={key} big delay={0.3} />}
-            {hit && hit.dmg === 0 && <Floater x={hx[k]} y={520} text={ev.poison ? `+${ev.poison} Gift` : 'verwundbar'} color={ev.poison ? '#9fd36a' : '#ff8a70'} k={key} delay={0.3} />}
+            {hit && hit.dmg === 0 && <Floater x={hx[k]} y={520} text={ev.curse ? `Fluch: ${ev.curse}` : ev.poison ? `+${ev.poison} Gift` : 'verwundbar'} color={ev.poison && !ev.curse ? '#9fd36a' : '#ff8a70'} k={key} delay={0.3} />}
             {hit?.saved && <Floater x={hx[k]} y={460} text={hit.saved === 'undying' ? 'Unbeugsam!' : 'Wiedergeburt!'} color="#f3c06a" k={key + 'sv'} big delay={0.8} />}
             {hit?.talisman && <Floater x={hx[k]} y={490} text={<><ShieldIcon size={24} color="#c9d6e8" /> +10 Talisman</>} color="#c9d6e8" k={key + 'tl'} delay={0.9} />}
             {ev?.k === 'enemy' && ev.vulnAll > 0 && !dead && <Floater x={hx[k]} y={500} text="verwundbar" color="#ff8a70" k={key + 'va'} delay={0.3} />}
@@ -782,19 +789,18 @@ function CardFace({ c, w = 112, onClick, dim, sel }: { c: any; w?: number; onCli
   const Tag = onClick ? 'button' : 'div';
   return (
     <Tag type={onClick ? 'button' : undefined} onClick={onClick} style={{
-      position: 'relative', width: w, height: h, boxSizing: 'border-box', background: '#eadcb9', color: C.ink, border: `${Math.max(3, Math.round(w * 0.03))}px solid ${classColor(c.cls)}`, outline: `1px solid ${darker(classColor(c.cls), 0.55)}`,
+      position: 'relative', width: w, height: h, boxSizing: 'border-box', background: '#eadcb9', color: C.ink, border: `${Math.max(4, Math.round(w * 0.04))}px solid ${frameOf(c.rarity)}`, outline: `1px solid ${darker(frameOf(c.rarity), 0.5)}`,
       borderRadius: 6, padding: `0 ${w * 0.06}px ${w * 0.05}px`, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, cursor: onClick ? 'pointer' : undefined,
-      boxShadow: sel ? `0 0 0 3px #f2a43a, 0 6px 12px rgba(0,0,0,.55)` : c.up ? `0 0 0 2px ${C.gold}, 0 6px 12px rgba(0,0,0,.55)` : '0 6px 12px rgba(0,0,0,.55)',
+      boxShadow: sel ? `0 0 0 3px #f2a43a, 0 6px 12px rgba(0,0,0,.55)` : `${frameGlow(c.rarity)}0 6px 12px rgba(0,0,0,.55)`,
       opacity: dim ? 0.45 : 1, fontFamily: BODY, touchAction: 'manipulation',
     }}>
       <span style={{ position: 'absolute', left: -9, top: -9, zIndex: 1, width: w * 0.25, height: w * 0.25, minWidth: 24, minHeight: 24, borderRadius: '50%', background: darker(classColor(c.cls), 0.8), border: '2px solid #eadcb9', color: '#f3e6c8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: DISPLAY, fontSize: Math.max(15, w * 0.15), boxShadow: 'inset 0 0 0 3px rgba(0,0,0,.25)' }}>{c.cost}</span>
-      <span className="ab-sc" style={{ alignSelf: 'stretch', margin: `0 -${w * 0.06}px`, padding: `${w * 0.035}px ${w * 0.17}px ${w * 0.04}px`, background: classColor(c.cls), color: '#f3e6c8', fontSize: w < 120 ? (String(c.name).length > 11 ? 12 : 13.5) : Math.max(13, w * 0.13), lineHeight: 1.05, textAlign: 'center', position: 'relative', overflowWrap: 'anywhere', hyphens: 'auto' }}>
+      <span className="ab-sc" style={{ alignSelf: 'stretch', margin: `0 -${w * 0.06}px`, padding: `${w * 0.035}px ${w * 0.17}px ${w * 0.04}px`, minHeight: Math.round((w < 120 ? 13.5 : Math.max(13, w * 0.13)) * 1.05 * 2 + w * 0.075), boxSizing: 'border-box', display: 'flex', alignItems: 'center', justifyContent: 'center', background: classColor(c.cls), color: '#f3e6c8', fontSize: w < 120 ? (String(c.name).length > 11 ? 12 : 13.5) : Math.max(13, w * 0.13), lineHeight: 1.05, textAlign: 'center', position: 'relative', overflowWrap: 'anywhere', hyphens: 'auto' }}>
         {c.name}
         {c.speed !== 'normal' && <span style={{ position: 'absolute', right: 4, top: '50%', transform: 'translateY(-50%)', display: 'flex', background: '#eadcb9', borderRadius: '50%', padding: 2 }}><SpeedIcon speed={c.speed} size={Math.max(12, w * 0.12)} /></span>}
       </span>
       <img src={IMG(c.img)} onError={fallbackTo()} alt="" style={{ height: h * (String(c.text).length > 44 ? 0.24 : 0.34), margin: '2px 0', objectFit: 'contain', maxWidth: '90%' }} />
       <span style={{ fontSize: Math.max(11.5, w * 0.105), lineHeight: 1.15, textAlign: 'center' }}>{c.speed === 'fast' ? <i>Schnell. </i> : c.speed === 'slow' ? <i>Langsam. </i> : null}{c.text}</span>
-      <span style={{ position: 'absolute', bottom: Math.max(5, w * 0.04), left: '50%', marginLeft: -5 }}><RarityGem r={c.rarity} size={Math.max(8, w * 0.07)} /></span>
     </Tag>
   );
 }
@@ -802,20 +808,20 @@ function CardFace({ c, w = 112, onClick, dim, sel }: { c: any; w?: number; onCli
 function MiniCard({ c, onClick, dim }: { c: any; onClick: () => void; dim?: boolean }) {
   return (
     <button type="button" onClick={onClick} style={{
-      position: 'relative', height: 104, boxSizing: 'border-box', background: '#eadcb9', color: C.ink, border: `3px solid ${classColor(c.cls)}`, borderRadius: 6, padding: '0 4px 5px', overflow: 'visible',
-      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 5px 10px rgba(0,0,0,.5)', fontFamily: BODY, cursor: 'pointer', opacity: dim ? 0.45 : 1, touchAction: 'manipulation',
+      position: 'relative', height: 104, boxSizing: 'border-box', background: '#eadcb9', color: C.ink, border: `3px solid ${frameOf(c.rarity)}`, borderRadius: 6, padding: '0 4px 5px', overflow: 'visible',
+      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', boxShadow: `${frameGlow(c.rarity)}0 5px 10px rgba(0,0,0,.5)`, fontFamily: BODY, cursor: 'pointer', opacity: dim ? 0.45 : 1, touchAction: 'manipulation',
     }}>
       <span style={{ position: 'absolute', left: -8, top: -8, zIndex: 1, width: 24, height: 24, borderRadius: '50%', background: darker(classColor(c.cls), 0.8), border: '2px solid #eadcb9', color: '#f3e6c8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: DISPLAY, fontSize: 15 }}>{c.cost}</span>
-      <span className="ab-sc" style={{ alignSelf: 'stretch', margin: '0 -4px', padding: '3px 14px 3px', background: classColor(c.cls), color: '#f3e6c8', fontSize: 13, lineHeight: 1.05, textAlign: 'center', position: 'relative' }}>
+      <span className="ab-sc" style={{ alignSelf: 'stretch', margin: '0 -4px', padding: '3px 14px 3px', minHeight: 34, boxSizing: 'border-box', display: 'flex', alignItems: 'center', justifyContent: 'center', background: classColor(c.cls), color: '#f3e6c8', fontSize: 13, lineHeight: 1.05, textAlign: 'center', position: 'relative' }}>
         {c.name}
         {c.speed !== 'normal' && <span style={{ position: 'absolute', right: 2, top: '50%', transform: 'translateY(-50%)', display: 'flex', background: '#eadcb9', borderRadius: '50%', padding: 1 }}><SpeedIcon speed={c.speed} size={11} /></span>}
       </span>
       <img src={IMG(c.img)} onError={fallbackTo()} alt="" style={{ height: 36 }} />
       <span style={{ fontSize: 12, fontWeight: 700, lineHeight: 1.1, textAlign: 'center' }}>{shortText(c.text)}</span>
-      <span style={{ position: 'absolute', bottom: 3, right: 4 }}><RarityGem r={c.rarity} size={7} /></span>
     </button>
   );
 }
+const SPEED_ORDER: Record<string, number> = { fast: 0, normal: 1, slow: 2 };
 const shortText = (t: string) => (t.length > 22 ? t.split(/[.,]/)[0] : t);
 
 function PhonePlan({ view, send, me, player }: ControllerViewProps) {
@@ -967,7 +973,7 @@ function PhonePlan({ view, send, me, player }: ControllerViewProps) {
       {view.plan.length > 0 && (
         <section aria-label="Geplant" style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           <span className="ab-sc" style={{ fontSize: 15, color: C.muted, letterSpacing: 1 }}>Geplant</span>
-          {view.plan.map((p: any) => {
+          {[...view.plan].sort((a: any, b: any) => SPEED_ORDER[view.hand.find((x: any) => x.uid === a.uid)?.speed] - SPEED_ORDER[view.hand.find((x: any) => x.uid === b.uid)?.speed]).map((p: any) => {
             const c = view.hand.find((x: any) => x.uid === p.uid);
             if (!c) return null;
             const tgt = p.target ? (view.enemies.find((e: any) => e.uid === p.target)?.name ?? (p.target === me.id ? 'dich' : player(p.target)?.name)) : null;
@@ -1018,11 +1024,21 @@ function EnemyDetail({ e, name, onClose }: { e: any; name: (id: string) => strin
 
   const plan: string[] = [];
   if (it) {
-    const who = it.all || it.weakAll ? 'alle Spieler' : it.targets?.length ? name(it.targets[0]) : '';
-    if (it.dmg) plan.push(`${it.hits > 1 ? `${it.hits}-mal ${it.dmg}` : it.dmg} Schaden ${it.all ? 'an alle Spieler' : `auf ${who}`}${it.vuln ? `, macht das Ziel verwundbar` : ''}`);
-    if (it.block) plan.push(`erhält ${it.block} Block`);
-    if (it.weakAll) plan.push(`schwächt alle Spieler (25 % weniger Schaden)`);
-    if (it.buff) plan.push(`wird stärker: +${it.buff} Schaden für alle weiteren Angriffe`);
+    const who = it.all || it.weakAll || it.vulnAll ? 'alle Spieler' : it.targets?.length ? name(it.targets[0]) : '';
+    const rounds = (n: number) => `${n} ${n === 1 ? 'Runde' : 'Runden'}`;
+    if (it.dmg) plan.push(`${it.hits > 1 ? `${it.hits}-mal ${it.dmg}` : it.dmg} Schaden ${it.all ? 'an alle Spieler' : `auf ${who}`}${it.weakest ? ' – er zielt immer auf den Spieler mit den wenigsten Leben' : ''}`);
+    if (it.vuln) plan.push(`macht ${who} verwundbar für ${rounds(it.vuln)}: ${who === 'dich' ? 'du erleidest' : 'erleidet'} 50 % mehr Schaden`);
+    if (it.vulnAll) plan.push(`macht alle Spieler verwundbar für ${rounds(it.vulnAll)}: alle erleiden 50 % mehr Schaden`);
+    if (it.poison) plan.push(`vergiftet ${who} mit ${it.poison} Gift: am Rundenende so viele Leben weniger, danach sinkt das Gift um 1`);
+    if (it.curse) plan.push(`belegt ${who} mit einem unbekannten Fluch – Schwächung, Verwundbar oder Gift. Welcher es ist, sieht man erst bei der Auflösung`);
+    if (it.block) plan.push(`erhält ${it.block} Block: fängt so viel Schaden ab, bis zu seinem nächsten Zug`);
+    if (it.blockAllies) plan.push(`gibt allen Gegnern ${it.blockAllies} Block`);
+    if (it.healAlly) plan.push(`heilt den angeschlagensten anderen Gegner um ${it.healAlly}`);
+    if (it.weakAll) plan.push(`schwächt alle Spieler für 1 Runde: ihr macht 25 % weniger Schaden`);
+    if (it.buff) plan.push(`wird stärker: +${it.buff} Schaden für alle weiteren Angriffe in diesem Kampf`);
+    if (it.spawn) plan.push(`ruft ${it.spawn} ${it.spawn === 1 ? 'Brutling' : 'Brutlinge'} herbei`);
+    if (it.charge) plan.push('lädt einen gewaltigen Angriff auf – in der nächsten Runde trifft er alle');
+    if (!plan.length) plan.push('tut diese Runde nichts');
   }
   return (
     <>
@@ -1042,7 +1058,7 @@ function EnemyDetail({ e, name, onClose }: { e: any; name: (id: string) => strin
             <span className="ab-sc" style={{ fontSize: 20 }}>{it.name}</span>
             <IntentIcons it={it} size={20} font={22} />
           </div>
-          <span style={{ fontSize: 16, lineHeight: 1.3 }}>{plan.join(', ')}.</span>
+          {plan.map((x, i) => <span key={i} style={{ fontSize: 16, lineHeight: 1.3 }}>{x[0].toUpperCase() + x.slice(1)}.</span>)}
         </section>
       )}
       <section aria-label="Zustände" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -1231,6 +1247,7 @@ function HeroSheet({ view, me, onClose }: { view: any; me: PlayerInfo; onClose: 
           </div>
         ))}
       </div>
+      <MyStatus m={m} />
       <span className="ab-sc" style={{ fontSize: 15, color: C.muted, letterSpacing: 1 }}>Relikte</span>
       {m.relics.length ? m.relics.map((r: any, i: number) => <RelicRow key={r.id + i} r={r} />) : <span className="ab-fell" style={{ fontStyle: 'italic', color: C.muted }}>Noch keine Relikte.</span>}
       {deck.length > 0 && <button type="button" style={{ ...SMALL_BTN, minHeight: 48 }} onClick={() => setDeckOpen(!deckOpen)}>{deckOpen ? 'Deck ausblenden' : `Mein Deck ansehen (${deck.length})`}</button>}
@@ -1241,6 +1258,42 @@ function HeroSheet({ view, me, onClose }: { view: any; me: PlayerInfo; onClose: 
       )}
       <div style={{ flex: 1 }} />
       <button type="button" style={{ ...SMALL_BTN, minHeight: 48 }} onClick={onClose}>Zurück</button>
+    </>
+  );
+}
+
+/** Eigene Zustände (Buffs und Debuffs) mit Erklärung */
+function MyStatus({ m }: { m: any }) {
+  const rows: { name: string; icon: ReactNode; text: string; bad?: boolean }[] = [];
+  const st = m.st ?? {};
+  const rounds = (n: number) => `Noch ${n} ${n === 1 ? 'Runde' : 'Runden'}.`;
+  if (m.block > 0) rows.push({ name: `Block ${m.block}`, icon: <ShieldIcon size={22} />, text: `Fängt die nächsten ${m.block} Schaden ab.${m.keepBlock ? ' Verfällt diese Runde nicht.' : ' Verfällt am Ende der Runde.'}` });
+  if (m.str > 0) rows.push({ name: `Stärke ${m.str}`, icon: <StrengthIcon size={22} />, text: `Jeder deiner Treffer macht ${m.str} Schaden mehr. Bis Kampfende.` });
+  if (m.roundStr > 0) rows.push({ name: `+${m.roundStr} Schaden`, icon: <StrengthIcon size={22} />, text: 'Jeder deiner Treffer macht diese Runde so viel Schaden mehr.' });
+  const P: Record<string, (v: number) => [string, string]> = {
+    blockRound: (v) => ['Rüstung', `Du erhältst zu Beginn jeder Runde ${v} Block. Bis Kampfende.`],
+    blockAllRound: (v) => ['Ägis', `Alle Spieler erhalten zu Beginn jeder Runde ${v} Block. Bis Kampfende.`],
+    poisonAllRound: (v) => ['Miasma', `Alle Gegner erhalten zu Beginn jeder Runde ${v} Gift. Bis Kampfende.`],
+    healAllRound: (v) => ['Lebensbaum', `Alle Spieler heilen zu Beginn jeder Runde ${v}. Bis Kampfende.`],
+    thorns: (v) => ['Eiserne Dornen', `Greift dich ein Gegner an, erleidet er ${v} Schaden. Bis Kampfende.`],
+  };
+  for (const [k, v] of Object.entries(m.powers ?? {}) as [string, number][]) if (v && P[k]) { const [n, t] = P[k](v); rows.push({ name: n, icon: <FlameIcon size={22} color={C.gold} />, text: t }); }
+  if (m.undying) rows.push({ name: 'Unbeugsam', icon: <HeartIcon size={22} color={C.gold} />, text: 'Fällst du in diesem Kampf, bleibst du einmal mit 1 Leben stehen.' });
+  if (m.revive) rows.push({ name: 'Wiedergeburt', icon: <HeartIcon size={22} color={C.gold} />, text: 'Fällt in diesem Kampf ein Spieler, steht er einmal mit 30 % Leben wieder auf.' });
+  if (st.poison) rows.push({ name: `Gift ${st.poison}`, icon: <Seal l="G" col={C.green} />, text: `Du verlierst am Rundenende ${st.poison} Leben, danach sinkt das Gift um 1.`, bad: true });
+  if (st.weak) rows.push({ name: `Schwächung ${st.weak}`, icon: <Seal l="S" col="#6b5d45" />, text: `Du machst 25 % weniger Schaden. ${rounds(st.weak)}`, bad: true });
+  if (st.vuln) rows.push({ name: `Verwundbar ${st.vuln}`, icon: <Seal l="V" col="#8a1a1a" />, text: `Du erleidest 50 % mehr Schaden. ${rounds(st.vuln)}`, bad: true });
+  if (st.mark) rows.push({ name: `Markiert ${st.mark}`, icon: <Seal l="M" col={C.gold} />, text: `Jeder Treffer gegen dich macht ${st.mark} Schaden mehr. Bis zum Rundenende.`, bad: true });
+  if (st.stun) rows.push({ name: 'Betäubt', icon: <Seal l="B" col={C.purple} />, text: 'Du setzt deine nächste Aktion aus.', bad: true });
+  return (
+    <>
+      <span className="ab-sc" style={{ fontSize: 15, color: C.muted, letterSpacing: 1 }}>Zustände</span>
+      {rows.length ? rows.map((r) => (
+        <div key={r.name} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, background: '#2a1f16', border: `1px solid ${r.bad ? '#7a2416' : '#5b452f'}`, padding: '8px 10px' }}>
+          <span style={{ width: 30, height: 30, flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', background: C.paper2, borderRadius: '50%' }}>{r.icon}</span>
+          <span style={{ fontSize: 15.5, lineHeight: 1.3 }}><b className="ab-sc" style={{ fontSize: 17, color: r.bad ? '#ff8a70' : C.paper }}>{r.name}</b><br />{r.text}</span>
+        </div>
+      )) : <span className="ab-fell" style={{ fontSize: 15, fontStyle: 'italic', color: C.muted }}>Keine Zustände.</span>}
     </>
   );
 }
@@ -1726,7 +1779,7 @@ function PhoneMap({ view, send, player, me }: ControllerViewProps) {
         })}
       </section>
       <div style={{ flex: 1 }} />
-      <span className="ab-fell" style={{ fontSize: 15, fontStyle: 'italic', color: C.muted, textAlign: 'center' }}>Du kannst deine Stimme ändern, bis die Zeit um ist.</span>
+      <span className="ab-fell" style={{ fontSize: 15, fontStyle: 'italic', color: C.muted, textAlign: 'center' }}>Du kannst deine Stimme ändern, bis alle abgestimmt haben.</span>
       <Waiting view={{ ...view, waitingFor: (v?.voters ?? []).filter((id: string) => id !== me.id && !Object.values(v.votes).some((a: any) => a.includes(id))) }} send={send} player={player} text="" />
     </>
   );

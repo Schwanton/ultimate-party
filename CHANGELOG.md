@@ -2,6 +2,17 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.11.2
+
+- Abgrund: Die Detailseite eines Gegners erklärt jede geplante Aktion (z. B. Fluch: „macht dich verwundbar für 2 Runden: du erleidest 50 % mehr Schaden“)
+- Abgrund: Neu – der Knochenpriester kann einen **unbekannten Fluch** planen; ob Schwächung, Verwundbar oder Gift, zeigt sich erst bei der Auflösung
+- Abgrund: Die Heldenseite zeigt deine Zustände mit Erklärung – Block, Stärke, Kräfte wie Rüstung oder Lebensbaum, Gift, Schwächung, Verwundbar usw.
+- Abgrund: Geplante Karten stehen in der Reihenfolge, in der sie ausgeführt werden: schnell, normal, langsam
+- Abgrund: Kein Zeitlimit mehr bei der Wegwahl und bei Ereignissen – es geht weiter, sobald alle abgestimmt haben
+- Abgrund: Karten haben einen Rahmen nach Seltenheit (Basis dunkel, gewöhnlich Eisen, ungewöhnlich Silber, selten Gold, legendär Glut); das farbige Namensband ist bei allen Karten gleich hoch
+- Abgrund: Schildwall stärker – 6 Block für alle (allein 13), verbessert 8 (allein 17)
+- Abgrund: Die Grubenmutter zeigt an, wie viel Brut sie wirklich ruft
+
 ## 0.11.1
 
 - Abgrund: Alle neuen Bilder sind da – Händler, Lagerfeuer, neue Gegner, beide Bosse, 8 Ereignisbilder, 15 Relikte und 27 Kartenmotive; die alten Kartenmotive im kräftigeren Holzschnitt-Stil, die Klassenfiguren mit Akzenten in ihrer Klassenfarbe
