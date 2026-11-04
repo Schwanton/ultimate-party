@@ -2,6 +2,10 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.11.3
+
+- Abgrund: Kartenrahmen in der Farbskala der Seltenheit – Basis dunkel, gewöhnlich eisengrau, ungewöhnlich blau, selten lila, legendär gold; ungewöhnliche, seltene und legendäre Karten glitzern (je seltener, desto mehr Funken)
+
 ## 0.11.2
 
 - Abgrund: Die Detailseite eines Gegners erklärt jede geplante Aktion (z. B. Fluch: „macht dich verwundbar für 2 Runden: du erleidest 50 % mehr Schaden“)

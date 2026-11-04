@@ -11,10 +11,27 @@ const C = {
 };
 /** Seltenheit als kleiner Edelstein unten auf der Karte (Basis: keiner) */
 const RARITY: Record<string, string> = { common: '#8a8172', uncommon: '#c9d2d8', rare: C.gold, legendary: '#e0702a' };
-/** Kartenrahmen nach Seltenheit: Basis dunkel, gewöhnlich Eisen, ungewöhnlich Silber, selten Gold, legendär Glut */
-const FRAME: Record<string, string> = { basis: '#4a3b29', common: '#8a8172', uncommon: '#cfd8de', rare: '#d4a640', legendary: '#e0702a' };
+/** Kartenrahmen nach Seltenheit: Basis dunkel, gewöhnlich eisengrau, ungewöhnlich blau, selten lila, legendär gold */
+const FRAME: Record<string, string> = { basis: '#4a3b29', common: '#8a8172', uncommon: '#4f86c6', rare: '#9a63d1', legendary: '#e0b040' };
 const frameOf = (r?: string) => FRAME[r ?? 'basis'] ?? FRAME.basis;
-const frameGlow = (r?: string) => (r === 'legendary' ? '0 0 14px 2px rgba(224,112,42,.7), ' : r === 'rare' ? '0 0 10px 1px rgba(212,166,64,.45), ' : '');
+const frameGlow = (r?: string) => (r === 'legendary' ? '0 0 16px 3px rgba(224,176,64,.75), ' : r === 'rare' ? '0 0 12px 2px rgba(154,99,209,.6), ' : r === 'uncommon' ? '0 0 8px 1px rgba(79,134,198,.45), ' : '');
+
+/** Glitzernde Funken am Kartenrand (ungewöhnlich wenig, selten mehr, legendär viele) */
+const SPARK_SPOTS = [[6, -3], [94, 8], [-3, 38], [103, 55], [30, 101], [78, 99], [-2, 82], [101, 24], [50, -3], [12, 60], [88, 78], [60, 102]];
+function Sparkles({ r, size = 1 }: { r?: string; size?: number }) {
+  const n = r === 'legendary' ? 12 : r === 'rare' ? 7 : r === 'uncommon' ? 3 : 0;
+  if (!n) return null;
+  const col = r === 'legendary' ? '#fff1b8' : r === 'rare' ? '#e6d2ff' : '#d6e8ff';
+  return (
+    <span aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 2 }}>
+      {SPARK_SPOTS.slice(0, n).map(([x, y], i) => (
+        <svg key={i} width={9 * size} height={9 * size} viewBox="0 0 10 10" style={{ position: 'absolute', left: `${x}%`, top: `${y}%`, marginLeft: -4.5 * size, marginTop: -4.5 * size, animation: `abSparkle ${1.6 + (i % 4) * 0.45}s ease-in-out ${(i * 0.37) % 2}s infinite`, filter: `drop-shadow(0 0 3px ${col})` }}>
+          <path d="M5 0 L6 4 L10 5 L6 6 L5 10 L4 6 L0 5 L4 4 Z" fill={col} />
+        </svg>
+      ))}
+    </span>
+  );
+}
 const RARITY_NAME: Record<string, string> = { common: 'gewöhnlich', uncommon: 'ungewöhnlich', rare: 'selten', legendary: 'legendär' };
 /** Klassenfarben (Stahlblau, Nachtviolett, Moosgrün) */
 const CLASS_COLOR: Record<string, string> = { schildwacht: '#3A5A78', klingenlaeufer: '#5B3A6E', kraeuterkundige: '#4F6B35' };
@@ -73,6 +90,7 @@ function Styles() {
 @keyframes abGlow{0%,100%{box-shadow:0 0 0 0 transparent}40%{box-shadow:0 0 28px 6px var(--ab-glow)}}
 @keyframes abCandle{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.12) translateY(-1px)}}
 @keyframes abFade{from{opacity:0}to{opacity:1}}
+@keyframes abSparkle{0%,100%{opacity:0;transform:scale(.3) rotate(0deg)}45%{opacity:1;transform:scale(1) rotate(45deg)}70%{opacity:.6;transform:scale(.7) rotate(90deg)}}
 @keyframes abRise{0%{transform:translateY(420px);opacity:0}30%{opacity:1}100%{transform:translateY(0)}}
 `}</style>
   );
@@ -795,6 +813,7 @@ function CardFace({ c, w = 112, onClick, dim, sel }: { c: any; w?: number; onCli
       opacity: dim ? 0.45 : 1, fontFamily: BODY, touchAction: 'manipulation',
     }}>
       <span style={{ position: 'absolute', left: -9, top: -9, zIndex: 1, width: w * 0.25, height: w * 0.25, minWidth: 24, minHeight: 24, borderRadius: '50%', background: darker(classColor(c.cls), 0.8), border: '2px solid #eadcb9', color: '#f3e6c8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: DISPLAY, fontSize: Math.max(15, w * 0.15), boxShadow: 'inset 0 0 0 3px rgba(0,0,0,.25)' }}>{c.cost}</span>
+      <Sparkles r={c.rarity} size={Math.max(0.8, w / 140)} />
       <span className="ab-sc" style={{ alignSelf: 'stretch', margin: `0 -${w * 0.06}px`, padding: `${w * 0.035}px ${w * 0.17}px ${w * 0.04}px`, minHeight: Math.round((w < 120 ? 13.5 : Math.max(13, w * 0.13)) * 1.05 * 2 + w * 0.075), boxSizing: 'border-box', display: 'flex', alignItems: 'center', justifyContent: 'center', background: classColor(c.cls), color: '#f3e6c8', fontSize: w < 120 ? (String(c.name).length > 11 ? 12 : 13.5) : Math.max(13, w * 0.13), lineHeight: 1.05, textAlign: 'center', position: 'relative', overflowWrap: 'anywhere', hyphens: 'auto' }}>
         {c.name}
         {c.speed !== 'normal' && <span style={{ position: 'absolute', right: 4, top: '50%', transform: 'translateY(-50%)', display: 'flex', background: '#eadcb9', borderRadius: '50%', padding: 2 }}><SpeedIcon speed={c.speed} size={Math.max(12, w * 0.12)} /></span>}
@@ -812,6 +831,7 @@ function MiniCard({ c, onClick, dim }: { c: any; onClick: () => void; dim?: bool
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', boxShadow: `${frameGlow(c.rarity)}0 5px 10px rgba(0,0,0,.5)`, fontFamily: BODY, cursor: 'pointer', opacity: dim ? 0.45 : 1, touchAction: 'manipulation',
     }}>
       <span style={{ position: 'absolute', left: -8, top: -8, zIndex: 1, width: 24, height: 24, borderRadius: '50%', background: darker(classColor(c.cls), 0.8), border: '2px solid #eadcb9', color: '#f3e6c8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: DISPLAY, fontSize: 15 }}>{c.cost}</span>
+      <Sparkles r={c.rarity} size={0.75} />
       <span className="ab-sc" style={{ alignSelf: 'stretch', margin: '0 -4px', padding: '3px 14px 3px', minHeight: 34, boxSizing: 'border-box', display: 'flex', alignItems: 'center', justifyContent: 'center', background: classColor(c.cls), color: '#f3e6c8', fontSize: 13, lineHeight: 1.05, textAlign: 'center', position: 'relative' }}>
         {c.name}
         {c.speed !== 'normal' && <span style={{ position: 'absolute', right: 2, top: '50%', transform: 'translateY(-50%)', display: 'flex', background: '#eadcb9', borderRadius: '50%', padding: 1 }}><SpeedIcon speed={c.speed} size={11} /></span>}
