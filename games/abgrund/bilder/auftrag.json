@@ -1,15 +1,11 @@
 {
   "_hinweis": "Liste der Bilder für Abgrund. 'Bilder erzeugen' erzeugt alle Bilder, die noch fehlen. Claude pflegt diese Datei.",
   "modell": [
-    "gpt-image-2",
     "gpt-image-1.5",
     "gpt-image-1"
   ],
   "qualitaet": "medium",
-  "nur": [
-    "held-schildwacht",
-    "gegner-skelett"
-  ],
+  "nur": [],
   "varianten": 2,
   "bilder": [
     {
@@ -159,5 +155,9 @@
       "transparent": true,
       "prompt": "A bundle of healing herbs tied with string, giving off a faint glow. Style: small antique ink etching vignette like the central emblem of an old tarot card, dense cross-hatching, sepia and bone-white tones, one small blood-red accent, simple clear silhouette that stays readable at small size, centered object only. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
     }
-  ]
+  ],
+  "_auswahl": {
+    "held-schildwacht": "1",
+    "gegner-skelett": "1"
+  }
 }
