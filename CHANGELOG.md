@@ -2,6 +2,15 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.14.0
+
+- Crash: Neue Auszählung – die Säule rechts hat eine Skala und feste Farbzonen (gleiche Farben wie der Kurs). Kommen die Einsätze dazu, steigt sie sichtbar in den freien Platz darüber
+- Crash: Die Balken links werden am Führenden gemessen und sind von Anfang an gut gefüllt; Hilfslinien mit Zahlen, neue Punkte leuchten kurz am Balkenende
+- Crash: Neue Einstellung „Bonus für den Letzten“ – wer als Letzter vor dem Absturz aussteigt, bekommt 100 extra (Standard: aus)
+- Crash: Wer noch keinen Einsatz angetippt hat, sieht einen pulsierenden gelben Rand auf dem Handy; der Fernseher zeigt „Jetzt Einsatz wählen!“ und wer noch fehlt
+- Crash: Höchststand der Kurve mit gestrichelter Linie – während der Runde und danach
+- Crash: Lässt sich zum Ausprobieren auch allein spielen
+
 ## 0.13.0
 
 - Abgrund: Karten-Ausbau – 25 neue Karten, Spielstile pro Klasse, alle Karten mit eigenem Bild

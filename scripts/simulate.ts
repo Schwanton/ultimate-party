@@ -74,6 +74,8 @@ const scenarios: { game: string; players: number; options?: Record<string, numbe
   { game: 'crash', players: 4, options: { rounds: 4 } },
   { game: 'crash', players: 6, options: { rounds: 4, mode: 'half' } },
   { game: 'crash', players: 3, options: { rounds: 4, mode: 'secret' } },
+  { game: 'crash', players: 1, options: { rounds: 4 } },
+  { game: 'crash', players: 5, options: { rounds: 4, lastMan: 'on' } },
   { game: 'kartoffel', players: 5, options: { lives: 2 } },
   { game: 'sumo', players: 4, options: { rounds: 1 } },
   { game: 'montagsmaler', players: 5, options: { mode: 'team', rounds: 4 } },

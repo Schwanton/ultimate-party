@@ -5,6 +5,7 @@
  * Letzte Runde doppelt. Geldstände bleiben bis zur Auszählung am Ende geheim.
  *
  * Modi: open (man sieht, wer aussteigt), half (nur, dass jemand aussteigt), secret (nichts).
+ * Option „Letzter raus“: Wer als Letzter vor dem Absturz aussteigt, bekommt einen Bonus (× Rundenmultiplikator).
  */
 
 import { Scores, type GameContext, type GameServerModule } from '@up/sdk';
@@ -14,6 +15,7 @@ import { tallyDuration, type TallyData } from './tally';
 const T = { intro: 8, ready: 5, afterCrash: 6, afterAllBusted: 2, allOutReveal: 1.5 };
 const BASE = 100;
 const BETS = [0, 10, 25, 100];
+const LAST_BONUS = 100;
 
 export default {
   create(ctx: GameContext) {
@@ -23,12 +25,14 @@ export default {
     const mode = (['open', 'half', 'secret'].includes(String(ctx.options.mode)) ? String(ctx.options.mode) : 'open') as 'open' | 'half' | 'secret';
     // frühester Absturz: einmal pro Partie zwischen 2 und 6 Sekunden
     const minCrash = 2 + Math.random() * 4;
+    const lastMan = String(ctx.options.lastMan) === 'on' && ids.length > 1;
     let round = 0;
     let phase: 'intro' | 'ready' | 'run' | 'crash' | 'tally' = 'intro';
     let seed = 1;
     let startAt = 0;
     let crashTime = 0;
     let bets = new Map<string, number>(); // gewählter Prozentsatz
+    let picked = new Set<string>(); // hat in dieser Runde schon einen Einsatz angetippt
     let stakes = new Map<string, number>(); // eingesetztes Geld (fest ab Start)
     let cashed = new Map<string, number>();
     let cashedT = new Map<string, number>();
@@ -37,7 +41,7 @@ export default {
     const extraSum = new Map<string, number>(ids.map((id) => [id, 0]));
 
     const mult = () => (round === total ? 2 : 1);
-    const base = () => ({ round, total, mult: mult(), seed, mode });
+    const base = () => ({ round, total, mult: mult(), seed, mode, lastMan });
 
     function intro() {
       ctx.setHostView({ screen: 'intro', mode });
@@ -52,19 +56,26 @@ export default {
       cashed = new Map();
       cashedT = new Map();
       bets = new Map();
+      // ohne Geld gibt es nichts zu wählen – dann nicht mahnen
+      picked = new Set(ids.filter((id) => money.get(id) <= 0));
       stakes = new Map();
       seed = newSeed();
       crashTime = rollCrashTime(Math.random(), minCrash);
       startAt = Date.now() + T.ready * 1000;
-      ctx.setHostView({ screen: 'ready', ...base(), startAt });
+      hostReady();
       ids.forEach(phoneReady);
       ctx.timer(T.ready, run);
+    }
+
+    function hostReady() {
+      // wer noch keinen Einsatz angetippt hat (nur Avatare, kein Geld)
+      ctx.setHostView({ screen: 'ready', ...base(), startAt, players: ids, waiting: ids.filter((id) => !picked.has(id)), canBet: ids.some((id) => money.get(id) > 0) });
     }
 
     function phoneReady(id: string) {
       const m = money.get(id);
       ctx.setPlayerView(id, {
-        screen: 'ready', ...base(), startAt, input: true, money: m, bet: bets.get(id) ?? 0,
+        screen: 'ready', ...base(), startAt, input: true, money: m, bet: bets.get(id) ?? 0, picked: picked.has(id),
         options: BETS.map((pct) => ({ pct, amount: Math.floor((m * pct) / 100) })),
       });
     }
@@ -108,22 +119,28 @@ export default {
       const m = mult();
       const roundBase: Record<string, number> = {};
       const roundExtra: Record<string, number> = {};
-      const results = new Map<string, { base: number; extra: number }>();
+      const results = new Map<string, { base: number; extra: number; bonus: number }>();
+      // Letzter raus: wer zuletzt ausgestiegen ist (gleichzeitig = alle Gleichzeitigen)
+      const lastT = cashed.size ? Math.max(...cashedT.values()) : -1;
+      const lastIds = lastMan ? [...cashed.keys()].filter((id) => cashedT.get(id) === lastT) : [];
       for (const id of ids) {
         const x = cashed.get(id);
         const stake = stakes.get(id) ?? 0;
         const b = x != null ? Math.round(BASE * x * m) : 0;
         const e = x != null ? Math.round(stake * x * m) - stake : -stake;
+        const bonus = lastIds.includes(id) ? LAST_BONUS * m : 0;
         roundBase[id] = b;
-        roundExtra[id] = e;
+        roundExtra[id] = e + bonus;
         extraSum.set(id, (extraSum.get(id) ?? 0) + e);
-        money.add(id, b + e);
-        results.set(id, { base: b, extra: e });
+        money.add(id, b + e + bonus);
+        results.set(id, { base: b, extra: e, bonus });
       }
       tally.rounds.push({
         crashAt, mult: m, base: roundBase, extra: roundExtra,
         pct: Object.fromEntries(ids.map((id) => [id, bets.get(id) ?? 0])),
         cm: Object.fromEntries([...cashed]),
+        last: lastIds.length ? lastIds : undefined,
+        lastBonus: lastIds.length ? LAST_BONUS * m : undefined,
       });
       const busted = ids.filter((id) => !cashed.has(id));
       ctx.setHostView({
@@ -131,10 +148,11 @@ export default {
         bustedCount: busted.length, outCount: cashed.size,
         cashed: mode === 'open' ? [...cashed].map(([id, x]) => ({ id, m: x, t: cashedT.get(id) ?? 0 })).sort((a, b) => b.m - a.m) : [],
         busted: mode === 'open' ? busted : [],
+        last: mode === 'open' ? lastIds : [], lastBonus: LAST_BONUS * m,
       });
       ctx.setAllPlayerViews((p) => {
         const r = results.get(p.id)!;
-        return { screen: 'crashed', crashAt, m: cashed.get(p.id) ?? null, pot: pot(p.id), stake: stakes.get(p.id) ?? 0, gain: r.base + r.extra, total: money.get(p.id) };
+        return { screen: 'crashed', crashAt, m: cashed.get(p.id) ?? null, pot: pot(p.id), stake: stakes.get(p.id) ?? 0, gain: r.base + r.extra + r.bonus, bonus: r.bonus, total: money.get(p.id) };
       });
       // Alle erwischt: schnell weiter
       ctx.after(cashed.size === 0 ? T.afterAllBusted : T.afterCrash, nextRound);
@@ -174,7 +192,10 @@ export default {
         if (action?.type === 'cash') return cashOut(id);
         if (action?.type === 'bet' && phase === 'ready' && ids.includes(id) && BETS.includes(Number(action.pct))) {
           bets.set(id, Number(action.pct));
+          const first = !picked.has(id);
+          picked.add(id);
           phoneReady(id);
+          if (first) hostReady();
         }
       },
       bot(_id, view) {

@@ -49,6 +49,13 @@
  "phone.cashedPot": "Dein Topf jetzt: {n}",
  "tally.plusBets": "+ Einsätze",
  "tally.allBusted": "ALLE WEG",
- "tally.betInfo": "Einsatz +{pct} % · {m}",
- "tally.crashed": "gecrasht"
+ "ready.betBig": "Jetzt Einsatz wählen!",
+ "ready.waiting": "Fehlt noch:",
+ "ready.allSet": "Alle haben gewählt!",
+ "bet.pickNow": "Tipp deinen Einsatz an!",
+ "graph.peak": "Höchststand {m}",
+ "crash.last": "Letzter raus: {name} +{n}",
+ "phone.lastBonus": "Letzter raus! +{n}",
+ "tally.last": "Letzter raus",
+ "intro.last": "Bonus: Wer als Letzter vor dem Absturz aussteigt, bekommt 100 extra."
 }

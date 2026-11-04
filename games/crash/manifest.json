@@ -8,7 +8,7 @@
     "de": "Der Kurs schwankt wie eine Aktie und steigt meist – bis er abstürzt. Steig rechtzeitig aus! Wer zu gierig ist, verliert alles.",
     "en": "The price swings like a stock and mostly climbs – until it crashes. Cash out in time! Get greedy and lose it all."
   },
-  "minPlayers": 2,
+  "minPlayers": 1,
   "maxPlayers": 100,
   "audience": false,
   "minutes": 8,
@@ -63,6 +63,34 @@
       "help": {
         "de": "Halbgeheim: Man sieht, dass jemand aussteigt und wie viele noch drin sind, aber nicht wer. Geheim: Man sieht während der Runden gar nichts.",
         "en": "Half secret: you see that someone cashed out and how many are still in, but not who. Secret: nothing is shown during the rounds."
+      }
+    },
+    {
+      "id": "lastMan",
+      "label": {
+        "de": "Bonus für den Letzten",
+        "en": "Last one out bonus"
+      },
+      "default": "off",
+      "choices": [
+        {
+          "value": "off",
+          "label": {
+            "de": "Aus",
+            "en": "Off"
+          }
+        },
+        {
+          "value": "on",
+          "label": {
+            "de": "An",
+            "en": "On"
+          }
+        }
+      ],
+      "help": {
+        "de": "Wer als Letzter vor dem Absturz aussteigt, bekommt 100 Punkte extra (letzte Runde 200).",
+        "en": "Whoever cashes out last before the crash gets 100 extra points (200 in the last round)."
       }
     }
   ]

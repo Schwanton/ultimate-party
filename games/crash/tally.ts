@@ -19,6 +19,9 @@ export interface TallyRound {
   pct?: Record<string, number>;
   /** Kurs beim Aussteigen (fehlt = gecrasht) */
   cm?: Record<string, number>;
+  /** Option „Letzter raus“: wer den Bonus bekommen hat (steckt schon in extra) */
+  last?: string[];
+  lastBonus?: number;
 }
 
 export interface TallyData {
@@ -31,7 +34,7 @@ const hasExtra = (r: TallyRound) => Object.values(r.extra).some((v) => v !== 0);
 /** Dauer der Abschnitte einer Runde in Sekunden */
 export function phases(r: TallyRound) {
   if (allBusted(r)) return { fill: 0, pause: 0.9, extra: hasExtra(r) ? 1.1 : 0, hold: hasExtra(r) ? 1 : 0.3 };
-  return { fill: 1.5, pause: 0.25, extra: hasExtra(r) ? 1.25 : 0, hold: 1.3 };
+  return { fill: 1.6, pause: 0.3, extra: hasExtra(r) ? 1.5 : 0, hold: 1.7 };
 }
 const roundLen = (r: TallyRound) => {
   const p = phases(r);
@@ -68,11 +71,18 @@ const ease = (x: number) => 1 - Math.pow(1 - Math.max(0, Math.min(1, x)), 3);
 
 /** Wie weit ist der Betrag dieses Spielers schon nach links geflossen? (nacheinander, größte zuerst) */
 export function flowFraction(r: TallyRound, id: string, holdSec: number) {
+  return ease((holdSec - flowDelay(r, id)) / FLOW_SEC);
+}
+
+const FLOW_SEC = 0.5;
+function flowDelay(r: TallyRound, id: string) {
   const amounts = Object.keys(r.base).map((k) => ({ k, v: Math.abs((r.base[k] ?? 0) + (r.extra[k] ?? 0)) })).sort((a, b) => b.v - a.v);
   const idx = amounts.findIndex((a) => a.k === id);
-  const delay = Math.min(0.12 * Math.max(0, idx), 0.6);
-  return ease((holdSec - delay) / 0.5);
+  return Math.min(0.12 * Math.max(0, idx), 0.6);
 }
+
+/** Sekunde der Haltephase, in der der Betrag links angekommen ist */
+export const arrivalAt = (r: TallyRound, id: string) => flowDelay(r, id) + FLOW_SEC;
 
 /** Stand eines Spielers links (während der Haltephase fließt der Rundenbetrag nach und nach dazu) */
 export function totalAt(t: TallyData, id: string, at: ReturnType<typeof tallyAt>) {

@@ -49,6 +49,13 @@
  "phone.cashedPot": "Your pot now: {n}",
  "tally.plusBets": "+ bets",
  "tally.allBusted": "ALL GONE",
- "tally.betInfo": "bet +{pct} % · {m}",
- "tally.crashed": "crashed"
+ "ready.betBig": "Pick your bet now!",
+ "ready.waiting": "Still missing:",
+ "ready.allSet": "Everyone's in!",
+ "bet.pickNow": "Tap your bet!",
+ "graph.peak": "Peak {m}",
+ "crash.last": "Last one out: {name} +{n}",
+ "phone.lastBonus": "Last one out! +{n}",
+ "tally.last": "last one out",
+ "intro.last": "Bonus: whoever cashes out last before the crash gets 100 extra."
 }
