@@ -1,0 +1,34 @@
+{
+  "id": "abgrund",
+  "name": { "de": "Abgrund", "en": "Abyss" },
+  "description": {
+    "de": "Kooperatives Deckbuilding in einer düsteren Papiertheater-Welt: Alle planen gleichzeitig ihre Karten, dann wird gemeinsam gekämpft. Prototyp mit 3 Klassen und 3 Kämpfen.",
+    "en": "Co-op deckbuilding in a dark paper-theatre world: everyone plans cards at the same time, then you fight together. Prototype with 3 classes and 3 fights."
+  },
+  "minPlayers": 1,
+  "maxPlayers": 12,
+  "audience": true,
+  "minutes": 30,
+  "color": "#8E1A17",
+  "tags": ["team"],
+  "sdkVersion": 1,
+  "autoSounds": false,
+  "version": "0.1.0",
+  "author": "UP!",
+  "options": [
+    {
+      "id": "planTime",
+      "label": { "de": "Zeit zum Planen", "en": "Planning time" },
+      "default": 0,
+      "choices": [
+        { "value": 0, "label": { "de": "Unbegrenzt", "en": "Unlimited" } },
+        { "value": 60, "label": { "de": "60 s", "en": "60 s" } },
+        { "value": 90, "label": { "de": "90 s", "en": "90 s" } }
+      ],
+      "help": {
+        "de": "Mit Zeitlimit bekommt, wer nicht fertig wird, automatisch Karten.",
+        "en": "With a time limit, anyone who isn't done gets cards played automatically."
+      }
+    }
+  ]
+}

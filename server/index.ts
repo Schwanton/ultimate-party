@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
 import { WebSocketServer, type WebSocket } from 'ws';
-import { BUILD_DIR, DEV, PORT, QUIET } from './config';
+import { BUILD_DIR, DEV, GAMES_DIR, PORT, QUIET } from './config';
 import { lanAddress } from './network';
 import { getGame, loadGames } from './registry';
 import { setSecret } from './secrets';
@@ -21,6 +21,11 @@ const MIME: Record<string, string> = {
   '.png': 'image/png',
   '.json': 'application/json',
   '.map': 'application/json',
+  '.webp': 'image/webp',
+  '.jpg': 'image/jpeg',
+  '.woff2': 'font/woff2',
+  '.mp3': 'audio/mpeg',
+  '.ogg': 'audio/ogg',
 };
 
 const lanIp = lanAddress();
@@ -47,6 +52,18 @@ const server = http.createServer((req, res) => {
   if (url.pathname === '/api/info') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     return void res.end(JSON.stringify({ baseUrl, dev: DEV, version: updateStatus().current }));
+  }
+
+  // Dateien eines Spiels (Bilder, Schriften, Klänge): /game/<spiel>/<ordner>/<datei>
+  const gameFile = /^\/game\/([a-z0-9-]+)\/(bilder|schriften|klaenge)\/([\w.-]+\.(?:webp|png|jpg|woff2|mp3|ogg|svg))$/.exec(url.pathname);
+  if (gameFile) {
+    const file = path.join(GAMES_DIR, gameFile[1], gameFile[2], gameFile[3]);
+    if (!fs.existsSync(file)) return void res.writeHead(404).end();
+    res.writeHead(200, {
+      'Content-Type': MIME[path.extname(file)] ?? 'application/octet-stream',
+      'Cache-Control': DEV ? 'no-cache' : 'public, max-age=86400',
+    });
+    return void fs.createReadStream(file).pipe(res);
   }
 
   if (url.pathname.startsWith('/assets/')) {

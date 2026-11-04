@@ -2,6 +2,12 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.10.0
+
+- Neues Spiel (Prototyp): **Abgrund** – kooperatives Deckbau-Abenteuer im Papiertheater-Stil für 1–12 Spieler. Im Lager wählt jeder per Wischen seine Klasse (Schildwacht, Klingenläufer, Kräuterkundige), dann plant ihr gleichzeitig eure Karten auf dem Handy; der TV zeigt die Gegner mit roten Fäden zu ihren Zielen und spielt die Runde Schritt für Schritt aus. Drei Kämpfe mit Kartenbelohnungen, der letzte gegen den Knochenkoloss. Wer fällt, verliert den Run für alle. Allein spielbar oder mit bis zu 11 Testspielern. Der Run wird nach jedem Kampf gespeichert und lässt sich fortsetzen
+- Spiele können eigene Bilder, Schriften und Klänge mitbringen (Ordner `bilder/`, `schriften/`, `klaenge/`)
+- Spiele können Dinge dauerhaft speichern (`ctx.store`), z. B. einen laufenden Run
+
 ## 0.9.3
 
 - Kronenduell: Treffer – der ganze Angriffsbereich schlägt gegen die Verteidigung des Gegners, die zurückgeschleudert wird und rot aufleuchtet, mit Einschlag-Geräusch

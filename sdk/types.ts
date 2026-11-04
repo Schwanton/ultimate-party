@@ -182,6 +182,16 @@ export interface GameContext {
    */
   deck<T extends ContentItem = ContentItem>(opts?: { filter?: (item: T) => boolean }): Deck<T>;
 
+  /**
+   * Spielspeicher: kleine JSON-Daten, die über Neustarts erhalten bleiben (z. B. ein gespeicherter Spielstand).
+   * Gilt pro Spiel für diesen Rechner. In Tests wird nichts auf die Festplatte geschrieben.
+   */
+  readonly store: {
+    get<T = unknown>(key: string): T | undefined;
+    /** undefined/null löscht den Eintrag */
+    set(key: string, value: unknown): void;
+  };
+
   /** Ansicht für den großen Bildschirm setzen */
   setHostView(view: object): void;
   /** Ansicht für ein einzelnes Handy setzen */

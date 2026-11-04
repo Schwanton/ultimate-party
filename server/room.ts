@@ -10,6 +10,7 @@ import { shuffle } from '../sdk/util';
 import { allGames, getGame, type LoadedGame } from './registry';
 import { DEV, QUIET, TIME_SCALE } from './config';
 import { getSecret, secretStatus, setSecret } from './secrets';
+import { storeGet, storeSet } from './store';
 import { deckStatus, drawnSet, markDrawn, refill, resetDeck, unmarkDrawn } from './decks';
 import { updateStatus } from './update';
 import { rememberRoom, rememberedRoom } from './roomstore';
@@ -405,6 +406,10 @@ export class Room {
       },
       content: <T,>() => room.contentFor(g) as T[],
       deck: <T extends { id?: string },>(opts?: { filter?: (item: T) => boolean }) => room.deckFor<T>(g, opts?.filter),
+      store: {
+        get: <T,>(key: string) => storeGet<T>(g.id, key),
+        set: (key: string, value: unknown) => storeSet(g.id, key, value),
+      },
       setHostView(view) {
         if (!alive()) return;
         g.hostView = view;

@@ -24,6 +24,7 @@ games/mein-spiel/
   i18n/en.json         Texte auf Englisch
   content/de/*.json    Content-Packs (Fragen, Begriffe …) pro Sprache
   content/en/*.json
+  bilder/ schriften/ klaenge/   eigene Dateien, im Spiel erreichbar unter /game/mein-spiel/bilder/datei.webp …
 ```
 
 ### manifest.json
@@ -122,6 +123,7 @@ export default {
 | `ctx.options` | gewählte Spiel-Einstellungen |
 | `ctx.after(sek, fn)` | kurze Pause, z. B. für Animationen |
 | `ctx.secret(id)` | geheime Einstellung lesen, z. B. einen API-Schlüssel (im Manifest unter `secrets` deklarieren; der Host trägt ihn in den Einstellungen ein) |
+| `ctx.store.get(schlüssel)` / `ctx.store.set(schlüssel, wert)` | dauerhaft speichern, auch über Neustarts hinweg (`.up-data/store/<spiel>.json`), z. B. einen laufenden Run. In Tests wird nichts geschrieben. |
 | `ctx.finish(ranking)` | Spiel beendet; Rangliste wird gemeldet (später für den Olympia-Modus) |
 
 Eigenschaften in Ansichten mit Sonderbedeutung: `input: true` lässt das Handy kurz vibrieren (neue Aufgabe).
