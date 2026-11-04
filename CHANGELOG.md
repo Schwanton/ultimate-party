@@ -2,6 +2,11 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.10.2
+
+- Abgrund: Jede Klasse hat ihre Farbe – Schildwacht Stahlblau, Klingenläufer Nachtviolett, Kräuterkundige Moosgrün. Karten tragen Rahmen, Namensband und Kostensiegel in der Klassenfarbe, auch Klassenwahl und Gruppenliste
+- Abgrund: Seltenheit steht als kleiner Edelstein unten auf der Karte (grau, silber, gold)
+
 ## 0.10.1
 
 - Fernseher: Taste **F** schaltet Vollbild an und aus

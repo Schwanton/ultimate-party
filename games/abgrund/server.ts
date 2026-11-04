@@ -220,7 +220,7 @@ export default {
       const c = cardOf(h, uid)!;
       const def = CARD[c.id];
       return {
-        uid, id: c.id, up: c.up, name: def.name + (c.up ? '+' : ''), cost: cost(c), speed: def.speed, rarity: def.rarity,
+        uid, id: c.id, cls: def.cls, up: c.up, name: def.name + (c.up ? '+' : ''), cost: cost(c), speed: def.speed, rarity: def.rarity,
         text: cardText(def, c.up, isSolo()), img: def.img, target: def.target, otherAlly: !!def.otherAlly && !isSolo(),
       };
     };
@@ -263,7 +263,7 @@ export default {
           ...base, me, input: !picked.has(id), done: picked.has(id), pickedName: picked.get(id) ? CARD[picked.get(id)!].name : null,
           offer: o.map((cid) => {
             const d = CARD[cid];
-            return { id: cid, name: d.name, cost: d.cost[0], speed: d.speed, rarity: d.rarity, text: cardText(d, false, isSolo()), img: d.img };
+            return { id: cid, cls: d.cls, name: d.name, cost: d.cost[0], speed: d.speed, rarity: d.rarity, text: cardText(d, false, isSolo()), img: d.img };
           }),
         };
       }

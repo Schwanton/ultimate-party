@@ -9,7 +9,22 @@ const C = {
   ground: '#0f0b08', paper: '#e9dbb8', paper2: '#e3d3ad', ink: '#1c140d', muted: '#b7a888', blood: '#a3171c', bright: '#c4161c',
   wax: '#8e1a17', bronze: '#8a6440', gold: '#b8893c', green: '#4f6b2a', blue: '#3e6fb0', purple: '#7a4fb0',
 };
-const RARITY: Record<string, string> = { basis: '#6b5236', common: '#7d7466', uncommon: C.blue, rare: C.purple, legendary: C.gold };
+/** Seltenheit als kleiner Edelstein unten auf der Karte (Basis: keiner) */
+const RARITY: Record<string, string> = { common: '#8a8172', uncommon: '#c9d2d8', rare: C.gold, legendary: '#e0702a' };
+const RARITY_NAME: Record<string, string> = { common: 'gewöhnlich', uncommon: 'ungewöhnlich', rare: 'selten', legendary: 'legendär' };
+/** Klassenfarben (Stahlblau, Nachtviolett, Moosgrün) */
+const CLASS_COLOR: Record<string, string> = { schildwacht: '#3A5A78', klingenlaeufer: '#5B3A6E', kraeuterkundige: '#4F6B35' };
+const classColor = (cls?: string) => (cls && CLASS_COLOR[cls]) || '#6b5236';
+/** dunklere Variante (Rahmen außen, Siegel) */
+const darker = (hex: string, f = 0.7) => {
+  const n = parseInt(hex.slice(1), 16);
+  const ch = (x: number) => Math.round(x * f).toString(16).padStart(2, '0');
+  return `#${ch((n >> 16) & 255)}${ch((n >> 8) & 255)}${ch(n & 255)}`;
+};
+function RarityGem({ r, size = 10 }: { r?: string; size?: number }) {
+  if (!r || !RARITY[r]) return null;
+  return <span role="img" aria-label={RARITY_NAME[r]} style={{ width: size, height: size, transform: 'rotate(45deg)', background: RARITY[r], boxShadow: '0 0 0 1.5px rgba(28,20,13,.75), inset -2px -2px 0 rgba(0,0,0,.2)', flexShrink: 0 }} />;
+}
 const DISPLAY = "'IM Fell English SC', 'IM Fell English', 'Palatino Linotype', 'Book Antiqua', Georgia, serif";
 const FELL = "'IM Fell English', 'Palatino Linotype', 'Book Antiqua', Georgia, serif";
 const BODY = "'Crimson Pro', 'Palatino Linotype', 'Book Antiqua', Georgia, serif";
@@ -270,7 +285,7 @@ function HostLager({ view, player }: HostViewProps) {
           return (
             <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: view.players.length > 9 ? 17 : 19 }}>
               <span className="ab-sc" style={{ color: shadeDark(pl?.color), width: 130, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{pl?.name}{(pl as any)?.comp ? <i className="ab-fell" style={{ fontSize: 14, color: '#6b5d45' }}> · Begleiter</i> : null}</span>
-              <span className="ab-fell" style={{ flex: 1, fontStyle: 'italic', color: p.cls ? C.ink : '#6b5d45' }}>{p.cls ? CLASS_NAME[p.cls] : 'wählt noch …'}</span>
+              <span className="ab-fell" style={{ flex: 1, fontStyle: 'italic', color: p.cls ? classColor(p.cls) : '#6b5d45', fontWeight: p.cls ? 600 : 400 }}>{p.cls ? CLASS_NAME[p.cls] : 'wählt noch …'}</span>
               {p.ready && <span style={{ width: 26, height: 26, borderRadius: '50%', background: '#7a2416', color: '#f3e6c8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700 }}>✓</span>}
             </div>
           );
@@ -498,7 +513,7 @@ function HostFight({ view, player }: HostViewProps) {
               <div style={{ display: 'flex', gap: 6, marginTop: 4, alignItems: 'center', minHeight: 20 }}>
                 {h.block > 0 && <span style={{ display: 'flex', alignItems: 'center', gap: 2, fontWeight: 700, fontSize: 14 }}><ShieldIcon size={15} />{h.block}</span>}
                 <Seals st={h.st} size={20} />
-                {hn <= 6 && !h.block && <span className="ab-fell" style={{ fontStyle: 'italic', fontSize: 13 }}>{CLASS_NAME[h.cls]}</span>}
+                {hn <= 6 && !h.block && <span className="ab-fell" style={{ fontStyle: 'italic', fontSize: 13, color: classColor(h.cls), fontWeight: 600 }}>{CLASS_NAME[h.cls]}</span>}
               </div>
             </div>
             {sup?.block > 0 && <Floater x={hx[k]} y={560} text={<><ShieldIcon size={24} color="#c9d6e8" /> +{sup.block}</>} color="#c9d6e8" k={key} />}
@@ -652,9 +667,9 @@ function PhoneLager({ view, send }: ControllerViewProps) {
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
         <button type="button" aria-label="Vorherige Klasse" style={{ ...SMALL_BTN, fontSize: 24, padding: '20px 8px' }} onClick={() => { play('paper'); setI((i + view.classes.length - 1) % view.classes.length); }}>‹</button>
-        <article key={c.id} style={{ flex: 1, background: C.paper, color: C.ink, border: '3px solid #6b5236', borderRadius: 12, padding: '14px 14px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, boxShadow: '0 14px 30px rgba(0,0,0,.7)', animation: 'abFade .3s' }}>
+        <article key={c.id} style={{ flex: 1, background: C.paper, color: C.ink, border: `4px solid ${classColor(c.id)}`, borderRadius: 12, padding: '14px 14px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, boxShadow: '0 14px 30px rgba(0,0,0,.7)', animation: 'abFade .3s' }}>
           <span className="ab-fell" style={{ fontSize: 14, fontStyle: 'italic', color: '#6b5d45' }}>{c.role}</span>
-          <span className="ab-sc" style={{ fontSize: 28, lineHeight: 1 }}>{c.name}</span>
+          <span className="ab-sc" style={{ fontSize: 28, lineHeight: 1, color: classColor(c.id) }}>{c.name}</span>
           <img src={IMG(c.img)} alt="" style={{ height: 230, margin: '4px 0', filter: 'drop-shadow(0 8px 8px rgba(0,0,0,.35))' }} />
           <span style={{ fontSize: 16, fontWeight: 700 }}>{c.hp} Leben · 3 Energie</span>
           <p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.3, textAlign: 'center' }}>{c.desc}</p>
@@ -664,7 +679,7 @@ function PhoneLager({ view, send }: ControllerViewProps) {
         </article>
         <button type="button" aria-label="Nächste Klasse" style={{ ...SMALL_BTN, fontSize: 24, padding: '20px 8px' }} onClick={() => { play('paper'); setI((i + 1) % view.classes.length); }}>›</button>
       </div>
-      <button type="button" style={BIG_BTN} onClick={() => { vibrate(20); send({ type: 'class', cls: c.id }); }}>{c.name} wählen</button>
+      <button type="button" style={{ ...BIG_BTN, background: classColor(c.id) }} onClick={() => { vibrate(20); send({ type: 'class', cls: c.id }); }}>{c.name} wählen</button>
     </>
   );
 }
@@ -715,16 +730,19 @@ function CardFace({ c, w = 112, onClick, dim, sel }: { c: any; w?: number; onCli
   const Tag = onClick ? 'button' : 'div';
   return (
     <Tag type={onClick ? 'button' : undefined} onClick={onClick} style={{
-      position: 'relative', width: w, height: h, boxSizing: 'border-box', background: '#eadcb9', color: C.ink, border: `2px solid ${RARITY[c.rarity] ?? '#6b5236'}`,
-      borderRadius: 6, padding: `${w * 0.07}px ${w * 0.07}px ${w * 0.06}px`, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, cursor: onClick ? 'pointer' : undefined,
+      position: 'relative', width: w, height: h, boxSizing: 'border-box', background: '#eadcb9', color: C.ink, border: `${Math.max(3, Math.round(w * 0.03))}px solid ${classColor(c.cls)}`, outline: `1px solid ${darker(classColor(c.cls), 0.55)}`,
+      borderRadius: 6, padding: `0 ${w * 0.06}px ${w * 0.05}px`, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, cursor: onClick ? 'pointer' : undefined,
       boxShadow: sel ? `0 0 0 3px #f2a43a, 0 6px 12px rgba(0,0,0,.55)` : c.up ? `0 0 0 2px ${C.gold}, 0 6px 12px rgba(0,0,0,.55)` : '0 6px 12px rgba(0,0,0,.55)',
       opacity: dim ? 0.45 : 1, fontFamily: BODY, touchAction: 'manipulation',
     }}>
-      <span style={{ position: 'absolute', left: -8, top: -8, width: w * 0.25, height: w * 0.25, minWidth: 24, minHeight: 24, borderRadius: '50%', background: C.wax, color: '#f3e6c8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: DISPLAY, fontSize: Math.max(15, w * 0.15), boxShadow: 'inset 0 0 0 3px rgba(0,0,0,.25)' }}>{c.cost}</span>
-      <span style={{ position: 'absolute', right: 5, top: 5 }}><SpeedIcon speed={c.speed} size={Math.max(14, w * 0.15)} /></span>
-      <span className="ab-sc" style={{ fontSize: Math.max(13, w * 0.13), lineHeight: 1.05, textAlign: 'center', padding: '0 10px' }}>{c.name}</span>
-      <img src={IMG(c.img)} alt="" style={{ height: h * 0.34, margin: '2px 0', objectFit: 'contain', maxWidth: '90%' }} />
+      <span style={{ position: 'absolute', left: -9, top: -9, zIndex: 1, width: w * 0.25, height: w * 0.25, minWidth: 24, minHeight: 24, borderRadius: '50%', background: darker(classColor(c.cls), 0.8), border: '2px solid #eadcb9', color: '#f3e6c8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: DISPLAY, fontSize: Math.max(15, w * 0.15), boxShadow: 'inset 0 0 0 3px rgba(0,0,0,.25)' }}>{c.cost}</span>
+      <span className="ab-sc" style={{ alignSelf: 'stretch', margin: `0 -${w * 0.06}px`, padding: `${w * 0.035}px ${w * 0.2}px ${w * 0.04}px`, background: classColor(c.cls), color: '#f3e6c8', fontSize: Math.max(13, w * 0.13), lineHeight: 1.05, textAlign: 'center', position: 'relative' }}>
+        {c.name}
+        {c.speed !== 'normal' && <span style={{ position: 'absolute', right: 4, top: '50%', transform: 'translateY(-50%)', display: 'flex', background: '#eadcb9', borderRadius: '50%', padding: 2 }}><SpeedIcon speed={c.speed} size={Math.max(12, w * 0.12)} /></span>}
+      </span>
+      <img src={IMG(c.img)} alt="" style={{ height: h * (String(c.text).length > 44 ? 0.24 : 0.34), margin: '2px 0', objectFit: 'contain', maxWidth: '90%' }} />
       <span style={{ fontSize: Math.max(11.5, w * 0.105), lineHeight: 1.15, textAlign: 'center' }}>{c.speed === 'fast' ? <i>Schnell. </i> : c.speed === 'slow' ? <i>Langsam. </i> : null}{c.text}</span>
+      <span style={{ position: 'absolute', bottom: Math.max(5, w * 0.04), left: '50%', marginLeft: -5 }}><RarityGem r={c.rarity} size={Math.max(8, w * 0.07)} /></span>
     </Tag>
   );
 }
@@ -732,14 +750,17 @@ function CardFace({ c, w = 112, onClick, dim, sel }: { c: any; w?: number; onCli
 function MiniCard({ c, onClick, dim }: { c: any; onClick: () => void; dim?: boolean }) {
   return (
     <button type="button" onClick={onClick} style={{
-      position: 'relative', height: 104, boxSizing: 'border-box', background: '#eadcb9', color: C.ink, border: `2px solid ${RARITY[c.rarity] ?? '#6b5236'}`, borderRadius: 6, padding: '6px 4px 5px',
+      position: 'relative', height: 104, boxSizing: 'border-box', background: '#eadcb9', color: C.ink, border: `3px solid ${classColor(c.cls)}`, borderRadius: 6, padding: '0 4px 5px', overflow: 'visible',
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 5px 10px rgba(0,0,0,.5)', fontFamily: BODY, cursor: 'pointer', opacity: dim ? 0.45 : 1, touchAction: 'manipulation',
     }}>
-      <span style={{ position: 'absolute', left: -7, top: -7, width: 24, height: 24, borderRadius: '50%', background: C.wax, color: '#f3e6c8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: DISPLAY, fontSize: 15 }}>{c.cost}</span>
-      <span style={{ position: 'absolute', right: 3, top: 3 }}><SpeedIcon speed={c.speed} size={13} /></span>
-      <span className="ab-sc" style={{ fontSize: 13, lineHeight: 1.05, padding: '0 8px', textAlign: 'center' }}>{c.name}</span>
+      <span style={{ position: 'absolute', left: -8, top: -8, zIndex: 1, width: 24, height: 24, borderRadius: '50%', background: darker(classColor(c.cls), 0.8), border: '2px solid #eadcb9', color: '#f3e6c8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: DISPLAY, fontSize: 15 }}>{c.cost}</span>
+      <span className="ab-sc" style={{ alignSelf: 'stretch', margin: '0 -4px', padding: '3px 14px 3px', background: classColor(c.cls), color: '#f3e6c8', fontSize: 13, lineHeight: 1.05, textAlign: 'center', position: 'relative' }}>
+        {c.name}
+        {c.speed !== 'normal' && <span style={{ position: 'absolute', right: 2, top: '50%', transform: 'translateY(-50%)', display: 'flex', background: '#eadcb9', borderRadius: '50%', padding: 1 }}><SpeedIcon speed={c.speed} size={11} /></span>}
+      </span>
       <img src={IMG(c.img)} alt="" style={{ height: 36 }} />
       <span style={{ fontSize: 12, fontWeight: 700, lineHeight: 1.1, textAlign: 'center' }}>{shortText(c.text)}</span>
+      <span style={{ position: 'absolute', bottom: 3, right: 4 }}><RarityGem r={c.rarity} size={7} /></span>
     </button>
   );
 }

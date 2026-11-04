@@ -56,6 +56,8 @@ export interface ClassDef {
   hp: number;
   desc: string;
   img: string;
+  /** Klassenfarbe: Kartenrahmen, Namensband, Kostensiegel (später auch die Figur) */
+  color: string;
   start: [string, number][];
 }
 
@@ -107,17 +109,17 @@ export const CARD: Record<string, CardDef> = Object.fromEntries(CARDS.map((c) =>
 
 export const CLASSES: Record<ClassId, ClassDef> = {
   schildwacht: {
-    id: 'schildwacht', name: 'Schildwacht', role: 'Verteidigung', hp: 80, img: 'held-schildwacht',
+    id: 'schildwacht', name: 'Schildwacht', role: 'Verteidigung', hp: 80, img: 'held-schildwacht', color: '#3A5A78',
     desc: 'Steht vor der Gruppe, fängt Schaden ab und lenkt Angriffe auf sich.',
     start: [['schildstoss', 4], ['deckung', 4], ['abfangen', 1], ['schildwall', 1]],
   },
   klingenlaeufer: {
-    id: 'klingenlaeufer', name: 'Klingenläufer', role: 'Schaden', hp: 65, img: 'held-klingenlaeufer',
+    id: 'klingenlaeufer', name: 'Klingenläufer', role: 'Schaden', hp: 65, img: 'held-klingenlaeufer', color: '#5B3A6E',
     desc: 'Schnelle, harte Schläge – besonders gegen geschwächte Gegner.',
     start: [['schnitt', 4], ['ausweichen', 4], ['schneller-hieb', 1], ['hinrichtung', 1]],
   },
   kraeuterkundige: {
-    id: 'kraeuterkundige', name: 'Kräuterkundige', role: 'Heilung & Gift', hp: 60, img: 'held-kraeuterkundige',
+    id: 'kraeuterkundige', name: 'Kräuterkundige', role: 'Heilung & Gift', hp: 60, img: 'held-kraeuterkundige', color: '#4F6B35',
     desc: 'Heilt die Gruppe und lässt Gegner langsam an Gift zugrunde gehen.',
     start: [['dornenstich', 4], ['rindenhaut', 4], ['giftstachel', 1], ['heilkraeuter', 1]],
   },
