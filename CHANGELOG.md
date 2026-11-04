@@ -2,6 +2,15 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.13.0
+
+- Abgrund: Karten-Ausbau – 25 neue Karten, Spielstile pro Klasse, alle Karten mit eigenem Bild
+- Abgrund: Neue Startdecks (4× Schlag, 4× Abwehr, 2 Klassenkarten) und Startrelikte (Familienschild, Wetzstahl, Alraunenwurzel)
+- Abgrund: Neue Schlüsselwörter Geschicklichkeit und Dornen (Dornen ersetzt Gegenwehr), „nächste Runde“ mehr Karten oder Energie
+- Abgrund: 12 Sticker – nach dem 1. Kampf einen von 3 wählen, beim Händler kaufen, in Truhen und bei Eliten finden; aufkleben über die Heldenseite
+- Abgrund: Farbige Symbole für Buffs und Debuffs unter den Figuren und im Kartentext
+- Abgrund: Helden mit mehr Klassenfarbe
+
 ## 0.12.2
 
 - Abgrund: Auf der Karte geht es nie mehr automatisch weiter – auch bei nur einem Weg wählen und bestätigen alle selbst (Zeit zum Sticker-Aufkleben)

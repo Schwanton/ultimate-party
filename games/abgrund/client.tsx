@@ -136,20 +136,34 @@ const DRONE: MusicTrack = {
 
 interface St { poison: number; weak: number; vuln: number; mark: number; stun: number }
 
-function Seals({ st, size = 28 }: { st: St; size?: number }) {
-  const items: [string, number, string][] = [];
-  if (st.poison) items.push(['Gift', st.poison, C.green]);
-  if (st.weak) items.push(['Schwächung', st.weak, '#6b5d45']);
-  if (st.vuln) items.push(['Verwundbar', st.vuln, '#8a1a1a']);
-  if (st.mark) items.push(['Markiert', st.mark, C.gold]);
-  if (st.stun) items.push(['Betäubt', st.stun, C.purple]);
+/** Farbige Symbole für Buffs und Debuffs (eigene Bilder status-*.webp) */
+const STAT_IMG: Record<string, string> = {
+  poison: 'gift', weak: 'schwaechung', vuln: 'verwundbar', mark: 'markiert', stun: 'betaeubt', str: 'staerke', dex: 'geschick', thorns: 'dornen',
+  block: 'block', dmg: 'schaden', heal: 'heilung', energy: 'energie', draw: 'karte', undying: 'unbeugsam', revive: 'wiedergeburt', taunt: 'spott', cover: 'abfangen', keepBlock: 'block-bleibt',
+};
+const STAT_NAME: Record<string, string> = { poison: 'Gift', weak: 'Schwächung', vuln: 'Verwundbar', mark: 'Markiert', stun: 'Betäubt', str: 'Stärke', dex: 'Geschicklichkeit', thorns: 'Dornen' };
+const Stat = ({ k, size = 18 }: { k: string; size?: number }) => (
+  <img src={IMG(`status-${STAT_IMG[k] ?? k}`)} alt="" aria-hidden="true" style={{ width: size, height: size, objectFit: 'contain', flex: 'none', verticalAlign: 'middle', filter: 'drop-shadow(0 1px 1px rgba(0,0,0,.5))' }} />
+);
+
+/** Zustände als „Zahl + Symbol“ (z. B. 2 [Gift]); eigene Buffs optional dazu */
+function Seals({ st, size = 28, extra, light }: { st: St; size?: number; extra?: { str?: number; dex?: number; thorns?: number }; light?: boolean }) {
+  const items: [string, number][] = [];
+  if (extra?.str) items.push(['str', extra.str]);
+  if (extra?.dex) items.push(['dex', extra.dex]);
+  if (extra?.thorns) items.push(['thorns', extra.thorns]);
+  if (st.poison) items.push(['poison', st.poison]);
+  if (st.weak) items.push(['weak', st.weak]);
+  if (st.vuln) items.push(['vuln', st.vuln]);
+  if (st.mark) items.push(['mark', st.mark]);
+  if (st.stun) items.push(['stun', st.stun]);
   return (
-    <div style={{ display: 'flex', gap: 4 }}>
-      {items.map(([name, n, col]) => (
-        <span key={name} title={`${name} ${n}`} aria-label={`${name} ${n}`} style={{
-          width: size, height: size, borderRadius: '50%', background: col, color: '#f3e6c8', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontFamily: BODY, fontWeight: 700, fontSize: size * 0.5, boxShadow: 'inset 0 0 0 3px rgba(0,0,0,.25), 0 2px 4px rgba(0,0,0,.5)', animation: 'abPop .4s ease-out',
-        }}>{name[0]}{n > 1 ? n : ''}</span>
+    <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap', alignItems: 'center' }}>
+      {items.map(([k, n]) => (
+        <span key={k} title={`${STAT_NAME[k]} ${n}`} aria-label={`${STAT_NAME[k]} ${n}`} style={{
+          display: 'inline-flex', alignItems: 'center', gap: 1, padding: `1px ${Math.round(size * 0.12)}px 1px ${Math.round(size * 0.22)}px`, borderRadius: size,
+          background: light ? 'transparent' : 'rgba(15,11,8,.78)', color: light ? C.ink : '#f3e6c8', fontFamily: BODY, fontWeight: 700, fontSize: Math.round(size * 0.62), lineHeight: 1, animation: 'abPop .4s ease-out',
+        }}>{k !== 'stun' && n}<Stat k={k} size={size} /></span>
       ))}
     </div>
   );
@@ -201,15 +215,15 @@ function IntentIcons({ it, size = 20, font = 22 }: { it: any; size?: number; fon
   );
   return (
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: Math.round(size * 0.45) }}>
-      {it.dmg > 0 && seg('d', <SwordIcon size={size} color={C.blood} />, `${it.dmg}${it.hits > 1 ? '×' + it.hits : ''}`, C.blood)}
-      {it.block > 0 && seg('b', <ShieldIcon size={size} />, String(it.block))}
-      {it.weakAll > 0 && seg('w', <SkullIcon size={size} />, 'Schwäche', C.ink)}
-      {it.buff > 0 && seg('s', <StrengthIcon size={size} />, `+${it.buff}`)}
-      {it.poison > 0 && seg('p', <MiniSeal l="G" col={C.green} size={size} />, String(it.poison), C.green)}
-      {it.vuln > 0 && !it.dmg && seg('v', <MiniSeal l="V" col="#8a1a1a" size={size} />, String(it.vuln), '#8a1a1a')}
-      {it.vulnAll > 0 && seg('va', <MiniSeal l="V" col="#8a1a1a" size={size} />, 'alle', '#8a1a1a')}
-      {it.healAlly > 0 && seg('h', <HeartIcon size={size} />, `+${it.healAlly}`, C.green)}
-      {it.blockAllies > 0 && seg('ba', <ShieldIcon size={size} />, `${it.blockAllies} alle`)}
+      {it.dmg > 0 && seg('d', <Stat k="dmg" size={size} />, `${it.dmg}${it.hits > 1 ? '×' + it.hits : ''}`, C.blood)}
+      {it.block > 0 && seg('b', <Stat k="block" size={size} />, String(it.block))}
+      {it.weakAll > 0 && seg('w', <Stat k="weak" size={size} />, 'alle', C.ink)}
+      {it.buff > 0 && seg('s', <Stat k="str" size={size} />, `+${it.buff}`)}
+      {it.poison > 0 && seg('p', <Stat k="poison" size={size} />, String(it.poison), C.green)}
+      {it.vuln > 0 && !it.dmg && seg('v', <Stat k="vuln" size={size} />, String(it.vuln), '#8a1a1a')}
+      {it.vulnAll > 0 && seg('va', <Stat k="vuln" size={size} />, 'alle', '#8a1a1a')}
+      {it.healAlly > 0 && seg('h', <Stat k="heal" size={size} />, `+${it.healAlly}`, C.green)}
+      {it.blockAllies > 0 && seg('ba', <Stat k="block" size={size} />, `${it.blockAllies} alle`)}
       {it.spawn > 0 && seg('sp', <SkullIcon size={size} />, `Brut ×${it.spawn}`)}
       {it.charge && seg('c', <FlameIcon size={size} />, 'lädt auf!', C.blood)}
       {it.curse && seg('cu', <MiniSeal l="?" col="#4a2a5a" size={size} />, 'Fluch', '#4a2a5a')}
@@ -227,7 +241,9 @@ const KEYWORDS: { key: string; name: string; re: RegExp; text: string }[] = [
   { key: 'vuln', name: 'Verwundbar', re: /verwundbar|Verwundbar/, text: 'Das Ziel erleidet 50 % mehr Schaden. Hält so viele Runden, wie die Zahl angibt.' },
   { key: 'mark', name: 'Markiert', re: /markiert|Markiert/, text: 'Jeder Treffer gegen das Ziel macht so viel Schaden mehr. Gilt bis zum Rundenende.' },
   { key: 'stun', name: 'Betäubt', re: /betäub|Betäub/, text: 'Setzt seine nächste Aktion aus.' },
-  { key: 'thorns', name: 'Gegenwehr', re: /Schaden zurück/, text: 'Greift dich ein Gegner diese Runde an, erleidet er diesen Schaden.' },
+  { key: 'thorns', name: 'Dornen', re: /Dornen/, text: 'Wer diesen Spieler angreift, erleidet so viel Schaden. Stapelt sich und hält bis Kampfende.' },
+  { key: 'dex', name: 'Geschicklichkeit', re: /Geschicklichkeit/, text: 'Jede Karte, die Block gibt, gibt so viel Block mehr. Hält bis Kampfende.' },
+  { key: 'next', name: 'Nächste Runde', re: /[Nn]ächste Runde/, text: 'Weil alle gleichzeitig planen, wirken zusätzliche Karten und Energie erst zu Beginn der nächsten Runde.' },
   { key: 'redirect', name: 'Abfangen', re: /treffen diese Runde dich/, text: 'Angriffe auf den Verbündeten treffen stattdessen dich. Angriffe auf alle sind davon ausgenommen.' },
   { key: 'str', name: 'Stärke', re: /Stärke/, text: 'Jeder Treffer macht so viel Schaden mehr. Hält bis zum Ende des Kampfes.' },
   { key: 'power', name: 'Bis Kampfende', re: /Bis Kampfende/, text: 'Wirkt sofort und dann zu Beginn jeder Runde, bis der Kampf vorbei ist.' },
@@ -505,8 +521,8 @@ function HostFight({ view, player }: HostViewProps) {
                 <div style={{ marginTop: 4 }}><Bar v={s.hp} max={e.maxHp} /></div>
               </div>
               <div style={{ display: 'flex', gap: 6, alignItems: 'center', minHeight: 22 }}>
-                {s.block > 0 && <span style={{ display: 'flex', alignItems: 'center', gap: 3, fontWeight: 700, background: C.paper2, color: C.ink, padding: '1px 6px' }}><ShieldIcon size={15} />{s.block}</span>}
-                {s.buff > 0 && <span title={`Stärke +${s.buff}`} style={{ display: 'flex', alignItems: 'center', gap: 3, fontWeight: 700, background: '#5a1d14', color: '#f3e6c8', padding: '1px 6px' }}><StrengthIcon size={16} color="#f3e6c8" />+{s.buff}</span>}
+                {s.block > 0 && <span style={{ display: 'flex', alignItems: 'center', gap: 3, fontWeight: 700, background: C.paper2, color: C.ink, padding: '1px 6px' }}>{s.block}<Stat k="block" size={20} /></span>}
+                {s.buff > 0 && <span title={`Stärke +${s.buff}`} style={{ display: 'flex', alignItems: 'center', gap: 3, fontWeight: 700, background: '#5a1d14', color: '#f3e6c8', padding: '1px 6px' }}>+{s.buff}<Stat k="str" size={20} /></span>}
                 <Seals st={s.st} size={24} />
               </div>
             </div>
@@ -520,7 +536,7 @@ function HostFight({ view, player }: HostViewProps) {
             )}
             {acting && ev.block > 0 && <Floater x={xs[k]} y={top} text={<><ShieldIcon size={26} color={C.paper} /> +{ev.block}</>} color={C.paper} k={key} />}
             {acting && ev.buff > 0 && <Floater x={xs[k]} y={top + 30} text={<><StrengthIcon size={26} color="#ff8a70" /> +{ev.buff}</>} color="#ff8a70" k={key + 'b'} />}
-            {acting && ev.thorns > 0 && <Floater x={xs[k]} y={top + 60} text={`−${ev.thorns} Gegenwehr`} color="#ff8a70" k={key + 't'} />}
+            {acting && ev.thorns > 0 && <Floater x={xs[k]} y={top + 60} text={`−${ev.thorns} Dornen`} color="#ff8a70" k={key + 't'} />}
             {ev?.k === 'stunned' && ev.enemy === i && <Floater x={xs[k]} y={top} text="betäubt" color={C.paper} k={key} />}
             {ev?.k === 'enemy' && ev.heal?.enemy === i && ev.heal.amount > 0 && <Floater x={xs[k]} y={top + 20} text={`+${ev.heal.amount}`} color="#9fd36a" k={key + 'hl'} />}
             {ev?.k === 'enemy' && ev.blockAll > 0 && !s.dead && <Floater x={xs[k]} y={top + 50} text={<><ShieldIcon size={24} color={C.paper} /> +{ev.blockAll}</>} color={C.paper} k={key + 'ba'} />}
@@ -578,17 +594,17 @@ function HostFight({ view, player }: HostViewProps) {
               </div>
               <div style={{ marginTop: 4 }}><Bar v={h.hp} max={h.maxHp} h={hn > 8 ? 7 : 9} /></div>
               <div style={{ display: 'flex', gap: 6, marginTop: 4, alignItems: 'center', minHeight: 20 }}>
-                {h.block > 0 && <span style={{ display: 'flex', alignItems: 'center', gap: 2, fontWeight: 700, fontSize: 14 }}><ShieldIcon size={15} />{h.block}</span>}
-                {h.str > 0 && <span title={`Stärke ${h.str}`} style={{ display: 'flex', alignItems: 'center', gap: 2, fontWeight: 700, fontSize: 14 }}><StrengthIcon size={15} />{h.str}</span>}
-                <Seals st={h.st} size={20} />
-                {hn <= 6 && !h.block && !h.str && <span className="ab-fell" style={{ fontStyle: 'italic', fontSize: 13, color: classColor(h.cls), fontWeight: 600 }}>{CLASS_NAME[h.cls]}</span>}
+                {h.block > 0 && <span title={`Block ${h.block}`} style={{ display: 'flex', alignItems: 'center', gap: 1, fontWeight: 700, fontSize: 14 }}>{h.block}<Stat k="block" size={18} /></span>}
+                <Seals st={h.st} size={18} light extra={{ str: h.str, dex: h.dex, thorns: h.thorns }} />
+                {hn <= 6 && !h.block && !h.str && !h.dex && !h.thorns && <span className="ab-fell" style={{ fontStyle: 'italic', fontSize: 13, color: classColor(h.cls), fontWeight: 600 }}>{CLASS_NAME[h.cls]}</span>}
               </div>
             </div>
-            {sup?.block > 0 && <Floater x={hx[k]} y={560} text={<><ShieldIcon size={24} color="#c9d6e8" /> +{sup.block}</>} color="#c9d6e8" k={key} />}
+            {sup?.block > 0 && <Floater x={hx[k]} y={560} text={<>+{sup.block} <Stat k="block" size={26} /></>} color="#c9d6e8" k={key} />}
             {sup?.heal > 0 && <Floater x={hx[k]} y={530} text={`+${sup.heal}`} color="#9fd36a" k={key + 'h'} />}
             {sup?.cover && <Floater x={hx[k]} y={500} text="beschützt" color={C.paper} k={key + 'c'} />}
-            {sup?.str > 0 && <Floater x={hx[k]} y={500} text={<><StrengthIcon size={24} color="#f3c06a" /> +{sup.str}</>} color="#f3c06a" k={key + 's'} />}
+            {sup?.str > 0 && <Floater x={hx[k]} y={500} text={<>+{sup.str} <Stat k="str" size={26} /></>} color="#f3c06a" k={key + 's'} />}
             {sup?.note && <Floater x={hx[k]} y={470} text={sup.note} color={C.paper} k={key + 'n'} />}
+            {sup?.thorns > 0 && <Floater x={hx[k]} y={440} text={<>+{sup.thorns} <Stat k="thorns" size={26} /></>} color="#9fd36a" k={key + 'th'} />}
             {hit && hit.dmg > 0 && <Floater x={hx[k]} y={520} text={hit.loss > 0 ? `−${hit.loss}` : 'geblockt'} color={hit.loss > 0 ? '#ff5d4e' : '#c9d6e8'} k={key} big delay={0.3} />}
             {hit && hit.dmg === 0 && <Floater x={hx[k]} y={520} text={ev.curse ? `Fluch: ${ev.curse}` : ev.poison ? `+${ev.poison} Gift` : 'verwundbar'} color={ev.poison && !ev.curse ? '#9fd36a' : '#ff8a70'} k={key} delay={0.3} />}
             {hit?.saved && <Floater x={hx[k]} y={460} text={hit.saved === 'undying' ? 'Unbeugsam!' : 'Wiedergeburt!'} color="#f3c06a" k={key + 'sv'} big delay={0.8} />}
@@ -702,7 +718,7 @@ function Controller(props0: ControllerViewProps) {
   else if (view.phase === 'bossIntro') inner = <PhoneCenter title="Achtung!" text="Schau auf den Fernseher." img={view.me?.img} />;
   else if (view.phase === 'end') inner = <PhoneEnd {...props} />;
   else inner = <PhoneCenter title="Schau auf den Fernseher" />;
-  if (sheet && view.me && view.phase !== 'lager') inner = <HeroSheet view={view} me={props.me} onClose={() => setSheet(false)} />;
+  if (sheet && view.me && view.phase !== 'lager') inner = <HeroSheet view={view} me={props.me} send={props.send} onClose={() => setSheet(false)} />;
   return (
     <div style={{ position: 'fixed', inset: 0, overflowY: 'auto', background: '#120d09', color: C.paper, fontFamily: BODY }}>
       <Styles />
@@ -762,6 +778,12 @@ function PhoneLager({ view, send }: ControllerViewProps) {
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, justifyContent: 'center' }}>
             {c.start.map((s: string) => <span key={s} style={{ fontSize: 13, background: '#d8c69c', padding: '2px 7px', borderRadius: 3 }}>{s}</span>)}
           </div>
+          {c.relic && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, alignSelf: 'stretch', background: '#d8c69c', padding: '4px 8px', borderRadius: 3 }}>
+              <RelicIcon r={c.relic} size={34} />
+              <span style={{ fontSize: 14, lineHeight: 1.2 }}><b className="ab-sc">{c.relic.name}:</b> {c.relic.text}</span>
+            </div>
+          )}
         </article>
         <button type="button" aria-label="Nächste Klasse" style={{ ...SMALL_BTN, fontSize: 24, padding: '20px 8px' }} onClick={() => { play('paper'); setI((i + 1) % view.classes.length); }}>›</button>
       </div>
@@ -829,7 +851,10 @@ function CardFace({ c, w = 112, onClick, dim, sel }: { c: any; w?: number; onCli
         {c.name}
         {c.speed !== 'normal' && <span style={{ position: 'absolute', right: 4, top: '50%', transform: 'translateY(-50%)', display: 'flex', background: '#eadcb9', borderRadius: '50%', padding: 2 }}><SpeedIcon speed={c.speed} size={Math.max(12, w * 0.12)} /></span>}
       </span>
-      <img src={IMG(c.img)} onError={fallbackTo()} alt="" style={{ height: h * (String(c.text).length > 44 ? 0.24 : 0.34), margin: '2px 0', objectFit: 'contain', maxWidth: '90%' }} />
+      <span style={{ position: 'relative', display: 'flex', justifyContent: 'center', alignSelf: 'stretch' }}>
+        <img src={IMG(c.img)} onError={fallbackTo()} alt="" style={{ height: h * (String(c.text).length > 70 ? 0.16 : String(c.text).length > 44 ? 0.24 : 0.34), margin: '2px 0', objectFit: 'contain', maxWidth: '90%' }} />
+        <StickersOn list={c.stickers} size={Math.round(w * 0.24)} />
+      </span>
       <span style={{ fontSize: Math.max(11.5, w * 0.105), lineHeight: 1.2, textAlign: 'center' }}><RichText text={c.text} size={Math.max(15, w * 0.14)} />{c.exhaust && <i style={{ display: 'block', fontSize: '.9em', color: '#6b5d45', marginTop: 2 }}>Erschöpft</i>}</span>
     </Tag>
   );
@@ -847,28 +872,52 @@ function MiniCard({ c, onClick, dim }: { c: any; onClick: () => void; dim?: bool
         {c.name}
         {c.speed !== 'normal' && <span style={{ position: 'absolute', right: 2, top: '50%', transform: 'translateY(-50%)', display: 'flex', background: '#eadcb9', borderRadius: '50%', padding: 1 }}><SpeedIcon speed={c.speed} size={11} /></span>}
       </span>
-      <img src={IMG(c.img)} onError={fallbackTo()} alt="" style={{ height: 36 }} />
+      <span style={{ position: 'relative', display: 'flex', justifyContent: 'center', alignSelf: 'stretch' }}>
+        <img src={IMG(c.img)} onError={fallbackTo()} alt="" style={{ height: 36 }} />
+        <StickersOn list={c.stickers} size={17} />
+      </span>
       <span style={{ fontSize: 12, fontWeight: 700, lineHeight: 1.1, textAlign: 'center' }}><RichText text={shortText(c.text)} size={14} /></span>
     </button>
   );
 }
-/** Kartentext: ⟦D:gezeigt:normal⟧ = Schwert, ⟦B:…⟧ = Schild; höher grün, niedriger rot */
+/** Zustandswörter im Kartentext, die als „Zahl + Symbol“ gezeigt werden */
+const TEXT_STATS: [RegExp, string][] = [
+  [/^(\+?\d+) Gift$/, 'poison'], [/^Schwächung (\d+)$/, 'weak'], [/^Verwundbar (\d+)$/, 'vuln'], [/^Markiert (\d+)$/, 'mark'],
+  [/^(\+?\d+) Dornen$/, 'thorns'], [/^(\+?\d+) Stärke$/, 'str'], [/^(\+?\d+) Geschicklichkeit$/, 'dex'], [/^(\+?\d+) Energie$/, 'energy'],
+];
+const TEXT_SPLIT = /(⟦[DB]:\d+:\d+⟧|\+?\d+ Gift|Schwächung \d+|Verwundbar \d+|Markiert \d+|\+?\d+ Dornen|\+?\d+ Stärke|\+?\d+ Geschicklichkeit|\+?\d+ Energie)/;
+
+/** Kartentext: ⟦D:gezeigt:normal⟧ = Schaden, ⟦B:…⟧ = Block (höher grün, niedriger rot); Zustände als Zahl + farbiges Symbol */
 function RichText({ text, size = 14 }: { text: string; size?: number }) {
-  const parts = String(text).split(/(⟦[DB]:\d+:\d+⟧)/);
+  const parts = String(text).split(TEXT_SPLIT);
+  const chip = (i: number, k: string, n: ReactNode, col: string = C.ink) => (
+    <span key={i} title={STAT_NAME[k]} style={{ display: 'inline-flex', alignItems: 'center', gap: 1, whiteSpace: 'nowrap', verticalAlign: 'middle' }}>
+      <b style={{ color: col, fontSize: '1.3em', lineHeight: 1 }}>{n}</b><Stat k={k} size={size * 1.15} />
+    </span>
+  );
   return (
     <>
       {parts.map((p, i) => {
         const m = /^⟦([DB]):(\d+):(\d+)⟧$/.exec(p);
-        if (!m) return <span key={i}>{p}</span>;
-        const shown = Number(m[2]), base = Number(m[3]);
-        const col = shown > base ? '#2f7a2a' : shown < base ? '#b0201a' : C.ink;
-        return (
-          <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 1, whiteSpace: 'nowrap', verticalAlign: 'middle' }}>
-            {m[1] === 'D' ? <SwordIcon size={size} color={C.blood} /> : <ShieldIcon size={size} />}
-            <b style={{ color: col, fontSize: '1.3em', lineHeight: 1 }}>{shown}</b>
-          </span>
-        );
+        if (m) {
+          const shown = Number(m[2]), base = Number(m[3]);
+          return chip(i, m[1] === 'D' ? 'dmg' : 'block', shown, shown > base ? '#2f7a2a' : shown < base ? '#b0201a' : C.ink);
+        }
+        for (const [re, k] of TEXT_STATS) { const x = re.exec(p); if (x) return chip(i, k, x[1]); }
+        return <span key={i}>{p}</span>;
       })}
+    </>
+  );
+}
+
+/** Aufgeklebte Sticker auf dem Kartenbild (Stelle und Drehung vom Server) */
+function StickersOn({ list, size }: { list?: any[]; size: number }) {
+  if (!list?.length) return null;
+  return (
+    <>
+      {list.map((s: any, i: number) => (
+        <img key={s.id + i} src={IMG(s.img)} alt={s.name} title={s.name} style={{ position: 'absolute', left: `${s.x * 100}%`, top: `${s.y * 100}%`, width: size, height: size, transform: `translate(-50%,-50%) rotate(${s.r}deg)`, filter: 'drop-shadow(0 2px 2px rgba(0,0,0,.45))', pointerEvents: 'none', zIndex: 1 }} />
+      ))}
     </>
   );
 }
@@ -950,7 +999,7 @@ function PhonePlan({ view, send, me, player }: ControllerViewProps) {
     );
   }
 
-  if (sheet) return <HeroSheet view={view} me={me} onClose={() => setSheet(false)} />;
+  if (sheet) return <HeroSheet view={view} me={me} send={send} onClose={() => setSheet(false)} />;
 
   const foeE = foe ? view.enemies.find((e: any) => e.uid === foe && !e.dead) : null;
   if (foeE) return <EnemyDetail e={foeE} name={name} onClose={() => setFoe(null)} />;
@@ -986,8 +1035,7 @@ function PhonePlan({ view, send, me, player }: ControllerViewProps) {
             <span style={{ fontWeight: 700, fontSize: 14 }}>{view.me.hp}/{view.me.maxHp}</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            {view.me.str > 0 && <span style={{ display: 'flex', alignItems: 'center', gap: 2, fontWeight: 700, fontSize: 13 }}><StrengthIcon size={14} color={C.paper} />{view.me.str}</span>}
-            <Seals st={view.me.st} size={20} />
+            <Seals st={view.me.st} size={20} extra={{ str: view.me.str, dex: view.me.dex, thorns: view.me.thorns }} />
           </div>
         </div>
         <span style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -1072,14 +1120,14 @@ function PhonePlan({ view, send, me, player }: ControllerViewProps) {
 function EnemyDetail({ e, name, onClose }: { e: any; name: (id: string) => string; onClose: () => void }) {
   const it = e.intent;
   const rows: { name: string; icon: ReactNode; text: string }[] = [];
-  if (e.block > 0) rows.push({ name: `Block ${e.block}`, icon: <ShieldIcon size={24} />, text: `Fängt die nächsten ${e.block} Schaden ab. Hält bis zu seinem nächsten Zug.` });
-  if (e.buff > 0) rows.push({ name: `Stärke +${e.buff}`, icon: <StrengthIcon size={24} />, text: `Jeder seiner Angriffe macht ${e.buff} Schaden mehr. Hält den ganzen Kampf.` });
+  if (e.block > 0) rows.push({ name: `Block ${e.block}`, icon: <Stat k="block" size={26} />, text: `Fängt die nächsten ${e.block} Schaden ab. Hält bis zu seinem nächsten Zug.` });
+  if (e.buff > 0) rows.push({ name: `Stärke +${e.buff}`, icon: <Stat k="str" size={26} />, text: `Jeder seiner Angriffe macht ${e.buff} Schaden mehr. Hält den ganzen Kampf.` });
   const st = e.st ?? {};
-  if (st.poison) rows.push({ name: `Gift ${st.poison}`, icon: <Seal l="G" col={C.green} />, text: `Verliert am Rundenende ${st.poison} Leben, danach sinkt das Gift um 1.` });
-  if (st.weak) rows.push({ name: `Schwächung ${st.weak}`, icon: <Seal l="S" col="#6b5d45" />, text: `Macht 25 % weniger Schaden. Noch ${st.weak} ${st.weak === 1 ? 'Runde' : 'Runden'}.` });
-  if (st.vuln) rows.push({ name: `Verwundbar ${st.vuln}`, icon: <Seal l="V" col="#8a1a1a" />, text: `Erleidet 50 % mehr Schaden. Noch ${st.vuln} ${st.vuln === 1 ? 'Runde' : 'Runden'}.` });
-  if (st.mark) rows.push({ name: `Markiert ${st.mark}`, icon: <Seal l="M" col={C.gold} />, text: `Jeder Treffer macht ${st.mark} Schaden mehr. Bis zum Rundenende.` });
-  if (st.stun) rows.push({ name: 'Betäubt', icon: <Seal l="B" col={C.purple} />, text: 'Setzt seine nächste Aktion aus.' });
+  if (st.poison) rows.push({ name: `Gift ${st.poison}`, icon: <Stat k="poison" size={26} />, text: `Verliert am Rundenende ${st.poison} Leben, danach sinkt das Gift um 1.` });
+  if (st.weak) rows.push({ name: `Schwächung ${st.weak}`, icon: <Stat k="weak" size={26} />, text: `Macht 25 % weniger Schaden. Noch ${st.weak} ${st.weak === 1 ? 'Runde' : 'Runden'}.` });
+  if (st.vuln) rows.push({ name: `Verwundbar ${st.vuln}`, icon: <Stat k="vuln" size={26} />, text: `Erleidet 50 % mehr Schaden. Noch ${st.vuln} ${st.vuln === 1 ? 'Runde' : 'Runden'}.` });
+  if (st.mark) rows.push({ name: `Markiert ${st.mark}`, icon: <Stat k="mark" size={26} />, text: `Jeder Treffer macht ${st.mark} Schaden mehr. Bis zum Rundenende.` });
+  if (st.stun) rows.push({ name: 'Betäubt', icon: <Stat k="stun" size={26} />, text: 'Setzt seine nächste Aktion aus.' });
 
   const plan: string[] = [];
   if (it) {
@@ -1160,7 +1208,25 @@ function PhoneReward({ view, send }: ControllerViewProps) {
       </>
     );
   }
-  if (view.done) return <PhoneCenter title={view.pickedName ? `${view.pickedName} kommt in dein Deck` : 'Du verzichtest'} text="Warte auf die anderen …" img={view.me.img} />;
+  if (view.done) return (<><MeHeader view={view} /><PhoneCenter title={view.pickedName ? `${view.pickedName} kommt in dein Deck` : 'Du verzichtest'} text="Warte auf die anderen …" /></>);
+  if (view.cardDone && view.stickerOffer?.length && view.stickerPicked === undefined && !(view.relic && view.relicKept == null)) {
+    return (
+      <>
+        <MeHeader view={view} />
+        <div style={{ textAlign: 'center' }}>
+          <span className="ab-sc" style={{ fontSize: 26 }}>Ein Sticker</span>
+          <div className="ab-fell" style={{ fontSize: 16, fontStyle: 'italic', color: C.muted }}>Wähle einen. Aufkleben kannst du ihn gleich oder später über deine Heldenseite.</div>
+        </div>
+        {view.stickerOffer.map((x: any) => (
+          <button key={x.id} type="button" onClick={() => { vibrate(20); play('paper'); send({ type: 'sticker', sticker: x.id }); }} style={{ border: 0, padding: 0, background: 'transparent', cursor: 'pointer', textAlign: 'left', fontFamily: BODY }}>
+            <StickerRow s={x} />
+          </button>
+        ))}
+        <span className="ab-fell" style={{ fontSize: 14, fontStyle: 'italic', color: C.muted }}>{STICKER_RULES}</span>
+        <button type="button" style={{ ...SMALL_BTN, minHeight: 48 }} onClick={() => send({ type: 'sticker', sticker: null })}>Keinen nehmen</button>
+      </>
+    );
+  }
   if (view.cardDone) {
     return (
       <>
@@ -1303,16 +1369,29 @@ function MeHeader({ view }: { view: any }) {
           {m.relics.map((r: any, i: number) => <RelicIcon key={r.id + i} r={r} size={30} />)}
         </span>
       )}
+      {m.canStick && m.stickers?.length > 0 && (
+        <span style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#3a2a12', border: '1px solid #b8893c', padding: '4px 10px', borderRadius: 4, animation: 'abFade .4s' }}>
+          {m.stickers.slice(0, 3).map((x: any, i: number) => <img key={i} src={IMG(x.img)} alt="" style={{ width: 26, height: 26, transform: `rotate(${i % 2 ? 8 : -8}deg)` }} />)}
+          <b className="ab-sc" style={{ fontSize: 15, color: '#e3b866' }}>{m.stickers.length === 1 ? '1 Sticker' : `${m.stickers.length} Sticker`} zum Aufkleben – hier tippen</b>
+        </span>
+      )}
     </button>
   );
 }
 
 /** Heldenseite: Werte, Relikte mit Erklärung, Deck */
-function HeroSheet({ view, me, onClose }: { view: any; me: PlayerInfo; onClose: () => void }) {
+function HeroSheet({ view, me, send, onClose }: { view: any; me: PlayerInfo; send: (a: any) => void; onClose: () => void }) {
   const [deckOpen, setDeckOpen] = useState(false);
   const [peek, setPeek] = useState<any>(null);
+  const [sticking, setSticking] = useState<any>(null);
   const m = view.me;
   const deck: any[] = view.deck ?? [];
+  if (sticking) {
+    return (
+      <StickPicker sticker={sticking} deck={deck} onCancel={() => setSticking(null)}
+        onPick={(uid) => { vibrate(25); play('paper'); send({ type: 'stick', sticker: sticking.id, uid }); setSticking(null); setDeckOpen(true); }} />
+    );
+  }
   if (peek) {
     return (
       <>
@@ -1340,6 +1419,7 @@ function HeroSheet({ view, me, onClose }: { view: any; me: PlayerInfo; onClose: 
         ))}
       </div>
       <MyStatus m={m} />
+      <StickerBag m={m} onStick={setSticking} />
       <span className="ab-sc" style={{ fontSize: 15, color: C.muted, letterSpacing: 1 }}>Relikte</span>
       {m.relics.length ? m.relics.map((r: any, i: number) => <RelicRow key={r.id + i} r={r} />) : <span className="ab-fell" style={{ fontStyle: 'italic', color: C.muted }}>Noch keine Relikte.</span>}
       {deck.length > 0 && <button type="button" style={{ ...SMALL_BTN, minHeight: 48 }} onClick={() => setDeckOpen(!deckOpen)}>{deckOpen ? 'Deck ausblenden' : `Mein Deck ansehen (${deck.length})`}</button>}
@@ -1354,29 +1434,102 @@ function HeroSheet({ view, me, onClose }: { view: any; me: PlayerInfo; onClose: 
   );
 }
 
+/** Ein Sticker mit Bild, Name und Wirkung */
+function StickerRow({ s, dark, right }: { s: any; dark?: boolean; right?: ReactNode }) {
+  return (
+    <div style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '8px 10px', background: dark ? '#2a1f16' : C.paper2, color: dark ? C.paper : C.ink, border: dark ? '1px solid #5b452f' : 0 }}>
+      <img src={IMG(s.img)} alt="" style={{ width: 50, height: 50, flex: 'none', transform: 'rotate(-6deg)', filter: 'drop-shadow(0 2px 2px rgba(0,0,0,.4))' }} />
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <b className="ab-sc" style={{ fontSize: 18 }}>{s.name}</b>
+        <span style={{ fontSize: 15, lineHeight: 1.25 }}>{s.text}</span>
+      </div>
+      {right}
+    </div>
+  );
+}
+
+const STICKER_RULES = 'Sticker klebst du außerhalb des Kampfes auf eine Karte. Sie bleiben den ganzen Run. Jeder Sticker nur einmal pro Karte.';
+
+/** Sticker im Beutel – zum Aufkleben antippen */
+function StickerBag({ m, onStick }: { m: any; onStick: (s: any) => void }) {
+  if (!m.stickers?.length) return null;
+  return (
+    <section aria-label="Sticker" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <span className="ab-sc" style={{ fontSize: 15, color: C.muted, letterSpacing: 1 }}>Sticker zum Aufkleben</span>
+      {m.stickers.map((x: any, i: number) => {
+        const can = m.canStick && x.fits.length > 0;
+        return (
+          <StickerRow key={x.id + i} s={x} dark right={
+            <button type="button" disabled={!can} onClick={() => { play('paper'); onStick(x); }} style={{ ...SMALL_BTN, minHeight: 44, padding: '6px 12px', fontSize: 16, opacity: can ? 1 : 0.5 }}>
+              {!m.canStick ? 'nach dem Kampf' : x.fits.length ? 'Aufkleben' : 'passt nirgends'}
+            </button>
+          } />
+        );
+      })}
+      <span className="ab-fell" style={{ fontSize: 14, fontStyle: 'italic', color: C.muted }}>{STICKER_RULES}</span>
+    </section>
+  );
+}
+
+/** Karte für einen Sticker wählen (nur passende Karten) – mit Vorschau */
+function StickPicker({ sticker, deck, onPick, onCancel }: { sticker: any; deck: any[]; onPick: (uid: string) => void; onCancel: () => void }) {
+  const [sel, setSel] = useState<any>(null);
+  const cards = deck.filter((c) => sticker.fits.includes(c.uid));
+  if (sel) {
+    const preview = { ...sel, stickers: [...(sel.stickers ?? []), { id: sticker.id, img: sticker.img, name: sticker.name, x: 0.5, y: 0.5, r: -10 }] };
+    return (
+      <>
+        <span className="ab-sc" style={{ fontSize: 22, textAlign: 'center' }}>{sticker.name} auf {sel.name}?</span>
+        <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8 }}><CardFace c={preview} w={190} /></div>
+        <StickerRow s={sticker} dark />
+        <span className="ab-fell" style={{ fontSize: 14, fontStyle: 'italic', color: C.muted, textAlign: 'center' }}>Wo genau er klebt, entscheidet der Zufall. Er bleibt für den ganzen Run.</span>
+        <button type="button" style={BIG_BTN} onClick={() => onPick(sel.uid)}>Hier aufkleben</button>
+        <button type="button" style={{ ...SMALL_BTN, minHeight: 48 }} onClick={() => setSel(null)}>Andere Karte</button>
+      </>
+    );
+  }
+  return (
+    <>
+      <StickerRow s={sticker} dark />
+      <span className="ab-sc" style={{ fontSize: 20 }}>Auf welche Karte?</span>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '12px 10px', paddingLeft: 6 }}>
+        {cards.map((c) => <MiniCard key={c.uid} c={c} onClick={() => { play('paper'); setSel(c); }} />)}
+      </div>
+      <div style={{ flex: 1 }} />
+      <button type="button" style={{ ...SMALL_BTN, minHeight: 48 }} onClick={onCancel}>Später aufkleben</button>
+    </>
+  );
+}
+
 /** Eigene Zustände (Buffs und Debuffs) mit Erklärung */
 function MyStatus({ m }: { m: any }) {
   const rows: { name: string; icon: ReactNode; text: string; bad?: boolean }[] = [];
   const st = m.st ?? {};
   const rounds = (n: number) => `Noch ${n} ${n === 1 ? 'Runde' : 'Runden'}.`;
-  if (m.block > 0) rows.push({ name: `Block ${m.block}`, icon: <ShieldIcon size={22} />, text: `Fängt die nächsten ${m.block} Schaden ab.${m.keepBlock ? ' Verfällt diese Runde nicht.' : ' Verfällt am Ende der Runde.'}` });
-  if (m.str > 0) rows.push({ name: `Stärke ${m.str}`, icon: <StrengthIcon size={22} />, text: `Jeder deiner Treffer macht ${m.str} Schaden mehr. Bis Kampfende.` });
-  if (m.roundStr > 0) rows.push({ name: `+${m.roundStr} Schaden`, icon: <StrengthIcon size={22} />, text: 'Jeder deiner Treffer macht diese Runde so viel Schaden mehr.' });
+  if (m.block > 0) rows.push({ name: `Block ${m.block}`, icon: <Stat k={m.keepBlock ? 'keepBlock' : 'block'} size={26} />, text: `Fängt die nächsten ${m.block} Schaden ab.${m.keepBlock ? ' Verfällt diese Runde nicht.' : ' Verfällt am Ende der Runde.'}` });
+  if (m.str > 0) rows.push({ name: `Stärke ${m.str}`, icon: <Stat k="str" size={26} />, text: `Jeder deiner Treffer macht ${m.str} Schaden mehr. Bis Kampfende.` });
+  if (m.roundStr > 0) rows.push({ name: `+${m.roundStr} Schaden`, icon: <Stat k="str" size={26} />, text: 'Jeder deiner Treffer macht diese Runde so viel Schaden mehr.' });
+  if (m.dex > 0) rows.push({ name: `Geschicklichkeit ${m.dex}`, icon: <Stat k="dex" size={26} />, text: `Jede deiner Blockkarten gibt ${m.dex} Block mehr. Bis Kampfende.` });
+  if (m.thorns > 0) rows.push({ name: `Dornen ${m.thorns}`, icon: <Stat k="thorns" size={26} />, text: `Greift dich ein Gegner an, erleidet er ${m.thorns} Schaden. Bis Kampfende.` });
+  if (m.drawNext > 0) rows.push({ name: `+${m.drawNext} ${m.drawNext === 1 ? 'Karte' : 'Karten'}`, icon: <Stat k="draw" size={26} />, text: 'Du ziehst nächste Runde so viele Karten mehr.' });
   const P: Record<string, (v: number) => [string, string]> = {
     blockRound: (v) => ['Rüstung', `Du erhältst zu Beginn jeder Runde ${v} Block. Bis Kampfende.`],
     blockAllRound: (v) => ['Ägis', `Alle Spieler erhalten zu Beginn jeder Runde ${v} Block. Bis Kampfende.`],
     poisonAllRound: (v) => ['Miasma', `Alle Gegner erhalten zu Beginn jeder Runde ${v} Gift. Bis Kampfende.`],
     healAllRound: (v) => ['Lebensbaum', `Alle Spieler heilen zu Beginn jeder Runde ${v}. Bis Kampfende.`],
     thorns: (v) => ['Eiserne Dornen', `Greift dich ein Gegner an, erleidet er ${v} Schaden. Bis Kampfende.`],
+    strRound: (v) => ['Raserei', `Du erhältst zu Beginn jeder Runde ${v} Stärke. Bis Kampfende.`],
+    thornsPoison: (v) => ['Stachelsaft', `Deine Dornen geben dem Angreifer zusätzlich ${v} Gift. Bis Kampfende.`],
+    thornsHeal: (v) => ['Rosenblut', `Treffen deine Dornen einen Gegner, heilst du ${v}. Bis Kampfende.`],
   };
   for (const [k, v] of Object.entries(m.powers ?? {}) as [string, number][]) if (v && P[k]) { const [n, t] = P[k](v); rows.push({ name: n, icon: <FlameIcon size={22} color={C.gold} />, text: t }); }
-  if (m.undying) rows.push({ name: 'Unbeugsam', icon: <HeartIcon size={22} color={C.gold} />, text: 'Fällst du in diesem Kampf, bleibst du einmal mit 1 Leben stehen.' });
-  if (m.revive) rows.push({ name: 'Wiedergeburt', icon: <HeartIcon size={22} color={C.gold} />, text: 'Fällt in diesem Kampf ein Spieler, steht er einmal mit 30 % Leben wieder auf.' });
-  if (st.poison) rows.push({ name: `Gift ${st.poison}`, icon: <Seal l="G" col={C.green} />, text: `Du verlierst am Rundenende ${st.poison} Leben, danach sinkt das Gift um 1.`, bad: true });
-  if (st.weak) rows.push({ name: `Schwächung ${st.weak}`, icon: <Seal l="S" col="#6b5d45" />, text: `Du machst 25 % weniger Schaden. ${rounds(st.weak)}`, bad: true });
-  if (st.vuln) rows.push({ name: `Verwundbar ${st.vuln}`, icon: <Seal l="V" col="#8a1a1a" />, text: `Du erleidest 50 % mehr Schaden. ${rounds(st.vuln)}`, bad: true });
-  if (st.mark) rows.push({ name: `Markiert ${st.mark}`, icon: <Seal l="M" col={C.gold} />, text: `Jeder Treffer gegen dich macht ${st.mark} Schaden mehr. Bis zum Rundenende.`, bad: true });
-  if (st.stun) rows.push({ name: 'Betäubt', icon: <Seal l="B" col={C.purple} />, text: 'Du setzt deine nächste Aktion aus.', bad: true });
+  if (m.undying) rows.push({ name: 'Unbeugsam', icon: <Stat k="undying" size={26} />, text: 'Fällst du in diesem Kampf, bleibst du einmal mit 1 Leben stehen.' });
+  if (m.revive) rows.push({ name: 'Wiedergeburt', icon: <Stat k="revive" size={26} />, text: 'Fällt in diesem Kampf ein Spieler, steht er einmal mit 30 % Leben wieder auf.' });
+  if (st.poison) rows.push({ name: `Gift ${st.poison}`, icon: <Stat k="poison" size={26} />, text: `Du verlierst am Rundenende ${st.poison} Leben, danach sinkt das Gift um 1.`, bad: true });
+  if (st.weak) rows.push({ name: `Schwächung ${st.weak}`, icon: <Stat k="weak" size={26} />, text: `Du machst 25 % weniger Schaden. ${rounds(st.weak)}`, bad: true });
+  if (st.vuln) rows.push({ name: `Verwundbar ${st.vuln}`, icon: <Stat k="vuln" size={26} />, text: `Du erleidest 50 % mehr Schaden. ${rounds(st.vuln)}`, bad: true });
+  if (st.mark) rows.push({ name: `Markiert ${st.mark}`, icon: <Stat k="mark" size={26} />, text: `Jeder Treffer gegen dich macht ${st.mark} Schaden mehr. Bis zum Rundenende.`, bad: true });
+  if (st.stun) rows.push({ name: 'Betäubt', icon: <Stat k="stun" size={26} />, text: 'Du setzt deine nächste Aktion aus.', bad: true });
   return (
     <>
       <span className="ab-sc" style={{ fontSize: 15, color: C.muted, letterSpacing: 1 }}>Zustände</span>
@@ -1984,6 +2137,19 @@ function PhoneShop({ view, send, player }: ControllerViewProps) {
           })}
         </section>
       )}
+      {view.stickers?.length > 0 && (
+        <section aria-label="Sticker" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <span className="ab-sc" style={{ fontSize: 15, color: C.muted, letterSpacing: 1 }}>Sticker</span>
+          {view.stickers.map((it: any, i: number) => {
+            const can = !it.sold && gold >= it.price;
+            return (
+              <button key={i} type="button" disabled={!can} onClick={() => { vibrate(20); play('paper'); send({ type: 'buy', kind: 'sticker', i }); }} style={{ border: 0, padding: 0, background: 'transparent', cursor: can ? 'pointer' : 'default', textAlign: 'left', opacity: it.sold ? 0.45 : 1, fontFamily: BODY }}>
+                <StickerRow s={it.sticker} dark right={it.sold ? <i style={{ color: C.muted }}>verkauft</i> : <Price n={it.price} can={gold >= it.price} />} />
+              </button>
+            );
+          })}
+        </section>
+      )}
       <button type="button" disabled={view.removed || gold < view.removePrice} style={{ ...SMALL_BTN, minHeight: 52, fontSize: 19, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, opacity: view.removed || gold < view.removePrice ? 0.5 : 1 }} onClick={() => setRemoving(true)}>
         {view.removed ? 'Karte entfernt' : <>Karte entfernen <Price n={view.removePrice} can={gold >= view.removePrice} /></>}
       </button>
@@ -2115,6 +2281,13 @@ function PhoneTreasure({ view, send, player }: ControllerViewProps) {
         {view.relic ? <RelicIcon r={view.relic} size={110} /> : null}
       </div>
       {view.relic ? <RelicRow r={view.relic} /> : <span className="ab-fell" style={{ fontStyle: 'italic', color: C.muted, textAlign: 'center' }}>Du hast schon alle Relikte – diesmal nichts Neues.</span>}
+      {view.sticker && (
+        <>
+          <span className="ab-sc" style={{ fontSize: 18 }}>Außerdem in der Truhe: ein Sticker</span>
+          <StickerRow s={view.sticker} />
+          <span className="ab-fell" style={{ fontSize: 14, fontStyle: 'italic', color: C.muted }}>Er liegt in deinem Beutel – aufkleben über deine Heldenseite (oben antippen).</span>
+        </>
+      )}
       <div style={{ flex: 1 }} />
       {view.done ? <Waiting view={view} send={send} player={player} /> : (
         <RelicChoice onKeep={(keep) => send({ type: 'done', keep })} />

@@ -6,13 +6,14 @@
 
 import type { GameContext, GameServerModule } from '@up/sdk';
 import {
-  BOSSES, CARD, CLASSES, CLASS_IDS, ENEMIES, EVENTS, FIGHT_POOLS, GOLD, LEVELS, NODE_DESC, NODE_NAME, PRICE, RELICS, SIGHT,
+  BOSSES, CARD, CLASSES, CLASS_IDS, ENEMIES, EVENTS, FIGHT_POOLS, GOLD, LEVELS, NODE_DESC, NODE_NAME, PRICE, RELICS, SIGHT, STICKERS,
   type ClassId, type EventDef, type FightSpec,
 } from './data';
 import {
   addCard, addRelic, afterFight, botPlan, cardOf, cardText, cost, fixHero, goldGain, heal, legendaryOffer, newFight, newHero, planCard,
   plannedCost, previewDamage, randomRelic, rareOffer, removeCard, resolveRound, rewardOffer, shopCards, shuffle, startRound,
   handMod, spawnCount, totalDuration, type CardMod, unplan, upgradeCard, type Fight, type Hero, type TimedEv,
+  applySticker, defOf, randomStickers, stickerFits, type CardInst,
 } from './engine';
 import { generateMap, nodeById, type ActMap } from './map';
 
@@ -31,14 +32,16 @@ interface SavedRun {
   removes: Record<string, number>;
   heroes: { name: string; hero: Hero; comp?: Comp }[];
   at: number;
+  /** gewonnene Kämpfe (nach dem ersten gibt es einen Sticker) */
+  won?: number;
 }
 
 type Phase = 'lager' | 'map' | 'plan' | 'resolve' | 'reward' | 'shop' | 'camp' | 'event' | 'treasure' | 'bossIntro' | 'end';
 type FightKind = 'fight' | 'elite' | 'boss' | 'eventRelic' | 'eventRare';
 
-interface ShopOffer { cards: { id: string; price: number; full: number; sale: boolean; sold: boolean }[]; relics: { id: string; price: number; sold: boolean }[]; removed: boolean }
+interface ShopOffer { cards: { id: string; price: number; full: number; sale: boolean; sold: boolean }[]; relics: { id: string; price: number; sold: boolean }[]; stickers: { id: string; price: number; sold: boolean }[]; removed: boolean }
 interface CampChoice { kind: 'rest' | 'forge' | 'watch'; uid?: string; target?: string }
-interface RewardInfo { gold: number; relic: string | null; healed: number; offer: string[] }
+interface RewardInfo { gold: number; relic: string | null; healed: number; offer: string[]; stickers: string[] }
 
 const rnd = (a: number, b: number) => a + Math.floor(Math.random() * (b - a + 1));
 const pick = <T>(a: T[]): T => a[Math.floor(Math.random() * a.length)];
@@ -61,6 +64,7 @@ export default {
     let boss = 'grubenmutter';
     let seen: string[] = [];
     let removes: Record<string, number> = {};
+    let won = 0;
 
     // Kampf
     let fight: Fight | null = null;
@@ -89,6 +93,10 @@ export default {
     let rewardApplied = false;
     /** Relikt behalten (true) oder liegen lassen (false) */
     const relicChoice = new Map<string, boolean>();
+    /** gewählter Sticker nach dem Kampf (null = keiner) */
+    const stickerPick = new Map<string, string | null>();
+    /** Sticker aus der Truhe */
+    const treasureSticker = new Map<string, string>();
 
     const compOf = (id: string) => comps.find((c) => c.id === id);
     /** Alle Helden-IDs: Mitspieler, dann Begleiter */
@@ -125,7 +133,7 @@ export default {
     }
 
     function saveRun() {
-      ctx.store.set('run', { v: 2, map, path, boss, seen, removes, heroes: heroes.map((h) => ({ name: nameOf(h.id), hero: h, comp: compOf(h.id) })), at: Date.now() } satisfies SavedRun);
+      ctx.store.set('run', { v: 2, map, path, boss, seen, removes, won, heroes: heroes.map((h) => ({ name: nameOf(h.id), hero: h, comp: compOf(h.id) })), at: Date.now() } satisfies SavedRun);
     }
 
     /* ---------------- Lager ---------------- */
@@ -145,6 +153,7 @@ export default {
       boss = pick([...BOSSES]);
       seen = [];
       removes = {};
+      won = 0;
       startMap();
     }
 
@@ -171,6 +180,7 @@ export default {
       path = s.path ?? [];
       boss = s.boss;
       seen = s.seen ?? [];
+      won = s.won ?? 1;
       removes = Object.fromEntries(Object.entries(s.removes ?? {}).map(([k, v]) => [newId.get(k) ?? k, v]));
       startMap();
     }
@@ -317,7 +327,11 @@ export default {
       rewards.clear();
       picked.clear();
       rewardApplied = false;
+      stickerPick.clear();
       const elite = fightKind === 'elite';
+      won++;
+      // Nach dem ersten Kampf wählt jeder einen von 3 Stickern; Eliten geben manchmal auch einen
+      const stickerChoice = fightKind !== 'boss' && (won === 1 || (elite && Math.random() < 0.5));
       for (const h of heroes) {
         const base = fightKind === 'boss' ? 0 : elite ? rnd(GOLD.elite[0], GOLD.elite[1]) : rnd(GOLD.fight[0], GOLD.fight[1]);
         const gold = goldGain(h, base);
@@ -328,16 +342,43 @@ export default {
           relic = randomRelic(h);
         }
         const offer = fightKind === 'boss' ? legendaryOffer(h.cls) : fightKind === 'eventRare' ? rareOffer(h.cls) : rewardOffer(h.cls, elite);
-        rewards.set(h.id, { gold, relic, healed, offer });
+        const stickers = stickerChoice ? randomStickers(3) : [];
+        rewards.set(h.id, { gold, relic, healed, offer, stickers });
         relicChoice.delete(h.id);
-        if (isBot(h.id)) { picked.set(h.id, Math.random() < 0.85 ? offer[0] ?? null : null); relicChoice.set(h.id, true); }
+        if (isBot(h.id)) {
+          picked.set(h.id, Math.random() < 0.85 ? offer[0] ?? null : null);
+          relicChoice.set(h.id, true);
+          if (stickers.length) { stickerPick.set(h.id, stickers[0]); h.stickers.push(stickers[0]); botStick(h); }
+        }
       }
       broadcast();
       checkRewardDone();
     }
 
+    const rewardDone = (h: Hero) => {
+      const r = rewards.get(h.id);
+      return picked.has(h.id) && (!r?.relic || relicChoice.has(h.id)) && (!r?.stickers.length || stickerPick.has(h.id));
+    };
+
+    /** Testspieler kleben ihre Sticker sofort auf eine passende Karte */
+    function botStick(h: Hero) {
+      for (const sid of [...h.stickers]) {
+        const fit = h.deck.filter((c) => stickerFits(c, sid));
+        if (fit.length) stick(h, sid, pick(fit).uid);
+      }
+    }
+
+    function stick(h: Hero, sid: string, uid: string) {
+      const c = cardOf(h, uid);
+      const i = h.stickers.indexOf(sid);
+      if (!c || i < 0 || !stickerFits(c, sid)) return false;
+      h.stickers.splice(i, 1);
+      applySticker(c, sid);
+      return true;
+    }
+
     function checkRewardDone() {
-      if (phase !== 'reward' || rewardApplied || !heroes.every((h) => picked.has(h.id) && (!rewards.get(h.id)?.relic || relicChoice.has(h.id)))) return;
+      if (phase !== 'reward' || rewardApplied || !heroes.every(rewardDone)) return;
       rewardApplied = true;
       for (const h of heroes) {
         const c = picked.get(h.id);
@@ -367,7 +408,8 @@ export default {
         const r1 = randomRelic(h);
         const r2 = r1 ? randomRelic(h, [r1]) : null;
         const relics = [r1, r2].filter((x): x is string => !!x).map((id) => ({ id, price: RELICS[id].risky ? PRICE.riskyRelic : PRICE.relic, sold: false }));
-        shop.set(h.id, { cards, relics, removed: false });
+        const stickers = randomStickers(2).map((id) => ({ id, price: PRICE.sticker, sold: false }));
+        shop.set(h.id, { cards, relics, stickers, removed: false });
         if (isBot(h.id)) botShop(h);
       }
       broadcast();
@@ -376,15 +418,16 @@ export default {
 
     const removePrice = (id: string) => PRICE.remove + PRICE.removeStep * (removes[id] ?? 0);
 
-    function buy(h: Hero, kind: 'card' | 'relic', i: number) {
+    function buy(h: Hero, kind: 'card' | 'relic' | 'sticker', i: number) {
       const o = shop.get(h.id);
-      const item = kind === 'card' ? o?.cards[i] : o?.relics[i];
+      const item = kind === 'card' ? o?.cards[i] : kind === 'relic' ? o?.relics[i] : o?.stickers[i];
       if (!o || !item || item.sold || h.gold < item.price) return;
       h.gold -= item.price;
       item.sold = true;
       if (kind === 'card') addCard(h, item.id);
-      else addRelic(h, item.id);
-      lastBuy = { id: h.id, text: `kauft ${kind === 'card' ? CARD[item.id].name : RELICS[item.id].name}`, at: Date.now() };
+      else if (kind === 'relic') addRelic(h, item.id);
+      else { h.stickers.push(item.id); if (isBot(h.id)) botStick(h); }
+      lastBuy = { id: h.id, text: `kauft ${kind === 'card' ? CARD[item.id].name : kind === 'relic' ? RELICS[item.id].name : `den Sticker ${STICKERS[item.id].name}`}`, at: Date.now() };
     }
 
     function shopRemove(h: Hero, uid: string) {
@@ -566,9 +609,17 @@ export default {
       treasure.clear();
       done.clear();
       relicChoice.clear();
+      treasureSticker.clear();
       for (const h of heroes) {
         const rel = randomRelic(h);
         treasure.set(h.id, rel);
+        // manchmal liegt auch ein Sticker in der Truhe
+        if (Math.random() < 0.5) {
+          const sid = randomStickers(1)[0];
+          treasureSticker.set(h.id, sid);
+          h.stickers.push(sid);
+          if (isBot(h.id)) botStick(h);
+        }
         if (isBot(h.id) || !rel) { done.add(h.id); if (rel) { addRelic(h, rel); relicChoice.set(h.id, true); } }
       }
       broadcast();
@@ -619,19 +670,22 @@ export default {
     }
 
     function heroesView() {
-      return heroes.map((h) => ({ id: h.id, cls: h.cls, img: CLASSES[h.cls].img, hp: h.hp, maxHp: h.maxHp, block: h.block, st: h.st, ready: h.ready, str: h.str, relics: h.relics, gold: h.gold }));
+      return heroes.map((h) => ({ id: h.id, cls: h.cls, img: CLASSES[h.cls].img, hp: h.hp, maxHp: h.maxHp, block: h.block, st: h.st, ready: h.ready, str: h.str, dex: h.dex, thorns: h.thorns, relics: h.relics, gold: h.gold }));
     }
 
-    const cardInfo = (id: string, up = false, mod?: CardMod) => {
-      const d = CARD[id];
+    const stickerView = (id: string) => ({ ...STICKERS[id] });
+    /** Karte für die Anzeige (mit Stickern; Grundkarten in der Farbe der eigenen Klasse) */
+    const cardInfo = (id: string, up = false, mod?: CardMod, inst?: CardInst, cls?: ClassId) => {
+      const d = inst ? defOf(inst) : CARD[id];
       return {
-        id, cls: d.cls, name: d.name + (up ? '+' : ''), cost: d.cost[up ? 1 : 0], speed: d.speed, rarity: d.rarity, text: cardText(d, up, isSolo(), mod), img: d.img, target: d.target, otherAlly: !!d.otherAlly && !isSolo(), up, exhaust: !!d.exhaust,
+        id, cls: d.cls === 'alle' ? cls ?? 'alle' : d.cls, name: d.name + (up ? '+' : ''), cost: d.cost[up ? 1 : 0], speed: d.speed, rarity: d.rarity, text: cardText(d, up, isSolo(), mod), img: d.img, target: d.target, otherAlly: !!d.otherAlly && !isSolo(), up, exhaust: !!d.exhaust,
         upText: up ? null : cardText(d, true, isSolo()), upCost: d.cost[1],
+        stickers: (inst?.st ?? []).map((x) => ({ ...x, img: STICKERS[x.id]?.img, name: STICKERS[x.id]?.name })),
       };
     };
     const cardView = (h: Hero, uid: string, mod?: CardMod) => {
       const c = cardOf(h, uid)!;
-      return { uid, ...cardInfo(c.id, c.up, mod) };
+      return { uid, ...cardInfo(c.id, c.up, mod, c, h.cls) };
     };
     const deckView = (h: Hero) => h.deck.map((c) => cardView(h, c.uid)).sort((a, b) => a.name.localeCompare(b.name));
 
@@ -683,7 +737,8 @@ export default {
           ...base, heroes: heroesView(), kind: fightKind,
           rewards: allIds().map((id) => {
             const r = rewards.get(id);
-            return { id, done: picked.has(id) && (!r?.relic || relicChoice.has(id)), card: picked.get(id) ? CARD[picked.get(id)!].name : null, gold: r?.gold ?? 0, healed: r?.healed ?? 0, relic: r?.relic && relicChoice.get(id) !== false ? relicView(r.relic) : null, relicKept: relicChoice.get(id) ?? null };
+            const hh = heroOf(id);
+            return { id, done: !!hh && rewardDone(hh), card: picked.get(id) ? CARD[picked.get(id)!].name : null, gold: r?.gold ?? 0, healed: r?.healed ?? 0, relic: r?.relic && relicChoice.get(id) !== false ? relicView(r.relic) : null, relicKept: relicChoice.get(id) ?? null };
           }),
         };
       }
@@ -698,8 +753,11 @@ export default {
     function meView(h: Hero) {
       return {
         cls: h.cls, img: CLASSES[h.cls].img, name: CLASSES[h.cls].name, hp: h.hp, maxHp: h.maxHp, block: h.block, st: h.st, str: h.str,
-        powers: h.powers, roundStr: h.roundStr, undying: h.undying, keepBlock: h.keepBlock, thorns: h.thorns, revive: !!fight?.revive && phase !== 'map',
+        powers: h.powers, roundStr: h.roundStr, undying: h.undying, keepBlock: h.keepBlock, thorns: h.thorns, dex: h.dex, drawNext: h.drawNext, revive: !!fight?.revive && phase !== 'map',
         gold: h.gold, relics: h.relics.map(relicView), deckSize: h.deck.length,
+        // Sticker im Beutel: auf welche Karten sie passen (aufkleben geht außerhalb des Kampfes)
+        stickers: h.stickers.map((sid) => ({ ...stickerView(sid), fits: h.deck.filter((c) => stickerFits(c, sid)).map((c) => c.uid) })),
+        canStick: phase !== 'plan' && phase !== 'resolve' && phase !== 'end',
       };
     }
 
@@ -713,7 +771,7 @@ export default {
           savedComps: s?.heroes.filter((x) => x.comp).length ?? 0, saved: s ? { level: savedLevel(s) } : null,
           classes: CLASS_IDS.map((c) => {
             const d = CLASSES[c];
-            return { id: c, name: d.name, role: d.role, hp: d.hp, desc: d.desc, img: d.img, start: d.start.map(([cid, n]) => `${n}× ${CARD[cid].name}`) };
+            return { id: c, name: d.name, role: d.role, hp: d.hp, desc: d.desc, img: d.img, start: d.start.map(([cid, n]) => `${n}× ${CARD[cid].name}`), relic: relicView(d.relic) };
           }),
         };
       }
@@ -727,16 +785,18 @@ export default {
       if (phase === 'reward') {
         const r = rewards.get(id);
         return {
-          ...base, me, deck, kind: fightKind, input: !picked.has(id) || (!!r?.relic && !relicChoice.has(id)), done: picked.has(id) && (!r?.relic || relicChoice.has(id)), cardDone: picked.has(id), pickedName: picked.get(id) ? CARD[picked.get(id)!].name : null,
-          gold: r?.gold ?? 0, healed: r?.healed ?? 0, relic: r?.relic ? relicView(r.relic) : null, relicKept: relicChoice.has(id) ? relicChoice.get(id) : null, offer: (r?.offer ?? []).map((cid) => cardInfo(cid)),
-          waitingFor: heroes.filter((x) => human(x) && !picked.has(x.id)).map((x) => x.id),
+          ...base, me, deck, kind: fightKind, input: !rewardDone(h), done: rewardDone(h), cardDone: picked.has(id), pickedName: picked.get(id) ? CARD[picked.get(id)!].name : null,
+          gold: r?.gold ?? 0, healed: r?.healed ?? 0, relic: r?.relic ? relicView(r.relic) : null, relicKept: relicChoice.has(id) ? relicChoice.get(id) : null, offer: (r?.offer ?? []).map((cid) => cardInfo(cid, false, undefined, undefined, h.cls)),
+          stickerOffer: (r?.stickers ?? []).map(stickerView), stickerPicked: stickerPick.has(id) ? stickerPick.get(id) : undefined,
+          waitingFor: heroes.filter((x) => human(x) && !rewardDone(x)).map((x) => x.id),
         };
       }
       if (phase === 'shop') {
         const o = shop.get(id)!;
         return {
           ...base, me, deck, input: !done.has(id), done: done.has(id), waitingFor: heroes.filter((x) => human(x) && !done.has(x.id)).map((x) => x.id),
-          cards: o.cards.map((c) => ({ ...c, card: cardInfo(c.id) })), relics: o.relics.map((r) => ({ ...r, relic: relicView(r.id) })),
+          cards: o.cards.map((c) => ({ ...c, card: cardInfo(c.id, false, undefined, undefined, h.cls) })), relics: o.relics.map((r) => ({ ...r, relic: relicView(r.id) })),
+          stickers: o.stickers.map((x) => ({ ...x, sticker: stickerView(x.id) })),
           removePrice: removePrice(id), removed: o.removed,
         };
       }
@@ -755,7 +815,7 @@ export default {
           waitingFor: ev?.stage === 'choose' ? heroes.filter((x) => human(x) && !evPick.has(x.id)).map((x) => x.id) : [],
         };
       }
-      if (phase === 'treasure') return { ...base, me, deck, relic: treasure.get(id) ? relicView(treasure.get(id)!) : null, done: done.has(id), input: !done.has(id), waitingFor: heroes.filter((x) => human(x) && !done.has(x.id)).map((x) => x.id) };
+      if (phase === 'treasure') return { ...base, me, deck, relic: treasure.get(id) ? relicView(treasure.get(id)!) : null, sticker: treasureSticker.has(id) ? stickerView(treasureSticker.get(id)!) : null, done: done.has(id), input: !done.has(id), waitingFor: heroes.filter((x) => human(x) && !done.has(x.id)).map((x) => x.id) };
       if (phase === 'end') return { ...base, me, result, level: level() };
       const f = fight!;
       return {
@@ -793,7 +853,15 @@ export default {
     function skipDisconnected() {
       const off = heroes.filter((h) => !connected(h.id));
       if (phase === 'plan' && fight) { for (const x of off) if (!x.ready) { botPlan(fight, x); x.ready = true; } broadcast(); return checkAllReady(); }
-      if (phase === 'reward') { for (const x of off) if (!picked.has(x.id)) picked.set(x.id, null); broadcast(); return checkRewardDone(); }
+      if (phase === 'reward') {
+        for (const x of off) {
+          if (!picked.has(x.id)) picked.set(x.id, null);
+          if (!relicChoice.has(x.id)) relicChoice.set(x.id, true);
+          if (!stickerPick.has(x.id)) stickerPick.set(x.id, null);
+        }
+        broadcast();
+        return checkRewardDone();
+      }
       if (phase === 'shop') { for (const x of off) done.add(x.id); broadcast(); return checkShopDone(); }
       if (phase === 'camp') { for (const x of off) if (!camp.has(x.id)) camp.set(x.id, { kind: 'rest' }); broadcast(); return checkCampDone(); }
       if (phase === 'event' && ev?.stage === 'choose') { for (const x of off) if (!evPick.has(x.id)) botEventPick(x); broadcast(); return checkEventDone(); }
@@ -816,6 +884,15 @@ export default {
         if (vip && a.type === 'skipWait') return skipDisconnected();
         const h = heroOf(id);
         if (a.type === 'vote' && (phase === 'map' || phase === 'event')) return castVote(id, String(a.option));
+        // Sticker aufkleben: jederzeit außerhalb des Kampfes
+        if (a.type === 'stick' && h && phase !== 'plan' && phase !== 'resolve' && phase !== 'end') { stick(h, String(a.sticker), String(a.uid)); return broadcast(); }
+        if (phase === 'reward' && h && a.type === 'sticker' && rewards.get(id)?.stickers.length && !stickerPick.has(id)) {
+          const sid = rewards.get(id)!.stickers.includes(a.sticker) ? String(a.sticker) : null;
+          stickerPick.set(id, sid);
+          if (sid) h.stickers.push(sid);
+          broadcast();
+          return checkRewardDone();
+        }
         if (phase === 'plan' && fight && h) {
           if (a.type === 'plan' && !h.ready) { planCard(fight, h, String(a.uid), a.target ? String(a.target) : undefined); return broadcast(); }
           if (a.type === 'unplan' && !h.ready) { unplan(h, String(a.uid)); return broadcast(); }
@@ -833,7 +910,7 @@ export default {
           return checkRewardDone();
         }
         if (phase === 'shop' && h && !done.has(id)) {
-          if (a.type === 'buy') buy(h, a.kind === 'relic' ? 'relic' : 'card', Number(a.i));
+          if (a.type === 'buy') buy(h, a.kind === 'relic' ? 'relic' : a.kind === 'sticker' ? 'sticker' : 'card', Number(a.i));
           if (a.type === 'remove') shopRemove(h, String(a.uid));
           if (a.type === 'done') done.add(id);
           broadcast();

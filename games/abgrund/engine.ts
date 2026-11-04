@@ -6,14 +6,16 @@
  */
 
 import {
-  CARD, CLASSES, ENEMIES, RARITY_ODDS, RELIC_IDS, SHOP_ODDS, dmgScale, extraEnemies, hpScale, legendaryPool, rewardPool,
+  CARD, CLASSES, ENEMIES, RARITY_ODDS, RELIC_IDS, RENAMED_CARDS, SHOP_ODDS, STICKERS, STICKER_IDS, dmgScale, extraEnemies, hpScale, legendaryPool, rewardPool,
   type CardDef, type ClassId, type EnemyMove, type FightSpec, type Fx, type PowerId, type Speed,
 } from './data';
 
 export interface Status { poison: number; weak: number; vuln: number; mark: number; stun: number }
 const noStatus = (): Status => ({ poison: 0, weak: 0, vuln: 0, mark: 0, stun: 0 });
 
-export interface CardInst { uid: string; id: string; up: boolean }
+/** Ein aufgeklebter Sticker: Stelle (0–1 im Bildbereich) und Drehung (Grad) werden beim Aufkleben festgelegt */
+export interface StickerOn { id: string; x: number; y: number; r: number }
+export interface CardInst { uid: string; id: string; up: boolean; st?: StickerOn[] }
 export interface Planned { uid: string; target?: string }
 
 export interface Hero {
@@ -36,10 +38,16 @@ export interface Hero {
   /** diese Runde: Angriffe auf diese Spieler treffen mich */
   covers: string[];
   taunt: boolean;
+  /** Dornen: wer mich angreift, erleidet so viel Schaden (bis Kampfende) */
   thorns: number;
-  /** Run: Gold und Relikte */
+  /** Geschicklichkeit: +Block pro Blockkarte (bis Kampfende) */
+  dex: number;
+  /** nächste Runde zusätzliche Karten */
+  drawNext: number;
+  /** Run: Gold, Relikte und noch nicht aufgeklebte Sticker */
   gold: number;
   relics: string[];
+  stickers: string[];
   /** Kampf: Stärke (+Schaden pro Treffer), Kräfte, einmalige Rettung */
   str: number;
   powers: Partial<Record<PowerId, number>>;
@@ -100,7 +108,63 @@ export function shuffle<T>(a: T[]): T[] {
 const pick = <T>(a: T[]): T => a[Math.floor(Math.random() * a.length)];
 
 export const cardOf = (h: Hero, uid: string) => h.deck.find((c) => c.uid === uid);
-export const cost = (c: CardInst) => CARD[c.id].cost[c.up ? 1 : 0];
+
+const BLOCK_KEYS = ['block', 'blockTarget', 'blockAll'];
+const plus = (f: Fx, n: number): Fx => {
+  const x = { ...f } as Fx & { v: [number, number]; solo?: [number, number] };
+  x.v = [x.v[0] + n, x.v[1] + n];
+  if (x.solo) x.solo = [x.solo[0] + n, x.solo[1] + n];
+  return x;
+};
+const STICKER_FX: Record<string, Fx> = {
+  heilsalbe: { k: 'tgtHeal', v: [2, 2] }, giftzahn: { k: 'tgtPoison', v: [1, 1] }, schwaeche: { k: 'tgtWeak', v: [1, 1] },
+  wunde: { k: 'tgtVuln', v: [1, 1] }, zielmarke: { k: 'tgtMark', v: [2, 2] }, dorn: { k: 'thorns', v: [1, 1] }, rabe: { k: 'drawNext', v: [1, 1] },
+};
+
+/** Die Karte, wie sie mit ihren Stickern wirkt (Werte, Tempo, Kosten, Zusatzwirkungen) */
+export function defOf(c: { id: string; st?: StickerOn[] }): CardDef {
+  const base = CARD[c.id];
+  if (!c.st?.length) return base;
+  const ids = c.st.map((s) => s.id);
+  let fx = base.fx.map((f) => (ids.includes('schaerfe') && f.k === 'dmg' ? plus(f, 2) : f));
+  fx = fx.map((f) => (ids.includes('panzer') && BLOCK_KEYS.includes(f.k) ? plus(f, 2) : f));
+  const extra: string[] = [];
+  for (const id of ids) {
+    if (!STICKER_FX[id]) continue;
+    // Dorn und Rabe stapeln sich mit gleichartigen Effekten der Karte nicht im Text – sie stehen extra da
+    fx = [...fx, STICKER_FX[id]];
+    extra.push(STICKERS[id].card ?? STICKERS[id].text);
+  }
+  const speed = ids.includes('eile') ? 'fast' : ids.includes('ruhe') ? 'slow' : base.speed;
+  const cst: [number, number] = ids.includes('sparsam') ? [Math.max(0, base.cost[0] - 1), Math.max(0, base.cost[1] - 1)] : base.cost;
+  const add = extra.length ? '. ' + extra.join('. ') : '';
+  return { ...base, fx, speed, cost: cst, text: base.text + add, soloText: base.soloText ? base.soloText + add : undefined };
+}
+
+/** Passt ein Sticker auf eine Karte? */
+export function stickerFits(c: CardInst, sid: string): boolean {
+  const s = STICKERS[sid];
+  const def = CARD[c.id];
+  if (!s || !def) return false;
+  const on = (c.st ?? []).map((x) => x.id);
+  if (on.includes(sid) || (s.excl && on.includes(s.excl))) return false;
+  if (s.fit === 'dmg') return def.fx.some((f) => f.k === 'dmg');
+  if (s.fit === 'block') return def.fx.some((f) => BLOCK_KEYS.includes(f.k));
+  if (s.fit === 'notFast') return def.speed !== 'fast';
+  if (s.fit === 'notSlow') return def.speed !== 'slow';
+  if (s.fit === 'cost1') return def.cost[0] >= 1;
+  return true;
+}
+
+/** Sticker aufkleben: zufällige Stelle im Bildbereich, leicht schief */
+export function applySticker(c: CardInst, sid: string) {
+  const r = (Math.random() < 0.5 ? -1 : 1) * (6 + Math.random() * 16);
+  (c.st ??= []).push({ id: sid, x: 0.18 + Math.random() * 0.64, y: 0.2 + Math.random() * 0.6, r: Math.round(r) });
+}
+
+export const randomStickers = (n: number, not: string[] = []) => shuffle(STICKER_IDS.filter((s) => !not.includes(s))).slice(0, n);
+
+export const cost = (c: CardInst) => defOf(c).cost[c.up ? 1 : 0];
 /** Wie oft ein Spieler ein Relikt hat */
 export const relicN = (h: Hero, id: string) => h.relics.filter((r) => r === id).length;
 /** Wie oft die Gruppe ein Relikt hat */
@@ -114,7 +178,7 @@ function val(f: Fx, up: boolean, solo: boolean): number {
 }
 
 /** Veränderung der Kartenwerte durch Stärke, Schwächung und Relikte (für die Anzeige auf der Hand) */
-export interface CardMod { add: number; weak: boolean }
+export interface CardMod { add: number; weak: boolean; block?: number }
 
 /**
  * Kartentext mit eingesetzten Werten. Schaden und Block werden als Marken ⟦D:gezeigt:normal⟧ / ⟦B:…⟧
@@ -136,17 +200,18 @@ export function cardText(def: CardDef, up: boolean, solo: boolean, mod?: CardMod
       return `⟦D:${shown}:${v}⟧`;
     }
     if (key === 'execute') return `⟦D:${v}:${v}⟧`;
-    if (key === 'block' || key === 'blockAll' || key === 'blockTarget' || (key === 'power' && f.k === 'power' && (f.p === 'blockRound' || f.p === 'blockAllRound'))) return `⟦B:${v}:${v}⟧`;
+    if (key === 'block' || key === 'blockAll' || key === 'blockTarget') return `⟦B:${v + (mod?.block ?? 0)}:${v}⟧`;
+    if (key === 'power' && f.k === 'power' && (f.p === 'blockRound' || f.p === 'blockAllRound')) return `⟦B:${v}:${v}⟧`;
     return String(v);
   }).replace(/(⟦D:[^⟧]+⟧) Schaden/g, '$1').replace(/(⟦B:[^⟧]+⟧) Block/g, '$1');
 }
 
 /** Wie sich Stärke, Schwächung und Relikte gerade auf die Karten eines Spielers auswirken */
 export function handMod(f: Fight, h: Hero): CardMod {
-  return { add: hitBonus(f, h) + (h.firstAtkDone ? 0 : relicN(h, 'schleifstein') * 3), weak: h.st.weak > 0 };
+  return { add: hitBonus(f, h) + (h.firstAtkDone ? 0 : relicN(h, 'schleifstein') * 3), weak: h.st.weak > 0, block: h.dex };
 }
 
-const isAttackDef = (def: CardDef) => def.fx.some((x) => ['dmg', 'poison', 'weak', 'vuln', 'mark', 'doublePoison', 'poisonBurst', 'dmgFromBlock', 'execute', 'stun'].includes(x.k));
+const isAttackDef = (def: CardDef) => def.fx.some((x) => ['dmg', 'poison', 'weak', 'vuln', 'mark', 'doublePoison', 'poisonBurst', 'dmgFromBlock', 'execute', 'stun', 'dmgFromThorns', 'missingDmg', 'stripBlock', 'spreadPoison'].includes(x.k));
 
 /* ---------------- Aufbau ---------------- */
 
@@ -156,15 +221,16 @@ export function newHero(id: string, cls: ClassId): Hero {
   for (const [cid, n] of c.start) for (let i = 0; i < n; i++) deck.push({ uid: newUid('c'), id: cid, up: false });
   return {
     id, cls, hp: c.hp, maxHp: c.hp, block: 0, st: noStatus(), deck, draw: [], discard: [], hand: [], exhaust: [],
-    energy: 0, bonusEnergy: 0, plan: [], ready: false, covers: [], taunt: false, thorns: 0,
-    gold: 0, relics: [], str: 0, powers: {}, undying: false, talismanUsed: false, roundStr: 0, keepBlock: false, doubleAtk: false, firstAtkDone: false,
+    energy: 0, bonusEnergy: 0, plan: [], ready: false, covers: [], taunt: false, thorns: 0, dex: 0, drawNext: 0,
+    gold: 0, relics: [c.relic], stickers: [], str: 0, powers: {}, undying: false, talismanUsed: false, roundStr: 0, keepBlock: false, doubleAtk: false, firstAtkDone: false,
   };
 }
 
 /** Ältere Spielstände ergänzen */
 export function fixHero(h: Hero): Hero {
   const n = newHero(h.id, h.cls);
-  return { ...n, ...h, gold: h.gold ?? 0, relics: h.relics ?? [], powers: h.powers ?? {}, exhaust: h.exhaust ?? [] };
+  const deck = h.deck.map((c) => (RENAMED_CARDS[c.id] ? { ...c, id: RENAMED_CARDS[c.id] } : c)).filter((c) => CARD[c.id]);
+  return { ...n, ...h, deck, gold: h.gold ?? 0, relics: h.relics ?? [], stickers: h.stickers ?? [], powers: h.powers ?? {}, exhaust: h.exhaust ?? [], dex: h.dex ?? 0, drawNext: h.drawNext ?? 0 };
 }
 
 function makeEnemy(id: string, hpMul: number): Enemy {
@@ -196,10 +262,14 @@ export function newFight(spec: FightSpec, heroes: Hero[]): Fight {
     h.talismanUsed = false;
     h.covers = [];
     h.taunt = false;
-    h.thorns = 0;
+    h.thorns = relicN(h, 'alraunenwurzel');
+    h.dex = relicN(h, 'familienschild');
+    h.str = relicN(h, 'wetzstahl');
+    h.drawNext = 0;
   }
   const f: Fight = { elite: !!spec.elite, boss: !!spec.boss, round: 0, dmgMul: dmgScale(heroes.length), heroes, enemies, revive: false };
   for (let i = 0; i < groupRelicN(f, 'knochenwuerfel'); i++) pick(enemies).st.vuln += 1;
+  for (const e of enemies) e.st.poison += 2 * groupRelicN(f, 'alraunenwurzel');
   return f;
 }
 
@@ -247,6 +317,7 @@ function applyPower(f: Fight, h: Hero, p: PowerId, v: number) {
   if (p === 'healAllRound') for (const t of solo ? [h] : f.heroes.filter((x) => x.hp > 0)) t.hp = Math.min(t.maxHp, t.hp + v);
   if (p === 'poisonAllRound') for (const e of f.enemies) if (!e.dead) e.st.poison += v;
   if (p === 'thorns') h.thorns += v;
+  if (p === 'strRound') h.str += v;
 }
 
 export function startRound(f: Fight) {
@@ -290,7 +361,8 @@ export function startRound(f: Fight) {
     h.doubleAtk = false;
     h.firstAtkDone = false;
     if (h.hp > 0) h.block += chain;
-    drawCards(h, 5 + relicN(h, 'seelenpakt') + (first ? relicN(h, 'rabenfeder') : 0));
+    drawCards(h, 5 + h.drawNext + relicN(h, 'seelenpakt') + (first ? relicN(h, 'rabenfeder') : 0));
+    h.drawNext = 0;
   }
   for (const h of f.heroes) {
     if (h.hp <= 0) continue;
@@ -311,7 +383,7 @@ export function planCard(f: Fight, h: Hero, uid: string, target?: string): PlanE
   const c = cardOf(h, uid);
   if (!c || !h.hand.includes(uid) || h.plan.some((p) => p.uid === uid)) return 'noCard';
   if (plannedCost(h) + cost(c) > h.energy) return 'noEnergy';
-  const def = CARD[c.id];
+  const def = defOf(c);
   if (def.target === 'enemy') {
     if (!f.enemies.some((e) => e.uid === target && !e.dead)) return 'badTarget';
   } else if (def.target === 'ally') {
@@ -343,12 +415,16 @@ function hitBonus(f: Fight, h: Hero) {
 
 /** Erwarteter Schaden einer geplanten Karte auf ein Ziel (für die Vorschau auf dem Handy) */
 export function previewDamage(f: Fight, h: Hero, c: CardInst, targetUid: string) {
-  const def = CARD[c.id];
+  const def = defOf(c);
   const e = f.enemies.find((x) => x.uid === targetUid);
   if (!e) return null;
   const mul = h.doubleAtk ? 2 : 1;
   const fb = def.fx.find((x) => x.k === 'dmgFromBlock');
   if (fb) return heroHit(h.block * val(fb, c.up, false) + hitBonus(f, h), h.st, e.st) * mul;
+  const ft = def.fx.find((x) => x.k === 'dmgFromThorns');
+  if (ft) return heroHit(h.thorns * 2 + val(ft, c.up, false) + hitBonus(f, h), h.st, e.st) * mul;
+  const fm = def.fx.find((x) => x.k === 'missingDmg');
+  if (fm) return heroHit(missingBase(e.maxHp - e.hp, val(fm, c.up, false), !!ENEMIES[e.id].boss) + hitBonus(f, h), h.st, e.st) * mul;
   const dmg = def.fx.find((x) => x.k === 'dmg') as { v: [number, number]; hits?: [number, number] } | undefined;
   if (!dmg) {
     const pb = def.fx.find((x) => x.k === 'poisonBurst');
@@ -361,6 +437,9 @@ export function previewDamage(f: Fight, h: Hero, c: CardInst, targetUid: string)
   const hits = dmg.hits?.[c.up ? 1 : 0] ?? 1;
   return heroHit(base + hitBonus(f, h), h.st, e.st) * hits * mul;
 }
+
+/** Gnadenstoß: Prozent der fehlenden Leben (Bosse: die Hälfte) */
+const missingBase = (missing: number, pct: number, boss: boolean) => Math.floor((missing * pct) / 100 / (boss ? 2 : 1));
 
 /** Schaden an einem Spieler (nach Block) – mit Rettungen (Unbeugsam, Wiedergeburt) und Talisman */
 function hurtHero(f: Fight, h: Hero, loss: number): { saved?: 'undying' | 'revive'; talisman?: boolean } {
@@ -421,7 +500,7 @@ function resolveTier(f: Fight, tier: Speed, push: (e: Ev) => void) {
     if (h.hp <= 0) continue;
     for (const p of h.plan) {
       const c = cardOf(h, p.uid)!;
-      const def = CARD[c.id];
+      const def = defOf(c);
       if (def.speed === tier) acts.push({ h, c, def, target: p.target });
     }
   }
@@ -445,12 +524,35 @@ function resolveTier(f: Fight, tier: Speed, push: (e: Ev) => void) {
         if (!it) support.push((it = { from: a.h.id, card: a.def.id, to }));
         return it;
       };
-      if (fx.k === 'block') { a.h.block += v; item(a.h.id).block = (item(a.h.id).block ?? 0) + v; }
+      const bv = v + a.h.dex; // Geschicklichkeit: jede Blockkarte gibt mehr Block
+      if (fx.k === 'block') { a.h.block += bv; item(a.h.id).block = (item(a.h.id).block ?? 0) + bv; }
       if (fx.k === 'blockTarget' && a.target) {
         const t = f.heroes.find((x) => x.id === a.target);
-        if (t && !(solo && t.id === a.h.id)) { t.block += v; item(t.id).block = (item(t.id).block ?? 0) + v; }
+        if (t && !(solo && t.id === a.h.id)) { t.block += bv; item(t.id).block = (item(t.id).block ?? 0) + bv; }
       }
-      if (fx.k === 'blockAll') for (const t of team) { t.block += v; item(t.id).block = v; }
+      if (fx.k === 'blockAll') for (const t of team) { t.block += bv; item(t.id).block = bv; }
+      const tgtHero = a.def.target === 'ally' ? f.heroes.find((x) => x.id === a.target) : a.def.target === 'self' ? a.h : undefined;
+      const heroTargets = tgtHero ? [tgtHero] : a.def.target === 'allAllies' ? team : [];
+      if (fx.k === 'thornsTarget' && tgtHero) { tgtHero.thorns += v; item(tgtHero.id).thorns = v; }
+      if (fx.k === 'thornsAll') for (const t of team) { t.thorns += v; item(t.id).thorns = v; }
+      if (fx.k === 'doubleThorns' && tgtHero) { item(tgtHero.id).thorns = tgtHero.thorns; tgtHero.thorns *= 2; }
+      if (fx.k === 'dex') { a.h.dex += v; item(a.h.id).note = `+${v} Geschicklichkeit`; }
+      if (fx.k === 'dexAll') for (const t of team) { t.dex += v; item(t.id).note = `+${v} Geschicklichkeit`; }
+      if (fx.k === 'drawNext') { a.h.drawNext += v; item(a.h.id).note = `+${v} Karte`; }
+      if (fx.k === 'drawNextAll') for (const t of team) { t.drawNext += v; item(t.id).note = `+${v} Karte`; }
+      if (fx.k === 'energyNext') { a.h.bonusEnergy += v; item(a.h.id).note = `+${v} Energie`; }
+      if (fx.k === 'energyNextAll') for (const t of team) { t.bonusEnergy += v; item(t.id).note = `+${v} Energie`; }
+      if (fx.k === 'tgtHeal') {
+        const t = tgtHero && tgtHero.hp > 0 ? tgtHero : a.h;
+        const g = Math.min(v + healBonus, t.maxHp - t.hp); t.hp += g; item(t.id).heal = (item(t.id).heal ?? 0) + g;
+      }
+      // Debuff-Sticker auf Karten, die Spieler treffen: das Ziel bekommt sie trotzdem (gewollt)
+      for (const t of heroTargets) {
+        if (fx.k === 'tgtPoison') { t.st.poison += v; item(t.id).note = `+${v} Gift`; }
+        if (fx.k === 'tgtWeak') { t.st.weak += v; item(t.id).note = `Schwächung ${v}`; }
+        if (fx.k === 'tgtVuln') { t.st.vuln += v; item(t.id).note = `Verwundbar ${v}`; }
+        if (fx.k === 'tgtMark') { t.st.mark += v; item(t.id).note = `Markiert ${v}`; }
+      }
       if (fx.k === 'heal' && a.target) {
         const t = f.heroes.find((x) => x.id === a.target);
         if (t && t.hp > 0) { const g = Math.min(v + healBonus, t.maxHp - t.hp); t.hp += g; item(t.id).heal = g; }
@@ -482,7 +584,7 @@ function resolveTier(f: Fight, tier: Speed, push: (e: Ev) => void) {
   if (support.length) push({ k: 'support', items: support });
 
   // 2. Angriffe und Effekte auf Gegner – pro Gegner gesammelt
-  const perEnemy = new Map<number, { parts: { from: string; card: string; dmg: number }[]; st: Partial<Status>; onKill: Hero[] }>();
+  const perEnemy = new Map<number, { parts: { from: string; card: string; dmg: number }[]; st: Partial<Status>; onKill: Hero[]; strip?: boolean }>();
   const add = (i: number) => {
     let x = perEnemy.get(i);
     if (!x) perEnemy.set(i, (x = { parts: [], st: {}, onKill: [] }));
@@ -526,6 +628,25 @@ function resolveTier(f: Fight, tier: Speed, push: (e: Ev) => void) {
         }
       }
       if (fx.k === 'dmgFromBlock') for (const i of targets) add(i).parts.push({ from: a.h.id, card: a.def.id, dmg: heroHit(a.h.block * v + bonus, hs, startE[i].st) * mul });
+      if (fx.k === 'dmgFromThorns') for (const i of targets) add(i).parts.push({ from: a.h.id, card: a.def.id, dmg: heroHit(a.h.thorns * 2 + v + bonus, hs, startE[i].st) * mul });
+      if (fx.k === 'missingDmg') for (const i of targets) {
+        const s = startE[i];
+        add(i).parts.push({ from: a.h.id, card: a.def.id, dmg: heroHit(missingBase(s.maxHp - s.hp, v, !!ENEMIES[f.enemies[i].id].boss) + bonus, hs, s.st) * mul });
+      }
+      if (fx.k === 'stripBlock') for (const i of targets) add(i).strip = true;
+      if (fx.k === 'spreadPoison') for (const i of targets) {
+        const n = Math.floor((startE[i].st.poison * v) / 100);
+        if (n > 0) for (const j of living) if (j !== i) add(j).st.poison = (add(j).st.poison ?? 0) + n;
+      }
+      // Debuff-Sticker: bei zufälligen Zielen trifft es einen zufälligen Gegner
+      const stTargets = a.def.target === 'randomEnemies' ? [targets[Math.floor(Math.random() * targets.length)]] : targets;
+      for (const i of stTargets) {
+        const x = add(i);
+        if (fx.k === 'tgtPoison') x.st.poison = (x.st.poison ?? 0) + v;
+        if (fx.k === 'tgtWeak') x.st.weak = (x.st.weak ?? 0) + v;
+        if (fx.k === 'tgtVuln') x.st.vuln = (x.st.vuln ?? 0) + v;
+        if (fx.k === 'tgtMark') x.st.mark = (x.st.mark ?? 0) + v;
+      }
       if (fx.k === 'poisonBurst') for (const i of targets) add(i).parts.push({ from: a.h.id, card: a.def.id, dmg: startE[i].st.poison * v * mul });
       if (fx.k === 'execute') for (const i of targets) {
         const s = startE[i];
@@ -547,6 +668,7 @@ function resolveTier(f: Fight, tier: Speed, push: (e: Ev) => void) {
   for (const [i, x] of [...perEnemy.entries()].sort((a, b) => a[0] - b[0])) {
     const e = f.enemies[i];
     if (e.dead) continue;
+    if (x.strip) e.block = 0;
     const total = x.parts.reduce((s, p) => s + p.dmg, 0);
     const blocked = Math.min(e.block, total);
     e.block -= blocked;
@@ -633,7 +755,11 @@ function enemyPhase(f: Fight, push: (e: Ev) => void) {
           talisman = talisman || !!r.talisman;
           dmgSum += d; blockedSum += b; lossSum += d - b;
         }
-        if (h.thorns > 0) thorns += h.thorns;
+        if (h.thorns > 0 && h.hp > 0) {
+          thorns += h.thorns;
+          if (h.powers.thornsPoison) e.st.poison += h.powers.thornsPoison;
+          if (h.powers.thornsHeal) heal(h, h.powers.thornsHeal);
+        }
       }
       if (m.vuln) h.st.vuln += m.vuln;
       if (m.poison) { h.st.poison += m.poison; ev.poison = m.poison; }
@@ -697,7 +823,6 @@ function endOfRound(f: Fight, push: (e: Ev) => void) {
   for (const h of f.heroes) {
     h.covers = [];
     h.taunt = false;
-    h.thorns = 0;
     // Hand und gespielte Karten auf die Ablage – erschöpfende Karten auf den Erschöpft-Stapel
     discardHand(h);
   }
@@ -707,7 +832,7 @@ function discardHand(h: Hero) {
   const played = new Set(h.plan.map((p) => p.uid));
   for (const uid of h.hand) {
     const c = cardOf(h, uid);
-    if (played.has(uid) && c && CARD[c.id].exhaust) h.exhaust.push(uid);
+    if (played.has(uid) && c && defOf(c).exhaust) h.exhaust.push(uid);
     else h.discard.push(uid);
   }
   h.hand = [];
@@ -741,13 +866,20 @@ export function resolveRound(f: Fight): TimedEv[] {
   if (o) { f.over = o; push({ k: 'result', result: o }); endCleanup(f); return out; }
   endOfRound(f, push);
   o = checkOver(f);
-  if (o) { f.over = o; push({ k: 'result', result: o }); }
+  if (o) { f.over = o; push({ k: 'result', result: o }); endCleanup(f); }
   return out;
 }
 
 function endCleanup(f: Fight) {
   for (const h of f.heroes) {
     discardHand(h);
+    // Kampfwerte enden mit dem Kampf
+    h.str = 0;
+    h.dex = 0;
+    h.drawNext = 0;
+    h.powers = {};
+    h.roundStr = 0;
+    h.bonusEnergy = 0;
     h.block = 0;
     h.covers = [];
     h.taunt = false;
@@ -851,11 +983,11 @@ export function botPlan(f: Fight, h: Hero) {
   const pickWeakest = () => [...living].filter((e) => left(e) > 0).sort((a, b) => left(a) - left(b))[0] ?? living[0];
   const toughest = [...living].sort((a, b) => b.hp - a.hp)[0];
   const hurt = [...f.heroes].filter((x) => x.hp > 0 && x.hp < x.maxHp * 0.5).sort((a, b) => a.hp / a.maxHp - b.hp / b.maxHp)[0];
-  const has = (c: CardInst, ks: string[]) => CARD[c.id].fx.some((x) => ks.includes(x.k));
+  const has = (c: CardInst, ks: string[]) => defOf(c).fx.some((x) => ks.includes(x.k));
   const isBlock = (c: CardInst) => has(c, ['block', 'blockAll', 'blockTarget']);
   const isHeal = (c: CardInst) => has(c, ['heal', 'healAll']);
-  const isAtk = (c: CardInst) => isAttackDef(CARD[c.id]);
-  const isBuff = (c: CardInst) => has(c, ['str', 'strAll', 'roundStr', 'power', 'undying', 'revive', 'doubleAtk']);
+  const isAtk = (c: CardInst) => isAttackDef(defOf(c));
+  const isBuff = (c: CardInst) => has(c, ['str', 'strAll', 'roundStr', 'power', 'undying', 'revive', 'doubleAtk', 'dex', 'dexAll', 'thorns', 'thornsAll', 'thornsTarget', 'doubleThorns', 'drawNext', 'drawNextAll', 'energyNext', 'energyNextAll']);
   const order = [
     ...hand.filter((c) => isHeal(c) && hurt),
     ...(incoming >= 6 ? hand.filter(isBlock) : []),
@@ -866,7 +998,7 @@ export function botPlan(f: Fight, h: Hero) {
   let blockSoFar = 0;
   for (const c of order) {
     if (h.plan.some((p) => p.uid === c.uid)) continue;
-    const def = CARD[c.id];
+    const def = defOf(c);
     if (isBlock(c) && !isAtk(c) && incoming >= 6 && blockSoFar >= incoming) continue;
     let target: string | undefined;
     if (def.target === 'enemy') {
