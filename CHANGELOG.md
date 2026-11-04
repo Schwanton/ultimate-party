@@ -2,6 +2,12 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.12.1
+
+- Abgrund: Relikte kann man jetzt behalten oder liegen lassen (Elite, Schatz, Gruft, Brücke)
+- Abgrund: Elixier des Lebens: +3 maximale Leben und erschöpft
+- Abgrund: Händler günstiger: gewöhnlich 25, ungewöhnlich 40, selten 80 Gold
+
 ## 0.12.0
 
 - Abgrund: Auf den Karten stehen Schwert und Schild statt „Schaden“ und „Block“ (z. B. „2 × ⚔4“)

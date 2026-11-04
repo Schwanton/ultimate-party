@@ -87,6 +87,8 @@ export default {
     const treasure = new Map<string, string | null>();
     let result: 'win' | 'lose' | null = null;
     let rewardApplied = false;
+    /** Relikt behalten (true) oder liegen lassen (false) */
+    const relicChoice = new Map<string, boolean>();
 
     const compOf = (id: string) => comps.find((c) => c.id === id);
     /** Alle Helden-IDs: Mitspieler, dann Begleiter */
@@ -323,22 +325,24 @@ export default {
         let relic: string | null = null;
         if (elite || fightKind === 'eventRelic') {
           relic = randomRelic(h);
-          if (relic) addRelic(h, relic);
         }
         const offer = fightKind === 'boss' ? legendaryOffer(h.cls) : fightKind === 'eventRare' ? rareOffer(h.cls) : rewardOffer(h.cls, elite);
         rewards.set(h.id, { gold, relic, healed, offer });
-        if (isBot(h.id)) picked.set(h.id, Math.random() < 0.85 ? offer[0] ?? null : null);
+        relicChoice.delete(h.id);
+        if (isBot(h.id)) { picked.set(h.id, Math.random() < 0.85 ? offer[0] ?? null : null); relicChoice.set(h.id, true); }
       }
       broadcast();
       checkRewardDone();
     }
 
     function checkRewardDone() {
-      if (phase !== 'reward' || rewardApplied || !heroes.every((h) => picked.has(h.id))) return;
+      if (phase !== 'reward' || rewardApplied || !heroes.every((h) => picked.has(h.id) && (!rewards.get(h.id)?.relic || relicChoice.has(h.id)))) return;
       rewardApplied = true;
       for (const h of heroes) {
         const c = picked.get(h.id);
         if (c) addCard(h, c);
+        const rel = rewards.get(h.id)?.relic;
+        if (rel && relicChoice.get(h.id)) addRelic(h, rel);
       }
       broadcast();
       const t = ++token;
@@ -490,11 +494,10 @@ export default {
         h.gold -= g;
         r.push({ id: h.id, text: `−${g} Gold, +${heal(h, Math.round(h.maxHp * 0.25))} Leben` });
       }
-      if (id === 'bruecke' && opt === 'cross') for (const h of heroes) {
-        h.hp = Math.max(1, h.hp - 8);
-        const rel = randomRelic(h);
-        if (rel) addRelic(h, rel);
-        r.push({ id: h.id, text: `−8 Leben${rel ? `, Relikt: ${RELICS[rel].name}` : ''}` });
+      if (id === 'bruecke' && opt === 'cross') {
+        // über die Brücke: jeder verliert Leben, dann wartet die Truhe (Relikt wählen)
+        for (const h of heroes) h.hp = Math.max(1, h.hp - 8);
+        return startTreasure();
       }
       if (!r.length) r.push(...heroes.map((h) => ({ id: h.id, text: 'geht weiter' })));
       finishEventResult(7);
@@ -561,11 +564,11 @@ export default {
       phase = 'treasure';
       treasure.clear();
       done.clear();
+      relicChoice.clear();
       for (const h of heroes) {
         const rel = randomRelic(h);
-        if (rel) addRelic(h, rel);
         treasure.set(h.id, rel);
-        if (isBot(h.id)) done.add(h.id);
+        if (isBot(h.id) || !rel) { done.add(h.id); if (rel) { addRelic(h, rel); relicChoice.set(h.id, true); } }
       }
       broadcast();
       checkTreasureDone();
@@ -672,14 +675,14 @@ export default {
       if (phase === 'event') return { ...base, event: eventView(), heroes: heroesView(), vote: voteView() };
       if (phase === 'shop') return { ...base, heroes: heroesView(), done: [...done], last: lastBuy };
       if (phase === 'camp') return { ...base, heroes: heroesView(), chosen: [...camp.keys()], result: campResult };
-      if (phase === 'treasure') return { ...base, heroes: heroesView(), done: [...done], relics: Object.fromEntries([...treasure.entries()].map(([k, v]) => [k, v ? relicView(v) : null])) };
+      if (phase === 'treasure') return { ...base, heroes: heroesView(), done: [...done], kept: Object.fromEntries(relicChoice.entries()), relics: Object.fromEntries([...treasure.entries()].map(([k, v]) => [k, v ? relicView(v) : null])) };
       if (phase === 'bossIntro') return { ...base, boss: { name: ENEMIES[boss].name, img: ENEMIES[boss].img, fallback: ENEMIES[boss].fallback } };
       if (phase === 'reward') {
         return {
           ...base, heroes: heroesView(), kind: fightKind,
           rewards: allIds().map((id) => {
             const r = rewards.get(id);
-            return { id, done: picked.has(id), card: picked.get(id) ? CARD[picked.get(id)!].name : null, gold: r?.gold ?? 0, healed: r?.healed ?? 0, relic: r?.relic ? relicView(r.relic) : null };
+            return { id, done: picked.has(id) && (!r?.relic || relicChoice.has(id)), card: picked.get(id) ? CARD[picked.get(id)!].name : null, gold: r?.gold ?? 0, healed: r?.healed ?? 0, relic: r?.relic && relicChoice.get(id) !== false ? relicView(r.relic) : null, relicKept: relicChoice.get(id) ?? null };
           }),
         };
       }
@@ -723,8 +726,8 @@ export default {
       if (phase === 'reward') {
         const r = rewards.get(id);
         return {
-          ...base, me, deck, kind: fightKind, input: !picked.has(id), done: picked.has(id), pickedName: picked.get(id) ? CARD[picked.get(id)!].name : null,
-          gold: r?.gold ?? 0, healed: r?.healed ?? 0, relic: r?.relic ? relicView(r.relic) : null, offer: (r?.offer ?? []).map((cid) => cardInfo(cid)),
+          ...base, me, deck, kind: fightKind, input: !picked.has(id) || (!!r?.relic && !relicChoice.has(id)), done: picked.has(id) && (!r?.relic || relicChoice.has(id)), cardDone: picked.has(id), pickedName: picked.get(id) ? CARD[picked.get(id)!].name : null,
+          gold: r?.gold ?? 0, healed: r?.healed ?? 0, relic: r?.relic ? relicView(r.relic) : null, relicKept: relicChoice.has(id) ? relicChoice.get(id) : null, offer: (r?.offer ?? []).map((cid) => cardInfo(cid)),
           waitingFor: heroes.filter((x) => human(x) && !picked.has(x.id)).map((x) => x.id),
         };
       }
@@ -850,7 +853,19 @@ export default {
           return checkEventDone();
         }
         if (phase === 'event' && vip && ev?.stage === 'result' && a.type === 'next') { token++; return startMap(); }
-        if (phase === 'treasure' && h && a.type === 'done') { done.add(id); broadcast(); return checkTreasureDone(); }
+        if (phase === 'treasure' && h && a.type === 'done' && !done.has(id)) {
+          const rel = treasure.get(id);
+          if (rel && a.keep) addRelic(h, rel);
+          relicChoice.set(id, !!a.keep);
+          done.add(id);
+          broadcast();
+          return checkTreasureDone();
+        }
+        if (phase === 'reward' && h && a.type === 'relic' && rewards.get(id)?.relic && !relicChoice.has(id)) {
+          relicChoice.set(id, !!a.keep);
+          broadcast();
+          return checkRewardDone();
+        }
       },
       onPlayerRejoin() {
         broadcast();

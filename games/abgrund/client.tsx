@@ -1161,6 +1161,16 @@ function PhoneReward({ view, send }: ControllerViewProps) {
     );
   }
   if (view.done) return <PhoneCenter title={view.pickedName ? `${view.pickedName} kommt in dein Deck` : 'Du verzichtest'} text="Warte auf die anderen …" img={view.me.img} />;
+  if (view.cardDone) {
+    return (
+      <>
+        <MeHeader view={view} />
+        <span className="ab-sc" style={{ fontSize: 24 }}>Ein Relikt</span>
+        {view.relic && <RelicRow r={view.relic} />}
+        <RelicChoice onKeep={(keep) => send({ type: 'relic', keep })} />
+      </>
+    );
+  }
   return (
     <>
       <MeHeader view={view} />
@@ -1170,6 +1180,8 @@ function PhoneReward({ view, send }: ControllerViewProps) {
           {view.gold > 0 && <span style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 16 }}><Coin n={`+${view.gold}`} dark /> Gold</span>}
           {view.healed > 0 && <span style={{ fontSize: 16 }}>Blutstein: +{view.healed} Leben</span>}
           {view.relic && <RelicRow r={view.relic} />}
+          {view.relic && view.relicKept == null && <RelicChoice onKeep={(keep) => send({ type: 'relic', keep })} />}
+          {view.relic && view.relicKept != null && <span className="ab-fell" style={{ fontSize: 15, fontStyle: 'italic' }}>{view.relicKept ? 'Du behältst das Relikt.' : 'Du lässt das Relikt liegen.'}</span>}
         </section>
       )}
       <div style={{ textAlign: 'center' }}>
@@ -1763,7 +1775,8 @@ function HostTreasure({ view, player }: HostViewProps) {
       <div style={{ position: 'absolute', left: 530, top: 150 }}><Chest /></div>
       <HeroRow heroes={view.heroes} player={player} top={380} mark={(h) => done.has(h.id)} label={(h) => {
         const r = view.relics[h.id];
-        return r ? <><RelicIcon r={r} size={28} /> {r.name}</> : <i>nichts Neues</i>;
+        const k = view.kept?.[h.id];
+        return r ? <><RelicIcon r={r} size={28} /> {k === false ? <i style={{ textDecoration: 'line-through', opacity: 0.6 }}>{r.name}</i> : r.name}</> : <i>nichts Neues</i>;
       }} />
     </>
   );
@@ -2103,8 +2116,20 @@ function PhoneTreasure({ view, send, player }: ControllerViewProps) {
       </div>
       {view.relic ? <RelicRow r={view.relic} /> : <span className="ab-fell" style={{ fontStyle: 'italic', color: C.muted, textAlign: 'center' }}>Du hast schon alle Relikte – diesmal nichts Neues.</span>}
       <div style={{ flex: 1 }} />
-      {view.done ? <Waiting view={view} send={send} player={player} /> : <button type="button" style={BIG_BTN} onClick={() => { vibrate(20); send({ type: 'done' }); }}>Weiter</button>}
+      {view.done ? <Waiting view={view} send={send} player={player} /> : (
+        <RelicChoice onKeep={(keep) => send({ type: 'done', keep })} />
+      )}
     </>
+  );
+}
+
+/** Relikt behalten oder liegen lassen */
+function RelicChoice({ onKeep }: { onKeep: (keep: boolean) => void }) {
+  return (
+    <div style={{ display: 'flex', gap: 10 }}>
+      <button type="button" style={{ ...SMALL_BTN, flex: 1, minHeight: 56, fontSize: 18 }} onClick={() => { vibrate(15); play('paper'); onKeep(false); }}>Liegen lassen</button>
+      <button type="button" style={{ ...BIG_BTN, flex: 1.4 }} onClick={() => { vibrate(25); play('heal'); onKeep(true); }}>Behalten</button>
+    </div>
   );
 }
 

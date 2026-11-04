@@ -141,7 +141,7 @@ const CARDS: CardDef[] = [
   { id: 'wurzelschild', name: 'Wurzelschild', cls: 'kraeuterkundige', rarity: 'common', cost: [1, 1], speed: 'normal', target: 'allAllies', fx: [{ k: 'blockAll', v: [3, 5], solo: [6, 9] }], text: 'Alle Spieler erhalten {blockAll} Block', img: 'karte-wurzelschild' },
   { id: 'miasma', name: 'Miasma', cls: 'kraeuterkundige', rarity: 'uncommon', cost: [2, 2], speed: 'normal', target: 'self', fx: [{ k: 'power', p: 'poisonAllRound', v: [1, 2] }], text: 'Bis Kampfende: jede Runde {power} Gift an alle Gegner', exhaust: true, img: 'karte-miasma' },
   { id: 'schlafmohn', name: 'Schlafmohn', cls: 'kraeuterkundige', rarity: 'rare', cost: [2, 1], speed: 'normal', target: 'enemy', fx: [{ k: 'stun' }], text: 'Betäubt einen Gegner: er setzt seine nächste Aktion aus', img: 'karte-schlafmohn' },
-  { id: 'elixier', name: 'Elixier des Lebens', cls: 'kraeuterkundige', rarity: 'rare', cost: [2, 2], speed: 'normal', target: 'allAllies', fx: [{ k: 'healAll', v: [6, 9], solo: [10, 14] }, { k: 'maxHpAll', v: [4, 6], solo: [6, 8] }], text: 'Alle Spieler heilen {healAll} und erhalten +{maxHpAll} maximale Leben', soloText: 'Du heilst {healAll} und erhältst +{maxHpAll} maximale Leben', img: 'karte-elixier' },
+  { id: 'elixier', name: 'Elixier des Lebens', cls: 'kraeuterkundige', rarity: 'rare', cost: [2, 2], speed: 'normal', target: 'allAllies', fx: [{ k: 'healAll', v: [6, 9], solo: [10, 14] }, { k: 'maxHpAll', v: [3, 3], solo: [3, 3] }], text: 'Alle Spieler heilen {healAll} und erhalten +{maxHpAll} maximale Leben', soloText: 'Du heilst {healAll} und erhältst +{maxHpAll} maximale Leben', exhaust: true, img: 'karte-elixier' },
 
   /* ---------- Legendär (Boss-Belohnung) ---------- */
   { id: 'aegis', name: 'Ägis', cls: 'schildwacht', rarity: 'legendary', cost: [3, 2], speed: 'normal', target: 'self', fx: [{ k: 'power', p: 'blockAllRound', v: [6, 8] }], text: 'Bis Kampfende: alle Spieler erhalten jede Runde {power} Block', soloText: 'Bis Kampfende: jede Runde {power} Block', exhaust: true, img: 'karte-aegis' },
@@ -371,7 +371,7 @@ export const SIGHT = 3;
 /* ---------------- Gold und Preise ---------------- */
 
 export const GOLD = { fight: [12, 18], elite: [27, 33] } as const;
-export const PRICE = { common: 35, uncommon: 55, rare: 100, relic: 120, riskyRelic: 90, remove: 35, removeStep: 20 };
+export const PRICE = { common: 25, uncommon: 40, rare: 80, relic: 120, riskyRelic: 90, remove: 35, removeStep: 20 };
 
 /** Gegner-Leben je Spielerzahl */
 /** Gesamtleben der Gegner relativ zur Grundgruppe (wird auf alle Gegner verteilt, auch zusätzliche) */
