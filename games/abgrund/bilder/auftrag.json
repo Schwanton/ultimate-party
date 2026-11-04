@@ -1,0 +1,163 @@
+{
+  "_hinweis": "Liste der Bilder für Abgrund. 'Bilder erzeugen' erzeugt alle Bilder, die noch fehlen. Claude pflegt diese Datei.",
+  "modell": [
+    "gpt-image-2",
+    "gpt-image-1.5",
+    "gpt-image-1"
+  ],
+  "qualitaet": "medium",
+  "nur": [
+    "held-schildwacht",
+    "gegner-skelett"
+  ],
+  "varianten": 2,
+  "bilder": [
+    {
+      "id": "held-schildwacht",
+      "art": "figur",
+      "groesse": "1024x1536",
+      "transparent": true,
+      "prompt": "A stern human shield warden, a weathered woman in her forties with a scarred but kind face and short grey hair, heavy dented plate armor under a tattered hooded cloak pushed back, a tall tower shield engraved with a single protective rune held in front, a short heavy mace in the other hand, steady protective stance, three-quarter view facing right. Style: antique black ink etching from a forbidden medieval bestiary, dense cross-hatching, fine engraved linework, sepia and bone-white tones on aged yellowed paper, very sparse blood-red accents only on eyes, wounds, runes or embers, dramatic light from below. Paper-theatre cut-out: the whole figure is cut out of one piece of old paper with a narrow, slightly irregular torn paper edge following the silhouette; gaps between limbs are filled with paper, not empty. Everything outside the paper cut-out is fully transparent. Full body, centered, the complete figure and its paper edge are inside the image with some empty margin on all sides. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo, no cropped body parts, no extra limbs or fingers."
+    },
+    {
+      "id": "held-klingenlaeufer",
+      "art": "figur",
+      "groesse": "1024x1536",
+      "transparent": true,
+      "prompt": "A lean agile human blade runner, a young man with a sharp determined face and a scarf pulled down from the lower jaw, light layered leather armor with many straps, two curved daggers held low and ready, dynamic crouched stance as if about to leap, three-quarter view facing right. Style: antique black ink etching from a forbidden medieval bestiary, dense cross-hatching, fine engraved linework, sepia and bone-white tones on aged yellowed paper, very sparse blood-red accents only on eyes, wounds, runes or embers, dramatic light from below. Paper-theatre cut-out: the whole figure is cut out of one piece of old paper with a narrow, slightly irregular torn paper edge following the silhouette; gaps between limbs are filled with paper, not empty. Everything outside the paper cut-out is fully transparent. Full body, centered, the complete figure and its paper edge are inside the image with some empty margin on all sides. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo, no cropped body parts, no extra limbs or fingers."
+    },
+    {
+      "id": "held-kraeuterkundige",
+      "art": "figur",
+      "groesse": "1024x1536",
+      "transparent": true,
+      "prompt": "A calm human herbalist, an older woman with braided hair and a wise face, a long hooded robe with pouches, bundles of dried herbs and small glass vials on her belt, holding a gnarled wooden staff with a sprig of thorny leaves, a small smoking mortar in the other hand, upright attentive stance, three-quarter view facing right. Style: antique black ink etching from a forbidden medieval bestiary, dense cross-hatching, fine engraved linework, sepia and bone-white tones on aged yellowed paper, very sparse blood-red accents only on eyes, wounds, runes or embers, dramatic light from below. Paper-theatre cut-out: the whole figure is cut out of one piece of old paper with a narrow, slightly irregular torn paper edge following the silhouette; gaps between limbs are filled with paper, not empty. Everything outside the paper cut-out is fully transparent. Full body, centered, the complete figure and its paper edge are inside the image with some empty margin on all sides. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo, no cropped body parts, no extra limbs or fingers."
+    },
+    {
+      "id": "gegner-skelett",
+      "art": "figur",
+      "groesse": "1024x1536",
+      "transparent": true,
+      "prompt": "A gaunt skeleton soldier, cracked skull with a faint red ember glow in the eye sockets, fragments of rusted armor and a torn tabard, holding one notched sword in its right hand, menacing slightly hunched stance, three-quarter view facing left. Style: antique black ink etching from a forbidden medieval bestiary, dense cross-hatching, fine engraved linework, sepia and bone-white tones on aged yellowed paper, very sparse blood-red accents only on eyes, wounds, runes or embers, dramatic light from below. Paper-theatre cut-out: the whole figure is cut out of one piece of old paper with a narrow, slightly irregular torn paper edge following the silhouette; gaps between limbs are filled with paper, not empty. Everything outside the paper cut-out is fully transparent. Full body, centered, the complete figure and its paper edge are inside the image with some empty margin on all sides. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo, no cropped body parts, no extra limbs or fingers."
+    },
+    {
+      "id": "gegner-aschenkultist",
+      "art": "figur",
+      "groesse": "1024x1536",
+      "transparent": true,
+      "prompt": "An ash cultist, a thin robed figure covered in grey ash, face hidden behind a cracked ceramic mask with a single red-glowing eye slit, glowing embers drifting from the sleeves, holding a smoking censer on a chain, ritual pose with one hand raised, three-quarter view facing left. Style: antique black ink etching from a forbidden medieval bestiary, dense cross-hatching, fine engraved linework, sepia and bone-white tones on aged yellowed paper, very sparse blood-red accents only on eyes, wounds, runes or embers, dramatic light from below. Paper-theatre cut-out: the whole figure is cut out of one piece of old paper with a narrow, slightly irregular torn paper edge following the silhouette; gaps between limbs are filled with paper, not empty. Everything outside the paper cut-out is fully transparent. Full body, centered, the complete figure and its paper edge are inside the image with some empty margin on all sides. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo, no cropped body parts, no extra limbs or fingers."
+    },
+    {
+      "id": "gegner-schlundhund",
+      "art": "figur",
+      "groesse": "1024x1536",
+      "transparent": true,
+      "prompt": "A maw hound, a starved four-legged beast like a hairless wolf with visible ribs, a grotesquely oversized jaw that splits open down to the chest lined with too many teeth, small red eyes, low snarling stance ready to pounce, three-quarter view facing left. Style: antique black ink etching from a forbidden medieval bestiary, dense cross-hatching, fine engraved linework, sepia and bone-white tones on aged yellowed paper, very sparse blood-red accents only on eyes, wounds, runes or embers, dramatic light from below. Paper-theatre cut-out: the whole figure is cut out of one piece of old paper with a narrow, slightly irregular torn paper edge following the silhouette; gaps between limbs are filled with paper, not empty. Everything outside the paper cut-out is fully transparent. Full body, centered, the complete figure and its paper edge are inside the image with some empty margin on all sides. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo, no cropped body parts, no extra limbs or fingers."
+    },
+    {
+      "id": "gegner-knochenkoloss",
+      "art": "figur",
+      "groesse": "1024x1536",
+      "transparent": true,
+      "prompt": "A bone colossus, a huge hulking giant assembled from hundreds of fused skeletons and bones, a crown of jagged bones on its head, a second smaller skull growing from its shoulder, faint red embers glowing between the ribs, dragging a massive bone club, heavy slow stance, three-quarter view facing left. Style: antique black ink etching from a forbidden medieval bestiary, dense cross-hatching, fine engraved linework, sepia and bone-white tones on aged yellowed paper, very sparse blood-red accents only on eyes, wounds, runes or embers, dramatic light from below. Paper-theatre cut-out: the whole figure is cut out of one piece of old paper with a narrow, slightly irregular torn paper edge following the silhouette; gaps between limbs are filled with paper, not empty. Everything outside the paper cut-out is fully transparent. Full body, centered, the complete figure and its paper edge are inside the image with some empty margin on all sides. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo, no cropped body parts, no extra limbs or fingers."
+    },
+    {
+      "id": "hintergrund-kampf-abgrund",
+      "art": "hintergrund",
+      "groesse": "1536x1024",
+      "transparent": false,
+      "prompt": "Vast underground abyss cavern, crumbling stone stairs descending into darkness, ancient carved pillars wrapped in roots, hanging chains, a broken stone floor in the foreground. Style: antique black ink etching on aged yellowed parchment, dense cross-hatching, fine engraved linework, sepia tones, very sparse blood-red accents, faint ember light and drifting fog, deep atmospheric perspective. Wide panorama with a calm, open, less detailed area in the lower center where figures will stand. No characters or creatures. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "hintergrund-lager",
+      "art": "hintergrund",
+      "groesse": "1536x1024",
+      "transparent": false,
+      "prompt": "A small camp at the edge of a giant abyss at dusk, a single campfire with rising embers on a rocky ledge, a few bedrolls and packs, a crooked wooden signpost, the gaping abyss with faint glowing veins far below, ruined towers on the far side. Style: antique black ink etching on aged yellowed parchment, dense cross-hatching, fine engraved linework, sepia tones, very sparse blood-red accents, faint ember light and drifting fog, deep atmospheric perspective. Wide panorama with a calm, open, less detailed area in the lower center where figures will stand. No characters or creatures. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-schildstoss",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A heavy tower shield thrusting forward with motion lines. Style: small antique ink etching vignette like the central emblem of an old tarot card, dense cross-hatching, sepia and bone-white tones, one small blood-red accent, simple clear silhouette that stays readable at small size, centered object only. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-deckung",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A raised kite shield with a glowing protective rune. Style: small antique ink etching vignette like the central emblem of an old tarot card, dense cross-hatching, sepia and bone-white tones, one small blood-red accent, simple clear silhouette that stays readable at small size, centered object only. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-abfangen",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A shield deflecting an incoming arrow, the arrow bending away. Style: small antique ink etching vignette like the central emblem of an old tarot card, dense cross-hatching, sepia and bone-white tones, one small blood-red accent, simple clear silhouette that stays readable at small size, centered object only. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-schildwall",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "Three overlapping shields forming a wall. Style: small antique ink etching vignette like the central emblem of an old tarot card, dense cross-hatching, sepia and bone-white tones, one small blood-red accent, simple clear silhouette that stays readable at small size, centered object only. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-schnitt",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A curved dagger with a crescent slash trail. Style: small antique ink etching vignette like the central emblem of an old tarot card, dense cross-hatching, sepia and bone-white tones, one small blood-red accent, simple clear silhouette that stays readable at small size, centered object only. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-ausweichen",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A swirling cloak in motion, empty inside, like a figure that just vanished. Style: small antique ink etching vignette like the central emblem of an old tarot card, dense cross-hatching, sepia and bone-white tones, one small blood-red accent, simple clear silhouette that stays readable at small size, centered object only. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-schneller-hieb",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "Two crossed daggers with lightning-fast streaks. Style: small antique ink etching vignette like the central emblem of an old tarot card, dense cross-hatching, sepia and bone-white tones, one small blood-red accent, simple clear silhouette that stays readable at small size, centered object only. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-hinrichtung",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A dagger plunged downward into a cracked skull. Style: small antique ink etching vignette like the central emblem of an old tarot card, dense cross-hatching, sepia and bone-white tones, one small blood-red accent, simple clear silhouette that stays readable at small size, centered object only. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-dornenstich",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A thorny vine curling into a sharp spike. Style: small antique ink etching vignette like the central emblem of an old tarot card, dense cross-hatching, sepia and bone-white tones, one small blood-red accent, simple clear silhouette that stays readable at small size, centered object only. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-rindenhaut",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A raised open hand covered in protective tree bark. Style: small antique ink etching vignette like the central emblem of an old tarot card, dense cross-hatching, sepia and bone-white tones, one small blood-red accent, simple clear silhouette that stays readable at small size, centered object only. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-giftstachel",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A dripping stinger with drops of poison, the poison in a thin sickly green as the only accent color instead of red. Style: small antique ink etching vignette like the central emblem of an old tarot card, dense cross-hatching, sepia and bone-white tones, one small blood-red accent, simple clear silhouette that stays readable at small size, centered object only. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-heilkraeuter",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A bundle of healing herbs tied with string, giving off a faint glow. Style: small antique ink etching vignette like the central emblem of an old tarot card, dense cross-hatching, sepia and bone-white tones, one small blood-red accent, simple clear silhouette that stays readable at small size, centered object only. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    }
+  ]
+}
