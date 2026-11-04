@@ -2,6 +2,10 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.11.4
+
+- Abgrund: Die Pfadkarte ist jetzt auch auf dem Handy – gleiche Anordnung wie auf dem Fernseher. Ziel antippen zeigt, was einen dort erwartet; erst „Bestätigen“ gibt die Stimme ab (änderbar, bis alle abgestimmt haben)
+
 ## 0.11.3
 
 - Abgrund: Kartenrahmen in der Farbskala der Seltenheit – Basis dunkel, gewöhnlich eisengrau, ungewöhnlich blau, selten lila, legendär gold; ungewöhnliche, seltene und legendäre Karten glitzern (je seltener, desto mehr Funken)

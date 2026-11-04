@@ -1736,72 +1736,121 @@ function PhoneMap({ view, send, player, me }: ControllerViewProps) {
   const names: Record<string, string> = view.nodeNames;
   const byId = new Map<string, any>(m.nodes.map((n: any) => [n.id, n]));
   const opts: string[] = v?.options ?? [];
-  const sortedCols = [...opts].map((o) => byId.get(o)?.col ?? 0).sort((a, b) => a - b);
-  const side = (o: string) => {
-    if (opts.length < 2) return '';
-    const c = byId.get(o)?.col ?? 0;
-    const i = sortedCols.indexOf(c);
-    return i === 0 ? 'linker Weg' : i === sortedCols.length - 1 ? 'rechter Weg' : 'mittlerer Weg';
-  };
+  const [sel, setSel] = useState<string | null>(null);
+  useEffect(() => { setSel(view.myVote ?? null); }, [m.pos]);
+  const label = (n: any) => (n?.type === 'boss' && m.boss ? m.boss.name : names[n?.type]);
   if (v?.winner) {
     const n = byId.get(v.winner);
     return (
       <>
         <MeHeader view={view} />
-        <PhoneCenter title={`Weiter zum ${names[n?.type] ?? ''}`} text={view.nodeDesc[n?.type]} />
+        <PhoneCenter title={`Weiter zum ${label(n) ?? ''}`} text={view.nodeDesc[n?.type]} />
       </>
     );
   }
+  const selN = sel ? byId.get(sel) : null;
+  const mine = view.myVote;
   return (
     <>
       <MeHeader view={view} />
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, paddingTop: 4 }}>
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <span className="ab-sc" style={{ fontSize: 30 }}>Wohin?</span>
-          <span className="ab-fell" style={{ fontSize: 16, fontStyle: 'italic', color: C.muted }}>Stufe {m.level + 1} von {m.levels} · die Mehrheit entscheidet</span>
-        </div>
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <span className="ab-sc" style={{ fontSize: 28 }}>Wohin?</span>
+        <span className="ab-fell" style={{ fontSize: 15, fontStyle: 'italic', color: C.muted }}>Tippe ein rot umrandetes Ziel an · die Mehrheit entscheidet</span>
       </div>
-      {v?.deadline && <PhoneTimer deadline={v.deadline} duration={v.duration} />}
-      {(v?.options ?? []).map((o: string) => {
-        const n = byId.get(o);
-        const mine = view.myVote === o;
-        const cnt = v.votes[o]?.length ?? 0;
-        return (
-          <button key={o} type="button" onClick={() => { vibrate(20); play('paper'); send({ type: 'vote', option: o }); }} style={{
-            width: '100%', border: 0, cursor: 'pointer', textAlign: 'left', background: C.paper2, color: C.ink, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 14, fontFamily: BODY, clipPath: TORN2,
-            boxShadow: mine ? 'inset 0 0 0 4px #f2a43a' : undefined, touchAction: 'manipulation',
-          }}>
-            <span style={{ width: 58, height: 58, flex: 'none', borderRadius: '50%', border: `3px solid ${n?.type === 'elite' ? '#7a1012' : C.ink}`, display: 'flex', alignItems: 'center', justifyContent: 'center', background: C.paper }}>
-              <NodeIcon type={n?.type} size={32} color={n?.type === 'elite' ? '#7a1012' : C.ink} />
-            </span>
-            <span style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-              <b className="ab-sc" style={{ fontSize: 24, color: n?.type === 'elite' ? '#7a1012' : C.ink }}>{names[n?.type]} {side(o) && <i className="ab-fell" style={{ fontSize: 14, fontWeight: 400, color: '#6b5d45' }}>{side(o)}</i>}</b>
-              <span style={{ fontSize: 16, lineHeight: 1.25 }}>{view.nodeDesc[n?.type]}</span>
-            </span>
-            <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-              <b style={{ fontSize: 18 }}>{cnt}</b>
-              {mine && <span className="ab-fell" style={{ fontSize: 12, fontStyle: 'italic' }}>deine</span>}
-            </span>
-          </button>
-        );
-      })}
-      <section aria-label="Blick voraus" style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingTop: 6 }}>
-        <span className="ab-sc" style={{ fontSize: 15, color: C.muted, letterSpacing: 1 }}>Danach, soweit man sehen kann</span>
-        {(v?.options ?? []).map((o: string) => {
-          const n = byId.get(o);
-          const after = (n?.next ?? []).map((t: string) => byId.get(t)).filter(Boolean);
-          return (
-            <div key={o} style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 15 }}>
-              <span className="ab-fell" style={{ fontStyle: 'italic', color: C.muted, minWidth: 110 }}>{side(o) || names[n?.type]} →</span>
-              <span style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>{after.length ? after.map((a: any) => <span key={a.id} style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><NodeIcon type={a.type} size={18} color={C.paper} />{a.type === 'boss' && m.boss ? m.boss.name : names[a.type]}</span>) : <i style={{ color: '#6f6450' }}>dunkel</i>}</span>
-            </div>
-          );
-        })}
-      </section>
+      <PhoneMapBoard m={m} names={names} sel={sel} onSel={(o) => { play('paper'); vibrate(10); setSel(o); }} player={player} myVote={mine} meImg={view.me.img} />
+      {selN ? (
+        <section style={{ background: C.paper2, color: C.ink, padding: '12px 14px', clipPath: TORN2, display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span style={{ width: 50, height: 50, flex: 'none', borderRadius: '50%', border: `3px solid ${['elite', 'boss'].includes(selN.type) ? '#7a1012' : C.ink}`, display: 'flex', alignItems: 'center', justifyContent: 'center', background: C.paper }}>
+            <NodeIcon type={selN.type} size={28} color={['elite', 'boss'].includes(selN.type) ? '#7a1012' : C.ink} />
+          </span>
+          <span style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <b className="ab-sc" style={{ fontSize: 22, color: ['elite', 'boss'].includes(selN.type) ? '#7a1012' : C.ink }}>{label(selN)}</b>
+            <span style={{ fontSize: 15.5, lineHeight: 1.25 }}>{view.nodeDesc[selN.type]}</span>
+            <span className="ab-fell" style={{ fontSize: 13.5, fontStyle: 'italic', color: '#6b5d45' }}>{(v.votes[sel!]?.length ?? 0) === 1 ? '1 Stimme' : `${v.votes[sel!]?.length ?? 0} Stimmen`}</span>
+          </span>
+        </section>
+      ) : (
+        <span className="ab-fell" style={{ fontSize: 16, fontStyle: 'italic', color: C.muted, textAlign: 'center' }}>Noch kein Ziel angetippt.</span>
+      )}
       <div style={{ flex: 1 }} />
-      <span className="ab-fell" style={{ fontSize: 15, fontStyle: 'italic', color: C.muted, textAlign: 'center' }}>Du kannst deine Stimme ändern, bis alle abgestimmt haben.</span>
+      <button type="button" disabled={!sel || sel === mine} style={{ ...BIG_BTN, opacity: !sel || sel === mine ? 0.5 : 1 }} onClick={() => { if (!sel) return; vibrate(25); play('ready'); send({ type: 'vote', option: sel }); }}>
+        {sel && sel === mine ? 'Deine Stimme' : mine ? 'Stimme ändern' : 'Bestätigen'}
+      </button>
+      <span className="ab-fell" style={{ fontSize: 14, fontStyle: 'italic', color: C.muted, textAlign: 'center' }}>Du kannst deine Stimme ändern, bis alle abgestimmt haben.</span>
       <Waiting view={{ ...view, waitingFor: (v?.voters ?? []).filter((id: string) => id !== me.id && !Object.values(v.votes).some((a: any) => a.includes(id))) }} send={send} player={player} text="" />
     </>
+  );
+}
+
+/** Pfadkarte auf dem Handy: gleiche Anordnung wie auf dem Fernseher, Ziele zum Antippen */
+function PhoneMapBoard({ m, names, sel, onSel, player, myVote, meImg }: { m: any; names: Record<string, string>; sel: string | null; onSel: (id: string) => void; player: (id: string) => PlayerInfo | undefined; myVote: string | null; meImg: string }) {
+  const v = m.vote;
+  const nodes: any[] = m.nodes;
+  const byId = new Map(nodes.map((n) => [n.id, n]));
+  const first = Math.max(1, m.level);
+  const lastLv = Math.min(m.levels, m.sight);
+  const top0 = m.level === 0 ? 84 : 50;
+  const y = (lv: number) => top0 + (lv - first) * 108;
+  const x = (col: number) => 14 + col * 24; // Prozent der Breite
+  const shown = nodes.filter((n) => n.lv >= first && n.lv <= lastLv);
+  const height = y(lastLv) + (lastLv < m.levels ? 76 : 70);
+  const options: string[] = v?.options ?? [];
+  const reach = new Set<string>();
+  const startIds = m.pos ? [m.pos] : nodes.filter((n) => n.lv === 1).map((n) => n.id);
+  const queue = [...startIds];
+  while (queue.length) { const id = queue.shift()!; if (reach.has(id)) continue; reach.add(id); for (const t of byId.get(id)?.next ?? []) queue.push(t); }
+  const here = m.pos ? byId.get(m.pos) : null;
+  return (
+    <section aria-label="Pfadkarte" style={{ position: 'relative', height, background: C.paper, color: C.ink, clipPath: 'polygon(0 1.5%,6% 0,40% 1%,70% 0,100% 1.5%,99% 40%,100% 99%,65% 100%,30% 99%,0 100%,1% 60%)', overflow: 'hidden' }}>
+      <svg width="100%" height={height} viewBox={`0 0 100 ${height}`} preserveAspectRatio="none" aria-hidden="true" style={{ position: 'absolute', inset: 0 }}>
+        {m.level === 0 && startIds.map((id) => { const n = byId.get(id); return <path key={id} d={`M50 30 C 50 50, ${x(n.col)} ${y(n.lv) - 40}, ${x(n.col)} ${y(n.lv)}`} fill="none" stroke="#3b2c1d" strokeWidth="2.5" strokeDasharray="2 7" vectorEffect="non-scaling-stroke" />; })}
+        {shown.flatMap((n) => n.next.map((t: string) => {
+          const tn = byId.get(t);
+          if (!tn || tn.lv > lastLv) return null;
+          const live = reach.has(n.id) && reach.has(t);
+          const pick = n.id === m.pos && t === sel;
+          return <path key={n.id + t} d={`M${x(n.col)} ${y(n.lv)} C ${x(n.col)} ${y(n.lv) + 45}, ${x(tn.col)} ${y(tn.lv) - 45}, ${x(tn.col)} ${y(tn.lv)}`} fill="none" stroke={pick ? '#7a1012' : '#3b2c1d'} strokeWidth={pick ? 4 : 2.5} strokeDasharray={pick ? undefined : '2 7'} opacity={live ? 1 : 0.28} vectorEffect="non-scaling-stroke" />;
+        }))}
+      </svg>
+      {m.level === 0 && (
+        <span style={{ position: 'absolute', left: '50%', top: 6, transform: 'translateX(-50%)', display: 'flex', alignItems: 'center', gap: 6 }}>
+          <img src={IMG(meImg)} alt="" style={{ height: 34 }} />
+          <span className="ab-fell" style={{ fontSize: 15, fontStyle: 'italic', color: '#3b2c1d' }}>Eingang</span>
+        </span>
+      )}
+      {shown.map((n) => {
+        const isOpt = options.includes(n.id);
+        const isHere = n.id === m.pos;
+        const isBoss = n.type === 'boss';
+        const isSel = sel === n.id;
+        const sz = isBoss ? 66 : isOpt ? 56 : 42;
+        const faded = !reach.has(n.id) && !isHere;
+        const voters: string[] = v?.votes?.[n.id] ?? [];
+        const Tag: any = isOpt ? 'button' : 'div';
+        return (
+          <div key={n.id}>
+            <Tag type={isOpt ? 'button' : undefined} aria-label={isOpt ? `${names[n.type]} wählen` : undefined} onClick={isOpt ? () => onSel(n.id) : undefined} style={{
+              position: 'absolute', left: `calc(${x(n.col)}% - ${sz / 2}px)`, top: y(n.lv) - sz / 2, width: sz, height: sz, padding: 0, borderRadius: '50%', boxSizing: 'border-box', cursor: isOpt ? 'pointer' : 'default',
+              background: isBoss ? '#2a1414' : '#e3d3ad', border: `${isOpt ? 4 : 2}px solid ${isOpt ? '#7a1012' : '#1c140d'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: faded ? 0.32 : 1,
+              boxShadow: isSel ? '0 0 0 5px #f2a43a' : isHere ? '0 0 0 5px rgba(184,137,60,.55)' : myVote === n.id ? '0 0 0 4px rgba(242,164,58,.5)' : '0 2px 0 rgba(28,20,13,.35)',
+              touchAction: 'manipulation', transition: 'box-shadow .2s',
+            }}>
+              <NodeIcon type={n.type} size={sz * 0.55} color={isBoss ? '#e23b30' : n.type === 'elite' ? '#7a1012' : C.ink} />
+            </Tag>
+            {isOpt && <span className="ab-fell" style={{ position: 'absolute', left: `${x(n.col)}%`, top: y(n.lv) + sz / 2 + 1, transform: 'translateX(-50%)', fontSize: 13.5, fontStyle: 'italic', whiteSpace: 'nowrap', color: n.type === 'elite' ? '#7a1012' : '#3b2c1d', fontWeight: isSel ? 700 : 400 }}>{names[n.type]}</span>}
+            {isBoss && m.boss && <span className="ab-fell" style={{ position: 'absolute', left: `${x(n.col)}%`, top: y(n.lv) + sz / 2 + 1, transform: 'translateX(-50%)', fontSize: 14, fontStyle: 'italic', color: '#7a1012', whiteSpace: 'nowrap' }}>{m.boss.name}</span>}
+            {isOpt && voters.length > 0 && (
+              <span style={{ position: 'absolute', left: `calc(${x(n.col)}% + ${sz / 2 - 6}px)`, top: y(n.lv) - sz / 2 - 6, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {voters.slice(0, 4).map((id) => <VoteSeal key={id} p={player(id)} size={18} />)}
+              </span>
+            )}
+            {isHere && <img src={IMG(meImg)} alt="" style={{ position: 'absolute', left: `calc(${x(n.col)}% - 46px)`, top: y(n.lv) - 46, height: 40, filter: 'drop-shadow(0 3px 2px rgba(0,0,0,.4))' }} />}
+          </div>
+        );
+      })}
+      {lastLv < m.levels && <div style={{ position: 'absolute', left: 0, right: 0, top: y(lastLv) - 26, bottom: 0, background: 'linear-gradient(180deg, rgba(18,13,9,0) 0%, rgba(18,13,9,.55) 45%, rgba(18,13,9,.95) 85%)', pointerEvents: 'none' }} />}
+      {lastLv < m.levels && <span className="ab-fell" style={{ position: 'absolute', left: 0, right: 0, bottom: 8, textAlign: 'center', fontSize: 14, fontStyle: 'italic', color: '#8f7f60' }}>… tiefer ist es dunkel</span>}
+    </section>
   );
 }
 
