@@ -158,6 +158,25 @@
   ],
   "_auswahl": {
     "held-schildwacht": "1",
-    "gegner-skelett": "1"
+    "held-klingenlaeufer": "1 (gespiegelt)",
+    "held-kraeuterkundige": "1",
+    "gegner-skelett": "1",
+    "gegner-aschenkultist": "1",
+    "gegner-schlundhund": "1",
+    "gegner-knochenkoloss": "1",
+    "hintergrund-kampf-abgrund": "1",
+    "hintergrund-lager": "2",
+    "karte-abfangen": "2",
+    "karte-ausweichen": "1",
+    "karte-deckung": "1",
+    "karte-dornenstich": "1",
+    "karte-giftstachel": "1",
+    "karte-heilkraeuter": "2",
+    "karte-hinrichtung": "1",
+    "karte-rindenhaut": "1",
+    "karte-schildstoss": "1",
+    "karte-schildwall": "2",
+    "karte-schneller-hieb": "2",
+    "karte-schnitt": "1"
   }
 }
