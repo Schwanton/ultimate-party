@@ -64,6 +64,8 @@ export interface CardDef {
   double?: 'belowHalf' | 'vulnOrMarked';
   /** Text, wenn man allein spielt */
   soloText?: string;
+  /** Erschöpft: nach dem Ausspielen für den Rest des Kampfes weg */
+  exhaust?: boolean;
 }
 
 export interface ClassDef {
@@ -105,7 +107,7 @@ const CARDS: CardDef[] = [
   { id: 'blutrausch', name: 'Blutrausch', cls: 'klingenlaeufer', rarity: 'uncommon', cost: [1, 1], speed: 'normal', target: 'enemy', fx: [{ k: 'dmg', v: [5, 8] }, { k: 'energyOnKill', v: [1, 1] }], text: '{dmg} Schaden. Besiegt sie das Ziel: nächste Runde +1 Energie', img: 'karte-hinrichtung-2' },
   { id: 'wirbelklingen', name: 'Wirbelklingen', cls: 'klingenlaeufer', rarity: 'uncommon', cost: [2, 2], speed: 'normal', target: 'allEnemies', fx: [{ k: 'dmg', v: [6, 9] }], text: '{dmg} Schaden an alle Gegner', img: 'karte-schneller-hieb-2' },
   { id: 'ausnutzen', name: 'Ausnutzen', cls: 'klingenlaeufer', rarity: 'uncommon', cost: [1, 1], speed: 'normal', target: 'enemy', fx: [{ k: 'dmg', v: [6, 9] }], double: 'vulnOrMarked', text: '{dmg} Schaden, doppelt gegen verwundbare oder markierte Gegner', img: 'karte-schnitt-2' },
-  { id: 'klingentanz', name: 'Klingentanz', cls: 'klingenlaeufer', rarity: 'rare', cost: [1, 1], speed: 'fast', target: 'randomEnemies', fx: [{ k: 'dmg', v: [3, 3], hits: [3, 4] }], text: '{hits} Treffer à {dmg} Schaden auf zufällige Gegner', img: 'karte-schneller-hieb-2' },
+  { id: 'klingentanz', name: 'Klingentanz', cls: 'klingenlaeufer', rarity: 'rare', cost: [1, 1], speed: 'fast', target: 'randomEnemies', fx: [{ k: 'dmg', v: [3, 3], hits: [3, 4] }], text: '{hits} × {dmg} Schaden auf zufällige Gegner', img: 'karte-schneller-hieb-2' },
 
   /* ---------- Kräuterkundige ---------- */
   { id: 'dornenstich', name: 'Dornenstich', cls: 'kraeuterkundige', rarity: 'basis', cost: [1, 1], speed: 'normal', target: 'enemy', fx: [{ k: 'dmg', v: [5, 7] }], text: '{dmg} Schaden', img: 'karte-dornenstich-2' },
@@ -124,33 +126,33 @@ const CARDS: CardDef[] = [
   /* ---------- Neu in Akt I ---------- */
   { id: 'schildschlag', name: 'Schildschlag', cls: 'schildwacht', rarity: 'common', cost: [1, 0], speed: 'slow', target: 'enemy', fx: [{ k: 'dmgFromBlock', v: [1, 1] }], text: 'Schaden in Höhe deines Blocks', img: 'karte-schildschlag' },
   { id: 'wachposten', name: 'Wachposten', cls: 'schildwacht', rarity: 'common', cost: [1, 1], speed: 'normal', target: 'ally', otherAlly: true, fx: [{ k: 'blockTarget', v: [5, 7] }, { k: 'block', v: [5, 7], solo: [9, 12] }], text: 'Ein Verbündeter und du erhalten je {block} Block', soloText: '{block} Block', img: 'karte-wachposten' },
-  { id: 'kampfschrei', name: 'Kampfschrei', cls: 'schildwacht', rarity: 'uncommon', cost: [1, 1], speed: 'fast', target: 'allAllies', fx: [{ k: 'strAll', v: [1, 2] }], text: 'Alle Spieler erhalten {strAll} Stärke', soloText: 'Du erhältst {strAll} Stärke', img: 'karte-herausforderung' },
-  { id: 'eiserne-dornen', name: 'Eiserne Dornen', cls: 'schildwacht', rarity: 'uncommon', cost: [1, 1], speed: 'normal', target: 'self', fx: [{ k: 'power', p: 'thorns', v: [3, 5] }], text: 'Bis Kampfende: Greift dich ein Gegner an, {power} Schaden zurück', img: 'karte-gegenwehr' },
-  { id: 'ruestung-schmieden', name: 'Rüstung schmieden', cls: 'schildwacht', rarity: 'uncommon', cost: [2, 1], speed: 'normal', target: 'self', fx: [{ k: 'power', p: 'blockRound', v: [3, 4] }], text: 'Bis Kampfende: jede Runde {power} Block', img: 'karte-ruestung-schmieden' },
+  { id: 'kampfschrei', name: 'Kampfschrei', cls: 'schildwacht', rarity: 'uncommon', cost: [1, 1], speed: 'fast', target: 'allAllies', fx: [{ k: 'strAll', v: [1, 2] }], text: 'Alle Spieler erhalten {strAll} Stärke', soloText: 'Du erhältst {strAll} Stärke', exhaust: true, img: 'karte-herausforderung' },
+  { id: 'eiserne-dornen', name: 'Eiserne Dornen', cls: 'schildwacht', rarity: 'uncommon', cost: [1, 1], speed: 'normal', target: 'self', fx: [{ k: 'power', p: 'thorns', v: [3, 5] }], text: 'Bis Kampfende: Greift dich ein Gegner an, {power} Schaden zurück', exhaust: true, img: 'karte-gegenwehr' },
+  { id: 'ruestung-schmieden', name: 'Rüstung schmieden', cls: 'schildwacht', rarity: 'uncommon', cost: [2, 1], speed: 'normal', target: 'self', fx: [{ k: 'power', p: 'blockRound', v: [3, 4] }], text: 'Bis Kampfende: jede Runde {power} Block', exhaust: true, img: 'karte-ruestung-schmieden' },
   { id: 'unerschuetterlich', name: 'Unerschütterlich', cls: 'schildwacht', rarity: 'rare', cost: [3, 2], speed: 'slow', target: 'self', fx: [{ k: 'block', v: [20, 26] }, { k: 'keepBlock' }], text: '{block} Block. Dein Block verfällt diese Runde nicht', img: 'karte-unerschuetterlich' },
   { id: 'kreuzschnitt', name: 'Kreuzschnitt', cls: 'klingenlaeufer', rarity: 'common', cost: [1, 1], speed: 'normal', target: 'enemy', fx: [{ k: 'dmg', v: [7, 9] }, { k: 'mark', v: [2, 3] }], text: '{dmg} Schaden, Markiert {mark}', img: 'karte-doppelschnitt' },
   { id: 'kehlschnitt', name: 'Kehlschnitt', cls: 'klingenlaeufer', rarity: 'common', cost: [1, 1], speed: 'normal', target: 'enemy', fx: [{ k: 'dmg', v: [5, 7] }, { k: 'weak', v: [1, 2] }], text: '{dmg} Schaden, Schwächung {weak}', img: 'karte-kehlschnitt' },
-  { id: 'schattenschritt', name: 'Schattenschritt', cls: 'klingenlaeufer', rarity: 'common', cost: [0, 0], speed: 'fast', target: 'self', fx: [{ k: 'block', v: [4, 6] }, { k: 'roundStr', v: [3, 4] }], text: '{block} Block. Diese Runde +{roundStr} Schaden pro Treffer', img: 'karte-schattenschritt' },
+  { id: 'schattenschritt', name: 'Schattenschritt', cls: 'klingenlaeufer', rarity: 'common', cost: [0, 0], speed: 'fast', target: 'self', fx: [{ k: 'block', v: [4, 6] }, { k: 'roundStr', v: [3, 4] }], text: '{block} Block. +{roundStr} Stärke für diese Runde', img: 'karte-schattenschritt' },
   { id: 'klingensturm', name: 'Klingensturm', cls: 'klingenlaeufer', rarity: 'uncommon', cost: [2, 2], speed: 'normal', target: 'allEnemies', fx: [{ k: 'dmg', v: [4, 5], hits: [2, 2] }], text: '2 × {dmg} Schaden an alle Gegner', img: 'karte-klingenwirbel' },
-  { id: 'kampfrausch', name: 'Kampfrausch', cls: 'klingenlaeufer', rarity: 'uncommon', cost: [1, 1], speed: 'fast', target: 'self', fx: [{ k: 'str', v: [2, 3] }], text: '+{str} Stärke', img: 'karte-blutrausch' },
-  { id: 'tausend-schnitte', name: 'Tausend Schnitte', cls: 'klingenlaeufer', rarity: 'rare', cost: [3, 3], speed: 'normal', target: 'randomEnemies', fx: [{ k: 'dmg', v: [3, 4], hits: [6, 6] }], text: '{hits} Treffer à {dmg} Schaden auf zufällige Gegner', img: 'karte-tausend-schnitte' },
+  { id: 'kampfrausch', name: 'Kampfrausch', cls: 'klingenlaeufer', rarity: 'uncommon', cost: [1, 1], speed: 'fast', target: 'self', fx: [{ k: 'str', v: [2, 3] }], text: '+{str} Stärke', exhaust: true, img: 'karte-blutrausch' },
+  { id: 'tausend-schnitte', name: 'Tausend Schnitte', cls: 'klingenlaeufer', rarity: 'rare', cost: [3, 3], speed: 'normal', target: 'randomEnemies', fx: [{ k: 'dmg', v: [3, 4], hits: [6, 6] }], text: '{hits} × {dmg} Schaden auf zufällige Gegner', img: 'karte-tausend-schnitte' },
   { id: 'brennnessel', name: 'Brennnessel', cls: 'kraeuterkundige', rarity: 'common', cost: [1, 1], speed: 'normal', target: 'enemy', fx: [{ k: 'poison', v: [3, 4] }, { k: 'vuln', v: [1, 2] }], text: '{poison} Gift, Verwundbar {vuln}', img: 'karte-brennnessel' },
   { id: 'heiltrank', name: 'Heiltrank', cls: 'kraeuterkundige', rarity: 'common', cost: [1, 1], speed: 'fast', target: 'ally', fx: [{ k: 'heal', v: [8, 11] }], text: 'Heilt einen Spieler um {heal}', img: 'karte-heiltrank' },
   { id: 'wurzelschild', name: 'Wurzelschild', cls: 'kraeuterkundige', rarity: 'common', cost: [1, 1], speed: 'normal', target: 'allAllies', fx: [{ k: 'blockAll', v: [3, 5], solo: [6, 9] }], text: 'Alle Spieler erhalten {blockAll} Block', img: 'karte-wurzelschild' },
-  { id: 'miasma', name: 'Miasma', cls: 'kraeuterkundige', rarity: 'uncommon', cost: [2, 2], speed: 'normal', target: 'self', fx: [{ k: 'power', p: 'poisonAllRound', v: [1, 2] }], text: 'Bis Kampfende: jede Runde {power} Gift an alle Gegner', img: 'karte-miasma' },
+  { id: 'miasma', name: 'Miasma', cls: 'kraeuterkundige', rarity: 'uncommon', cost: [2, 2], speed: 'normal', target: 'self', fx: [{ k: 'power', p: 'poisonAllRound', v: [1, 2] }], text: 'Bis Kampfende: jede Runde {power} Gift an alle Gegner', exhaust: true, img: 'karte-miasma' },
   { id: 'schlafmohn', name: 'Schlafmohn', cls: 'kraeuterkundige', rarity: 'rare', cost: [2, 1], speed: 'normal', target: 'enemy', fx: [{ k: 'stun' }], text: 'Betäubt einen Gegner: er setzt seine nächste Aktion aus', img: 'karte-schlafmohn' },
   { id: 'elixier', name: 'Elixier des Lebens', cls: 'kraeuterkundige', rarity: 'rare', cost: [2, 2], speed: 'normal', target: 'allAllies', fx: [{ k: 'healAll', v: [6, 9], solo: [10, 14] }, { k: 'maxHpAll', v: [4, 6], solo: [6, 8] }], text: 'Alle Spieler heilen {healAll} und erhalten +{maxHpAll} maximale Leben', soloText: 'Du heilst {healAll} und erhältst +{maxHpAll} maximale Leben', img: 'karte-elixier' },
 
   /* ---------- Legendär (Boss-Belohnung) ---------- */
-  { id: 'aegis', name: 'Ägis', cls: 'schildwacht', rarity: 'legendary', cost: [3, 2], speed: 'normal', target: 'self', fx: [{ k: 'power', p: 'blockAllRound', v: [6, 8] }], text: 'Bis Kampfende: alle Spieler erhalten jede Runde {power} Block', soloText: 'Bis Kampfende: jede Runde {power} Block', img: 'karte-aegis' },
+  { id: 'aegis', name: 'Ägis', cls: 'schildwacht', rarity: 'legendary', cost: [3, 2], speed: 'normal', target: 'self', fx: [{ k: 'power', p: 'blockAllRound', v: [6, 8] }], text: 'Bis Kampfende: alle Spieler erhalten jede Runde {power} Block', soloText: 'Bis Kampfende: jede Runde {power} Block', exhaust: true, img: 'karte-aegis' },
   { id: 'letztes-gefecht', name: 'Letztes Gefecht', cls: 'schildwacht', rarity: 'legendary', cost: [2, 2], speed: 'slow', target: 'enemy', fx: [{ k: 'dmgFromBlock', v: [2, 3] }], text: 'Schaden in Höhe deines {dmgFromBlock}-fachen Blocks', img: 'karte-letztes-gefecht' },
-  { id: 'unbeugsam', name: 'Unbeugsam', cls: 'schildwacht', rarity: 'legendary', cost: [1, 0], speed: 'fast', target: 'self', fx: [{ k: 'undying' }], text: 'Fällst du in diesem Kampf, bleibst du einmal mit 1 Leben stehen', img: 'karte-unbeugsam' },
-  { id: 'todesreigen', name: 'Todesreigen', cls: 'klingenlaeufer', rarity: 'legendary', cost: [2, 2], speed: 'normal', target: 'randomEnemies', fx: [{ k: 'dmg', v: [5, 7], hits: [5, 5] }], text: '{hits} Treffer à {dmg} Schaden auf zufällige Gegner', img: 'karte-todesreigen' },
+  { id: 'unbeugsam', name: 'Unbeugsam', cls: 'schildwacht', rarity: 'legendary', cost: [1, 0], speed: 'fast', target: 'self', fx: [{ k: 'undying' }], text: 'Fällst du in diesem Kampf, bleibst du einmal mit 1 Leben stehen', exhaust: true, img: 'karte-unbeugsam' },
+  { id: 'todesreigen', name: 'Todesreigen', cls: 'klingenlaeufer', rarity: 'legendary', cost: [2, 2], speed: 'normal', target: 'randomEnemies', fx: [{ k: 'dmg', v: [5, 7], hits: [5, 5] }], text: '{hits} × {dmg} Schaden auf zufällige Gegner', img: 'karte-todesreigen' },
   { id: 'mondsichel', name: 'Mondsichel', cls: 'klingenlaeufer', rarity: 'legendary', cost: [2, 1], speed: 'slow', target: 'allEnemies', fx: [{ k: 'execute', v: [20, 30] }], text: 'Besiegt alle Gegner unter 25 % Leben. Bosse erleiden stattdessen {execute} Schaden', img: 'karte-mondsichel' },
   { id: 'schattenklon', name: 'Schattenklon', cls: 'klingenlaeufer', rarity: 'legendary', cost: [1, 0], speed: 'fast', target: 'self', fx: [{ k: 'doubleAtk' }], text: 'Deine Angriffskarten wirken diese Runde doppelt', img: 'karte-schattenklon' },
   { id: 'pestwind', name: 'Pestwind', cls: 'kraeuterkundige', rarity: 'legendary', cost: [1, 0], speed: 'slow', target: 'allEnemies', fx: [{ k: 'doublePoison' }], text: 'Verdoppelt das Gift aller Gegner', img: 'karte-pestwind' },
-  { id: 'lebensbaum', name: 'Lebensbaum', cls: 'kraeuterkundige', rarity: 'legendary', cost: [2, 2], speed: 'normal', target: 'self', fx: [{ k: 'power', p: 'healAllRound', v: [4, 6] }], text: 'Bis Kampfende: alle Spieler heilen jede Runde {power}', soloText: 'Bis Kampfende: jede Runde {power} heilen', img: 'karte-lebensbaum' },
-  { id: 'wiedergeburt', name: 'Wiedergeburt', cls: 'kraeuterkundige', rarity: 'legendary', cost: [2, 1], speed: 'normal', target: 'self', fx: [{ k: 'revive' }], text: 'Fällt in diesem Kampf ein Spieler, steht er einmal mit 30 % Leben wieder auf', img: 'karte-wiedergeburt' },
+  { id: 'lebensbaum', name: 'Lebensbaum', cls: 'kraeuterkundige', rarity: 'legendary', cost: [2, 2], speed: 'normal', target: 'self', fx: [{ k: 'power', p: 'healAllRound', v: [4, 6] }], text: 'Bis Kampfende: alle Spieler heilen jede Runde {power}', soloText: 'Bis Kampfende: jede Runde {power} heilen', exhaust: true, img: 'karte-lebensbaum' },
+  { id: 'wiedergeburt', name: 'Wiedergeburt', cls: 'kraeuterkundige', rarity: 'legendary', cost: [2, 1], speed: 'normal', target: 'self', fx: [{ k: 'revive' }], text: 'Fällt in diesem Kampf ein Spieler, steht er einmal mit 30 % Leben wieder auf', exhaust: true, img: 'karte-wiedergeburt' },
 ];
 
 export const CARD: Record<string, CardDef> = Object.fromEntries(CARDS.map((c) => [c.id, c]));
@@ -316,18 +318,18 @@ export const RELIC_IDS = Object.keys(RELICS);
 
 /* ---------------- Ereignisse ---------------- */
 
-export interface EventDef { id: string; name: string; img: string; text: string; group: boolean; options: { id: string; label: string; desc: string }[] }
+export interface EventDef { id: string; name: string; img: string; text: string; group: boolean; /** frühestens ab Stufe */ minLv?: number; /** nur, wenn jeder so viel Gold hat */ minGold?: number; options: { id: string; label: string; desc: string; /** Gold pro Spieler */ cost?: number }[] }
 export const EVENTS: EventDef[] = [
   { id: 'gruft', name: 'Die versiegelte Gruft', img: 'ereignis-gruft', group: true, text: 'Eine Steintür, mit Ketten verschlossen. Dahinter schlurft etwas Schweres hin und her. Auf der Schwelle glänzt ein altes Siegel.',
     options: [{ id: 'open', label: 'Öffnen', desc: 'Kampf gegen einen Gruftwächter – danach ein Relikt für jeden' }, { id: 'leave', label: 'Weitergehen', desc: 'Nichts passiert' }] },
-  { id: 'brunnen', name: 'Brunnen der Tiefe', img: 'ereignis-brunnen', group: true, text: 'Ein uralter Brunnen, sein Rand voller steinerner Gesichter. Tief unten glänzt dunkles Wasser.',
-    options: [{ id: 'drink', label: 'Trinken', desc: 'Jeder heilt 12 Leben – oder verliert 5 (Zufall)' }, { id: 'gold', label: 'Gold opfern', desc: 'Jeder zahlt 20 Gold, alle heilen 25 % ihrer Leben' }] },
+  { id: 'brunnen', name: 'Brunnen der Tiefe', img: 'ereignis-brunnen', group: true, minLv: 3, text: 'Ein uralter Brunnen, sein Rand voller steinerner Gesichter. Tief unten glänzt dunkles Wasser.',
+    options: [{ id: 'drink', label: 'Trinken', desc: 'Jeder heilt 12 Leben – oder verliert 5 (Zufall)' }, { id: 'gold', label: 'Gold opfern', desc: 'Jeder zahlt 20 Gold, alle heilen 25 % ihrer Leben', cost: 20 }] },
   { id: 'bruecke', name: 'Brücke über dem Abgrund', img: 'ereignis-bruecke', group: true, text: 'Eine morsche Hängebrücke über bodenloser Tiefe. Auf der anderen Seite schimmert eine Truhe.',
     options: [{ id: 'cross', label: 'Riskant überqueren', desc: 'Jeder verliert 8 Leben, dafür ein Relikt für jeden' }, { id: 'around', label: 'Umweg', desc: 'Nichts passiert' }] },
   { id: 'gefangener', name: 'Der Gefangene', img: 'ereignis-gefangener', group: true, text: 'Ein Gefangener hängt in einem rostigen Käfig über der Grube. „Holt mich hier raus – ich zeige euch etwas!“',
     options: [{ id: 'free', label: 'Befreien', desc: 'Kampf gegen seine Wärter, danach eine seltene Karte für jeden' }, { id: 'ignore', label: 'Ignorieren', desc: 'Nichts passiert' }] },
-  { id: 'haendler', name: 'Wandernder Händler', img: 'ereignis-haendler', group: false, text: 'Ein Händler mit klapprigem Karren. „Für euch hab ich was Besonderes …“',
-    options: [{ id: 'remove', label: 'Karte entfernen', desc: '40 Gold: eine Karte aus deinem Deck entfernen' }, { id: 'relic', label: 'Relikt kaufen', desc: '90 Gold: ein zufälliges Relikt' }, { id: 'nothing', label: 'Weitergehen', desc: 'Nichts passiert' }] },
+  { id: 'haendler', name: 'Wandernder Händler', img: 'ereignis-haendler', group: false, minLv: 4, minGold: 25, text: 'Ein Händler mit klapprigem Karren. „Für euch hab ich was Besonderes …“',
+    options: [{ id: 'remove', label: 'Karte entfernen', desc: 'Eine Karte aus deinem Deck entfernen', cost: 25 }, { id: 'relic', label: 'Relikt kaufen', desc: 'Ein zufälliges Relikt', cost: 80 }, { id: 'nothing', label: 'Weitergehen', desc: 'Nichts passiert' }] },
   { id: 'blutaltar', name: 'Der Blutaltar', img: 'ereignis-blutaltar', group: false, text: 'Ein Altar aus schwarzem Stein, warm wie lebendige Haut. Wer ihm Blut gibt, dessen Waffen werden schärfer.',
     options: [{ id: 'bleed', label: 'Blut opfern', desc: 'Verliere 10 Leben, 2 zufällige Karten werden verbessert' }, { id: 'nothing', label: 'Weitergehen', desc: 'Nichts passiert' }] },
   { id: 'spiegel', name: 'Zerbrochener Spiegel', img: 'ereignis-spiegel', group: false, text: 'Ein hoher Spiegel mit gesprungenem Glas. Im Spiegelbild liegt alles doppelt.',
@@ -369,7 +371,7 @@ export const SIGHT = 3;
 /* ---------------- Gold und Preise ---------------- */
 
 export const GOLD = { fight: [12, 18], elite: [27, 33] } as const;
-export const PRICE = { common: 50, uncommon: 75, rare: 140, relic: 150, riskyRelic: 110, remove: 75, removeStep: 25 };
+export const PRICE = { common: 35, uncommon: 55, rare: 100, relic: 120, riskyRelic: 90, remove: 35, removeStep: 20 };
 
 /** Gegner-Leben je Spielerzahl */
 /** Gesamtleben der Gegner relativ zur Grundgruppe (wird auf alle Gegner verteilt, auch zusätzliche) */

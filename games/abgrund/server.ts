@@ -12,7 +12,7 @@ import {
 import {
   addCard, addRelic, afterFight, botPlan, cardOf, cardText, cost, fixHero, goldGain, heal, legendaryOffer, newFight, newHero, planCard,
   plannedCost, previewDamage, randomRelic, rareOffer, removeCard, resolveRound, rewardOffer, shopCards, shuffle, startRound,
-  spawnCount, totalDuration, unplan, upgradeCard, type Fight, type Hero, type TimedEv,
+  handMod, spawnCount, totalDuration, type CardMod, unplan, upgradeCard, type Fight, type Hero, type TimedEv,
 } from './engine';
 import { generateMap, nodeById, type ActMap } from './map';
 
@@ -36,7 +36,7 @@ interface SavedRun {
 type Phase = 'lager' | 'map' | 'plan' | 'resolve' | 'reward' | 'shop' | 'camp' | 'event' | 'treasure' | 'bossIntro' | 'end';
 type FightKind = 'fight' | 'elite' | 'boss' | 'eventRelic' | 'eventRare';
 
-interface ShopOffer { cards: { id: string; price: number; sold: boolean }[]; relics: { id: string; price: number; sold: boolean }[]; removed: boolean }
+interface ShopOffer { cards: { id: string; price: number; full: number; sale: boolean; sold: boolean }[]; relics: { id: string; price: number; sold: boolean }[]; removed: boolean }
 interface CampChoice { kind: 'rest' | 'forge' | 'watch'; uid?: string; target?: string }
 interface RewardInfo { gold: number; relic: string | null; healed: number; offer: string[] }
 
@@ -192,7 +192,7 @@ export default {
         // nur ein Weg oder niemand zum Abstimmen: kurz zeigen, dann weiter
         vote.winner = options.length === 1 ? options[0] : pick(options);
         broadcast();
-        ctx.after(options.length === 1 ? 3 : 2, () => t === token && finishVote());
+        ctx.after(options.length === 1 ? 4 : 2.5, () => t === token && finishVote());
         return;
       }
       // Kein Zeitlimit: es geht weiter, sobald alle (verbundenen) Spieler abgestimmt haben.
@@ -229,6 +229,14 @@ export default {
         winner = pick(top);
       }
       const kind = vote.kind;
+      if (!vote.winner) {
+        // Ergebnis kurz zeigen (Karte: die Figuren laufen zum Ziel), dann weiter
+        vote.winner = winner;
+        const t = ++token;
+        broadcast();
+        ctx.after(kind === 'map' ? 2.5 : 1.8, () => t === token && finishVote());
+        return;
+      }
       vote = null;
       token++;
       if (kind === 'map') enterNode(winner);
@@ -346,7 +354,11 @@ export default {
       done.clear();
       lastBuy = null;
       for (const h of heroes) {
-        const cards = shopCards(h.cls).map((id) => ({ id, price: round5(PRICE[CARD[id].rarity as 'common' | 'uncommon' | 'rare'] * (0.9 + Math.random() * 0.2)), sold: false }));
+        const sale = Math.floor(Math.random() * 6);
+        const cards = shopCards(h.cls).map((id, i) => {
+          const full = round5(PRICE[CARD[id].rarity as 'common' | 'uncommon' | 'rare'] * (0.9 + Math.random() * 0.2));
+          return { id, price: i === sale ? round5(full / 2) : full, full, sale: i === sale, sold: false };
+        });
         const r1 = randomRelic(h);
         const r2 = r1 ? randomRelic(h, [r1]) : null;
         const relics = [r1, r2].filter((x): x is string => !!x).map((id) => ({ id, price: RELICS[id].risky ? PRICE.riskyRelic : PRICE.relic, sold: false }));
@@ -438,16 +450,21 @@ export default {
 
     function startEvent() {
       phase = 'event';
-      const pool = EVENTS.filter((e) => !seen.includes(e.id));
-      const def = pick(pool.length ? pool : EVENTS);
+      const fits = EVENTS.filter((e) => (e.minLv ?? 0) <= level() && heroes.every((h) => h.gold >= (e.minGold ?? 0)));
+      const pool = fits.filter((e) => !seen.includes(e.id));
+      const def = pick(pool.length ? pool : fits.length ? fits : EVENTS);
       seen.push(def.id);
       ev = { def, stage: def.group ? 'vote' : 'choose', results: [] };
       evPick.clear();
-      if (def.group) return startVote('event', def.options.map((o) => o.id));
+      if (def.group) return startVote('event', def.options.filter((o) => groupCanPay(o.cost)).map((o) => o.id));
       for (const h of heroes) if (isBot(h.id)) botEventPick(h);
       broadcast();
       checkEventDone();
     }
+
+    /** Kann die ganze Gruppe die Kosten einer Option zahlen? */
+    const groupCanPay = (c?: number) => !c || heroes.every((h) => h.gold >= c);
+    const optCost = (opt: string) => ev?.def.options.find((o) => o.id === opt)?.cost ?? 0;
 
     function finishEventResult(secs: number) {
       if (!ev) return;
@@ -469,7 +486,7 @@ export default {
         else { h.hp = Math.max(1, h.hp - 5); r.push({ id: h.id, text: '−5 Leben' }); }
       }
       if (id === 'brunnen' && opt === 'gold') for (const h of heroes) {
-        const g = Math.min(20, h.gold);
+        const g = Math.min(optCost(opt), h.gold);
         h.gold -= g;
         r.push({ id: h.id, text: `−${g} Gold, +${heal(h, Math.round(h.maxHp * 0.25))} Leben` });
       }
@@ -487,18 +504,20 @@ export default {
     function eventPick(h: Hero, opt: string, uid?: string): boolean {
       if (!ev || ev.stage !== 'choose' || evPick.has(h.id) || !ev.def.options.some((o) => o.id === opt)) return false;
       const id = ev.def.id;
+      const price = optCost(opt);
+      if (h.gold < price) return false;
       let text = 'geht weiter';
       if (id === 'haendler' && opt === 'remove') {
         const c = uid ? cardOf(h, uid) : undefined;
-        if (h.gold < 40 || !c || h.deck.length <= 5) return false;
-        h.gold -= 40;
+        if (!c || h.deck.length <= 5) return false;
+        h.gold -= price;
         removeCard(h, c.uid);
         text = `entfernt ${CARD[c.id].name}`;
       }
       if (id === 'haendler' && opt === 'relic') {
         const rel = randomRelic(h);
-        if (h.gold < 90 || !rel) return false;
-        h.gold -= 90;
+        if (!rel) return false;
+        h.gold -= price;
         addRelic(h, rel);
         text = `kauft ${RELICS[rel].name}`;
       }
@@ -599,16 +618,16 @@ export default {
       return heroes.map((h) => ({ id: h.id, cls: h.cls, img: CLASSES[h.cls].img, hp: h.hp, maxHp: h.maxHp, block: h.block, st: h.st, ready: h.ready, str: h.str, relics: h.relics, gold: h.gold }));
     }
 
-    const cardInfo = (id: string, up = false) => {
+    const cardInfo = (id: string, up = false, mod?: CardMod) => {
       const d = CARD[id];
       return {
-        id, cls: d.cls, name: d.name + (up ? '+' : ''), cost: d.cost[up ? 1 : 0], speed: d.speed, rarity: d.rarity, text: cardText(d, up, isSolo()), img: d.img, target: d.target, otherAlly: !!d.otherAlly && !isSolo(), up,
+        id, cls: d.cls, name: d.name + (up ? '+' : ''), cost: d.cost[up ? 1 : 0], speed: d.speed, rarity: d.rarity, text: cardText(d, up, isSolo(), mod), img: d.img, target: d.target, otherAlly: !!d.otherAlly && !isSolo(), up, exhaust: !!d.exhaust,
         upText: up ? null : cardText(d, true, isSolo()), upCost: d.cost[1],
       };
     };
-    const cardView = (h: Hero, uid: string) => {
+    const cardView = (h: Hero, uid: string, mod?: CardMod) => {
       const c = cardOf(h, uid)!;
-      return { uid, ...cardInfo(c.id, c.up) };
+      return { uid, ...cardInfo(c.id, c.up, mod) };
     };
     const deckView = (h: Hero) => h.deck.map((c) => cardView(h, c.uid)).sort((a, b) => a.name.localeCompare(b.name));
 
@@ -639,7 +658,7 @@ export default {
       if (!ev) return null;
       return {
         id: ev.def.id, name: ev.def.name, img: ev.def.img, text: ev.def.text, group: ev.def.group, stage: ev.stage, choice: ev.choice ?? null,
-        options: ev.def.options, results: ev.results, picked: [...evPick.keys()],
+        options: ev.def.options.map((o) => ({ ...o, groupOk: groupCanPay(o.cost) })), results: ev.results, picked: [...evPick.keys()],
       };
     }
 
@@ -739,7 +758,7 @@ export default {
         ...base, me, round: f.round, elite: f.elite, boss: f.boss,
         energy: h.energy, used: plannedCost(h), ready: h.ready, input: phase === 'plan' && !h.ready,
         hand: h.hand.map((u) => {
-          const cv = { ...cardView(h, u), cost: cost(cardOf(h, u)!) };
+          const cv = { ...cardView(h, u, handMod(f, h)), cost: cost(cardOf(h, u)!) };
           const preview: Record<string, number> = {};
           if (cv.target === 'enemy') for (const e of f.enemies) if (!e.dead) {
             const d = previewDamage(f, h, cardOf(h, u)!, e.uid);
@@ -751,6 +770,7 @@ export default {
         deck,
         drawPile: h.draw.map((u) => cardView(h, u)).sort((a, b) => a.name.localeCompare(b.name)),
         discardPile: h.discard.map((u) => cardView(h, u)).sort((a, b) => a.name.localeCompare(b.name)),
+        exhaustPile: h.exhaust.map((u) => cardView(h, u)).sort((a, b) => a.name.localeCompare(b.name)),
         enemies: enemiesView(f),
         allies: heroes.map((x) => ({ id: x.id, cls: x.cls, img: CLASSES[x.cls].img, hp: x.hp, maxHp: x.maxHp })),
         waitingFor: phase === 'plan' ? heroes.filter((x) => !x.ready).map((x) => x.id) : [],

@@ -27,6 +27,8 @@ export interface Hero {
   draw: string[];
   discard: string[];
   hand: string[];
+  /** Erschöpft: in diesem Kampf nicht mehr verfügbar */
+  exhaust: string[];
   energy: number;
   bonusEnergy: number;
   plan: Planned[];
@@ -111,18 +113,37 @@ function val(f: Fx, up: boolean, solo: boolean): number {
   return pair ? pair[up ? 1 : 0] : 0;
 }
 
-/** Kartentext mit eingesetzten Werten */
-export function cardText(def: CardDef, up: boolean, solo: boolean) {
-  const base = solo && def.soloText ? def.soloText : def.text;
+/** Veränderung der Kartenwerte durch Stärke, Schwächung und Relikte (für die Anzeige auf der Hand) */
+export interface CardMod { add: number; weak: boolean }
+
+/**
+ * Kartentext mit eingesetzten Werten. Schaden und Block werden als Marken ⟦D:gezeigt:normal⟧ / ⟦B:…⟧
+ * geliefert – das Handy zeigt dafür Schwert bzw. Schild und färbt veränderte Werte grün oder rot.
+ */
+export function cardText(def: CardDef, up: boolean, solo: boolean, mod?: CardMod) {
+  let base = solo && def.soloText ? def.soloText : def.text;
+  if (solo) base = base.replace(/^Alle Spieler erhalten/, 'Du erhältst').replace(/^Alle Spieler werden um \{(\w+)\} geheilt$/, 'Du wirst um {$1} geheilt');
   return base.replace(/\{(\w+)\}/g, (_, key: string) => {
     if (key === 'hits') {
       const f = def.fx.find((x) => x.k === 'dmg') as { hits?: [number, number] } | undefined;
       return String(f?.hits?.[up ? 1 : 0] ?? 1);
     }
     const f = def.fx.find((x) => x.k === key);
-    return f ? String(val(f, up, solo)) : '?';
-  }).replace(/^Alle Spieler erhalten (\d+) Block$/, solo ? 'Du erhältst $1 Block' : 'Alle Spieler erhalten $1 Block')
-    .replace(/^Alle Spieler werden um (\d+) geheilt$/, solo ? 'Du wirst um $1 geheilt' : 'Alle Spieler werden um $1 geheilt');
+    if (!f) return '?';
+    const v = val(f, up, solo);
+    if (key === 'dmg') {
+      const shown = mod ? Math.max(0, Math.floor((v + mod.add) * (mod.weak ? 0.75 : 1))) : v;
+      return `⟦D:${shown}:${v}⟧`;
+    }
+    if (key === 'execute') return `⟦D:${v}:${v}⟧`;
+    if (key === 'block' || key === 'blockAll' || key === 'blockTarget' || (key === 'power' && f.k === 'power' && (f.p === 'blockRound' || f.p === 'blockAllRound'))) return `⟦B:${v}:${v}⟧`;
+    return String(v);
+  }).replace(/(⟦D:[^⟧]+⟧) Schaden/g, '$1').replace(/(⟦B:[^⟧]+⟧) Block/g, '$1');
+}
+
+/** Wie sich Stärke, Schwächung und Relikte gerade auf die Karten eines Spielers auswirken */
+export function handMod(f: Fight, h: Hero): CardMod {
+  return { add: hitBonus(f, h) + (h.firstAtkDone ? 0 : relicN(h, 'schleifstein') * 3), weak: h.st.weak > 0 };
 }
 
 const isAttackDef = (def: CardDef) => def.fx.some((x) => ['dmg', 'poison', 'weak', 'vuln', 'mark', 'doublePoison', 'poisonBurst', 'dmgFromBlock', 'execute', 'stun'].includes(x.k));
@@ -134,7 +155,7 @@ export function newHero(id: string, cls: ClassId): Hero {
   const deck: CardInst[] = [];
   for (const [cid, n] of c.start) for (let i = 0; i < n; i++) deck.push({ uid: newUid('c'), id: cid, up: false });
   return {
-    id, cls, hp: c.hp, maxHp: c.hp, block: 0, st: noStatus(), deck, draw: [], discard: [], hand: [],
+    id, cls, hp: c.hp, maxHp: c.hp, block: 0, st: noStatus(), deck, draw: [], discard: [], hand: [], exhaust: [],
     energy: 0, bonusEnergy: 0, plan: [], ready: false, covers: [], taunt: false, thorns: 0,
     gold: 0, relics: [], str: 0, powers: {}, undying: false, talismanUsed: false, roundStr: 0, keepBlock: false, doubleAtk: false, firstAtkDone: false,
   };
@@ -143,7 +164,7 @@ export function newHero(id: string, cls: ClassId): Hero {
 /** Ältere Spielstände ergänzen */
 export function fixHero(h: Hero): Hero {
   const n = newHero(h.id, h.cls);
-  return { ...n, ...h, gold: h.gold ?? 0, relics: h.relics ?? [], powers: h.powers ?? {} };
+  return { ...n, ...h, gold: h.gold ?? 0, relics: h.relics ?? [], powers: h.powers ?? {}, exhaust: h.exhaust ?? [] };
 }
 
 function makeEnemy(id: string, hpMul: number): Enemy {
@@ -166,6 +187,7 @@ export function newFight(spec: FightSpec, heroes: Hero[]): Fight {
     h.draw = shuffle(h.deck.map((c) => c.uid));
     h.discard = [];
     h.hand = [];
+    h.exhaust = [];
     h.plan = [];
     h.bonusEnergy = 0;
     h.str = 0;
@@ -445,7 +467,7 @@ function resolveTier(f: Fight, tier: Speed, push: (e: Ev) => void) {
       if (fx.k === 'selfDmg') { a.h.hp = Math.max(1, a.h.hp - v); }
       if (fx.k === 'str') { a.h.str += v; item(a.h.id).str = v; }
       if (fx.k === 'strAll') for (const t of team) { t.str += v; item(t.id).str = v; }
-      if (fx.k === 'roundStr') { a.h.roundStr += v; item(a.h.id).note = `+${v} Schaden diese Runde`; }
+      if (fx.k === 'roundStr') { a.h.roundStr += v; item(a.h.id).note = `+${v} Stärke (Runde)`; }
       if (fx.k === 'keepBlock') { a.h.keepBlock = true; item(a.h.id).note = 'Block bleibt'; }
       if (fx.k === 'undying') { a.h.undying = true; item(a.h.id).note = 'unbeugsam'; }
       if (fx.k === 'revive') { f.revive = true; item(a.h.id).note = 'Wiedergeburt'; }
@@ -676,11 +698,20 @@ function endOfRound(f: Fight, push: (e: Ev) => void) {
     h.covers = [];
     h.taunt = false;
     h.thorns = 0;
-    // Hand und gespielte Karten auf die Ablage
-    h.discard.push(...h.hand);
-    h.hand = [];
-    h.plan = [];
+    // Hand und gespielte Karten auf die Ablage – erschöpfende Karten auf den Erschöpft-Stapel
+    discardHand(h);
   }
+}
+
+function discardHand(h: Hero) {
+  const played = new Set(h.plan.map((p) => p.uid));
+  for (const uid of h.hand) {
+    const c = cardOf(h, uid);
+    if (played.has(uid) && c && CARD[c.id].exhaust) h.exhaust.push(uid);
+    else h.discard.push(uid);
+  }
+  h.hand = [];
+  h.plan = [];
 }
 
 function checkOver(f: Fight): 'win' | 'lose' | null {
@@ -716,9 +747,7 @@ export function resolveRound(f: Fight): TimedEv[] {
 
 function endCleanup(f: Fight) {
   for (const h of f.heroes) {
-    h.discard.push(...h.hand);
-    h.hand = [];
-    h.plan = [];
+    discardHand(h);
     h.block = 0;
     h.covers = [];
     h.taunt = false;

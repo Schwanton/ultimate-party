@@ -90,6 +90,7 @@ function Styles() {
 @keyframes abGlow{0%,100%{box-shadow:0 0 0 0 transparent}40%{box-shadow:0 0 28px 6px var(--ab-glow)}}
 @keyframes abCandle{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.12) translateY(-1px)}}
 @keyframes abFade{from{opacity:0}to{opacity:1}}
+@keyframes abReady{0%,100%{box-shadow:inset 0 0 0 3px rgba(0,0,0,.25),0 6px 0 #4a0c0a,0 0 0 0 rgba(242,164,58,0)}50%{box-shadow:inset 0 0 0 3px rgba(0,0,0,.25),0 6px 0 #4a0c0a,0 0 18px 6px rgba(242,164,58,.75)}}
 @keyframes abSparkle{0%,100%{opacity:0;transform:scale(.3) rotate(0deg)}45%{opacity:1;transform:scale(1) rotate(45deg)}70%{opacity:.6;transform:scale(.7) rotate(90deg)}}
 @keyframes abRise{0%{transform:translateY(420px);opacity:0}30%{opacity:1}100%{transform:translateY(0)}}
 `}</style>
@@ -174,14 +175,20 @@ const SkullIcon = ({ size = 22 }: { size?: number }) => (
 const SpeedIcon = ({ speed, size = 18 }: { speed: string; size?: number }) => speed === 'fast'
   ? <svg width={size} height={size} viewBox="0 0 24 24" role="img" aria-label="schnell"><path d="M13 2L4 14h7l-1 8 9-12h-7z" fill={C.wax} /></svg>
   : speed === 'slow'
-    ? <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={C.ink} strokeWidth="2" role="img" aria-label="langsam"><path d="M6 3h12M6 21h12M7 3c0 6 10 6 10 9s-10 3-10 9M17 3c0 6-10 6-10 9" /></svg>
+    ? (
+      <svg width={size} height={size} viewBox="0 0 24 24" role="img" aria-label="langsam">
+        <rect x="4" y="2" width="16" height="2.6" rx="1" fill={C.ink} /><rect x="4" y="19.4" width="16" height="2.6" rx="1" fill={C.ink} />
+        <path d="M7.5 4.6C7.5 9 11 10.5 11 12C11 13.5 7.5 15 7.5 19.4H16.5C16.5 15 13 13.5 13 12C13 10.5 16.5 9 16.5 4.6Z" fill="#f6ecd2" stroke={C.ink} strokeWidth="1.4" />
+        <path d="M9.2 7H14.8C14.3 8.8 12.8 10.2 12 11.2C11.2 10.2 9.7 8.8 9.2 7Z" fill="#b8893c" /><path d="M8.6 19.4C8.8 17.2 10.5 15.8 12 15.4C13.5 15.8 15.2 17.2 15.4 19.4Z" fill="#b8893c" /><path d="M12 11.2V15.4" stroke="#b8893c" strokeWidth="1" />
+      </svg>
+    )
     : null;
 
-/** Stärke: angespannter Arm */
-const StrengthIcon = ({ size = 18, color = C.ink }: { size?: number; color?: string }) => (
+/** Stärke: geballte Faust */
+const StrengthIcon = ({ size = 18, color = C.ink, bg }: { size?: number; color?: string; bg?: string }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
-    <path d="M3.5 20.5c-.6-3.6.3-6.6 2.4-8.6l2.6-5.6c.5-1.1 1.6-1.6 2.7-1.2l1.6.6c.7.3.9 1.1.5 1.7l-1.4 2.1 1.1 1.5c2.2-1.6 5.3-1.6 7 .4 1.8 2.1 1.4 5.4-1 7.1-1.9 1.4-4.4 1.6-6.6 1.3-3-.4-6-.4-8.9.7z" fill={color} />
-    <path d="M14 12.6c1.3-.5 2.8-.3 3.6.7" fill="none" stroke={color === C.ink ? C.paper : C.ink} strokeWidth="1.3" strokeLinecap="round" opacity=".7" />
+    <path d="M5 9.5C5 7.8 6 7 7.2 7C7.4 5.6 8.3 4.8 9.6 4.8C10.3 4.8 10.9 5.1 11.3 5.6C11.7 4.7 12.5 4.2 13.5 4.2C14.6 4.2 15.4 4.9 15.6 5.9C16 5.7 16.4 5.6 16.8 5.6C18.2 5.6 19.2 6.6 19.2 8.1V14.6C19.2 17.1 17.9 18.6 16.4 19.2V22H8.4V19.4C6.3 18.4 5 16.4 5 14Z" fill={color} />
+    <path d="M9.6 5.4V10.2M13.5 4.8V10M16.8 6.2V10.4M5.4 11.2C7.2 10.4 10.6 10.4 12.6 11.4C13.4 11.8 13.3 13 12.4 13.2C10.4 13.6 8.6 13.4 7 12.8" fill="none" stroke={bg ?? (color === C.ink ? C.paper2 : '#2a1f16')} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
@@ -214,7 +221,7 @@ function IntentIcons({ it, size = 20, font = 22 }: { it: any; size?: number; fon
 const KEYWORDS: { key: string; name: string; re: RegExp; text: string }[] = [
   { key: 'fast', name: 'Schnell', re: /^$/, text: 'Wird zuerst ausgeführt – vor allen normalen Karten.' },
   { key: 'slow', name: 'Langsam', re: /^$/, text: 'Wird zuletzt ausgeführt – nach allen normalen Karten, aber noch vor den Gegnern.' },
-  { key: 'block', name: 'Block', re: /Block/, text: 'Fängt so viel Schaden ab. Dein Block verfällt am Ende der Runde.' },
+  { key: 'block', name: 'Block', re: /Block|⟦B/, text: 'Fängt so viel Schaden ab. Dein Block verfällt am Ende der Runde.' },
   { key: 'poison', name: 'Gift', re: /Gift/, text: 'Am Rundenende verliert das Ziel so viele Leben wie es Gift hat, danach sinkt das Gift um 1.' },
   { key: 'weak', name: 'Schwächung', re: /Schwächung/, text: 'Das Ziel macht 25 % weniger Schaden. Hält so viele Runden, wie die Zahl angibt.' },
   { key: 'vuln', name: 'Verwundbar', re: /verwundbar|Verwundbar/, text: 'Das Ziel erleidet 50 % mehr Schaden. Hält so viele Runden, wie die Zahl angibt.' },
@@ -224,6 +231,7 @@ const KEYWORDS: { key: string; name: string; re: RegExp; text: string }[] = [
   { key: 'redirect', name: 'Abfangen', re: /treffen diese Runde dich/, text: 'Angriffe auf den Verbündeten treffen stattdessen dich. Angriffe auf alle sind davon ausgenommen.' },
   { key: 'str', name: 'Stärke', re: /Stärke/, text: 'Jeder Treffer macht so viel Schaden mehr. Hält bis zum Ende des Kampfes.' },
   { key: 'power', name: 'Bis Kampfende', re: /Bis Kampfende/, text: 'Wirkt sofort und dann zu Beginn jeder Runde, bis der Kampf vorbei ist.' },
+  { key: 'exhaust', name: 'Erschöpft', re: /^$/, text: 'Nach dem Ausspielen kommt die Karte auf den Erschöpft-Stapel und kann in diesem Kampf nicht mehr verwendet werden. Im nächsten Kampf ist sie wieder da.' },
 ];
 const KW = Object.fromEntries(KEYWORDS.map((k) => [k.key, k]));
 
@@ -231,6 +239,7 @@ function cardKeywords(c: any) {
   const out = [] as typeof KEYWORDS;
   if (c.speed === 'fast') out.push(KW.fast);
   if (c.speed === 'slow') out.push(KW.slow);
+  if (c.exhaust) out.push(KW.exhaust);
   for (const k of KEYWORDS) if (k.re.source !== '^$' && k.re.test(c.text)) out.push(k);
   return out;
 }
@@ -447,26 +456,6 @@ function HostFight({ view, player }: HostViewProps) {
         </div>
       </header>
 
-      {/* rote Fäden: Absicht → Ziel (nur beim Planen) */}
-      {!resolving && (
-        <svg width="1280" height="720" viewBox="0 0 1280 720" aria-hidden="true" style={{ position: 'absolute', inset: 0 }}>
-          {living.map(({ e, i }, k) => {
-            if (e.dead || !e.intent || e.intent.all || e.intent.weakAll || e.intent.vulnAll || !e.intent.targets?.length) return null;
-            const tx = heroX.get(e.intent.targets[0]);
-            if (tx == null) return null;
-            const sx = xs[k];
-            const sy = enemyTop(e, scale) + 30;
-            const ty = 486;
-            return (
-              <g key={i}>
-                <path d={`M${sx} ${sy} C ${sx} ${sy + 200}, ${tx} ${ty - 140}, ${tx} ${ty}`} fill="none" stroke={C.bright} strokeWidth="2.5" opacity=".9" />
-                <circle cx={tx} cy={ty} r="5" fill={C.bright} />
-              </g>
-            );
-          })}
-        </svg>
-      )}
-
       {/* Gegner */}
       {living.map(({ e, i }, k) => {
         const s = hpOf(i);
@@ -507,7 +496,7 @@ function HostFight({ view, player }: HostViewProps) {
               </div>
             )}
             {/* Leben */}
-            <div style={{ position: 'absolute', left: xs[k] - stripE / 2, top: 372, width: stripE, display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <div style={{ position: 'absolute', left: xs[k] - (e.boss ? 160 : stripE / 2), top: 372, width: e.boss ? 320 : stripE, display: 'flex', flexDirection: 'column', gap: 4, zIndex: 5 }}>
               <div style={{ background: C.paper2, color: C.ink, padding: '5px 10px 7px', clipPath: TORN2, boxShadow: '0 6px 14px rgba(0,0,0,.55)', opacity: s.dead ? 0.5 : 1 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 6 }}>
                   <span className="ab-sc" style={{ fontSize: 16, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.name}</span>
@@ -541,6 +530,26 @@ function HostFight({ view, player }: HostViewProps) {
           </div>
         );
       })}
+
+      {/* rote Fäden: Absicht → Ziel (nur beim Planen) */}
+      {!resolving && (
+        <svg width="1280" height="720" viewBox="0 0 1280 720" aria-hidden="true" style={{ position: 'absolute', inset: 0, zIndex: 4, pointerEvents: 'none' }}>
+          {living.map(({ e, i }, k) => {
+            if (e.dead || !e.intent || e.intent.all || e.intent.weakAll || e.intent.vulnAll || !e.intent.targets?.length) return null;
+            const tx = heroX.get(e.intent.targets[0]);
+            if (tx == null) return null;
+            const sx = xs[k];
+            const sy = enemyTop(e, scale) + 30;
+            const ty = 486;
+            return (
+              <g key={i}>
+                <path d={`M${sx} ${sy} C ${sx} ${sy + 200}, ${tx} ${ty - 140}, ${tx} ${ty}`} fill="none" stroke={C.bright} strokeWidth="2.5" opacity=".9" />
+                <circle cx={tx} cy={ty} r="5" fill={C.bright} />
+              </g>
+            );
+          })}
+        </svg>
+      )}
 
       {/* Spieler */}
       {heroes.map((h0: any, k: number) => {
@@ -781,9 +790,9 @@ function CompPicker({ view, send }: { view: any; send: (a: any) => void }) {
   );
 }
 
-function Candles({ total, used }: { total: number; used: number }) {
+function Candles({ total, used, children }: { total: number; used: number; children?: ReactNode }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12 }} aria-label={`${total - used} von ${total} Energie übrig`}>
+    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10 }} aria-label={`${total - used} von ${total} Energie übrig`}>
       {Array.from({ length: total }, (_, k) => {
         const lit = k < total - used;
         return (
@@ -797,7 +806,9 @@ function Candles({ total, used }: { total: number; used: number }) {
           </svg>
         );
       })}
-      <span className="ab-fell" style={{ fontSize: 16, fontStyle: 'italic', color: C.muted, paddingBottom: 4 }}>{total - used} von {total} Energie übrig</span>
+      <span className="ab-fell" style={{ fontSize: 17, fontStyle: 'italic', color: C.muted, paddingBottom: 4, whiteSpace: 'nowrap' }}>{total - used}/{total} Energie</span>
+      <span style={{ flex: 1 }} />
+      {children}
     </div>
   );
 }
@@ -814,12 +825,12 @@ function CardFace({ c, w = 112, onClick, dim, sel }: { c: any; w?: number; onCli
     }}>
       <span style={{ position: 'absolute', left: -9, top: -9, zIndex: 1, width: w * 0.25, height: w * 0.25, minWidth: 24, minHeight: 24, borderRadius: '50%', background: darker(classColor(c.cls), 0.8), border: '2px solid #eadcb9', color: '#f3e6c8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: DISPLAY, fontSize: Math.max(15, w * 0.15), boxShadow: 'inset 0 0 0 3px rgba(0,0,0,.25)' }}>{c.cost}</span>
       <Sparkles r={c.rarity} size={Math.max(0.8, w / 140)} />
-      <span className="ab-sc" style={{ alignSelf: 'stretch', margin: `0 -${w * 0.06}px`, padding: `${w * 0.035}px ${w * 0.17}px ${w * 0.04}px`, minHeight: Math.round((w < 120 ? 13.5 : Math.max(13, w * 0.13)) * 1.05 * 2 + w * 0.075), boxSizing: 'border-box', display: 'flex', alignItems: 'center', justifyContent: 'center', background: classColor(c.cls), color: '#f3e6c8', fontSize: w < 120 ? (String(c.name).length > 11 ? 12 : 13.5) : Math.max(13, w * 0.13), lineHeight: 1.05, textAlign: 'center', position: 'relative', overflowWrap: 'anywhere', hyphens: 'auto' }}>
+      <span className="ab-sc" style={{ alignSelf: 'stretch', margin: `0 -${w * 0.06}px`, padding: `${w * 0.035}px ${w * 0.17}px ${w * 0.04}px`, minHeight: Math.round((w < 120 ? 13.5 : Math.max(13, w * 0.13)) * 1.05 * 2 + w * 0.075), boxSizing: 'border-box', display: 'flex', alignItems: 'center', justifyContent: 'center', background: classColor(c.cls), color: '#f3e6c8', fontSize: w < 120 ? (String(c.name).length > 13 ? 11 : String(c.name).length > 9 ? 12 : 13.5) : Math.max(13, w * 0.13), lineHeight: 1.05, textAlign: 'center', position: 'relative', overflowWrap: 'normal', hyphens: 'auto' }} lang="de">
         {c.name}
         {c.speed !== 'normal' && <span style={{ position: 'absolute', right: 4, top: '50%', transform: 'translateY(-50%)', display: 'flex', background: '#eadcb9', borderRadius: '50%', padding: 2 }}><SpeedIcon speed={c.speed} size={Math.max(12, w * 0.12)} /></span>}
       </span>
       <img src={IMG(c.img)} onError={fallbackTo()} alt="" style={{ height: h * (String(c.text).length > 44 ? 0.24 : 0.34), margin: '2px 0', objectFit: 'contain', maxWidth: '90%' }} />
-      <span style={{ fontSize: Math.max(11.5, w * 0.105), lineHeight: 1.15, textAlign: 'center' }}>{c.speed === 'fast' ? <i>Schnell. </i> : c.speed === 'slow' ? <i>Langsam. </i> : null}{c.text}</span>
+      <span style={{ fontSize: Math.max(11.5, w * 0.105), lineHeight: 1.2, textAlign: 'center' }}><RichText text={c.text} size={Math.max(15, w * 0.14)} />{c.exhaust && <i style={{ display: 'block', fontSize: '.9em', color: '#6b5d45', marginTop: 2 }}>Erschöpft</i>}</span>
     </Tag>
   );
 }
@@ -837,16 +848,37 @@ function MiniCard({ c, onClick, dim }: { c: any; onClick: () => void; dim?: bool
         {c.speed !== 'normal' && <span style={{ position: 'absolute', right: 2, top: '50%', transform: 'translateY(-50%)', display: 'flex', background: '#eadcb9', borderRadius: '50%', padding: 1 }}><SpeedIcon speed={c.speed} size={11} /></span>}
       </span>
       <img src={IMG(c.img)} onError={fallbackTo()} alt="" style={{ height: 36 }} />
-      <span style={{ fontSize: 12, fontWeight: 700, lineHeight: 1.1, textAlign: 'center' }}>{shortText(c.text)}</span>
+      <span style={{ fontSize: 12, fontWeight: 700, lineHeight: 1.1, textAlign: 'center' }}><RichText text={shortText(c.text)} size={14} /></span>
     </button>
   );
 }
+/** Kartentext: ⟦D:gezeigt:normal⟧ = Schwert, ⟦B:…⟧ = Schild; höher grün, niedriger rot */
+function RichText({ text, size = 14 }: { text: string; size?: number }) {
+  const parts = String(text).split(/(⟦[DB]:\d+:\d+⟧)/);
+  return (
+    <>
+      {parts.map((p, i) => {
+        const m = /^⟦([DB]):(\d+):(\d+)⟧$/.exec(p);
+        if (!m) return <span key={i}>{p}</span>;
+        const shown = Number(m[2]), base = Number(m[3]);
+        const col = shown > base ? '#2f7a2a' : shown < base ? '#b0201a' : C.ink;
+        return (
+          <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 1, whiteSpace: 'nowrap', verticalAlign: 'middle' }}>
+            {m[1] === 'D' ? <SwordIcon size={size} color={C.blood} /> : <ShieldIcon size={size} />}
+            <b style={{ color: col, fontSize: '1.3em', lineHeight: 1 }}>{shown}</b>
+          </span>
+        );
+      })}
+    </>
+  );
+}
+
 const SPEED_ORDER: Record<string, number> = { fast: 0, normal: 1, slow: 2 };
 const shortText = (t: string) => (t.length > 22 ? t.split(/[.,]/)[0] : t);
 
 function PhonePlan({ view, send, me, player }: ControllerViewProps) {
   const [sel, setSel] = useState<string | null>(null);
-  const [pile, setPile] = useState<'draw' | 'discard' | null>(null);
+  const [pile, setPile] = useState<'draw' | 'discard' | 'exhaust' | null>(null);
   const [peek, setPeek] = useState<any>(null);
   const [foe, setFoe] = useState<string | null>(null);
   const [sheet, setSheet] = useState(false);
@@ -924,10 +956,11 @@ function PhonePlan({ view, send, me, player }: ControllerViewProps) {
   if (foeE) return <EnemyDetail e={foeE} name={name} onClose={() => setFoe(null)} />;
 
   if (pile) {
-    const list = pile === 'draw' ? view.drawPile : view.discardPile;
+    const list = pile === 'draw' ? view.drawPile : pile === 'exhaust' ? view.exhaustPile ?? [] : view.discardPile;
     return (
       <>
-        <span className="ab-sc" style={{ fontSize: 22 }}>{pile === 'draw' ? `Ziehstapel (${list.length})` : `Ablage (${list.length})`}</span>
+        <span className="ab-sc" style={{ fontSize: 22 }}>{pile === 'draw' ? `Ziehstapel (${list.length})` : pile === 'exhaust' ? `Erschöpft (${list.length})` : `Ablage (${list.length})`}</span>
+        {pile === 'exhaust' && <span className="ab-fell" style={{ fontSize: 14, fontStyle: 'italic', color: C.muted }}>In diesem Kampf nicht mehr verfügbar.</span>}
         {pile === 'draw' && <span className="ab-fell" style={{ fontSize: 14, fontStyle: 'italic', color: C.muted }}>Sortiert nach Name – die Reihenfolge ist geheim.</span>}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '12px 10px', paddingLeft: 6 }}>
           {list.map((c: any) => <MiniCard key={c.uid} c={c} onClick={() => { play('paper'); setPeek(c); }} />)}
@@ -957,8 +990,13 @@ function PhonePlan({ view, send, me, player }: ControllerViewProps) {
             <Seals st={view.me.st} size={20} />
           </div>
         </div>
-        <button type="button" style={SMALL_BTN} onClick={() => setPile('draw')}>Deck {view.drawPile.length}</button>
-        <button type="button" style={SMALL_BTN} onClick={() => setPile('discard')}>Ablage {view.discardPile.length}</button>
+        <span style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <span style={{ display: 'flex', gap: 6 }}>
+            <button type="button" style={SMALL_BTN} onClick={() => setPile('draw')}>Deck {view.drawPile.length}</button>
+            <button type="button" style={SMALL_BTN} onClick={() => setPile('discard')}>Ablage {view.discardPile.length}</button>
+          </span>
+          {(view.exhaustPile?.length ?? 0) > 0 && <button type="button" style={{ ...SMALL_BTN, padding: '4px 10px', fontSize: 13 }} onClick={() => setPile('exhaust')}>Erschöpft {view.exhaustPile.length}</button>}
+        </span>
       </header>
       {view.deadline && <PhoneTimer deadline={view.deadline} duration={view.duration} />}
 
@@ -988,7 +1026,11 @@ function PhonePlan({ view, send, me, player }: ControllerViewProps) {
         })}
       </section>
 
-      <Candles total={view.energy} used={view.used} />
+      <Candles total={view.energy} used={view.used}>
+        <button type="button" style={{ ...BIG_BTN, minHeight: 48, fontSize: 20, padding: '0 18px', background: view.ready ? '#3a2a1d' : C.wax, animation: !view.ready && left <= 0 ? 'abReady 1.4s ease-in-out infinite' : undefined }} onClick={() => { vibrate(25); send({ type: 'ready', on: !view.ready }); }}>
+          {view.ready ? 'Nicht bereit' : 'Bereit'}
+        </button>
+      </Candles>
 
       {view.plan.length > 0 && (
         <section aria-label="Geplant" style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -1022,9 +1064,6 @@ function PhonePlan({ view, send, me, player }: ControllerViewProps) {
       {view.vip && view.waitingFor.some((id: string) => !player(id)?.connected && !player(id)?.isBot) && (
         <button type="button" style={SMALL_BTN} onClick={() => send({ type: 'skipWait' })}>Nicht auf getrennte Spieler warten</button>
       )}
-      <button type="button" style={{ ...BIG_BTN, background: view.ready ? '#3a2a1d' : C.wax }} onClick={() => { vibrate(25); send({ type: 'ready', on: !view.ready }); }}>
-        {view.ready ? 'Doch nicht bereit' : 'Bereit'}
-      </button>
     </>
   );
 }
@@ -1110,6 +1149,17 @@ function PhoneResolve({ view, send }: ControllerViewProps) {
 }
 
 function PhoneReward({ view, send }: ControllerViewProps) {
+  const [sel, setSel] = useState<any>(null);
+  if (!view.done && sel) {
+    return (
+      <>
+        <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8 }}><CardFace c={sel} w={200} /></div>
+        <KeywordList items={cardKeywords(sel)} dark />
+        <button type="button" style={BIG_BTN} onClick={() => { vibrate(20); play('paper'); send({ type: 'pick', card: sel.id }); setSel(null); }}>Diese Karte nehmen</button>
+        <button type="button" style={{ ...SMALL_BTN, minHeight: 48 }} onClick={() => setSel(null)}>Zurück</button>
+      </>
+    );
+  }
   if (view.done) return <PhoneCenter title={view.pickedName ? `${view.pickedName} kommt in dein Deck` : 'Du verzichtest'} text="Warte auf die anderen …" img={view.me.img} />;
   return (
     <>
@@ -1124,13 +1174,12 @@ function PhoneReward({ view, send }: ControllerViewProps) {
       )}
       <div style={{ textAlign: 'center' }}>
         <span className="ab-sc" style={{ fontSize: 26 }}>{view.kind === 'boss' ? 'Legendäre Karte' : 'Neue Karte'}</span>
-        <div className="ab-fell" style={{ fontSize: 16, fontStyle: 'italic', color: C.muted }}>Wähle eine Karte für dein Deck – oder keine.</div>
+        <div className="ab-fell" style={{ fontSize: 16, fontStyle: 'italic', color: C.muted }}>Tippe eine Karte an, um sie genauer anzusehen.</div>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
         {view.offer.map((c: any) => (
           <div key={c.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, width: '100%' }}>
-            <CardFace c={c} w={170} onClick={() => { vibrate(20); play('paper'); send({ type: 'pick', card: c.id }); }} />
-            <div style={{ width: '100%' }}><KeywordList items={cardKeywords(c)} dark /></div>
+            <CardFace c={c} w={170} onClick={() => { play('paper'); setSel(c); }} />
           </div>
         ))}
       </div>
@@ -1154,6 +1203,17 @@ const HeartIcon = ({ size = 18, color = C.green }: { size?: number; color?: stri
 const FlameIcon = ({ size = 18, color = C.blood }: { size?: number; color?: string }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c3 4 7 6.5 7 12a7 7 0 0 1-14 0c0-3.5 2-5.5 3.5-7.5.5 2 1.5 3.5 3 3.5 0-3-1-5.5.5-8z" fill={color} /><path d="M12 12c1.5 2 3 3 3 5a3 3 0 0 1-6 0c0-1.5 1-2.5 1.8-3.5.3.9.8 1.5 1.2 1.5 0-1.2-.3-2 0-3z" fill="#ffd27a" /></svg>
 );
+
+/** Preis: rot, wenn man ihn sich nicht leisten kann; grün mit „−50 %“ im Angebot */
+function Price({ n, can, sale }: { n: number; can: boolean; sale?: boolean }) {
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, whiteSpace: 'nowrap' }}>
+      <svg width={18} height={18} viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="#b8893c" stroke="#6e4f1c" /><circle cx="8" cy="8" r="4" fill="none" stroke="#6e4f1c" /></svg>
+      <b style={{ color: !can ? '#ff6a5a' : sale ? '#8fdc6a' : '#e3b866' }}>{n}</b>
+      {sale && <span style={{ fontSize: 11, fontWeight: 700, color: '#12200c', background: '#8fdc6a', padding: '0 4px', borderRadius: 3 }}>−50 %</span>}
+    </span>
+  );
+}
 
 /** Goldmünze mit Zahl */
 function Coin({ n, dark, size = 18 }: { n: ReactNode; dark?: boolean; size?: number }) {
@@ -1413,7 +1473,8 @@ function HostMap({ view, player }: HostViewProps) {
   const leader = v ? (v.winner ?? [...options].sort((a, b) => (v.votes[b]?.length ?? 0) - (v.votes[a]?.length ?? 0))[0]) : null;
   const heroes: any[] = view.heroes ?? [];
   const here = m.pos ? byId.get(m.pos) : null;
-  const hereX = here ? x(here.col) : 380, hereY = here ? y(here.lv) : 78;
+  const dest = v?.winner ? byId.get(v.winner) : null;
+  const hereX = dest ? x(dest.col) : here ? x(here.col) : 380, hereY = dest ? y(dest.lv) : here ? y(here.lv) : 78;
   useEffect(() => { play('paper'); }, [m.pos]);
   const voteCount = Object.values(v?.votes ?? {}).reduce((s: number, a: any) => s + a.length, 0);
   useEffect(() => { if (voteCount) play('ready'); }, [voteCount]);
@@ -1463,7 +1524,7 @@ function HostMap({ view, player }: HostViewProps) {
         })}
         {/* eure Figuren */}
         {heroes.slice(0, 4).map((h, k) => (
-          <img key={h.id} src={IMG(h.img)} alt="" style={{ position: 'absolute', left: hereX - 76 + k * 34, top: Math.max(6, hereY - 72) + (k % 2) * 6, height: 62, filter: 'drop-shadow(0 4px 3px rgba(0,0,0,.4))', transition: 'left .8s, top .8s' }} />
+          <img key={h.id} src={IMG(h.img)} alt="" style={{ position: 'absolute', left: hereX - 76 + k * 34, top: Math.max(6, hereY - 72) + (k % 2) * 6, height: 62, filter: 'drop-shadow(0 4px 3px rgba(0,0,0,.4))', transition: 'left 1.4s ease-in-out, top 1.4s ease-in-out', zIndex: 3 }} />
         ))}
         {heroes.length > 4 && <span className="ab-sc" style={{ position: 'absolute', left: hereX + 70, top: hereY - 50, fontSize: 18, color: '#3b2c1d' }}>+{heroes.length - 4}</span>}
         {/* Nebel: tiefer sieht man nicht */}
@@ -1744,7 +1805,9 @@ function PhoneMap({ view, send, player, me }: ControllerViewProps) {
     return (
       <>
         <MeHeader view={view} />
-        <PhoneCenter title={`Weiter zum ${label(n) ?? ''}`} text={view.nodeDesc[n?.type]} />
+        <span className="ab-sc" style={{ fontSize: 26 }}>Es geht weiter: {label(n) ?? ''}</span>
+        <PhoneMapBoard m={m} names={names} sel={v.winner} onSel={() => {}} player={player} myVote={view.myVote} meImg={view.me.img} />
+        <span className="ab-fell" style={{ fontSize: 16, fontStyle: 'italic', color: C.muted }}>{view.nodeDesc[n?.type]}</span>
       </>
     );
   }
@@ -1799,7 +1862,9 @@ function PhoneMapBoard({ m, names, sel, onSel, player, myVote, meImg }: { m: any
   const startIds = m.pos ? [m.pos] : nodes.filter((n) => n.lv === 1).map((n) => n.id);
   const queue = [...startIds];
   while (queue.length) { const id = queue.shift()!; if (reach.has(id)) continue; reach.add(id); for (const t of byId.get(id)?.next ?? []) queue.push(t); }
-  const here = m.pos ? byId.get(m.pos) : null;
+  const dest: string | null = v?.winner ?? null;
+  const figAt = dest ?? m.pos;
+  const fig = figAt ? byId.get(figAt) : null;
   return (
     <section aria-label="Pfadkarte" style={{ position: 'relative', height, background: C.paper, color: C.ink, clipPath: 'polygon(0 1.5%,6% 0,40% 1%,70% 0,100% 1.5%,99% 40%,100% 99%,65% 100%,30% 99%,0 100%,1% 60%)', overflow: 'hidden' }}>
       <svg width="100%" height={height} viewBox={`0 0 100 ${height}`} preserveAspectRatio="none" aria-hidden="true" style={{ position: 'absolute', inset: 0 }}>
@@ -1814,7 +1879,7 @@ function PhoneMapBoard({ m, names, sel, onSel, player, myVote, meImg }: { m: any
       </svg>
       {m.level === 0 && (
         <span style={{ position: 'absolute', left: '50%', top: 6, transform: 'translateX(-50%)', display: 'flex', alignItems: 'center', gap: 6 }}>
-          <img src={IMG(meImg)} alt="" style={{ height: 34 }} />
+          {!dest && <img src={IMG(meImg)} alt="" style={{ height: 34 }} />}
           <span className="ab-fell" style={{ fontSize: 15, fontStyle: 'italic', color: '#3b2c1d' }}>Eingang</span>
         </span>
       )}
@@ -1844,10 +1909,11 @@ function PhoneMapBoard({ m, names, sel, onSel, player, myVote, meImg }: { m: any
                 {voters.slice(0, 4).map((id) => <VoteSeal key={id} p={player(id)} size={18} />)}
               </span>
             )}
-            {isHere && <img src={IMG(meImg)} alt="" style={{ position: 'absolute', left: `calc(${x(n.col)}% - 46px)`, top: y(n.lv) - 46, height: 40, filter: 'drop-shadow(0 3px 2px rgba(0,0,0,.4))' }} />}
+
           </div>
         );
       })}
+      {fig && <img src={IMG(meImg)} alt="" style={{ position: 'absolute', left: `calc(${x(fig.col)}% - 46px)`, top: y(fig.lv) - 46, height: 40, zIndex: 3, filter: 'drop-shadow(0 3px 2px rgba(0,0,0,.4))', transition: 'left 1.2s ease-in-out, top 1.2s ease-in-out' }} />}
       {lastLv < m.levels && <div style={{ position: 'absolute', left: 0, right: 0, top: y(lastLv) - 26, bottom: 0, background: 'linear-gradient(180deg, rgba(18,13,9,0) 0%, rgba(18,13,9,.55) 45%, rgba(18,13,9,.95) 85%)', pointerEvents: 'none' }} />}
       {lastLv < m.levels && <span className="ab-fell" style={{ position: 'absolute', left: 0, right: 0, bottom: 8, textAlign: 'center', fontSize: 14, fontStyle: 'italic', color: '#8f7f60' }}>… tiefer ist es dunkel</span>}
     </section>
@@ -1887,7 +1953,7 @@ function PhoneShop({ view, send, player }: ControllerViewProps) {
         {view.cards.map((it: any, i: number) => (
           <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
             <CardFace c={it.card} w={100} dim={it.sold || gold < it.price} onClick={() => { play('paper'); setSel(i); }} />
-            <span style={{ fontSize: 16, color: it.sold ? C.muted : gold < it.price ? '#ff8a70' : '#e3b866' }}>{it.sold ? 'verkauft' : <Coin n={it.price} />}</span>
+            <span style={{ fontSize: 16, display: 'inline-flex', alignItems: 'center', gap: 4 }}>{it.sold ? <i style={{ color: C.muted }}>verkauft</i> : <Price n={it.price} can={gold >= it.price} sale={it.sale} />}</span>
           </div>
         ))}
       </section>
@@ -1899,14 +1965,14 @@ function PhoneShop({ view, send, player }: ControllerViewProps) {
             return (
               <button key={i} type="button" disabled={!can} onClick={() => { vibrate(20); play('paper'); send({ type: 'buy', kind: 'relic', i }); }} style={{ border: 0, padding: 0, background: 'transparent', cursor: can ? 'pointer' : 'default', textAlign: 'left', opacity: it.sold ? 0.45 : 1, display: 'flex', alignItems: 'stretch', gap: 0, fontFamily: BODY }}>
                 <div style={{ flex: 1 }}><RelicRow r={it.relic} dark /></div>
-                <span style={{ display: 'flex', alignItems: 'center', padding: '0 10px', background: '#2a1f16', border: '1px solid #5b452f', borderLeft: 0, color: can ? '#e3b866' : '#ff8a70' }}>{it.sold ? 'verkauft' : <Coin n={it.price} />}</span>
+                <span style={{ display: 'flex', alignItems: 'center', padding: '0 10px', background: '#2a1f16', border: '1px solid #5b452f', borderLeft: 0 }}>{it.sold ? <i style={{ color: C.muted }}>verkauft</i> : <Price n={it.price} can={gold >= it.price} />}</span>
               </button>
             );
           })}
         </section>
       )}
       <button type="button" disabled={view.removed || gold < view.removePrice} style={{ ...SMALL_BTN, minHeight: 52, fontSize: 19, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, opacity: view.removed || gold < view.removePrice ? 0.5 : 1 }} onClick={() => setRemoving(true)}>
-        {view.removed ? 'Karte entfernt' : <>Karte entfernen <Coin n={view.removePrice} /></>}
+        {view.removed ? 'Karte entfernt' : <>Karte entfernen <Price n={view.removePrice} can={gold >= view.removePrice} /></>}
       </button>
       <div style={{ flex: 1 }} />
       <button type="button" style={BIG_BTN} onClick={() => { vibrate(25); send({ type: 'done' }); }}>Fertig</button>
@@ -1983,7 +2049,7 @@ function PhoneEvent({ view, send, player, me }: ControllerViewProps) {
   }
   const v = view.vote;
   const myPick = e.picked.includes(me.id);
-  const affordable = (o: any) => !(e.id === 'haendler' && ((o.id === 'remove' && view.me.gold < 40) || (o.id === 'relic' && view.me.gold < 90)));
+  const affordable = (o: any) => !o.cost || view.me.gold >= o.cost;
   return (
     <>
       <MeHeader view={view} />
@@ -2004,8 +2070,8 @@ function PhoneEvent({ view, send, player, me }: ControllerViewProps) {
           {e.options.map((o: any) => {
             const mine = view.myVote === o.id;
             return (
-              <button key={o.id} type="button" disabled={!!v?.winner} onClick={() => { vibrate(20); play('paper'); send({ type: 'vote', option: o.id }); }} style={{ width: '100%', border: `2px solid ${mine ? '#f2a43a' : '#3b2c1d'}`, cursor: 'pointer', textAlign: 'left', background: C.paper2, color: C.ink, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10, fontFamily: BODY }}>
-                <span style={{ flex: 1, display: 'flex', flexDirection: 'column' }}><b className="ab-sc" style={{ fontSize: 22 }}>{o.label}</b><span style={{ fontSize: 16 }}>{o.desc}</span></span>
+              <button key={o.id} type="button" disabled={!!v?.winner || !o.groupOk} onClick={() => { vibrate(20); play('paper'); send({ type: 'vote', option: o.id }); }} style={{ width: '100%', border: `2px solid ${mine ? '#f2a43a' : '#3b2c1d'}`, cursor: o.groupOk ? 'pointer' : 'default', textAlign: 'left', background: C.paper2, color: C.ink, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10, fontFamily: BODY, opacity: o.groupOk ? 1 : 0.5 }}>
+                <span style={{ flex: 1, display: 'flex', flexDirection: 'column' }}><b className="ab-sc" style={{ fontSize: 22, display: 'flex', alignItems: 'center', gap: 10 }}>{o.label}{o.cost ? <span style={{ fontSize: 16, background: '#2a1f16', padding: '1px 8px', borderRadius: 4 }}><Price n={o.cost} can={o.groupOk} /></span> : null}</b><span style={{ fontSize: 16 }}>{o.desc}{!o.groupOk ? ' – nicht alle haben genug Gold' : ''}</span></span>
                 <b style={{ fontSize: 18 }}>{v?.votes?.[o.id]?.length ?? 0}</b>
               </button>
             );
@@ -2018,7 +2084,7 @@ function PhoneEvent({ view, send, player, me }: ControllerViewProps) {
           const ok = affordable(o);
           return (
             <button key={o.id} type="button" disabled={!ok} onClick={() => { vibrate(20); play('paper'); if (o.id === 'remove' || o.id === 'copy') setCardFor(o.id); else send({ type: 'event', option: o.id }); }} style={{ width: '100%', border: '2px solid #3b2c1d', cursor: ok ? 'pointer' : 'default', textAlign: 'left', background: C.paper2, color: C.ink, padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 2, fontFamily: BODY, opacity: ok ? 1 : 0.5 }}>
-              <b className="ab-sc" style={{ fontSize: 22 }}>{o.label}</b><span style={{ fontSize: 16 }}>{o.desc}{!ok ? ' – zu wenig Gold' : ''}</span>
+              <b className="ab-sc" style={{ fontSize: 22, display: 'flex', alignItems: 'center', gap: 10 }}>{o.label}{o.cost ? <span style={{ fontSize: 16, background: '#2a1f16', padding: '1px 8px', borderRadius: 4 }}><Price n={o.cost} can={ok} /></span> : null}</b><span style={{ fontSize: 16 }}>{o.desc}{!ok ? ' – zu wenig Gold' : ''}</span>
             </button>
           );
         })

@@ -2,6 +2,20 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.12.0
+
+- Abgrund: Auf den Karten stehen Schwert und Schild statt „Schaden“ und „Block“ (z. B. „2 × ⚔4“)
+- Abgrund: Stärke, Schwächung und Relikte wie der Schleifstein verändern die Werte der Karten auf der Hand – höher grün, niedriger rot
+- Abgrund: Neues Schlüsselwort **Erschöpft** – solche Karten sind nach dem Ausspielen für den Rest des Kampfes weg (eigener Stapel auf dem Handy). Erschöpft sind Kampfrausch, Kampfschrei, alle Karten „bis Kampfende“, Unbeugsam und Wiedergeburt
+- Abgrund: Schattenschritt gibt „+3 Stärke für diese Runde“
+- Abgrund: „Bereit“ steht rechts neben der Energie und leuchtet, wenn keine Energie mehr übrig ist; Energie als „0/3“
+- Abgrund: Schnell/Langsam nur noch als Symbol oben; schönere Sanduhr, Stärke als Faust
+- Abgrund: Neue Karte als Belohnung: Antippen öffnet die Detailseite, dort bestätigen oder zurück
+- Abgrund: Nach jeder Wegwahl (auch wenn es nur einen Weg gibt) laufen die Figuren auf der Karte sichtbar zum Ziel – auf Fernseher und Handy
+- Abgrund: Händler – 6 Karten, eine davon zum halben Preis (grün mit „−50 %“), alles günstiger (35/55/100, Relikte 120/90, Karte entfernen ab 35); Preise, die man sich nicht leisten kann, sind rot
+- Abgrund: Ereignisse erst ab passender Stufe; der wandernde Händler erscheint nur, wenn alle genug Gold haben; Optionen mit Kosten zeigen den Preis und sind gesperrt, wenn das Gold fehlt (auch beim Brunnen)
+- Abgrund: Rote Fäden liegen über den Gegnerbildern; Bossnamen werden nicht mehr abgeschnitten
+
 ## 0.11.4
 
 - Abgrund: Die Pfadkarte ist jetzt auch auf dem Handy – gleiche Anordnung wie auf dem Fernseher. Ziel antippen zeigt, was einen dort erwartet; erst „Bestätigen“ gibt die Stimme ab (änderbar, bis alle abgestimmt haben)
