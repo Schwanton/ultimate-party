@@ -8,7 +8,86 @@
   "nur": [
     "held-schildwacht-3",
     "held-klingenlaeufer-3",
-    "held-kraeuterkundige-3"
+    "held-kraeuterkundige-3",
+    "karte-schlag",
+    "karte-abwehr",
+    "karte-schwerer-schlag",
+    "karte-erschuettern",
+    "karte-stachelschild",
+    "karte-herausfordern",
+    "karte-bollwerk",
+    "karte-festungswall",
+    "karte-doppelschnitt",
+    "karte-ausnutzen",
+    "karte-finte",
+    "karte-wirbelklingen",
+    "karte-klingentanz",
+    "karte-blutrausch",
+    "karte-wurzelgriff",
+    "karte-giftwolke",
+    "karte-virulenz",
+    "karte-pestbluete",
+    "karte-heilsalbe",
+    "karte-laeutern",
+    "karte-lebenssaft",
+    "karte-eiserne-haltung",
+    "karte-dornenschlag",
+    "karte-sammelruf",
+    "karte-schildreihe",
+    "karte-kriegshorn",
+    "karte-standarte",
+    "karte-taumelstoss",
+    "karte-ruestungsbrecher",
+    "karte-niederwerfen",
+    "karte-wurfmesser",
+    "karte-rauchbombe",
+    "karte-schattentanz",
+    "karte-zwillingsklingen",
+    "karte-raserei",
+    "karte-sehnenschnitt",
+    "karte-praezision",
+    "karte-gnadenstoss",
+    "karte-dornenranke",
+    "karte-brombeerhecke",
+    "karte-dornenkranz",
+    "karte-stachelsaft",
+    "karte-wucherung",
+    "karte-rosenblut",
+    "karte-kraeutertee",
+    "karte-ansteckung",
+    "relikt-familienschild",
+    "relikt-wetzstahl",
+    "relikt-alraunenwurzel",
+    "status-gift",
+    "status-schwaechung",
+    "status-verwundbar",
+    "status-markiert",
+    "status-betaeubt",
+    "status-staerke",
+    "status-geschick",
+    "status-dornen",
+    "status-block",
+    "status-schaden",
+    "status-heilung",
+    "status-energie",
+    "status-karte",
+    "status-unbeugsam",
+    "status-wiedergeburt",
+    "status-spott",
+    "status-abfangen",
+    "status-block-bleibt",
+    "sticker-schaerfe",
+    "sticker-panzer",
+    "sticker-heilsalbe",
+    "sticker-giftzahn",
+    "sticker-schwaeche",
+    "sticker-wunde",
+    "sticker-zielmarke",
+    "sticker-dorn",
+    "sticker-eile",
+    "sticker-ruhe",
+    "sticker-sparsam",
+    "sticker-rabe"
   ],
   "varianten": 1,
   "bilder": [
@@ -697,6 +776,545 @@
       "groesse": "1024x1536",
       "transparent": true,
       "prompt": "A calm human herbalist, an older woman with braided hair and a wise face, a long hooded robe with pouches, bundles of dried herbs and small glass vials on her belt, holding a gnarled wooden staff with a sprig of thorny leaves, a small smoking mortar in the other hand, upright attentive stance, three-quarter view facing right. Style: antique black ink etching from a forbidden medieval bestiary, dense cross-hatching, fine engraved linework, sepia and bone-white tones on aged yellowed paper, strong, clearly visible moss green (#4F6B35) hand-tinted color on the hooded robe, the shawl, the herb pouches and the staff leaves, covering roughly a third of the figure like rich watercolor washed into an old engraving, so the class color reads instantly from across a room; no red anywhere on the face or around the eyes, natural skin tones in sepia, dramatic light from below. Paper-theatre cut-out: the whole figure is cut out of one piece of old paper with a narrow, slightly irregular torn paper edge following the silhouette; gaps between limbs are filled with paper, not empty. Everything outside the paper cut-out is fully transparent. Full body, centered, the complete figure and its paper edge are inside the image with some empty margin on all sides. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo, no cropped body parts, no extra limbs or fingers."
+    },
+    {
+      "id": "karte-schlag",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A plain short sword striking diagonally downward with a single curved motion arc. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-abwehr",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A round wooden buckler with an iron rim and a central iron boss, raised in defense. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-schwerer-schlag",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A massive two-handed war hammer crashing down, cracks spreading through the stone below it. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-erschuettern",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A flanged mace striking a dented iron helmet, small shock lines and dizzy sparks around it. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-stachelschild",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A kite shield covered with sharp iron spikes. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-herausfordern",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A raised armored gauntlet pointing forward in challenge in front of a tattered pennant. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-bollwerk",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "Two tall tower shields braced side by side, overlapping. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-festungswall",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A short stretch of stone fortress wall with battlements and a closed iron gate. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-ausnutzen",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A dagger plunging into a crack in a breastplate. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-finte",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A dagger half hidden behind a swirling cloak, a deceptive feint. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-wirbelklingen",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A ring of sickle blades spinning in a circle. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-klingentanz",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "Three throwing blades dancing through the air in a spiral. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-wurzelgriff",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "Gnarled roots bursting from the ground and gripping a skeletal ankle. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-giftwolke",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A billowing cloud of poison gas with tiny skulls in its swirls, the gas in sickly green as the only accent color instead of red. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small sickly poison green accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-virulenz",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A cracked glass vial with poison bubbling and multiplying until it overflows, the poison in sickly green as the only accent color instead of red. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small sickly poison green accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-pestbluete",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A sinister flower releasing a cloud of poisonous pollen, the pollen in sickly green as the only accent color instead of red. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small sickly poison green accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-heilsalbe",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "An open small clay jar of salve with a wooden spatula and a sprig of leaves. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-laeutern",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A clear water droplet falling into a bowl and washing away black smoke. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-lebenssaft",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A goblet overflowing with glowing tree sap, leaves curling around it. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-eiserne-haltung",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A planted armored boot and greave in a firm wide stance on cracked ground. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-dornenschlag",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A spiked gauntlet punching forward, iron thorns along the knuckles. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-sammelruf",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A hand ringing a large iron bell. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-schildreihe",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A row of three overlapping round shields forming a shield wall. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-kriegshorn",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A curved war horn made from a ram's horn with a leather strap. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-standarte",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A tall battle standard: a tattered banner on a pole with an iron spearhead on top. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-taumelstoss",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A shield edge slamming forward with swirling dizziness lines. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-ruestungsbrecher",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A heavy war pick cracking through a breastplate, metal shards flying. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-niederwerfen",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A shield pinning a fallen helmet to the ground. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-wurfmesser",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A small throwing knife in mid-flight with motion lines. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-rauchbombe",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A small round clay bomb bursting into thick smoke. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-schattentanz",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A dancing silhouette made of shadow and smoke holding two daggers. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-zwillingsklingen",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "Two identical short swords crossed in an X. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-raserei",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A snarling wolf head with bared fangs and glowing red eyes. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-sehnenschnitt",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A hooked knife cutting through a taut cord. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-praezision",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "An eye looking through a ring-shaped sight with a crosshair. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-gnadenstoss",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A thin misericorde dagger pointing straight down, a single drop of blood at its tip. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-dornenranke",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A thorny vine spiraling upward. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-brombeerhecke",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A dense blackberry bramble with berries and long thorns. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-dornenkranz",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A circular wreath of thorny branches. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-stachelsaft",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "Poison sap oozing from a broken thorny stem, the sap in sickly green as the only accent color instead of red. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small sickly poison green accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-wucherung",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "Thorny brambles growing explosively in all directions. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-rosenblut",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A rose with sharp thorns, a drop of blood falling from one thorn. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-kraeutertee",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A steaming clay cup of herbal tea with leaves floating in it. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-ansteckung",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A poison drop splitting into many smaller drops spreading outward, the poison in sickly green as the only accent color instead of red. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small sickly poison green accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "relikt-familienschild",
+      "art": "relikt",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A small heraldic family shield with a carved oak tree emblem, accent: deep blue paint on the shield. Style: a single small relic object drawn as a bold antique ink engraving, heavy black outlines, deep cross-hatching, sepia and bone-white tones with one small accent color as described; simple iconic silhouette readable at 40 pixels, centered, object only. Everything around the object is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "relikt-wetzstahl",
+      "art": "relikt",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A sharpening steel rod with a worn wooden handle and a few sparks, accent: orange sparks. Style: a single small relic object drawn as a bold antique ink engraving, heavy black outlines, deep cross-hatching, sepia and bone-white tones with one small accent color as described; simple iconic silhouette readable at 40 pixels, centered, object only. Everything around the object is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "relikt-alraunenwurzel",
+      "art": "relikt",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A mandrake root shaped like a tiny screaming figure with leaves on its head, accent: green leaves. Style: a single small relic object drawn as a bold antique ink engraving, heavy black outlines, deep cross-hatching, sepia and bone-white tones with one small accent color as described; simple iconic silhouette readable at 40 pixels, centered, object only. Everything around the object is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "status-gift",
+      "art": "symbol",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A single poison drop with a tiny skull inside it. Style: a small colored status icon for a dark-fantasy card game, drawn as a bold antique ink engraving with heavy black outlines and a little cross-hatching, filled with rich saturated toxic green as the dominant color, bone-white highlights; an extremely simple, bold, iconic silhouette that stays clearly readable at 24 pixels, centered, the icon fills most of the image, object only. Everything around the icon is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "status-schwaechung",
+      "art": "symbol",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A broken sword with its blade snapped in half. Style: a small colored status icon for a dark-fantasy card game, drawn as a bold antique ink engraving with heavy black outlines and a little cross-hatching, filled with rich saturated dull ochre brown as the dominant color, bone-white highlights; an extremely simple, bold, iconic silhouette that stays clearly readable at 24 pixels, centered, the icon fills most of the image, object only. Everything around the icon is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "status-verwundbar",
+      "art": "symbol",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A cracked shield with a split running through it. Style: a small colored status icon for a dark-fantasy card game, drawn as a bold antique ink engraving with heavy black outlines and a little cross-hatching, filled with rich saturated deep crimson red as the dominant color, bone-white highlights; an extremely simple, bold, iconic silhouette that stays clearly readable at 24 pixels, centered, the icon fills most of the image, object only. Everything around the icon is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "status-markiert",
+      "art": "symbol",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A crosshair target ring. Style: a small colored status icon for a dark-fantasy card game, drawn as a bold antique ink engraving with heavy black outlines and a little cross-hatching, filled with rich saturated bright gold as the dominant color, bone-white highlights; an extremely simple, bold, iconic silhouette that stays clearly readable at 24 pixels, centered, the icon fills most of the image, object only. Everything around the icon is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "status-betaeubt",
+      "art": "symbol",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "Three small stars circling in a ring. Style: a small colored status icon for a dark-fantasy card game, drawn as a bold antique ink engraving with heavy black outlines and a little cross-hatching, filled with rich saturated violet purple as the dominant color, bone-white highlights; an extremely simple, bold, iconic silhouette that stays clearly readable at 24 pixels, centered, the icon fills most of the image, object only. Everything around the icon is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "status-staerke",
+      "art": "symbol",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A clenched fist. Style: a small colored status icon for a dark-fantasy card game, drawn as a bold antique ink engraving with heavy black outlines and a little cross-hatching, filled with rich saturated fiery orange-red as the dominant color, bone-white highlights; an extremely simple, bold, iconic silhouette that stays clearly readable at 24 pixels, centered, the icon fills most of the image, object only. Everything around the icon is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "status-geschick",
+      "art": "symbol",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A feather crossed with a small shield. Style: a small colored status icon for a dark-fantasy card game, drawn as a bold antique ink engraving with heavy black outlines and a little cross-hatching, filled with rich saturated sky blue as the dominant color, bone-white highlights; an extremely simple, bold, iconic silhouette that stays clearly readable at 24 pixels, centered, the icon fills most of the image, object only. Everything around the icon is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "status-dornen",
+      "art": "symbol",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A short thorny branch with three sharp thorns. Style: a small colored status icon for a dark-fantasy card game, drawn as a bold antique ink engraving with heavy black outlines and a little cross-hatching, filled with rich saturated dark forest green as the dominant color, bone-white highlights; an extremely simple, bold, iconic silhouette that stays clearly readable at 24 pixels, centered, the icon fills most of the image, object only. Everything around the icon is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "status-block",
+      "art": "symbol",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A simple heater shield. Style: a small colored status icon for a dark-fantasy card game, drawn as a bold antique ink engraving with heavy black outlines and a little cross-hatching, filled with rich saturated steel blue-grey as the dominant color, bone-white highlights; an extremely simple, bold, iconic silhouette that stays clearly readable at 24 pixels, centered, the icon fills most of the image, object only. Everything around the icon is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "status-schaden",
+      "art": "symbol",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A simple straight sword pointing upward. Style: a small colored status icon for a dark-fantasy card game, drawn as a bold antique ink engraving with heavy black outlines and a little cross-hatching, filled with rich saturated blood red as the dominant color, bone-white highlights; an extremely simple, bold, iconic silhouette that stays clearly readable at 24 pixels, centered, the icon fills most of the image, object only. Everything around the icon is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "status-heilung",
+      "art": "symbol",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A heart with a small leaf sprouting from it. Style: a small colored status icon for a dark-fantasy card game, drawn as a bold antique ink engraving with heavy black outlines and a little cross-hatching, filled with rich saturated warm rose red with a fresh green leaf as the dominant color, bone-white highlights; an extremely simple, bold, iconic silhouette that stays clearly readable at 24 pixels, centered, the icon fills most of the image, object only. Everything around the icon is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "status-energie",
+      "art": "symbol",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A single burning candle flame. Style: a small colored status icon for a dark-fantasy card game, drawn as a bold antique ink engraving with heavy black outlines and a little cross-hatching, filled with rich saturated warm amber as the dominant color, bone-white highlights; an extremely simple, bold, iconic silhouette that stays clearly readable at 24 pixels, centered, the icon fills most of the image, object only. Everything around the icon is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "status-karte",
+      "art": "symbol",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A raven feather. Style: a small colored status icon for a dark-fantasy card game, drawn as a bold antique ink engraving with heavy black outlines and a little cross-hatching, filled with rich saturated midnight blue as the dominant color, bone-white highlights; an extremely simple, bold, iconic silhouette that stays clearly readable at 24 pixels, centered, the icon fills most of the image, object only. Everything around the icon is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "status-unbeugsam",
+      "art": "symbol",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "An iron anvil. Style: a small colored status icon for a dark-fantasy card game, drawn as a bold antique ink engraving with heavy black outlines and a little cross-hatching, filled with rich saturated iron grey with a glowing orange edge as the dominant color, bone-white highlights; an extremely simple, bold, iconic silhouette that stays clearly readable at 24 pixels, centered, the icon fills most of the image, object only. Everything around the icon is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "status-wiedergeburt",
+      "art": "symbol",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A phoenix feather made of flame. Style: a small colored status icon for a dark-fantasy card game, drawn as a bold antique ink engraving with heavy black outlines and a little cross-hatching, filled with rich saturated bright orange as the dominant color, bone-white highlights; an extremely simple, bold, iconic silhouette that stays clearly readable at 24 pixels, centered, the icon fills most of the image, object only. Everything around the icon is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "status-spott",
+      "art": "symbol",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A roaring open mouth of a lion head. Style: a small colored status icon for a dark-fantasy card game, drawn as a bold antique ink engraving with heavy black outlines and a little cross-hatching, filled with rich saturated golden yellow as the dominant color, bone-white highlights; an extremely simple, bold, iconic silhouette that stays clearly readable at 24 pixels, centered, the icon fills most of the image, object only. Everything around the icon is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "status-abfangen",
+      "art": "symbol",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A shield standing in front of a small human silhouette, protecting it. Style: a small colored status icon for a dark-fantasy card game, drawn as a bold antique ink engraving with heavy black outlines and a little cross-hatching, filled with rich saturated steel blue as the dominant color, bone-white highlights; an extremely simple, bold, iconic silhouette that stays clearly readable at 24 pixels, centered, the icon fills most of the image, object only. Everything around the icon is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "status-block-bleibt",
+      "art": "symbol",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A shield with a chain and padlock across it. Style: a small colored status icon for a dark-fantasy card game, drawn as a bold antique ink engraving with heavy black outlines and a little cross-hatching, filled with rich saturated steel blue with a gold padlock as the dominant color, bone-white highlights; an extremely simple, bold, iconic silhouette that stays clearly readable at 24 pixels, centered, the icon fills most of the image, object only. Everything around the icon is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "sticker-schaerfe",
+      "art": "sticker",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "Motif: a whetstone sharpening a blade with sparks. A round die-cut sticker: a circular badge of thick aged cream paper with a narrow white die-cut border and subtle paper texture, the motif in the center drawn as a bold antique ink engraving with heavy black outlines and cross-hatching, with orange sparks as the strong accent color. Simple and readable at 50 pixels, the circle fills most of the image. Everything outside the round sticker is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "sticker-panzer",
+      "art": "sticker",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "Motif: a riveted square plate of armor. A round die-cut sticker: a circular badge of thick aged cream paper with a narrow white die-cut border and subtle paper texture, the motif in the center drawn as a bold antique ink engraving with heavy black outlines and cross-hatching, with steel blue as the strong accent color. Simple and readable at 50 pixels, the circle fills most of the image. Everything outside the round sticker is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "sticker-heilsalbe",
+      "art": "sticker",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "Motif: a small ointment jar with a green leaf. A round die-cut sticker: a circular badge of thick aged cream paper with a narrow white die-cut border and subtle paper texture, the motif in the center drawn as a bold antique ink engraving with heavy black outlines and cross-hatching, with fresh green as the strong accent color. Simple and readable at 50 pixels, the circle fills most of the image. Everything outside the round sticker is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "sticker-giftzahn",
+      "art": "sticker",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "Motif: a fang dripping poison. A round die-cut sticker: a circular badge of thick aged cream paper with a narrow white die-cut border and subtle paper texture, the motif in the center drawn as a bold antique ink engraving with heavy black outlines and cross-hatching, with toxic green as the strong accent color. Simple and readable at 50 pixels, the circle fills most of the image. Everything outside the round sticker is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "sticker-schwaeche",
+      "art": "sticker",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "Motif: a broken sword. A round die-cut sticker: a circular badge of thick aged cream paper with a narrow white die-cut border and subtle paper texture, the motif in the center drawn as a bold antique ink engraving with heavy black outlines and cross-hatching, with ochre brown as the strong accent color. Simple and readable at 50 pixels, the circle fills most of the image. Everything outside the round sticker is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "sticker-wunde",
+      "art": "sticker",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "Motif: a cracked bleeding heart. A round die-cut sticker: a circular badge of thick aged cream paper with a narrow white die-cut border and subtle paper texture, the motif in the center drawn as a bold antique ink engraving with heavy black outlines and cross-hatching, with blood red as the strong accent color. Simple and readable at 50 pixels, the circle fills most of the image. Everything outside the round sticker is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "sticker-zielmarke",
+      "art": "sticker",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "Motif: a crosshair over a bullseye. A round die-cut sticker: a circular badge of thick aged cream paper with a narrow white die-cut border and subtle paper texture, the motif in the center drawn as a bold antique ink engraving with heavy black outlines and cross-hatching, with gold as the strong accent color. Simple and readable at 50 pixels, the circle fills most of the image. Everything outside the round sticker is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "sticker-dorn",
+      "art": "sticker",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "Motif: a single large thorn. A round die-cut sticker: a circular badge of thick aged cream paper with a narrow white die-cut border and subtle paper texture, the motif in the center drawn as a bold antique ink engraving with heavy black outlines and cross-hatching, with dark green as the strong accent color. Simple and readable at 50 pixels, the circle fills most of the image. Everything outside the round sticker is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "sticker-eile",
+      "art": "sticker",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "Motif: a winged hourglass. A round die-cut sticker: a circular badge of thick aged cream paper with a narrow white die-cut border and subtle paper texture, the motif in the center drawn as a bold antique ink engraving with heavy black outlines and cross-hatching, with sky blue as the strong accent color. Simple and readable at 50 pixels, the circle fills most of the image. Everything outside the round sticker is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "sticker-ruhe",
+      "art": "sticker",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "Motif: a sleeping crescent moon. A round die-cut sticker: a circular badge of thick aged cream paper with a narrow white die-cut border and subtle paper texture, the motif in the center drawn as a bold antique ink engraving with heavy black outlines and cross-hatching, with deep indigo as the strong accent color. Simple and readable at 50 pixels, the circle fills most of the image. Everything outside the round sticker is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "sticker-sparsam",
+      "art": "sticker",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "Motif: a single old coin next to a short candle. A round die-cut sticker: a circular badge of thick aged cream paper with a narrow white die-cut border and subtle paper texture, the motif in the center drawn as a bold antique ink engraving with heavy black outlines and cross-hatching, with gold as the strong accent color. Simple and readable at 50 pixels, the circle fills most of the image. Everything outside the round sticker is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "sticker-rabe",
+      "art": "sticker",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "Motif: a raven head in profile. A round die-cut sticker: a circular badge of thick aged cream paper with a narrow white die-cut border and subtle paper texture, the motif in the center drawn as a bold antique ink engraving with heavy black outlines and cross-hatching, with midnight blue as the strong accent color. Simple and readable at 50 pixels, the circle fills most of the image. Everything outside the round sticker is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
     }
   ],
   "_auswahl": {
@@ -726,5 +1344,6 @@
     "held-kraeuterkundige-2": "1"
   },
   "_hinweis2": "Etappe 2: neue Bilder und überarbeitete Fassungen (-2) der Helden (Klassenfarbe) und Kartenmotive (kräftiger).",
-  "_offen": "Klassenfiguren -3: deutlich mehr Klassenfarbe (Wunsch vom 4.11.). Vorbereitet, noch nicht erzeugt – vorerst werden die -2-Fassungen benutzt."
+  "_offen": "Klassenfiguren -3: deutlich mehr Klassenfarbe (Wunsch vom 4.11.). Vorbereitet, noch nicht erzeugt – vorerst werden die -2-Fassungen benutzt.",
+  "_hinweis3": "Karten-Ausbau (4.11.): Schlag/Abwehr, Ersatz für geteilte Kartenbilder, 25 neue Karten, 3 Startrelikte, 18 Status-Symbole (farbig), 12 Sticker, dazu die Helden -3."
 }
