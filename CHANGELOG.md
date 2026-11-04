@@ -2,6 +2,12 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.15.0
+
+- Neue Namen: Bluff heißt jetzt Flunkerfakt, Crash heißt Cash Out or Crash Out!, Kritzelei heißt Vernissage, Mehrheit heißt Mainstream, Schlagfertig heißt Mic Drop und Verräter-Team heißt Maulwurf
+- Abgrund heißt jetzt Der Abgrund – auch in der englischen Version
+- Eigene Content-Packs, Einstellungen und schon gezogene Karten der umbenannten Spiele werden automatisch übernommen
+
 ## 0.14.0
 
 - Crash: Neue Auszählung – die Säule rechts hat eine Skala und feste Farbzonen (gleiche Farben wie der Kurs). Kommen die Einsätze dazu, steigt sie sichtbar in den freien Platz darüber

@@ -1,6 +1,6 @@
 {
-  "id": "mehrheit",
-  "name": { "de": "Mehrheit", "en": "Majority" },
+  "id": "mainstream",
+  "name": { "de": "Mainstream", "en": "Mainstream" },
   "description": {
     "de": "Eine Frage, ein paar Antworten: Wähle deine – und tippe, was die Mehrheit wählt. Wer die Gruppe kennt, gewinnt.",
     "en": "One question, a few answers: pick yours – and predict what the majority picks. Know your crowd to win."

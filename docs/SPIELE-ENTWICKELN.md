@@ -130,7 +130,7 @@ Eigenschaften in Ansichten mit Sonderbedeutung: `input: true` lässt das Handy k
 
 ### Hilfsfunktionen aus `@up/sdk`
 
-`shuffle`, `pick`, `splitEvenly`, `cleanText`, `normalizeAnswer`, `isTooClose`, `Scores` und der Baustein **`DeceptionRound`** („Täuschen und Wahrheit finden“) – damit sind Bluff und Kritzelei gebaut. Wer ein ähnliches Spiel baut (z. B. „Wer hat das gesagt?“), bekommt Lügen-Prüfung, Optionen, Abstimmen und Auflösung geschenkt.
+`shuffle`, `pick`, `splitEvenly`, `cleanText`, `normalizeAnswer`, `isTooClose`, `Scores` und der Baustein **`DeceptionRound`** („Täuschen und Wahrheit finden“) – damit sind Flunkerfakt und Vernissage gebaut. Wer ein ähnliches Spiel baut (z. B. „Wer hat das gesagt?“), bekommt Lügen-Prüfung, Optionen, Abstimmen und Auflösung geschenkt.
 
 ## client.tsx
 

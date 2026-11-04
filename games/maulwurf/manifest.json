@@ -1,6 +1,6 @@
 {
-  "id": "verraeter",
-  "name": { "de": "Verräter-Team", "en": "Traitors" },
+  "id": "maulwurf",
+  "name": { "de": "Maulwurf", "en": "The Mole" },
   "description": {
     "de": "Unter euch sind heimliche Verräter. Erfüllt Missionen, diskutiert und werft die Richtigen raus – bevor sie euch sabotieren.",
     "en": "Secret traitors are among you. Complete missions, argue and vote out the right people – before they sabotage you."

@@ -1,8 +1,8 @@
 {
-  "title": "Doodle",
+  "title": "Vernissage",
   "round": "Round {n} of {total}",
   "drawing": "Drawing {n} of {total}",
-  "intro.title": "Doodle",
+  "intro.title": "Vernissage",
   "intro.text": "Everyone gets a secret prompt and draws it on their phone. Then you invent a fake title for each drawing – and hunt for the real one.",
   "intro.points": "Find the real title: 1000 · Everyone who picks your fake title: 500 · Artist: 500 per correct guess",
   "draw.title": "Draw!",

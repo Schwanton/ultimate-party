@@ -1,9 +1,9 @@
 {
-  "title": "Quick Wit",
+  "title": "Mic Drop",
   "round": "Round {n} of {total}",
   "roundFinal": "Final",
   "mult": "×{n} points",
-  "intro.title": "Quick Wit",
+  "intro.title": "Mic Drop",
   "intro.duel": "You get prompts on your phone. Write the funniest answer! Every prompt goes to two of you – everyone else votes for the winner.",
   "intro.crowd": "Everyone gets the same prompt. Write the funniest answer! Then we vote tournament-style until the best answer is left.",
   "intro.final": "The last round has one prompt for everyone – and triple points.",

@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { GAMES_DIR, DEV } from './config';
+import { migrateRenamedGames } from './migrate';
 import { LANGS, SDK_VERSION, type ContentPack, type GameManifest, type GameServerModule, type Lang } from '../sdk/types';
 
 export interface PackInfo {
@@ -78,6 +79,7 @@ function loadPacks(dir: string, manifest: GameManifest) {
 export async function loadGames(): Promise<Map<string, LoadedGame>> {
   games.clear();
   if (!fs.existsSync(GAMES_DIR)) return games;
+  migrateRenamedGames();
   for (const name of fs.readdirSync(GAMES_DIR).sort()) {
     const dir = path.join(GAMES_DIR, name);
     const manifestPath = path.join(dir, 'manifest.json');

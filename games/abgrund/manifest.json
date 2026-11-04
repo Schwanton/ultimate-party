@@ -1,6 +1,6 @@
 {
   "id": "abgrund",
-  "name": { "de": "Abgrund", "en": "Abyss" },
+  "name": { "de": "Der Abgrund", "en": "Der Abgrund" },
   "description": {
     "de": "Kooperatives Deckbuilding in einer düsteren Papiertheater-Welt: Alle planen gleichzeitig ihre Karten, dann wird gemeinsam gekämpft. Prototyp mit 3 Klassen und 3 Kämpfen.",
     "en": "Co-op deckbuilding in a dark paper-theatre world: everyone plans cards at the same time, then you fight together. Prototype with 3 classes and 3 fights."

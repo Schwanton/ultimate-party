@@ -6,22 +6,22 @@ Party-Spiele für zu Hause: Ein Bildschirm (Fernseher, Laptop, Beamer) zeigt das
 
 | Spiel | Spieler | Worum es geht |
 | --- | --- | --- |
-| **Schlagfertig** | 3–100 | Witzige Antworten auf schräge Fragen schreiben, die anderen stimmen ab. Bis 12 Spieler als Duelle, darüber als Turnier. |
-| **Bluff** | 3–12 (+ Publikum) | Glaubwürdige Lügen zu kuriosen, wahren Fakten erfinden – und die Wahrheit finden. |
-| **Kritzelei** | 3–10 (+ Publikum) | Geheime Begriffe aufs Handy zeichnen, falsche Titel erfinden, den echten finden. |
+| **Mic Drop** | 3–100 | Witzige Antworten auf schräge Fragen schreiben, die anderen stimmen ab. Bis 12 Spieler als Duelle, darüber als Turnier. |
+| **Flunkerfakt** | 3–12 (+ Publikum) | Glaubwürdige Lügen zu kuriosen, wahren Fakten erfinden – und die Wahrheit finden. |
+| **Vernissage** | 3–10 (+ Publikum) | Geheime Begriffe aufs Handy zeichnen, falsche Titel erfinden, den echten finden. |
 | **Guess the Clicks!** | 2–100 | Ein zufälliges YouTube-Video läuft – wie viele Aufrufe hat es? Wer am nächsten dran ist, bekommt den Punkt. Braucht einen kostenlosen YouTube-API-Schlüssel (siehe unten). |
 | **Hochstapler** | 3–10 | Alle bekommen eine Aufgabe – Hand heben, Finger zeigen oder auf jemanden zeigen –, nur einer nicht. Findet den Hochstapler, bevor er 3 Aufgaben übersteht! |
-| **Mehrheit** | 3–100 | Eine Frage, 2–4 Antworten: Wähle deine eigene – und tippe, was die Mehrheit wählt. |
+| **Mainstream** | 3–100 | Eine Frage, 2–4 Antworten: Wähle deine eigene – und tippe, was die Mehrheit wählt. |
 | **Wer war's?** | 3–10 | Alle beantworten anonym eine persönliche Frage, dann wird geraten, wer was geschrieben hat. |
 | **Schätzmeister** | 2–100 | Schätzfragen mit Zahlen (Eiffelturm, Knochen, Mondlandung …). Der Zahlenstrahl zeigt, wer am nächsten dran ist. |
 | **Schwarmsinn** | 1–100 | Steuert gemeinsam bis zu vier Figuren durch ein Labyrinth im Nebel zu ihren Ausgängen. Jeder hat nur ein paar Knöpfe (Farbe + Richtung) – ohne Zurufen geht nichts. 20 Level plus Endlos-Modus, jedes Level wird neu erzeugt. |
-| **Crash** | 2–100 | Ein Multiplikator steigt, bis er zufällig abstürzt. Wer rechtzeitig aussteigt, bekommt 100 × Multiplikator Punkte – wer zu gierig ist, nichts. |
+| **Cash Out or Crash Out!** | 2–100 | Ein Multiplikator steigt, bis er zufällig abstürzt. Wer rechtzeitig aussteigt, bekommt 100 × Multiplikator Punkte – wer zu gierig ist, nichts. |
 | **Heiße Kartoffel** | 3–20 | Eine Bombe mit geheimer Zündschnur wandert von Handy zu Handy. Weiterwerfen darf nur, wer eine Mini-Aufgabe löst. Wer sie beim Knall hat, fliegt raus. |
 | **Sumo** | 2–100 | Echtzeit: Jeder steuert eine Kugel per Handy-Joystick auf einer schrumpfenden Plattform und schubst die anderen runter. |
 | **Montagsmaler** | 2–100 | Einer malt live aufs Handy, alle anderen raten per Tipp um die Wette – die Zeichnung erscheint auf dem TV und allen Handys. Optional zwei Teams mit Klau-Versuch. |
 | **Kronenduell** | 2 | Taktisches Kartenduell zu zweit nach den Regeln von *Regicide: Crown Duels*: abwechselnd verdeckt Waffen, Rüstungen, Tränke und Kristalle legen und Bube, Dame und König des anderen stürzen. Spickzettel auf dem Handy. |
-| **Abgrund** (Akt I) | 1–12 | Kooperatives Deckbau-Abenteuer im Papiertheater: Klasse wählen, gemeinsam Karten planen, auf der Pfadkarte abstimmen, Händler, Lagerfeuer, Ereignisse, Relikte und ein Boss. Allein, mit Freunden oder mit Begleitern. |
-| **Verräter-Team** | 5–30 | Heimliche Verräter sabotieren Missionen. Diskutiert, werft die Richtigen raus – oder gewinnt als Verräter. |
+| **Der Abgrund** (Akt I) | 1–12 | Kooperatives Deckbau-Abenteuer im Papiertheater: Klasse wählen, gemeinsam Karten planen, auf der Pfadkarte abstimmen, Händler, Lagerfeuer, Ereignisse, Relikte und ein Boss. Allein, mit Freunden oder mit Begleitern. |
+| **Maulwurf** | 5–30 | Heimliche Verräter sabotieren Missionen. Diskutiert, werft die Richtigen raus – oder gewinnt als Verräter. |
 
 Neue Spiele lassen sich mit wenig Code hinzufügen und teilen – siehe [Spiele entwickeln](docs/SPIELE-ENTWICKELN.md).
 

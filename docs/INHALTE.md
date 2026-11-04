@@ -19,7 +19,7 @@ UP! merkt sich innerhalb eines Raums, was schon gespielt wurde, und nimmt bevorz
 }
 ```
 
-Speichern als z. B. `games/schlagfertig/content/de/firmenfeier.json`, dann UP! neu starten. Prüfen mit:
+Speichern als z. B. `games/mic-drop/content/de/firmenfeier.json`, dann UP! neu starten. Prüfen mit:
 
 ```bash
 npm run check-packs
@@ -29,11 +29,11 @@ npm run check-packs
 
 | Spiel | Pflichtfelder | Optionale Felder |
 | --- | --- | --- |
-| Schlagfertig | `prompt` – die Frage | `tags` |
-| Bluff | `question` – Satz mit `___` als Lücke · `answer` – die Wahrheit | `alternatives` (Schreibweisen, die auch als Wahrheit zählen) · `decoys` (2–3 Haus-Lügen, falls zu wenig Spieler) · `source` (Quelle) · `tags` |
-| Kritzelei | `word` – was gezeichnet werden soll | `tags` |
+| Mic Drop | `prompt` – die Frage | `tags` |
+| Flunkerfakt | `question` – Satz mit `___` als Lücke · `answer` – die Wahrheit | `alternatives` (Schreibweisen, die auch als Wahrheit zählen) · `decoys` (2–3 Haus-Lügen, falls zu wenig Spieler) · `source` (Quelle) · `tags` |
+| Vernissage | `word` – was gezeichnet werden soll | `tags` |
 
-**Bluff-Beispiel**
+**Flunkerfakt-Beispiel**
 
 ```json
 {
@@ -45,16 +45,16 @@ npm run check-packs
 }
 ```
 
-Bei Bluff müssen die Fakten **wirklich stimmen** – bitte zu jeder Frage eine Quelle angeben und gegenprüfen.
+Bei Flunkerfakt müssen die Fakten **wirklich stimmen** – bitte zu jeder Frage eine Quelle angeben und gegenprüfen.
 
 ## Mit KI neue Inhalte erzeugen
 
 Kopiere eine der Vorlagen in eine KI (z. B. Claude), passe Thema und Anzahl an und speichere die Antwort als `.json`-Datei im passenden Ordner.
 
-### Schlagfertig
+### Mic Drop
 
 ```
-Erstelle ein Content-Pack für das Partyspiel „Schlagfertig“ (wie Quiplash).
+Erstelle ein Content-Pack für das Partyspiel „Mic Drop“ (wie Quiplash).
 Thema: [z. B. Büroalltag]. Sprache: Deutsch. Anzahl: 40.
 Jeder Prompt ist eine kurze, offene Aufforderung, auf die man witzig antworten kann,
 z. B. „Das schlechteste Motto für eine Hochzeitsfeier“. Keine Fragen, die man mit Ja/Nein beantwortet.
@@ -62,10 +62,10 @@ Familienfreundlich. Gib NUR gültiges JSON in diesem Format aus:
 { "name": "[Name]", "author": "KI", "items": [ { "prompt": "…" } ] }
 ```
 
-### Bluff
+### Flunkerfakt
 
 ```
-Erstelle ein Content-Pack für das Partyspiel „Bluff“ (wie Fibbage).
+Erstelle ein Content-Pack für das Partyspiel „Flunkerfakt“ (wie Fibbage).
 Thema: [z. B. Tiere]. Sprache: Deutsch. Anzahl: 20.
 Jeder Eintrag ist ein kurioser, aber WAHRER Fakt als Satz mit einer Lücke „___“.
 Die Antwort ist kurz (1–3 Wörter) und überraschend; man soll sie nicht leicht erraten können.
@@ -77,10 +77,10 @@ Nimm nur Fakten, bei denen du dir sicher bist. Gib NUR gültiges JSON aus:
 
 KI-Fakten bitte stichprobenartig prüfen – KIs liegen manchmal daneben.
 
-### Kritzelei
+### Vernissage
 
 ```
-Erstelle ein Content-Pack für das Zeichenspiel „Kritzelei“ (wie Drawful).
+Erstelle ein Content-Pack für das Zeichenspiel „Vernissage“ (wie Drawful).
 Thema: [z. B. Urlaub]. Sprache: Deutsch. Anzahl: 50.
 Jeder Begriff ist eine lustige, zeichenbare Szene aus 2–6 Wörtern, z. B. „Kaktus mit Sonnenbrille“.
 Gib NUR gültiges JSON aus: { "name": "[Name]", "author": "KI", "items": [ { "word": "…" } ] }

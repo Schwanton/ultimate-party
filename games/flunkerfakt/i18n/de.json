@@ -1,8 +1,8 @@
 {
-  "title": "Bluff",
+  "title": "Flunkerfakt",
   "question": "Frage {n} von {total}",
   "mult": "×{n} Punkte",
-  "intro.title": "Bluff",
+  "intro.title": "Flunkerfakt",
   "intro.text": "Jede Frage hat eine wahre, kuriose Antwort. Erfindet eine Lüge, die so echt klingt, dass andere darauf hereinfallen!",
   "intro.points": "Wahrheit finden: 1000 Punkte · Jeder, der auf deine Lüge hereinfällt: 500 Punkte",
   "write.title": "Erfindet eine glaubwürdige Lüge!",
