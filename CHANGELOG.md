@@ -2,6 +2,17 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.11.0
+
+- Abgrund: **Akt I** – statt drei fester Kämpfe eine Pfadkarte mit 10 Stufen und einem Boss. Ihr stimmt auf dem Handy ab, wohin es geht (20 s, Mehrheit, bei Gleichstand Zufall); man sieht nur drei Stufen voraus
+- Abgrund: Neue Stationen – Händler (Karten, Relikte, Karte entfernen), Lagerfeuer (rasten, schmieden, Wache halten), 8 Ereignisse (manche entscheidet die Gruppe, manche jeder für sich), Schatz
+- Abgrund: Gold für jeden, 15 Relikte (auch für die Gruppe und riskante), Eliten geben immer ein Relikt
+- Abgrund: Neue Gegner Rattenschwarm, Knochenpriester, Gruftwächter, Elite „Der Henker“ und zwei Bosse – die Grubenmutter (ruft Brut) und der Aschenfürst (lädt die Feuersbrunst auf); pro Run wird einer ausgelost, mit eigenem Auftritt
+- Abgrund: 18 neue Karten und 9 legendäre als Boss-Belohnung; neues Schlüsselwort Stärke und Kräfte „bis Kampfende“
+- Abgrund: Heldenseite auf dem Handy (Kopf antippen): Gold, Relikte mit Erklärung, ganzes Deck
+- Abgrund: Bilder, die noch fehlen, werden vorübergehend durch ähnliche ersetzt
+- Abgrund: Gespeichert wird vor jeder Wegwahl
+
 ## 0.10.2
 
 - Abgrund: Jede Klasse hat ihre Farbe – Schildwacht Stahlblau, Klingenläufer Nachtviolett, Kräuterkundige Moosgrün. Karten tragen Rahmen, Namensband und Kostensiegel in der Klassenfarbe, auch Klassenwahl und Gruppenliste

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import type { ControllerViewProps, GameClientModule, HostViewProps, PlayerInfo, Translate } from '@up/sdk';
 import { HostTimer, PhoneTimer, sfx, useServerNow, vibrate, type MusicTrack } from '@up/ui';
 
@@ -25,6 +25,11 @@ function RarityGem({ r, size = 10 }: { r?: string; size?: number }) {
   if (!r || !RARITY[r]) return null;
   return <span role="img" aria-label={RARITY_NAME[r]} style={{ width: size, height: size, transform: 'rotate(45deg)', background: RARITY[r], boxShadow: '0 0 0 1.5px rgba(28,20,13,.75), inset -2px -2px 0 rgba(0,0,0,.2)', flexShrink: 0 }} />;
 }
+/** Fehlt ein Bild (z. B. noch nicht erzeugt): Ersatzbild oder ausblenden */
+const fallbackTo = (name?: string) => (ev: { currentTarget: HTMLImageElement }) => {
+  const t = ev.currentTarget;
+  if (name && !t.dataset.fb) { t.dataset.fb = '1'; t.src = IMG(name); } else t.style.visibility = 'hidden';
+};
 const DISPLAY = "'IM Fell English SC', 'IM Fell English', 'Palatino Linotype', 'Book Antiqua', Georgia, serif";
 const FELL = "'IM Fell English', 'Palatino Linotype', 'Book Antiqua', Georgia, serif";
 const BODY = "'Crimson Pro', 'Palatino Linotype', 'Book Antiqua', Georgia, serif";
@@ -63,6 +68,7 @@ function Styles() {
 @keyframes abGlow{0%,100%{box-shadow:0 0 0 0 transparent}40%{box-shadow:0 0 28px 6px var(--ab-glow)}}
 @keyframes abCandle{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.12) translateY(-1px)}}
 @keyframes abFade{from{opacity:0}to{opacity:1}}
+@keyframes abRise{0%{transform:translateY(420px);opacity:0}30%{opacity:1}100%{transform:translateY(0)}}
 `}</style>
   );
 }
@@ -169,6 +175,13 @@ function IntentIcons({ it, size = 20, font = 22 }: { it: any; size?: number; fon
       {it.block > 0 && seg('b', <ShieldIcon size={size} />, String(it.block))}
       {it.weakAll > 0 && seg('w', <SkullIcon size={size} />, 'Schwäche', C.ink)}
       {it.buff > 0 && seg('s', <StrengthIcon size={size} />, `+${it.buff}`)}
+      {it.poison > 0 && seg('p', <MiniSeal l="G" col={C.green} size={size} />, String(it.poison), C.green)}
+      {it.vuln > 0 && !it.dmg && seg('v', <MiniSeal l="V" col="#8a1a1a" size={size} />, String(it.vuln), '#8a1a1a')}
+      {it.vulnAll > 0 && seg('va', <MiniSeal l="V" col="#8a1a1a" size={size} />, 'alle', '#8a1a1a')}
+      {it.healAlly > 0 && seg('h', <HeartIcon size={size} />, `+${it.healAlly}`, C.green)}
+      {it.blockAllies > 0 && seg('ba', <ShieldIcon size={size} />, `${it.blockAllies} alle`)}
+      {it.spawn > 0 && seg('sp', <SkullIcon size={size} />, `Brut ×${it.spawn}`)}
+      {it.charge && seg('c', <FlameIcon size={size} />, 'lädt auf!', C.blood)}
     </span>
   );
 }
@@ -185,6 +198,8 @@ const KEYWORDS: { key: string; name: string; re: RegExp; text: string }[] = [
   { key: 'stun', name: 'Betäubt', re: /betäub|Betäub/, text: 'Setzt seine nächste Aktion aus.' },
   { key: 'thorns', name: 'Gegenwehr', re: /Schaden zurück/, text: 'Greift dich ein Gegner diese Runde an, erleidet er diesen Schaden.' },
   { key: 'redirect', name: 'Abfangen', re: /treffen diese Runde dich/, text: 'Angriffe auf den Verbündeten treffen stattdessen dich. Angriffe auf alle sind davon ausgenommen.' },
+  { key: 'str', name: 'Stärke', re: /Stärke/, text: 'Jeder Treffer macht so viel Schaden mehr. Hält bis zum Ende des Kampfes.' },
+  { key: 'power', name: 'Bis Kampfende', re: /Bis Kampfende/, text: 'Wirkt sofort und dann zu Beginn jeder Runde, bis der Kampf vorbei ist.' },
 ];
 const KW = Object.fromEntries(KEYWORDS.map((k) => [k.key, k]));
 
@@ -214,8 +229,13 @@ function intentText(it: any, name: (id: string) => string, short = false) {
   if (it.block) parts.push(`${it.block} Block`);
   if (it.weakAll) parts.push('Schwächung');
   if (it.buff) parts.push(`+${it.buff} Stärke`);
-  const who = it.all || it.weakAll ? 'alle' : it.targets?.length ? name(it.targets[0]) : '';
-  return { main: parts.join(' · '), who: short ? who : who ? (it.all || it.weakAll ? 'auf alle' : `auf ${who}`) : '' };
+  if (it.poison) parts.push(`${it.poison} Gift`);
+  if (it.vulnAll) parts.push('alle verwundbar');
+  if (it.healAlly) parts.push(`heilt ${it.healAlly}`);
+  if (it.charge) parts.push('lädt auf');
+  const everyone = it.all || it.weakAll || it.vulnAll;
+  const who = everyone ? 'alle' : it.targets?.length ? name(it.targets[0]) : '';
+  return { main: parts.join(' · '), who: short ? who : who ? (everyone ? 'auf alle' : `auf ${who}`) : '' };
 }
 
 /* ================= TV ================= */
@@ -245,8 +265,14 @@ function Host(props0: HostViewProps) {
     <div style={{ position: 'absolute', inset: 0, background: C.ground, color: C.paper, fontFamily: BODY, overflow: 'hidden' }}>
       <Styles />
       {view.phase === 'lager' && <HostLager {...props} />}
+      {view.phase === 'map' && <HostMap {...props} />}
       {(view.phase === 'plan' || view.phase === 'resolve') && <HostFight {...props} />}
       {view.phase === 'reward' && <HostReward {...props} />}
+      {view.phase === 'shop' && <HostShop {...props} />}
+      {view.phase === 'camp' && <HostCamp {...props} />}
+      {view.phase === 'event' && <HostEvent {...props} />}
+      {view.phase === 'treasure' && <HostTreasure {...props} />}
+      {view.phase === 'bossIntro' && <HostBossIntro {...props} />}
       {view.phase === 'end' && <HostEnd {...props} />}
     </div>
   );
@@ -294,7 +320,7 @@ function HostLager({ view, player }: HostViewProps) {
           <>
             <div style={{ height: 1, background: '#b39f78', margin: '6px 0' }} />
             <span className="ab-sc" style={{ fontSize: 20 }}>Gespeicherter Run</span>
-            <span style={{ fontSize: 17 }}>Kampf {view.saved.fightNo + 1} von {view.fights} · {new Date(view.saved.at).toLocaleDateString('de-DE')}</span>
+            <span style={{ fontSize: 17 }}>Akt I · Stufe {view.saved.level} von {view.levels} · {new Date(view.saved.at).toLocaleDateString('de-DE')}</span>
           </>
         )}
       </section>
@@ -372,7 +398,9 @@ function HostFight({ view, player }: HostViewProps) {
   const attackers = new Set<string>(ev?.k === 'hits' ? ev.parts.map((p: any) => p.from) : []);
   const supportFx = new Map<string, any>(ev?.k === 'support' ? ev.items.map((x: any) => [x.to, x]) : []);
   const enemyHitHeroes = new Map<string, any>(ev?.k === 'enemy' ? ev.results.map((r: any) => [r.id, r]) : []);
-  const poisonMap = new Map<string, number>(ev?.k === 'poison' ? ev.items.map((x: any) => [x.who, x.dmg]) : []);
+  const poisonMap = new Map<string, number>();
+  const poisonSrc = new Map<string, string>();
+  if (ev?.k === 'poison') for (const x of ev.items) { poisonMap.set(x.who, (poisonMap.get(x.who) ?? 0) + x.dmg); if (x.src) poisonSrc.set(x.who, x.src); }
 
   return (
     <>
@@ -384,7 +412,7 @@ function HostFight({ view, player }: HostViewProps) {
       <header style={{ position: 'absolute', left: 32, right: 32, top: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', zIndex: 5 }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 18 }}>
           <span className="ab-sc" style={{ fontSize: 34, letterSpacing: 4 }}>Abgrund</span>
-          <span className="ab-fell" style={{ fontSize: 19, fontStyle: 'italic', color: C.muted }}>Kampf {view.fightNo + 1} von {view.fights}{view.elite ? ' · Elite' : ''} · Runde {view.round}</span>
+          <span className="ab-fell" style={{ fontSize: 19, fontStyle: 'italic', color: C.muted }}>Akt I · Stufe {view.node?.lv ?? 1} · {view.boss ? 'Boss' : view.elite ? 'Elite' : 'Kampf'} · Runde {view.round}</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           {resolving
@@ -398,7 +426,7 @@ function HostFight({ view, player }: HostViewProps) {
       {!resolving && (
         <svg width="1280" height="720" viewBox="0 0 1280 720" aria-hidden="true" style={{ position: 'absolute', inset: 0 }}>
           {living.map(({ e, i }, k) => {
-            if (e.dead || !e.intent || e.intent.all || e.intent.weakAll || !e.intent.targets?.length) return null;
+            if (e.dead || !e.intent || e.intent.all || e.intent.weakAll || e.intent.vulnAll || !e.intent.targets?.length) return null;
             const tx = heroX.get(e.intent.targets[0]);
             if (tx == null) return null;
             const sx = xs[k];
@@ -417,6 +445,7 @@ function HostFight({ view, player }: HostViewProps) {
       {/* Gegner */}
       {living.map(({ e, i }, k) => {
         const s = hpOf(i);
+        if (!s) return null;
         const isHit = ev?.k === 'hits' && ev.enemy === i;
         const acting = ev?.k === 'enemy' && ev.enemy === i;
         const dying = isHit && ev.killed || (ev?.k === 'enemy' && ev.enemy === i && ev.killed) || (ev?.k === 'poison' && ev.items.some((x: any) => x.who === 'e' + i && x.killed));
@@ -438,18 +467,18 @@ function HostFight({ view, player }: HostViewProps) {
             }}>
               {dying ? (
                 <>
-                  <img src={IMG(e.img)} alt={e.name} style={{ position: 'absolute', height: h, clipPath: 'polygon(0 0,52% 0,46% 30%,55% 55%,47% 80%,52% 100%,0 100%)', animation: 'abTearL 1.2s .5s ease-in forwards', filter: 'drop-shadow(0 14px 12px rgba(0,0,0,.65))' }} />
-                  <img src={IMG(e.img)} alt="" style={{ position: 'absolute', height: h, clipPath: 'polygon(52% 0,100% 0,100% 100%,52% 100%,47% 80%,55% 55%,46% 30%)', animation: 'abTearR 1.2s .5s ease-in forwards', filter: 'drop-shadow(0 14px 12px rgba(0,0,0,.65))' }} />
+                  <img src={IMG(e.img)} onError={fallbackTo(e.fallback)} alt={e.name} style={{ position: 'absolute', height: h, clipPath: 'polygon(0 0,52% 0,46% 30%,55% 55%,47% 80%,52% 100%,0 100%)', animation: 'abTearL 1.2s .5s ease-in forwards', filter: 'drop-shadow(0 14px 12px rgba(0,0,0,.65))' }} />
+                  <img src={IMG(e.img)} onError={fallbackTo(e.fallback)} alt="" style={{ position: 'absolute', height: h, clipPath: 'polygon(52% 0,100% 0,100% 100%,52% 100%,47% 80%,55% 55%,46% 30%)', animation: 'abTearR 1.2s .5s ease-in forwards', filter: 'drop-shadow(0 14px 12px rgba(0,0,0,.65))' }} />
                 </>
               ) : (
-                <img src={IMG(e.img)} alt={e.name} style={{ height: h, filter: 'drop-shadow(0 14px 12px rgba(0,0,0,.65))' }} />
+                <img src={IMG(e.img)} onError={fallbackTo(e.fallback)} alt={e.name} style={{ height: h, filter: 'drop-shadow(0 14px 12px rgba(0,0,0,.65))' }} />
               )}
             </div>
             {/* Absicht */}
             {e.intent && !s.dead && (
               <div style={{ position: 'absolute', left: xs[k], top: Math.max(58, top - 44), transform: 'translateX(-50%)', background: C.paper, color: C.ink, padding: '5px 12px 6px', display: 'flex', alignItems: 'center', gap: 7, clipPath: TORN, boxShadow: '0 6px 14px rgba(0,0,0,.55)', whiteSpace: 'nowrap', opacity: resolving && !acting ? 0.75 : 1 }}>
                 <IntentIcons it={e.intent} size={n > 4 ? 19 : 22} font={n > 4 ? 20 : 24} />
-                {(n <= 4 || e.intent.all || e.intent.weakAll) && <span className="ab-fell" style={{ fontSize: 15, fontStyle: 'italic' }}>{intentText(e.intent, name).who}</span>}
+                {(n <= 4 || e.intent.all || e.intent.weakAll || e.intent.vulnAll) && <span className="ab-fell" style={{ fontSize: 15, fontStyle: 'italic' }}>{intentText(e.intent, name).who}</span>}
               </div>
             )}
             {/* Leben */}
@@ -479,6 +508,10 @@ function HostFight({ view, player }: HostViewProps) {
             {acting && ev.buff > 0 && <Floater x={xs[k]} y={top + 30} text={<><StrengthIcon size={26} color="#ff8a70" /> +{ev.buff}</>} color="#ff8a70" k={key + 'b'} />}
             {acting && ev.thorns > 0 && <Floater x={xs[k]} y={top + 60} text={`−${ev.thorns} Gegenwehr`} color="#ff8a70" k={key + 't'} />}
             {ev?.k === 'stunned' && ev.enemy === i && <Floater x={xs[k]} y={top} text="betäubt" color={C.paper} k={key} />}
+            {ev?.k === 'enemy' && ev.heal?.enemy === i && ev.heal.amount > 0 && <Floater x={xs[k]} y={top + 20} text={`+${ev.heal.amount}`} color="#9fd36a" k={key + 'hl'} />}
+            {ev?.k === 'enemy' && ev.blockAll > 0 && !s.dead && <Floater x={xs[k]} y={top + 50} text={<><ShieldIcon size={24} color={C.paper} /> +{ev.blockAll}</>} color={C.paper} k={key + 'ba'} />}
+            {acting && ev.charge && <Floater x={xs[k]} y={top + 10} text="lädt auf …" color="#ff8a50" k={key + 'ch'} big />}
+            {acting && ev.spawned > 0 && <Floater x={xs[k]} y={top + 10} text={`Brut ×${ev.spawned}`} color={C.paper} k={key + 'sp'} big />}
             {poisonMap.has('e' + i) && <Floater x={xs[k]} y={top + 40} text={`−${poisonMap.get('e' + i)} Gift`} color="#9fd36a" k={key} />}
           </div>
         );
@@ -512,15 +545,22 @@ function HostFight({ view, player }: HostViewProps) {
               <div style={{ marginTop: 4 }}><Bar v={h.hp} max={h.maxHp} h={hn > 8 ? 7 : 9} /></div>
               <div style={{ display: 'flex', gap: 6, marginTop: 4, alignItems: 'center', minHeight: 20 }}>
                 {h.block > 0 && <span style={{ display: 'flex', alignItems: 'center', gap: 2, fontWeight: 700, fontSize: 14 }}><ShieldIcon size={15} />{h.block}</span>}
+                {h.str > 0 && <span title={`Stärke ${h.str}`} style={{ display: 'flex', alignItems: 'center', gap: 2, fontWeight: 700, fontSize: 14 }}><StrengthIcon size={15} />{h.str}</span>}
                 <Seals st={h.st} size={20} />
-                {hn <= 6 && !h.block && <span className="ab-fell" style={{ fontStyle: 'italic', fontSize: 13, color: classColor(h.cls), fontWeight: 600 }}>{CLASS_NAME[h.cls]}</span>}
+                {hn <= 6 && !h.block && !h.str && <span className="ab-fell" style={{ fontStyle: 'italic', fontSize: 13, color: classColor(h.cls), fontWeight: 600 }}>{CLASS_NAME[h.cls]}</span>}
               </div>
             </div>
             {sup?.block > 0 && <Floater x={hx[k]} y={560} text={<><ShieldIcon size={24} color="#c9d6e8" /> +{sup.block}</>} color="#c9d6e8" k={key} />}
             {sup?.heal > 0 && <Floater x={hx[k]} y={530} text={`+${sup.heal}`} color="#9fd36a" k={key + 'h'} />}
             {sup?.cover && <Floater x={hx[k]} y={500} text="beschützt" color={C.paper} k={key + 'c'} />}
-            {hit && <Floater x={hx[k]} y={520} text={hit.loss > 0 ? `−${hit.loss}` : 'geblockt'} color={hit.loss > 0 ? '#ff5d4e' : '#c9d6e8'} k={key} big delay={0.3} />}
-            {poisonMap.has(h.id) && <Floater x={hx[k]} y={540} text={`−${poisonMap.get(h.id)} Gift`} color="#9fd36a" k={key} />}
+            {sup?.str > 0 && <Floater x={hx[k]} y={500} text={<><StrengthIcon size={24} color="#f3c06a" /> +{sup.str}</>} color="#f3c06a" k={key + 's'} />}
+            {sup?.note && <Floater x={hx[k]} y={470} text={sup.note} color={C.paper} k={key + 'n'} />}
+            {hit && hit.dmg > 0 && <Floater x={hx[k]} y={520} text={hit.loss > 0 ? `−${hit.loss}` : 'geblockt'} color={hit.loss > 0 ? '#ff5d4e' : '#c9d6e8'} k={key} big delay={0.3} />}
+            {hit && hit.dmg === 0 && <Floater x={hx[k]} y={520} text={ev.poison ? `+${ev.poison} Gift` : 'verwundbar'} color={ev.poison ? '#9fd36a' : '#ff8a70'} k={key} delay={0.3} />}
+            {hit?.saved && <Floater x={hx[k]} y={460} text={hit.saved === 'undying' ? 'Unbeugsam!' : 'Wiedergeburt!'} color="#f3c06a" k={key + 'sv'} big delay={0.8} />}
+            {hit?.talisman && <Floater x={hx[k]} y={490} text={<><ShieldIcon size={24} color="#c9d6e8" /> +10 Talisman</>} color="#c9d6e8" k={key + 'tl'} delay={0.9} />}
+            {ev?.k === 'enemy' && ev.vulnAll > 0 && !dead && <Floater x={hx[k]} y={500} text="verwundbar" color="#ff8a70" k={key + 'va'} delay={0.3} />}
+            {poisonMap.has(h.id) && <Floater x={hx[k]} y={540} text={poisonSrc.get(h.id) === 'kerze' ? `−${poisonMap.get(h.id)} Kerze` : `−${poisonMap.get(h.id)} Gift`} color={poisonSrc.get(h.id) === 'kerze' ? '#ff8a70' : '#9fd36a'} k={key} />}
           </div>
         );
       })}
@@ -561,19 +601,20 @@ function HostReward({ view, player }: HostViewProps) {
     <>
       <Backdrop img="hintergrund-lager" opacity={0.45} />
       <div style={{ position: 'absolute', left: 0, right: 0, top: 70, textAlign: 'center' }}>
-        <span className="ab-sc" style={{ fontSize: 64, textShadow: '0 6px 18px rgba(0,0,0,.8)' }}>Kampf {view.fightNo + 1} gewonnen</span>
-        <p className="ab-fell" style={{ fontSize: 24, fontStyle: 'italic', color: '#c8b993', margin: '8px 0 0' }}>Jeder wählt auf dem Handy eine neue Karte – oder keine.</p>
+        <span className="ab-sc" style={{ fontSize: 64, textShadow: '0 6px 18px rgba(0,0,0,.8)' }}>{view.kind === 'boss' ? 'Der Boss ist besiegt!' : view.kind === 'elite' ? 'Elite besiegt' : 'Sieg'}</span>
+        <p className="ab-fell" style={{ fontSize: 24, fontStyle: 'italic', color: '#c8b993', margin: '8px 0 0' }}>{view.kind === 'boss' ? 'Jeder wählt eine legendäre Karte.' : 'Jeder wählt auf dem Handy eine neue Karte – oder keine.'}</p>
       </div>
       <div style={{ position: 'absolute', left: 60, right: 60, top: 260, display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 22 }}>
         {view.heroes.map((h: any) => {
-          const p = view.picked.find((x: any) => x.id === h.id);
+          const p = view.rewards.find((x: any) => x.id === h.id);
           const pl = player(h.id);
           return (
             <div key={h.id} style={{ width: 170, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
               <img src={IMG(h.img)} alt="" style={{ height: 150, filter: 'drop-shadow(0 12px 10px rgba(0,0,0,.6))', opacity: p?.done ? 1 : 0.6 }} />
               <span className="ab-sc" style={{ fontSize: 20, color: pl?.color }}>{pl?.name}</span>
               <span className="ab-fell" style={{ fontSize: 16, fontStyle: 'italic', color: C.muted }}>{p?.done ? (p.card ? `nimmt ${p.card}` : 'verzichtet') : 'wählt …'}</span>
-              <span style={{ fontSize: 15 }}>{h.hp}/{h.maxHp} Leben</span>
+              <span style={{ fontSize: 15, display: 'flex', alignItems: 'center', gap: 8 }}>{h.hp}/{h.maxHp} Leben{p?.gold > 0 && <Coin n={`+${p.gold}`} />}</span>
+              {p?.relic && <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 15 }}><RelicIcon r={p.relic} size={30} /> {p.relic.name}</span>}
             </div>
           );
         })}
@@ -591,7 +632,7 @@ function HostEnd({ view, player }: HostViewProps) {
       <div style={{ position: 'absolute', left: 0, right: 0, top: 90, textAlign: 'center', animation: 'abFade 1s' }}>
         <span className="ab-sc" style={{ fontSize: 110, letterSpacing: 6, color: win ? C.paper : '#e23b30', textShadow: '0 8px 24px rgba(0,0,0,.9)' }}>{win ? 'Sieg' : 'Niederlage'}</span>
         <p className="ab-fell" style={{ fontSize: 26, fontStyle: 'italic', color: '#c8b993', margin: 0 }}>
-          {win ? 'Ihr habt die äußeren Schichten des Abgrunds überstanden.' : `Der Abgrund hat euch verschlungen – in Kampf ${view.fightNo + 1}.`}
+          {win ? 'Der Herr dieser Tiefe ist gefallen – Akt I ist geschafft.' : `Der Abgrund hat euch verschlungen – auf Stufe ${view.level} von ${view.levels}.`}
         </p>
       </div>
       <div style={{ position: 'absolute', left: 60, right: 60, top: 360, display: 'flex', justifyContent: 'center', gap: 26, flexWrap: 'wrap' }}>
@@ -612,19 +653,30 @@ function Controller(props0: ControllerViewProps) {
   useFonts();
   const props = withComps(props0);
   const { view } = props;
+  const [sheet, setSheet] = useState(false);
+  useEffect(() => setSheet(false), [view.phase]);
   let inner: ReactNode;
   if (view.phase === 'lager') inner = <PhoneLager {...props} />;
   else if (view.phase === 'plan') inner = <PhonePlan {...props} />;
   else if (view.phase === 'resolve') inner = <PhoneResolve {...props} />;
   else if (view.phase === 'reward') inner = <PhoneReward {...props} />;
+  else if (view.phase === 'map') inner = <PhoneMap {...props} />;
+  else if (view.phase === 'shop') inner = <PhoneShop {...props} />;
+  else if (view.phase === 'camp') inner = <PhoneCamp {...props} />;
+  else if (view.phase === 'event') inner = <PhoneEvent {...props} />;
+  else if (view.phase === 'treasure') inner = <PhoneTreasure {...props} />;
+  else if (view.phase === 'bossIntro') inner = <PhoneCenter title="Achtung!" text="Schau auf den Fernseher." img={view.me?.img} />;
   else if (view.phase === 'end') inner = <PhoneEnd {...props} />;
   else inner = <PhoneCenter title="Schau auf den Fernseher" />;
+  if (sheet && view.me && view.phase !== 'lager') inner = <HeroSheet view={view} me={props.me} onClose={() => setSheet(false)} />;
   return (
     <div style={{ position: 'fixed', inset: 0, overflowY: 'auto', background: '#120d09', color: C.paper, fontFamily: BODY }}>
       <Styles />
-      <div style={{ maxWidth: 520, margin: '0 auto', minHeight: '100%', boxSizing: 'border-box', padding: 'max(14px, env(safe-area-inset-top)) 14px max(18px, env(safe-area-inset-bottom))', display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {inner}
-      </div>
+      <SheetContext.Provider value={setSheet}>
+        <div style={{ maxWidth: 520, margin: '0 auto', minHeight: '100%', boxSizing: 'border-box', padding: 'max(14px, env(safe-area-inset-top)) 14px max(18px, env(safe-area-inset-bottom))', display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {inner}
+        </div>
+      </SheetContext.Provider>
     </div>
   );
 }
@@ -654,7 +706,7 @@ function PhoneLager({ view, send }: ControllerViewProps) {
         <PhoneCenter title={`Du spielst ${view.classes.find((x: any) => x.id === view.cls)?.name}`} text={view.allChosen ? (view.vip ? 'Alle haben gewählt – du kannst starten.' : 'Warte auf den VIP …') : 'Warte auf die anderen …'} img={view.classes.find((x: any) => x.id === view.cls)?.img} />
         {view.vip && <CompPicker view={view} send={send} />}
         {view.vip && view.allChosen && <button type="button" style={BIG_BTN} onClick={() => send({ type: 'start' })}>Neuer Run</button>}
-        {view.vip && view.saved && <button type="button" style={{ ...SMALL_BTN, minHeight: 48 }} onClick={() => send({ type: 'continue' })}>Run fortsetzen (Kampf {view.saved.fightNo + 1}{view.savedComps ? `, ${view.savedComps} Begleiter` : ''})</button>}
+        {view.vip && view.saved && <button type="button" style={{ ...SMALL_BTN, minHeight: 48 }} onClick={() => send({ type: 'continue' })}>Run fortsetzen (Stufe {view.saved.level}{view.savedComps ? `, ${view.savedComps} Begleiter` : ''})</button>}
         <button type="button" style={SMALL_BTN} onClick={() => send({ type: 'unready' })}>Klasse ändern</button>
       </>
     );
@@ -670,7 +722,7 @@ function PhoneLager({ view, send }: ControllerViewProps) {
         <article key={c.id} style={{ flex: 1, background: C.paper, color: C.ink, border: `4px solid ${classColor(c.id)}`, borderRadius: 12, padding: '14px 14px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, boxShadow: '0 14px 30px rgba(0,0,0,.7)', animation: 'abFade .3s' }}>
           <span className="ab-fell" style={{ fontSize: 14, fontStyle: 'italic', color: '#6b5d45' }}>{c.role}</span>
           <span className="ab-sc" style={{ fontSize: 28, lineHeight: 1, color: classColor(c.id) }}>{c.name}</span>
-          <img src={IMG(c.img)} alt="" style={{ height: 230, margin: '4px 0', filter: 'drop-shadow(0 8px 8px rgba(0,0,0,.35))' }} />
+          <img src={IMG(c.img)} onError={fallbackTo()} alt="" style={{ height: 230, margin: '4px 0', filter: 'drop-shadow(0 8px 8px rgba(0,0,0,.35))' }} />
           <span style={{ fontSize: 16, fontWeight: 700 }}>{c.hp} Leben · 3 Energie</span>
           <p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.3, textAlign: 'center' }}>{c.desc}</p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, justifyContent: 'center' }}>
@@ -736,11 +788,11 @@ function CardFace({ c, w = 112, onClick, dim, sel }: { c: any; w?: number; onCli
       opacity: dim ? 0.45 : 1, fontFamily: BODY, touchAction: 'manipulation',
     }}>
       <span style={{ position: 'absolute', left: -9, top: -9, zIndex: 1, width: w * 0.25, height: w * 0.25, minWidth: 24, minHeight: 24, borderRadius: '50%', background: darker(classColor(c.cls), 0.8), border: '2px solid #eadcb9', color: '#f3e6c8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: DISPLAY, fontSize: Math.max(15, w * 0.15), boxShadow: 'inset 0 0 0 3px rgba(0,0,0,.25)' }}>{c.cost}</span>
-      <span className="ab-sc" style={{ alignSelf: 'stretch', margin: `0 -${w * 0.06}px`, padding: `${w * 0.035}px ${w * 0.2}px ${w * 0.04}px`, background: classColor(c.cls), color: '#f3e6c8', fontSize: Math.max(13, w * 0.13), lineHeight: 1.05, textAlign: 'center', position: 'relative' }}>
+      <span className="ab-sc" style={{ alignSelf: 'stretch', margin: `0 -${w * 0.06}px`, padding: `${w * 0.035}px ${c.speed !== 'normal' ? w * 0.19 : w * 0.06}px ${w * 0.04}px`, background: classColor(c.cls), color: '#f3e6c8', fontSize: w < 120 ? (String(c.name).length > 11 ? 12 : 13.5) : Math.max(13, w * 0.13), lineHeight: 1.05, textAlign: 'center', position: 'relative', overflowWrap: 'anywhere', hyphens: 'auto' }}>
         {c.name}
         {c.speed !== 'normal' && <span style={{ position: 'absolute', right: 4, top: '50%', transform: 'translateY(-50%)', display: 'flex', background: '#eadcb9', borderRadius: '50%', padding: 2 }}><SpeedIcon speed={c.speed} size={Math.max(12, w * 0.12)} /></span>}
       </span>
-      <img src={IMG(c.img)} alt="" style={{ height: h * (String(c.text).length > 44 ? 0.24 : 0.34), margin: '2px 0', objectFit: 'contain', maxWidth: '90%' }} />
+      <img src={IMG(c.img)} onError={fallbackTo()} alt="" style={{ height: h * (String(c.text).length > 44 ? 0.24 : 0.34), margin: '2px 0', objectFit: 'contain', maxWidth: '90%' }} />
       <span style={{ fontSize: Math.max(11.5, w * 0.105), lineHeight: 1.15, textAlign: 'center' }}>{c.speed === 'fast' ? <i>Schnell. </i> : c.speed === 'slow' ? <i>Langsam. </i> : null}{c.text}</span>
       <span style={{ position: 'absolute', bottom: Math.max(5, w * 0.04), left: '50%', marginLeft: -5 }}><RarityGem r={c.rarity} size={Math.max(8, w * 0.07)} /></span>
     </Tag>
@@ -758,7 +810,7 @@ function MiniCard({ c, onClick, dim }: { c: any; onClick: () => void; dim?: bool
         {c.name}
         {c.speed !== 'normal' && <span style={{ position: 'absolute', right: 2, top: '50%', transform: 'translateY(-50%)', display: 'flex', background: '#eadcb9', borderRadius: '50%', padding: 1 }}><SpeedIcon speed={c.speed} size={11} /></span>}
       </span>
-      <img src={IMG(c.img)} alt="" style={{ height: 36 }} />
+      <img src={IMG(c.img)} onError={fallbackTo()} alt="" style={{ height: 36 }} />
       <span style={{ fontSize: 12, fontWeight: 700, lineHeight: 1.1, textAlign: 'center' }}>{shortText(c.text)}</span>
       <span style={{ position: 'absolute', bottom: 3, right: 4 }}><RarityGem r={c.rarity} size={7} /></span>
     </button>
@@ -771,6 +823,7 @@ function PhonePlan({ view, send, me, player }: ControllerViewProps) {
   const [pile, setPile] = useState<'draw' | 'discard' | null>(null);
   const [peek, setPeek] = useState<any>(null);
   const [foe, setFoe] = useState<string | null>(null);
+  const [sheet, setSheet] = useState(false);
   const plannedSet = new Set(view.plan.map((p: any) => p.uid));
   const hand = view.hand.filter((c: any) => !plannedSet.has(c.uid));
   const left = view.energy - view.used;
@@ -801,7 +854,7 @@ function PhonePlan({ view, send, me, player }: ControllerViewProps) {
             <span className="ab-sc" style={{ fontSize: 22, textAlign: 'center' }}>Ziel wählen</span>
             {card.target === 'enemy' && view.enemies.filter((e: any) => !e.dead).map((e: any) => (
               <button key={e.uid} type="button" onClick={() => choose(e.uid)} style={{ display: 'flex', alignItems: 'center', gap: 12, background: C.paper2, color: C.ink, padding: '8px 12px', border: 0, textAlign: 'left', cursor: 'pointer', fontFamily: BODY, clipPath: TORN2, minHeight: 70 }}>
-                <img src={IMG(e.img)} alt="" style={{ height: 60 }} />
+                <img src={IMG(e.img)} onError={fallbackTo(e.fallback)} alt="" style={{ height: 60 }} />
                 <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 3 }}>
                   <span className="ab-sc" style={{ fontSize: 18 }}>{e.name}</span>
                   <Bar v={e.hp} max={e.maxHp} h={8} />
@@ -839,6 +892,8 @@ function PhonePlan({ view, send, me, player }: ControllerViewProps) {
     );
   }
 
+  if (sheet) return <HeroSheet view={view} me={me} onClose={() => setSheet(false)} />;
+
   const foeE = foe ? view.enemies.find((e: any) => e.uid === foe && !e.dead) : null;
   if (foeE) return <EnemyDetail e={foeE} name={name} onClose={() => setFoe(null)} />;
 
@@ -861,7 +916,7 @@ function PhonePlan({ view, send, me, player }: ControllerViewProps) {
   return (
     <>
       <header style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <img src={IMG(view.me.img)} alt="" style={{ height: 50 }} />
+        <button type="button" aria-label="Mein Held: Details und Relikte" onClick={() => { play('paper'); setSheet(true); }} style={{ border: 0, background: 'transparent', padding: 0, cursor: 'pointer' }}><img src={IMG(view.me.img)} alt="" style={{ height: 50 }} /></button>
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 3 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
             <span className="ab-sc" style={{ fontSize: 19, color: me.color }}>{me.name}</span>
@@ -871,7 +926,10 @@ function PhonePlan({ view, send, me, player }: ControllerViewProps) {
             <div style={{ flex: 1 }}><Bar v={view.me.hp} max={view.me.maxHp} h={7} /></div>
             <span style={{ fontWeight: 700, fontSize: 14 }}>{view.me.hp}/{view.me.maxHp}</span>
           </div>
-          <Seals st={view.me.st} size={20} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            {view.me.str > 0 && <span style={{ display: 'flex', alignItems: 'center', gap: 2, fontWeight: 700, fontSize: 13 }}><StrengthIcon size={14} color={C.paper} />{view.me.str}</span>}
+            <Seals st={view.me.st} size={20} />
+          </div>
         </div>
         <button type="button" style={SMALL_BTN} onClick={() => setPile('draw')}>Deck {view.drawPile.length}</button>
         <button type="button" style={SMALL_BTN} onClick={() => setPile('discard')}>Ablage {view.discardPile.length}</button>
@@ -884,7 +942,7 @@ function PhonePlan({ view, send, me, player }: ControllerViewProps) {
           const it = e.intent ? intentText(e.intent, name, true) : null;
           return (
             <button key={e.uid} type="button" aria-label={`${e.name}: Details`} onClick={() => { play('paper'); setFoe(e.uid); }} style={{ border: 0, cursor: 'pointer', fontFamily: BODY, touchAction: 'manipulation', background: C.paper2, color: C.ink, padding: '6px 6px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, clipPath: TORN2, boxShadow: meTarget ? `inset 0 0 0 3px ${C.bright}` : undefined }}>
-              <img src={IMG(e.img)} alt="" style={{ height: 54 }} />
+              <img src={IMG(e.img)} onError={fallbackTo(e.fallback)} alt="" style={{ height: 54 }} />
               <span className="ab-sc" style={{ fontSize: 13.5, textAlign: 'center', lineHeight: 1.05 }}>{e.name}</span>
               <div style={{ width: '90%' }}><Bar v={e.hp} max={e.maxHp} h={6} /></div>
               <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap' }}>
@@ -915,7 +973,7 @@ function PhonePlan({ view, send, me, player }: ControllerViewProps) {
             const tgt = p.target ? (view.enemies.find((e: any) => e.uid === p.target)?.name ?? (p.target === me.id ? 'dich' : player(p.target)?.name)) : null;
             return (
               <div key={p.uid} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#2a1f16', border: '1px solid #5b452f', padding: '6px 6px 6px 10px', animation: 'abFade .25s' }}>
-                <img src={IMG(c.img)} alt="" style={{ height: 30 }} />
+                <img src={IMG(c.img)} onError={fallbackTo()} alt="" style={{ height: 30 }} />
                 <span style={{ flex: 1, fontSize: 16 }}><b>{c.name}</b>{tgt ? ` → ${tgt}` : ''}{c.speed !== 'normal' ? ` · ${c.speed === 'fast' ? 'schnell' : 'langsam'}` : ''}</span>
                 {!view.ready && <button type="button" aria-label={`${c.name} zurück auf die Hand`} onClick={() => send({ type: 'unplan', uid: p.uid })} style={{ background: 'transparent', border: 0, color: C.muted, fontSize: 24, width: 40, height: 40, cursor: 'pointer' }}>×</button>}
               </div>
@@ -969,7 +1027,7 @@ function EnemyDetail({ e, name, onClose }: { e: any; name: (id: string) => strin
   return (
     <>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, paddingTop: 6 }}>
-        <img src={IMG(e.img)} alt="" style={{ height: 190, filter: 'drop-shadow(0 10px 10px rgba(0,0,0,.6))' }} />
+        <img src={IMG(e.img)} onError={fallbackTo(e.fallback)} alt="" style={{ height: 190, filter: 'drop-shadow(0 10px 10px rgba(0,0,0,.6))' }} />
         <span className="ab-sc" style={{ fontSize: 28 }}>{e.name}</span>
         {e.elite && <span className="ab-fell" style={{ fontSize: 15, fontStyle: 'italic', color: C.gold }}>Elite</span>}
         <div style={{ width: '80%', display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -1019,8 +1077,17 @@ function PhoneReward({ view, send }: ControllerViewProps) {
   if (view.done) return <PhoneCenter title={view.pickedName ? `${view.pickedName} kommt in dein Deck` : 'Du verzichtest'} text="Warte auf die anderen …" img={view.me.img} />;
   return (
     <>
+      <MeHeader view={view} />
+      {(view.gold > 0 || view.relic || view.healed > 0) && (
+        <section style={{ background: C.paper2, color: C.ink, padding: '10px 12px', clipPath: TORN2, display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <span className="ab-sc" style={{ fontSize: 18 }}>Beute</span>
+          {view.gold > 0 && <span style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 16 }}><Coin n={`+${view.gold}`} dark /> Gold</span>}
+          {view.healed > 0 && <span style={{ fontSize: 16 }}>Blutstein: +{view.healed} Leben</span>}
+          {view.relic && <RelicRow r={view.relic} />}
+        </section>
+      )}
       <div style={{ textAlign: 'center' }}>
-        <span className="ab-sc" style={{ fontSize: 26 }}>Neue Karte</span>
+        <span className="ab-sc" style={{ fontSize: 26 }}>{view.kind === 'boss' ? 'Legendäre Karte' : 'Neue Karte'}</span>
         <div className="ab-fell" style={{ fontSize: 16, fontStyle: 'italic', color: C.muted }}>Wähle eine Karte für dein Deck – oder keine.</div>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
@@ -1037,7 +1104,820 @@ function PhoneReward({ view, send }: ControllerViewProps) {
 }
 
 function PhoneEnd({ view }: ControllerViewProps) {
-  return <PhoneCenter title={view.result === 'win' ? 'Sieg!' : 'Niederlage'} text={view.result === 'win' ? 'Ihr habt alle drei Kämpfe überstanden.' : 'Der Abgrund hat gewonnen – diesmal.'} img={view.me?.img} />;
+  return <PhoneCenter title={view.result === 'win' ? 'Sieg!' : 'Niederlage'} text={view.result === 'win' ? 'Akt I ist geschafft.' : `Der Abgrund hat gewonnen – auf Stufe ${view.level}.`} img={view.me?.img} />;
+}
+
+/* ================= Akt I: gemeinsame Bausteine ================= */
+
+const MiniSeal = ({ l, col, size = 18 }: { l: string; col: string; size?: number }) => (
+  <span aria-hidden="true" style={{ width: size, height: size, borderRadius: '50%', background: col, color: '#f3e6c8', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: size * 0.55, fontFamily: BODY, flex: 'none' }}>{l}</span>
+);
+const HeartIcon = ({ size = 18, color = C.green }: { size?: number; color?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.3-9.3C1.4 8.2 3.6 4.5 7.2 4.5c2 0 3.6 1.1 4.8 2.8 1.2-1.7 2.8-2.8 4.8-2.8 3.6 0 5.8 3.7 4.5 7.2C19.5 16.4 12 21 12 21z" fill={color} /></svg>
+);
+const FlameIcon = ({ size = 18, color = C.blood }: { size?: number; color?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c3 4 7 6.5 7 12a7 7 0 0 1-14 0c0-3.5 2-5.5 3.5-7.5.5 2 1.5 3.5 3 3.5 0-3-1-5.5.5-8z" fill={color} /><path d="M12 12c1.5 2 3 3 3 5a3 3 0 0 1-6 0c0-1.5 1-2.5 1.8-3.5.3.9.8 1.5 1.2 1.5 0-1.2-.3-2 0-3z" fill="#ffd27a" /></svg>
+);
+
+/** Goldmünze mit Zahl */
+function Coin({ n, dark, size = 18 }: { n: ReactNode; dark?: boolean; size?: number }) {
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontWeight: 700, color: dark ? '#6e4f1c' : '#e3b866', whiteSpace: 'nowrap' }}>
+      <svg width={size} height={size} viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="#b8893c" stroke="#6e4f1c" /><circle cx="8" cy="8" r="4" fill="none" stroke="#6e4f1c" /></svg>{n}
+    </span>
+  );
+}
+
+/** Bild mit Ersatz-Darstellung, solange das Bild noch fehlt */
+function FigureOr({ name, fallback, alt = '', style, children }: { name: string; fallback?: string; alt?: string; style?: CSSProperties; children?: ReactNode }) {
+  const [stage, setStage] = useState(0);
+  useEffect(() => setStage(0), [name]);
+  if (stage === 0) return <img src={IMG(name)} alt={alt} style={style} onError={() => setStage(fallback ? 1 : 2)} />;
+  if (stage === 1 && fallback) return <img src={IMG(fallback)} alt={alt} style={style} onError={() => setStage(2)} />;
+  return <>{children ?? null}</>;
+}
+
+/** Relikt-Symbol: Bild oder Siegel mit Anfangsbuchstabe; Gruppe = Bronzerand, riskant = roter Rand */
+function RelicIcon({ r, size = 34 }: { r: any; size?: number }) {
+  const ring = r.risky ? C.bright : r.group ? C.bronze : '#5b452f';
+  return (
+    <span title={r.name} style={{ width: size, height: size, flex: 'none', borderRadius: '50%', background: '#2a1f16', border: `2px solid ${ring}`, boxShadow: r.group ? `0 0 0 2px #5b452f` : undefined, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+      <FigureOr name={r.img} style={{ width: size * 0.86, height: size * 0.86, objectFit: 'contain' }}>
+        <span className="ab-sc" style={{ fontSize: size * 0.5, color: r.risky ? '#ff8a70' : '#e3b866', lineHeight: 1 }}>{r.letter}</span>
+      </FigureOr>
+    </span>
+  );
+}
+
+function RelicRow({ r, dark }: { r: any; dark?: boolean }) {
+  return (
+    <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: '8px 10px', background: dark ? '#2a1f16' : C.paper2, color: dark ? C.paper : C.ink, border: dark ? '1px solid #5b452f' : 0, boxShadow: r.risky ? `inset 0 0 0 2px ${C.blood}` : r.group ? `inset 0 0 0 2px ${C.bronze}` : undefined }}>
+      <RelicIcon r={r} size={44} />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <b className="ab-sc" style={{ fontSize: 18 }}>{r.name}{r.group && <i className="ab-fell" style={{ fontSize: 13, color: dark ? C.muted : '#6b5236' }}> für die Gruppe</i>}{r.risky && <i className="ab-fell" style={{ fontSize: 13, color: dark ? '#ff8a70' : C.blood }}> riskant</i>}</b>
+        <span style={{ fontSize: 15, lineHeight: 1.25 }}>{r.text}</span>
+      </div>
+    </div>
+  );
+}
+
+/** Stationssymbole der Pfadkarte */
+function NodeIcon({ type, size = 30, color = C.ink }: { type: string; size?: number; color?: string }) {
+  const common = { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: color, strokeWidth: 2, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, 'aria-hidden': true };
+  if (type === 'fight') return <svg {...common}><path d="M4 4l11 11M20 4L9 15M13 17l4 4M11 17l-4 4M6 15l3 3M18 15l-3 3" /></svg>;
+  if (type === 'elite') return <svg {...common}><path d="M12 3a7 7 0 0 0-7 7c0 2.5 1.2 4.2 3 5.3V19h8v-3.7c1.8-1.1 3-2.8 3-5.3a7 7 0 0 0-7-7z" /><circle cx="9.3" cy="10.5" r="1.3" /><circle cx="14.7" cy="10.5" r="1.3" /><path d="M10 19v2M14 19v2" /></svg>;
+  if (type === 'event') return <svg {...common}><path d="M9 9a3 3 0 1 1 4 2.8c-.8.4-1 .9-1 1.7V15M12 18.5h.01" /></svg>;
+  if (type === 'shop') return <svg {...common}><path d="M12 3v18M5 7h14M5 7l-3 7a3 3 0 0 0 6 0zM19 7l-3 7a3 3 0 0 0 6 0zM8 21h8" /></svg>;
+  if (type === 'camp') return <svg {...common}><path d="M12 3c3 4 6 6 6 11a6 6 0 0 1-12 0c0-3 2-5 3-7 1 2 2 3 3 3 0-2-1-4 0-7zM4 21l16-3M4 18l16 3" /></svg>;
+  if (type === 'treasure') return <svg {...common}><path d="M4 10h16v10H4zM4 10l2-5h12l2 5M12 13v3M10 13h4" /></svg>;
+  return <svg {...common}><path d="M4 8l4 3 4-6 4 6 4-3-2 10H6z" /><path d="M6 21h12" /></svg>;
+}
+
+const SheetContext = createContext<(open: boolean) => void>(() => {});
+
+/** Kopf auf dem Handy: ich, Leben, Gold, Relikte – antippen öffnet die Heldenseite */
+function MeHeader({ view }: { view: any }) {
+  const open = useContext(SheetContext);
+  const m = view.me;
+  if (!m) return null;
+  return (
+    <button type="button" aria-label="Mein Held: Details und Relikte" onClick={() => { play('paper'); open(true); }} style={{ border: 0, background: 'transparent', color: 'inherit', padding: 0, cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 6, textAlign: 'left', fontFamily: BODY, touchAction: 'manipulation' }}>
+      <span style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%' }}>
+        <img src={IMG(m.img)} alt="" style={{ height: 48 }} />
+        <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <span className="ab-fell" style={{ fontStyle: 'italic', fontSize: 15, color: C.muted }}>{m.name}</span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ flex: 1 }}><Bar v={m.hp} max={m.maxHp} h={7} /></span><b style={{ fontSize: 14 }}>{m.hp}/{m.maxHp}</b></span>
+        </span>
+        <Coin n={m.gold} size={20} />
+      </span>
+      {m.relics.length > 0 && (
+        <span style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
+          {m.relics.map((r: any, i: number) => <RelicIcon key={r.id + i} r={r} size={30} />)}
+        </span>
+      )}
+    </button>
+  );
+}
+
+/** Heldenseite: Werte, Relikte mit Erklärung, Deck */
+function HeroSheet({ view, me, onClose }: { view: any; me: PlayerInfo; onClose: () => void }) {
+  const [deckOpen, setDeckOpen] = useState(false);
+  const [peek, setPeek] = useState<any>(null);
+  const m = view.me;
+  const deck: any[] = view.deck ?? [];
+  if (peek) {
+    return (
+      <>
+        <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8 }}><CardFace c={peek} w={190} /></div>
+        <KeywordList items={cardKeywords(peek)} dark />
+        <button type="button" style={{ ...SMALL_BTN, minHeight: 48 }} onClick={() => setPeek(null)}>Zurück</button>
+      </>
+    );
+  }
+  return (
+    <>
+      <header style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+        <img src={IMG(m.img)} alt="" style={{ height: 110 }} />
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <span className="ab-sc" style={{ fontSize: 26, color: me.color, lineHeight: 1 }}>{me.name}</span>
+          <span className="ab-fell" style={{ fontSize: 17, fontStyle: 'italic', color: classColor(m.cls) === '#6b5236' ? C.muted : lighten(classColor(m.cls)) }}>{m.name}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}><div style={{ flex: 1 }}><Bar v={m.hp} max={m.maxHp} h={9} /></div><b>{m.hp}/{m.maxHp}</b></div>
+        </div>
+      </header>
+      <div style={{ display: 'flex', gap: 8 }}>
+        {[[<Coin key="g" n={m.gold} size={20} />, 'Gold'], [m.deckSize, 'Karten'], [m.relics.length, 'Relikte']].map(([v, l], i) => (
+          <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', background: '#2a1f16', border: '1px solid #5b452f', padding: '8px 4px' }}>
+            <span style={{ fontSize: 22, fontWeight: 700 }}>{v}</span><span className="ab-fell" style={{ fontSize: 13, fontStyle: 'italic', color: C.muted }}>{l}</span>
+          </div>
+        ))}
+      </div>
+      <span className="ab-sc" style={{ fontSize: 15, color: C.muted, letterSpacing: 1 }}>Relikte</span>
+      {m.relics.length ? m.relics.map((r: any, i: number) => <RelicRow key={r.id + i} r={r} />) : <span className="ab-fell" style={{ fontStyle: 'italic', color: C.muted }}>Noch keine Relikte.</span>}
+      {deck.length > 0 && <button type="button" style={{ ...SMALL_BTN, minHeight: 48 }} onClick={() => setDeckOpen(!deckOpen)}>{deckOpen ? 'Deck ausblenden' : `Mein Deck ansehen (${deck.length})`}</button>}
+      {deckOpen && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '12px 10px', paddingLeft: 6 }}>
+          {deck.map((c) => <MiniCard key={c.uid} c={c} onClick={() => { play('paper'); setPeek(c); }} />)}
+        </div>
+      )}
+      <div style={{ flex: 1 }} />
+      <button type="button" style={{ ...SMALL_BTN, minHeight: 48 }} onClick={onClose}>Zurück</button>
+    </>
+  );
+}
+
+/** Helle Variante einer Klassenfarbe (Schrift auf dunklem Grund) */
+const lighten = (hex: string) => {
+  const n = parseInt(hex.slice(1), 16);
+  const ch = (x: number) => Math.round(x + (255 - x) * 0.45).toString(16).padStart(2, '0');
+  return `#${ch((n >> 16) & 255)}${ch((n >> 8) & 255)}${ch(n & 255)}`;
+};
+
+/** Karte aus dem eigenen Deck wählen (entfernen, schmieden, verdoppeln) */
+function DeckPicker({ cards, title, hint, confirm, upgrade, onPick, onCancel }: { cards: any[]; title: string; hint?: string; confirm: string; upgrade?: boolean; onPick: (uid: string) => void; onCancel: () => void }) {
+  const [sel, setSel] = useState<any>(null);
+  if (sel) {
+    const after = upgrade ? { ...sel, name: sel.name + '+', text: sel.upText ?? sel.text, cost: sel.upCost ?? sel.cost, up: true } : null;
+    return (
+      <>
+        <span className="ab-sc" style={{ fontSize: 22, textAlign: 'center' }}>{title}</span>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10, paddingTop: 8 }}>
+          <CardFace c={sel} w={after ? 140 : 190} />
+          {after && <span className="ab-sc" style={{ fontSize: 30, color: C.muted }}>→</span>}
+          {after && <CardFace c={after} w={140} />}
+        </div>
+        <KeywordList items={cardKeywords(after ?? sel)} dark />
+        <button type="button" style={BIG_BTN} onClick={() => { vibrate(20); play('paper'); onPick(sel.uid); }}>{confirm}</button>
+        <button type="button" style={{ ...SMALL_BTN, minHeight: 48 }} onClick={() => setSel(null)}>Andere Karte</button>
+      </>
+    );
+  }
+  return (
+    <>
+      <span className="ab-sc" style={{ fontSize: 22 }}>{title}</span>
+      {hint && <span className="ab-fell" style={{ fontSize: 15, fontStyle: 'italic', color: C.muted }}>{hint}</span>}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '12px 10px', paddingLeft: 6 }}>
+        {cards.map((c) => <MiniCard key={c.uid} c={c} onClick={() => { play('paper'); setSel(c); }} />)}
+      </div>
+      {!cards.length && <p className="ab-fell" style={{ fontStyle: 'italic', color: C.muted }}>Keine passende Karte.</p>}
+      <button type="button" style={{ ...SMALL_BTN, minHeight: 48 }} onClick={onCancel}>Abbrechen</button>
+    </>
+  );
+}
+
+/** „Warte auf …“ mit Knopf für den VIP, wenn jemand getrennt ist */
+function Waiting({ view, send, player, text = 'Warte auf die anderen …' }: { view: any; send: (a: any) => void; player: (id: string) => PlayerInfo | undefined; text?: string }) {
+  const names = (view.waitingFor ?? []).map((id: string) => player(id)?.name).filter(Boolean);
+  const off = (view.waitingFor ?? []).some((id: string) => !player(id)?.connected && !player(id)?.isBot);
+  return (
+    <>
+      <span className="ab-fell" style={{ fontSize: 16, fontStyle: 'italic', color: C.muted, textAlign: 'center' }}>{names.length ? `Warte auf ${names.join(', ')} …` : text}</span>
+      {view.vip && off && <button type="button" style={SMALL_BTN} onClick={() => send({ type: 'skipWait' })}>Nicht auf getrennte Spieler warten</button>}
+    </>
+  );
+}
+
+/** Siegel eines Spielers (Anfangsbuchstabe in Spielerfarbe) */
+function VoteSeal({ p, size = 26 }: { p?: PlayerInfo; size?: number }) {
+  return (
+    <span title={p?.name} style={{ width: size, height: size, borderRadius: '50%', background: shadeDark(p?.color), color: '#f3e6c8', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: size * 0.5, fontWeight: 700, boxShadow: 'inset 0 0 0 3px rgba(0,0,0,.22), 0 2px 3px rgba(0,0,0,.4)', animation: 'abPop .35s ease-out', flex: 'none' }}>
+      {(p?.name ?? '?').slice(0, 1).toUpperCase()}
+    </span>
+  );
+}
+
+/* ================= Akt I: Fernseher ================= */
+
+function TvTitle({ title, sub }: { title: string; sub?: string }) {
+  return (
+    <div style={{ position: 'absolute', left: 36, top: 22, display: 'flex', alignItems: 'baseline', gap: 16, zIndex: 5 }}>
+      <span className="ab-sc" style={{ fontSize: 40, letterSpacing: 6, textShadow: '0 4px 12px rgba(0,0,0,.8)' }}>{title}</span>
+      {sub && <span className="ab-fell" style={{ fontSize: 22, fontStyle: 'italic', color: '#c8b993' }}>{sub}</span>}
+    </div>
+  );
+}
+
+const PAPER_BOX: CSSProperties = { background: C.paper, color: C.ink, clipPath: TORN, boxShadow: '0 8px 18px rgba(0,0,0,.6)' };
+
+function HostMap({ view, player }: HostViewProps) {
+  const m = view.map;
+  const v = m.vote;
+  const names: Record<string, string> = view.nodeNames;
+  const nodes: any[] = m.nodes;
+  const byId = new Map(nodes.map((n) => [n.id, n]));
+  const first = Math.max(1, m.level);
+  const lastLv = Math.min(m.levels, m.sight);
+  const top0 = m.level === 0 ? 170 : 90;
+  const y = (lv: number) => top0 + (lv - first) * 140;
+  const x = (col: number) => 110 + col * 180;
+  const shown = nodes.filter((n) => n.lv >= first && n.lv <= lastLv);
+  // erreichbar ab hier
+  const reach = new Set<string>();
+  const startIds = m.pos ? [m.pos] : nodes.filter((n) => n.lv === 1).map((n) => n.id);
+  const queue = [...startIds];
+  while (queue.length) { const id = queue.shift()!; if (reach.has(id)) continue; reach.add(id); for (const t of byId.get(id)?.next ?? []) queue.push(t); }
+  const onPath = (a: string, b: string) => { const i = m.path.indexOf(a); return i >= 0 && m.path[i + 1] === b; };
+  const options: string[] = v?.options ?? [];
+  const leader = v ? (v.winner ?? [...options].sort((a, b) => (v.votes[b]?.length ?? 0) - (v.votes[a]?.length ?? 0))[0]) : null;
+  const heroes: any[] = view.heroes ?? [];
+  const here = m.pos ? byId.get(m.pos) : null;
+  const hereX = here ? x(here.col) : 380, hereY = here ? y(here.lv) : 78;
+  useEffect(() => { play('paper'); }, [m.pos]);
+  const voteCount = Object.values(v?.votes ?? {}).reduce((s: number, a: any) => s + a.length, 0);
+  useEffect(() => { if (voteCount) play('ready'); }, [voteCount]);
+
+  return (
+    <>
+      <Backdrop img="hintergrund-kampf-abgrund" opacity={0.35} />
+      <TvTitle title="Abgrund" sub={`Akt I · Stufe ${m.level} von ${m.levels}`} />
+      <section aria-label="Pfadkarte" style={{ ...PAPER_BOX, position: 'absolute', left: 60, top: 84, width: 760, height: 700, clipPath: 'polygon(0 3%,6% 0,40% 2%,70% 0,100% 3%,99% 40%,100% 97%,65% 100%,30% 98%,0 100%,1% 60%)' }}>
+        <svg width="760" height="700" viewBox="0 0 760 700" aria-hidden="true" style={{ position: 'absolute', inset: 0 }}>
+          {m.level === 0 && startIds.map((id) => { const n = byId.get(id)!; return <path key={id} d={`M380 84 C 380 110, ${x(n.col)} ${y(n.lv) - 60}, ${x(n.col)} ${y(n.lv)}`} fill="none" stroke="#3b2c1d" strokeWidth="3" strokeLinecap="round" strokeDasharray="2 9" />; })}
+          {shown.flatMap((n) => n.next.map((t: string) => {
+            const tn = byId.get(t);
+            if (!tn || tn.lv > lastLv) return null;
+            const x1 = x(n.col), y1 = y(n.lv), x2 = x(tn.col), y2 = y(tn.lv);
+            const red = onPath(n.id, t);
+            const live = reach.has(n.id) && reach.has(t);
+            return <path key={n.id + t} d={`M${x1} ${y1} C ${x1} ${y1 + 60}, ${x2} ${y2 - 60}, ${x2} ${y2}`} fill="none" stroke={red ? '#7a1012' : '#3b2c1d'} strokeWidth={red ? 5 : 3} strokeLinecap="round" strokeDasharray={red ? undefined : '2 9'} opacity={live || red ? 1 : 0.3} />;
+          }))}
+        </svg>
+        {m.level === 0 && <span className="ab-fell" style={{ position: 'absolute', left: 520, top: 52, fontSize: 20, fontStyle: 'italic', color: '#3b2c1d' }}>Eingang</span>}
+        {shown.map((n) => {
+          const isOpt = options.includes(n.id);
+          const isHere = n.id === m.pos;
+          const isBoss = n.type === 'boss';
+          const sz = isBoss ? 96 : isOpt ? 70 : 58;
+          const faded = !reach.has(n.id) && !isHere;
+          const win = v?.winner === n.id;
+          return (
+            <div key={n.id}>
+              <div style={{
+                position: 'absolute', left: x(n.col) - sz / 2, top: y(n.lv) - sz / 2, width: sz, height: sz, borderRadius: '50%', boxSizing: 'border-box',
+                background: isBoss ? '#2a1414' : '#e3d3ad', border: `${isOpt || isBoss ? 4 : 3}px solid ${isOpt ? '#7a1012' : '#1c140d'}`, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                opacity: faded ? 0.35 : 1, boxShadow: isHere ? '0 0 0 6px rgba(184,137,60,.55)' : win ? '0 0 0 8px rgba(196,22,28,.5)' : '0 3px 0 rgba(28,20,13,.35)', transition: 'box-shadow .3s',
+                animation: win ? 'abPop .5s ease-out' : undefined,
+              }}>
+                <NodeIcon type={n.type} size={sz * 0.55} color={isBoss ? '#e23b30' : n.type === 'elite' ? '#7a1012' : C.ink} />
+              </div>
+              {(isOpt || isBoss) && <span className="ab-fell" style={{ position: 'absolute', left: x(n.col), top: y(n.lv) + sz / 2 + 2, transform: 'translateX(-50%)', fontSize: 18, fontStyle: 'italic', color: n.type === 'elite' || isBoss ? '#7a1012' : '#3b2c1d', whiteSpace: 'nowrap' }}>{isBoss && m.boss ? m.boss.name : names[n.type]}</span>}
+              {isOpt && (v?.votes[n.id]?.length ?? 0) > 0 && (
+                <div style={{ position: 'absolute', left: x(n.col) + sz / 2 + 6, top: y(n.lv) - sz / 2, display: 'flex', flexDirection: 'column', gap: 3 }}>
+                  {v.votes[n.id].map((id: string) => <VoteSeal key={id} p={player(id)} size={24} />)}
+                </div>
+              )}
+            </div>
+          );
+        })}
+        {/* eure Figuren */}
+        {heroes.slice(0, 4).map((h, k) => (
+          <img key={h.id} src={IMG(h.img)} alt="" style={{ position: 'absolute', left: hereX - 76 + k * 34, top: Math.max(6, hereY - 72) + (k % 2) * 6, height: 62, filter: 'drop-shadow(0 4px 3px rgba(0,0,0,.4))', transition: 'left .8s, top .8s' }} />
+        ))}
+        {heroes.length > 4 && <span className="ab-sc" style={{ position: 'absolute', left: hereX + 70, top: hereY - 50, fontSize: 18, color: '#3b2c1d' }}>+{heroes.length - 4}</span>}
+        {/* Nebel: tiefer sieht man nicht */}
+        {lastLv < m.levels && <div style={{ position: 'absolute', left: 0, right: 0, top: y(lastLv) - 40, bottom: 0, background: 'linear-gradient(180deg, rgba(15,11,8,0) 0%, rgba(15,11,8,.6) 45%, rgba(15,11,8,.97) 80%)' }} />}
+        {lastLv < m.levels && <span className="ab-fell" style={{ position: 'absolute', left: 0, right: 0, top: Math.min(640, y(lastLv) + 90), textAlign: 'center', fontSize: 20, fontStyle: 'italic', color: '#8f7f60' }}>… die Tiefe ist noch dunkel</span>}
+      </section>
+
+      <section style={{ ...PAPER_BOX, position: 'absolute', right: 24, top: 96, width: 330, padding: '20px 22px 24px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {v?.winner ? (
+          <>
+            <span className="ab-fell" style={{ fontSize: 18, fontStyle: 'italic', color: '#4a3b29' }}>Es geht weiter zum</span>
+            <span className="ab-sc" style={{ fontSize: 34, display: 'flex', alignItems: 'center', gap: 10, color: ['elite', 'boss'].includes(byId.get(v.winner)?.type) ? '#7a1012' : C.ink }}><NodeIcon type={byId.get(v.winner)?.type} size={34} />{byId.get(v.winner)?.type === 'boss' && m.boss ? m.boss.name : names[byId.get(v.winner)?.type]}</span>
+          </>
+        ) : (
+          <>
+            <span className="ab-sc" style={{ fontSize: 30 }}>Wohin?</span>
+            <span className="ab-fell" style={{ fontSize: 17, fontStyle: 'italic', color: '#4a3b29' }}>Stimmt auf dem Handy ab.</span>
+            {options.map((o) => {
+              const n = byId.get(o);
+              const cnt = v?.votes[o]?.length ?? 0;
+              const tot = Math.max(1, v?.voters?.length ?? 1);
+              return (
+                <div key={o} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 20 }}>
+                    <NodeIcon type={n?.type} size={24} color={n?.type === 'elite' ? '#7a1012' : C.ink} />
+                    <span className="ab-sc" style={{ flex: 1, color: n?.type === 'elite' ? '#7a1012' : C.ink }}>{names[n?.type]}</span><b>{cnt}</b>
+                  </div>
+                  <div style={{ height: 8, background: '#c9b88f' }}><div style={{ width: `${(cnt / tot) * 100}%`, height: 8, background: n?.type === 'elite' ? '#7a1012' : '#3b2c1d', transition: 'width .3s' }} /></div>
+                </div>
+              );
+            })}
+            <div style={{ height: 1, background: '#b39f78', margin: '4px 0' }} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <span style={{ fontSize: 17, flex: 1 }}>{((ids: string[]) => (ids.length ? `Noch offen: ${ids.map((id) => player(id)?.name).join(', ')}` : 'Alle haben abgestimmt'))((v?.voters ?? []).filter((id: string) => !Object.values(v.votes).some((a: any) => a.includes(id))))}</span>
+              {v?.deadline && <HostTimer deadline={v.deadline} duration={v.duration} size={48} />}
+            </div>
+          </>
+        )}
+      </section>
+      {leader && byId.get(leader) && (
+        <section style={{ ...PAPER_BOX, position: 'absolute', right: 24, top: 470, width: 330, padding: '16px 22px 20px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <span className="ab-sc" style={{ fontSize: 20 }}>{byId.get(leader).type === 'boss' && m.boss ? m.boss.name : names[byId.get(leader).type]}</span>
+          <span style={{ fontSize: 17, lineHeight: 1.3 }}>{view.nodeDesc[byId.get(leader).type]}</span>
+        </section>
+      )}
+    </>
+  );
+}
+
+/** Spielerfiguren in einer Reihe (Laden, Lagerfeuer, Schatz) */
+function HeroRow({ heroes, player, top = 520, label, mark }: { heroes: any[]; player: (id: string) => PlayerInfo | undefined; top?: number; label: (h: any) => ReactNode; mark?: (h: any) => boolean }) {
+  const n = heroes.length;
+  const slot = Math.min(190, 1180 / n);
+  const figH = n <= 4 ? 120 : n <= 8 ? 96 : 76;
+  return (
+    <>
+      {heroes.map((h, k) => {
+        const x = 640 + (k - (n - 1) / 2) * slot;
+        const pl = player(h.id);
+        return (
+          <div key={h.id} style={{ position: 'absolute', left: x - slot / 2, top, width: slot, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+            <div style={{ position: 'relative' }}>
+              <img src={IMG(h.img)} alt="" style={{ height: figH, filter: 'drop-shadow(0 10px 8px rgba(0,0,0,.65))', animation: `abSway ${3.2 + (k % 4) * 0.4}s ease-in-out infinite`, transformOrigin: 'bottom center' }} />
+              {mark?.(h) && <span style={{ position: 'absolute', right: -14, top: 4, width: 30, height: 30, borderRadius: '50%', background: '#7a2416', color: '#f3e6c8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, boxShadow: 'inset 0 0 0 3px rgba(0,0,0,.22)', animation: 'abPop .4s ease-out' }}>✓</span>}
+            </div>
+            <div style={{ background: C.paper, color: C.ink, padding: '3px 10px 5px', clipPath: TORN2, display: 'flex', flexDirection: 'column', alignItems: 'center', maxWidth: slot - 6, boxSizing: 'border-box' }}>
+              <span className="ab-sc" style={{ fontSize: n > 8 ? 14 : 17, color: shadeDark(pl?.color), whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: slot - 26 }}>{pl?.name}</span>
+              <span style={{ fontSize: n > 8 ? 12 : 15, display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}>{label(h)}</span>
+            </div>
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
+function MerchantSilhouette() {
+  return (
+    <svg width="300" height="330" viewBox="0 0 300 330" aria-hidden="true">
+      <path d="M150 20c-40 0-62 34-62 70 0 20 6 34 14 46-30 20-50 70-56 150h208c-6-80-26-130-56-150 8-12 14-26 14-46 0-36-22-70-62-70z" fill="#1c140d" opacity=".85" />
+      <circle cx="136" cy="96" r="4" fill="#c4161c" /><circle cx="164" cy="96" r="4" fill="#c4161c" />
+    </svg>
+  );
+}
+
+function HostShop({ view, player }: HostViewProps) {
+  const done = new Set<string>(view.done);
+  useEffect(() => { if (view.last) play('paper'); }, [view.last?.at]);
+  return (
+    <>
+      <Backdrop img="hintergrund-kampf-abgrund" opacity={0.42} />
+      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 45% 60% at 50% 45%, rgba(255,150,60,.16), rgba(15,11,8,.6) 70%)' }} />
+      <TvTitle title="Der Händler" sub={`Akt I · Stufe ${view.node?.lv} · Jeder kauft auf dem Handy`} />
+      <div style={{ position: 'absolute', left: 490, top: 100, width: 300, height: 330, display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
+        <FigureOr name="figur-haendler" style={{ height: 330, filter: 'drop-shadow(0 14px 12px rgba(0,0,0,.65))', animation: 'abSway 5s ease-in-out infinite', transformOrigin: 'bottom center' }}><MerchantSilhouette /></FigureOr>
+      </div>
+      <svg width="620" height="110" viewBox="0 0 620 110" aria-hidden="true" style={{ position: 'absolute', left: 330, top: 410 }}>
+        <path d="M10 20 L610 20 L590 50 L30 50 Z" fill="#3a2718" stroke="#1c140d" strokeWidth="2" />
+        <path d="M40 50 L40 110 M580 50 L580 110" stroke="#2a1b10" strokeWidth="10" />
+        <ellipse cx="120" cy="16" rx="22" ry="8" fill="#b8893c" /><ellipse cx="128" cy="10" rx="22" ry="8" fill="#d0a24f" />
+        <rect x="250" y="-6" width="38" height="24" rx="3" fill="#e3d3ad" stroke="#1c140d" /><rect x="296" y="-10" width="38" height="28" rx="3" fill="#e9dbb8" stroke="#1c140d" />
+        <circle cx="470" cy="6" r="12" fill="#7a4fb0" stroke="#1c140d" />
+      </svg>
+      <HeroRow heroes={view.heroes} player={player} top={500} label={(h) => <Coin n={h.gold} dark />} mark={(h) => done.has(h.id)} />
+      {view.last && Date.now() - view.last.at < 4000 && <Floater key={view.last.at} x={640} y={380} text={`${player(view.last.id)?.name ?? ''} ${view.last.text}`} color={C.paper} k={String(view.last.at)} />}
+      <section style={{ ...PAPER_BOX, position: 'absolute', right: 40, top: 110, width: 270, padding: '18px 22px 22px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <span className="ab-sc" style={{ fontSize: 22 }}>Im Laden</span>
+        <span style={{ fontSize: 17, lineHeight: 1.35 }}>Jeder hat sein eigenes Angebot: Karten seiner Klasse, Relikte und „Karte entfernen“.</span>
+        <div style={{ height: 1, background: '#b39f78', margin: '4px 0' }} />
+        <span style={{ fontSize: 17 }}><b>{done.size} von {view.heroes.length}</b> fertig</span>
+      </section>
+    </>
+  );
+}
+
+function Campfire({ size = 1 }: { size?: number }) {
+  return (
+    <svg width={180 * size} height={200 * size} viewBox="0 0 180 200" aria-hidden="true">
+      <g style={{ transformOrigin: '90px 160px', animation: 'abCandle 1.3s ease-in-out infinite' }}>
+        <path d="M90 10 C 120 60 150 80 140 130 C 132 170 48 170 40 130 C 32 90 70 70 70 40 C 80 60 85 70 90 70 C 92 50 86 30 90 10 Z" fill="#f2a43a" />
+        <path d="M92 70 C 110 100 122 115 116 140 C 110 162 70 162 64 140 C 60 120 78 110 80 92 C 86 104 90 108 92 108 Z" fill="#ffe38a" />
+      </g>
+      <circle cx="60" cy="40" r="3" fill="#ffb347" /><circle cx="124" cy="24" r="2.5" fill="#ffb347" /><circle cx="104" cy="2" r="2" fill="#ffd27a" />
+      <path d="M20 182 L160 160 M20 160 L160 184" stroke="#3a2718" strokeWidth="14" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function HostCamp({ view, player }: HostViewProps) {
+  const chosen = new Set<string>(view.chosen);
+  const res = new Map<string, string>((view.result ?? []).map((r: any) => [r.id, r.text]));
+  useEffect(() => { if (view.result) play('heal'); }, [!!view.result]);
+  useEffect(() => { sfx.custom((s) => s.noise(1.4, { filter: 1800, type: 'bandpass', vol: 0.05 })); }, [chosen.size]);
+  return (
+    <>
+      <Backdrop img="hintergrund-lager" opacity={0.4} />
+      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 40% 45% at 50% 62%, rgba(255,140,40,.35), rgba(255,90,20,.06) 55%, rgba(15,11,8,.85) 100%)' }} />
+      <TvTitle title="Lagerfeuer" sub={`Akt I · Stufe ${view.node?.lv}${view.node?.lv === 10 ? ' · Ein letzter Halt vor der Tiefe' : ''}`} />
+      <div style={{ position: 'absolute', left: 550, top: 250 }}>
+        <FigureOr name="figur-lagerfeuer" style={{ height: 210 }}><Campfire /></FigureOr>
+      </div>
+      <HeroRow heroes={view.heroes} player={player} top={460} label={(h) => (res.get(h.id) ? <i>{res.get(h.id)}</i> : chosen.has(h.id) ? 'hat gewählt' : <i>wählt …</i>)} mark={(h) => chosen.has(h.id) && !view.result} />
+      <section style={{ ...PAPER_BOX, position: 'absolute', right: 40, top: 96, width: 300, padding: '18px 22px 22px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <span className="ab-sc" style={{ fontSize: 22 }}>Jeder wählt eins</span>
+        <span style={{ fontSize: 17, lineHeight: 1.35 }}><b>Rasten</b> · 30 % der Leben heilen</span>
+        <span style={{ fontSize: 17, lineHeight: 1.35 }}><b>Schmieden</b> · eine Karte verbessern</span>
+        {!view.solo && <span style={{ fontSize: 17, lineHeight: 1.35 }}><b>Wache halten</b> · deine Rast einem Mitspieler schenken</span>}
+      </section>
+    </>
+  );
+}
+
+function EventPicture({ img, height }: { img: string; height: number }) {
+  return (
+    <FigureOr name={img} style={{ width: '100%', height, objectFit: 'cover', filter: 'sepia(.2)' }}>
+      <div style={{ height, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'radial-gradient(ellipse at 50% 40%, #d8c69c, #b9a57a)', color: '#6b5d45' }}>
+        <NodeIcon type="event" size={height * 0.4} color="#6b5d45" />
+      </div>
+    </FigureOr>
+  );
+}
+
+function HostEvent({ view, player }: HostViewProps) {
+  const e = view.event;
+  const v = view.vote;
+  if (!e) return null;
+  const picked = new Set<string>(e.picked);
+  useEffect(() => { play('paper'); }, [e.stage]);
+  return (
+    <>
+      <Backdrop img="hintergrund-kampf-abgrund" opacity={0.25} />
+      <section aria-label="Ereignis" style={{ position: 'absolute', left: 70, top: 50, width: 1140, height: 610, display: 'flex', filter: 'drop-shadow(0 20px 30px rgba(0,0,0,.75))' }}>
+        <div style={{ flex: 1, background: C.paper2, borderRadius: '8px 0 0 8px', padding: 34, boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: 14, boxShadow: 'inset -30px 0 40px -20px rgba(60,40,20,.55)', color: C.ink }}>
+          <EventPicture img={e.img} height={480} />
+          <span className="ab-fell" style={{ fontSize: 18, fontStyle: 'italic', color: '#4a3b29', textAlign: 'center' }}>— Stufe {view.node?.lv} —</span>
+        </div>
+        <div style={{ flex: 1, background: C.paper, color: C.ink, borderRadius: '0 8px 8px 0', padding: '38px 44px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: 14, boxShadow: 'inset 30px 0 40px -20px rgba(60,40,20,.45)' }}>
+          <span className="ab-sc" style={{ fontSize: 42, lineHeight: 1 }}>{e.name}</span>
+          <p className="ab-fell" style={{ margin: 0, fontSize: 22, lineHeight: 1.4 }}><span className="ab-sc" style={{ fontSize: 44, float: 'left', lineHeight: 0.9, padding: '4px 8px 0 0', color: '#7a1012' }}>{e.text[0]}</span>{e.text.slice(1)}</p>
+          <div style={{ flex: 1 }} />
+          {e.stage === 'result' ? (
+            <>
+              <span className="ab-fell" style={{ fontSize: 18, fontStyle: 'italic', color: '#4a3b29' }}>{e.choice ? `Ihr habt gewählt: ${e.options.find((o: any) => o.id === e.choice)?.label}` : 'So ist es ausgegangen:'}</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4, maxHeight: 230, overflow: 'hidden' }}>
+                {e.results.map((r: any) => (
+                  <span key={r.id} style={{ fontSize: e.results.length > 6 ? 15 : 18, animation: 'abFade .4s' }}><b className="ab-sc" style={{ color: shadeDark(player(r.id)?.color) }}>{player(r.id)?.name}</b> · {r.text}</span>
+                ))}
+              </div>
+            </>
+          ) : (
+            <>
+              <span className="ab-fell" style={{ fontSize: 18, fontStyle: 'italic', color: '#4a3b29' }}>{e.group ? 'Die Gruppe entscheidet:' : 'Jeder entscheidet auf dem Handy für sich:'}</span>
+              {e.options.map((o: any) => {
+                const votes: string[] = v?.votes?.[o.id] ?? [];
+                const win = v?.winner === o.id;
+                return (
+                  <div key={o.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', border: `2px solid ${win ? '#7a1012' : '#3b2c1d'}`, background: C.paper2 }}>
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}><b className="ab-sc" style={{ fontSize: 21 }}>{o.label}</b><span style={{ fontSize: 16 }}>{o.desc}</span></div>
+                    {votes.map((id) => <VoteSeal key={id} p={player(id)} />)}
+                  </div>
+                );
+              })}
+              {e.group && v && !v.winner && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <span style={{ fontSize: 17, flex: 1 }}>{((ids: string[]) => (ids.length ? `Noch offen: ${ids.map((id) => player(id)?.name).join(', ')}` : 'Alle haben abgestimmt'))((v.voters ?? []).filter((id: string) => !Object.values(v.votes).some((a: any) => a.includes(id))))}</span>
+                  {v.deadline && <HostTimer deadline={v.deadline} duration={v.duration} size={44} />}
+                </div>
+              )}
+              {!e.group && <span style={{ fontSize: 17 }}>{((l: string[]) => (l.length ? `Noch offen: ${l.join(', ')}` : 'Alle haben gewählt'))(view.heroes.filter((h: any) => !picked.has(h.id)).map((h: any) => player(h.id)?.name))}</span>}
+            </>
+          )}
+        </div>
+      </section>
+    </>
+  );
+}
+
+function Chest() {
+  return (
+    <svg width="220" height="170" viewBox="0 0 220 170" aria-hidden="true">
+      <path d="M20 70 L200 70 L200 160 L20 160 Z" fill="#5a3a20" stroke="#1c140d" strokeWidth="4" />
+      <path d="M20 70 Q110 0 200 70" fill="#6e4a28" stroke="#1c140d" strokeWidth="4" />
+      <path d="M20 100 L200 100" stroke="#b8893c" strokeWidth="8" /><rect x="96" y="88" width="28" height="34" rx="4" fill="#b8893c" stroke="#1c140d" strokeWidth="3" />
+      <g style={{ animation: 'abCandle 1.6s ease-in-out infinite', transformOrigin: '110px 60px' }}><path d="M70 60 Q110 10 150 60" fill="none" stroke="#ffd27a" strokeWidth="4" opacity=".7" /></g>
+    </svg>
+  );
+}
+
+function HostTreasure({ view, player }: HostViewProps) {
+  const done = new Set<string>(view.done);
+  useEffect(() => { play('win'); }, []);
+  return (
+    <>
+      <Backdrop img="hintergrund-kampf-abgrund" opacity={0.4} />
+      <TvTitle title="Ein Schatz" sub={`Akt I · Stufe ${view.node?.lv} · Ein Relikt für jeden`} />
+      <div style={{ position: 'absolute', left: 530, top: 150 }}><Chest /></div>
+      <HeroRow heroes={view.heroes} player={player} top={380} mark={(h) => done.has(h.id)} label={(h) => {
+        const r = view.relics[h.id];
+        return r ? <><RelicIcon r={r} size={28} /> {r.name}</> : <i>nichts Neues</i>;
+      }} />
+    </>
+  );
+}
+
+function HostBossIntro({ view }: HostViewProps) {
+  useEffect(() => {
+    sfx.custom((s) => { s.tone(55, 3.5, { type: 'sawtooth', vol: 0.08, attack: 0.8 }); s.tone(41, 3.5, { vol: 0.12, attack: 1 }); s.noise(3, { filter: 400, type: 'lowpass', vol: 0.15, at: 0.5 }); });
+  }, []);
+  return (
+    <>
+      <div style={{ position: 'absolute', inset: 0, background: '#070504' }} />
+      <img src={IMG('hintergrund-kampf-abgrund')} alt="" style={{ position: 'absolute', inset: 0, width: 1280, height: 720, objectFit: 'cover', opacity: 0.12 }} />
+      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 50% 60% at 50% 80%, rgba(196,40,20,.4), rgba(7,5,4,0) 70%)' }} />
+      <div style={{ position: 'absolute', left: 0, right: 0, bottom: -20, display: 'flex', justifyContent: 'center', animation: 'abRise 3.5s ease-out both' }}>
+        <FigureOr name={view.boss.img} fallback={view.boss.fallback} style={{ height: 520, filter: 'drop-shadow(0 0 30px rgba(196,40,20,.5)) drop-shadow(0 14px 12px rgba(0,0,0,.8))' }} />
+      </div>
+      <div style={{ position: 'absolute', left: 0, right: 0, top: 70, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, animation: 'abFade 1.5s .8s both' }}>
+        <span className="ab-fell" style={{ fontSize: 26, fontStyle: 'italic', color: '#c8b993', letterSpacing: 2 }}>Aus der Tiefe erhebt sich</span>
+        <span className="ab-sc" style={{ fontSize: 104, lineHeight: 1, letterSpacing: 8, color: '#c4161c', textShadow: '0 0 30px rgba(196,22,28,.55), 0 8px 18px rgba(0,0,0,.9)' }}>{view.boss.name}</span>
+      </div>
+    </>
+  );
+}
+
+/* ================= Akt I: Handy ================= */
+
+function PhoneMap({ view, send, player, me }: ControllerViewProps) {
+  const m = view.map;
+  const v = m.vote;
+  const names: Record<string, string> = view.nodeNames;
+  const byId = new Map<string, any>(m.nodes.map((n: any) => [n.id, n]));
+  const opts: string[] = v?.options ?? [];
+  const sortedCols = [...opts].map((o) => byId.get(o)?.col ?? 0).sort((a, b) => a - b);
+  const side = (o: string) => {
+    if (opts.length < 2) return '';
+    const c = byId.get(o)?.col ?? 0;
+    const i = sortedCols.indexOf(c);
+    return i === 0 ? 'linker Weg' : i === sortedCols.length - 1 ? 'rechter Weg' : 'mittlerer Weg';
+  };
+  if (v?.winner) {
+    const n = byId.get(v.winner);
+    return (
+      <>
+        <MeHeader view={view} />
+        <PhoneCenter title={`Weiter zum ${names[n?.type] ?? ''}`} text={view.nodeDesc[n?.type]} />
+      </>
+    );
+  }
+  return (
+    <>
+      <MeHeader view={view} />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, paddingTop: 4 }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+          <span className="ab-sc" style={{ fontSize: 30 }}>Wohin?</span>
+          <span className="ab-fell" style={{ fontSize: 16, fontStyle: 'italic', color: C.muted }}>Stufe {m.level + 1} von {m.levels} · die Mehrheit entscheidet</span>
+        </div>
+      </div>
+      {v?.deadline && <PhoneTimer deadline={v.deadline} duration={v.duration} />}
+      {(v?.options ?? []).map((o: string) => {
+        const n = byId.get(o);
+        const mine = view.myVote === o;
+        const cnt = v.votes[o]?.length ?? 0;
+        return (
+          <button key={o} type="button" onClick={() => { vibrate(20); play('paper'); send({ type: 'vote', option: o }); }} style={{
+            width: '100%', border: 0, cursor: 'pointer', textAlign: 'left', background: C.paper2, color: C.ink, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 14, fontFamily: BODY, clipPath: TORN2,
+            boxShadow: mine ? 'inset 0 0 0 4px #f2a43a' : undefined, touchAction: 'manipulation',
+          }}>
+            <span style={{ width: 58, height: 58, flex: 'none', borderRadius: '50%', border: `3px solid ${n?.type === 'elite' ? '#7a1012' : C.ink}`, display: 'flex', alignItems: 'center', justifyContent: 'center', background: C.paper }}>
+              <NodeIcon type={n?.type} size={32} color={n?.type === 'elite' ? '#7a1012' : C.ink} />
+            </span>
+            <span style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+              <b className="ab-sc" style={{ fontSize: 24, color: n?.type === 'elite' ? '#7a1012' : C.ink }}>{names[n?.type]} {side(o) && <i className="ab-fell" style={{ fontSize: 14, fontWeight: 400, color: '#6b5d45' }}>{side(o)}</i>}</b>
+              <span style={{ fontSize: 16, lineHeight: 1.25 }}>{view.nodeDesc[n?.type]}</span>
+            </span>
+            <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+              <b style={{ fontSize: 18 }}>{cnt}</b>
+              {mine && <span className="ab-fell" style={{ fontSize: 12, fontStyle: 'italic' }}>deine</span>}
+            </span>
+          </button>
+        );
+      })}
+      <section aria-label="Blick voraus" style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingTop: 6 }}>
+        <span className="ab-sc" style={{ fontSize: 15, color: C.muted, letterSpacing: 1 }}>Danach, soweit man sehen kann</span>
+        {(v?.options ?? []).map((o: string) => {
+          const n = byId.get(o);
+          const after = (n?.next ?? []).map((t: string) => byId.get(t)).filter(Boolean);
+          return (
+            <div key={o} style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 15 }}>
+              <span className="ab-fell" style={{ fontStyle: 'italic', color: C.muted, minWidth: 110 }}>{side(o) || names[n?.type]} →</span>
+              <span style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>{after.length ? after.map((a: any) => <span key={a.id} style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><NodeIcon type={a.type} size={18} color={C.paper} />{a.type === 'boss' && m.boss ? m.boss.name : names[a.type]}</span>) : <i style={{ color: '#6f6450' }}>dunkel</i>}</span>
+            </div>
+          );
+        })}
+      </section>
+      <div style={{ flex: 1 }} />
+      <span className="ab-fell" style={{ fontSize: 15, fontStyle: 'italic', color: C.muted, textAlign: 'center' }}>Du kannst deine Stimme ändern, bis die Zeit um ist.</span>
+      <Waiting view={{ ...view, waitingFor: (v?.voters ?? []).filter((id: string) => id !== me.id && !Object.values(v.votes).some((a: any) => a.includes(id))) }} send={send} player={player} text="" />
+    </>
+  );
+}
+
+function PhoneShop({ view, send, player }: ControllerViewProps) {
+  const [sel, setSel] = useState<number | null>(null);
+  const [removing, setRemoving] = useState(false);
+  const gold = view.me.gold;
+  if (view.done) return (<><MeHeader view={view} /><PhoneCenter title="Fertig eingekauft" /><Waiting view={view} send={send} player={player} /></>);
+  if (removing) {
+    return <DeckPicker cards={view.deck} title="Karte entfernen" hint={`Kostet ${view.removePrice} Gold. Die Karte verschwindet für den Rest des Runs.`} confirm={`Entfernen für ${view.removePrice} Gold`} onCancel={() => setRemoving(false)} onPick={(uid) => { send({ type: 'remove', uid }); setRemoving(false); }} />;
+  }
+  if (sel != null && view.cards[sel]) {
+    const it = view.cards[sel];
+    const can = !it.sold && gold >= it.price;
+    return (
+      <>
+        <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8 }}><CardFace c={it.card} w={190} /></div>
+        <KeywordList items={cardKeywords(it.card)} dark />
+        <button type="button" disabled={!can} style={{ ...BIG_BTN, opacity: can ? 1 : 0.5 }} onClick={() => { vibrate(20); play('paper'); send({ type: 'buy', kind: 'card', i: sel }); setSel(null); }}>
+          {it.sold ? 'Verkauft' : can ? `Kaufen für ${it.price} Gold` : `Zu teuer (${it.price} Gold)`}
+        </button>
+        <button type="button" style={{ ...SMALL_BTN, minHeight: 48 }} onClick={() => setSel(null)}>Zurück</button>
+      </>
+    );
+  }
+  return (
+    <>
+      <MeHeader view={view} />
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <span className="ab-sc" style={{ fontSize: 28 }}>Der Händler</span>
+        <span className="ab-fell" style={{ fontSize: 15, fontStyle: 'italic', color: C.muted }}>Tippe eine Ware an, um sie anzusehen und zu kaufen.</span>
+      </div>
+      <section aria-label="Karten" style={{ background: '#2a1b10', borderTop: '6px solid #3a2718', padding: '16px 8px 12px', display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '16px 6px', justifyItems: 'center' }}>
+        {view.cards.map((it: any, i: number) => (
+          <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
+            <CardFace c={it.card} w={100} dim={it.sold || gold < it.price} onClick={() => { play('paper'); setSel(i); }} />
+            <span style={{ fontSize: 16, color: it.sold ? C.muted : gold < it.price ? '#ff8a70' : '#e3b866' }}>{it.sold ? 'verkauft' : <Coin n={it.price} />}</span>
+          </div>
+        ))}
+      </section>
+      {view.relics.length > 0 && (
+        <section aria-label="Relikte" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <span className="ab-sc" style={{ fontSize: 15, color: C.muted, letterSpacing: 1 }}>Relikte</span>
+          {view.relics.map((it: any, i: number) => {
+            const can = !it.sold && gold >= it.price;
+            return (
+              <button key={i} type="button" disabled={!can} onClick={() => { vibrate(20); play('paper'); send({ type: 'buy', kind: 'relic', i }); }} style={{ border: 0, padding: 0, background: 'transparent', cursor: can ? 'pointer' : 'default', textAlign: 'left', opacity: it.sold ? 0.45 : 1, display: 'flex', alignItems: 'stretch', gap: 0, fontFamily: BODY }}>
+                <div style={{ flex: 1 }}><RelicRow r={it.relic} dark /></div>
+                <span style={{ display: 'flex', alignItems: 'center', padding: '0 10px', background: '#2a1f16', border: '1px solid #5b452f', borderLeft: 0, color: can ? '#e3b866' : '#ff8a70' }}>{it.sold ? 'verkauft' : <Coin n={it.price} />}</span>
+              </button>
+            );
+          })}
+        </section>
+      )}
+      <button type="button" disabled={view.removed || gold < view.removePrice} style={{ ...SMALL_BTN, minHeight: 52, fontSize: 19, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, opacity: view.removed || gold < view.removePrice ? 0.5 : 1 }} onClick={() => setRemoving(true)}>
+        {view.removed ? 'Karte entfernt' : <>Karte entfernen <Coin n={view.removePrice} /></>}
+      </button>
+      <div style={{ flex: 1 }} />
+      <button type="button" style={BIG_BTN} onClick={() => { vibrate(25); send({ type: 'done' }); }}>Fertig</button>
+    </>
+  );
+}
+
+function PhoneCamp({ view, send, player, me }: ControllerViewProps) {
+  const [mode, setMode] = useState<'forge' | 'watch' | null>(null);
+  if (view.result) {
+    return (
+      <>
+        <MeHeader view={view} />
+        <span className="ab-sc" style={{ fontSize: 26 }}>Am Feuer</span>
+        {view.result.map((r: any) => <span key={r.id} style={{ fontSize: 17 }}><b className="ab-sc" style={{ color: player(r.id)?.color }}>{r.id === me.id ? 'Du' : player(r.id)?.name}</b> · {r.text}</span>)}
+      </>
+    );
+  }
+  if (view.chosen) {
+    const c = view.chosen;
+    const what = c.kind === 'rest' ? 'Du rastest.' : c.kind === 'forge' ? `Du schmiedest ${view.deck.find((x: any) => x.uid === c.uid)?.name ?? ''}.` : `Du hältst Wache für ${player(c.target)?.name}.`;
+    return (<><MeHeader view={view} /><PhoneCenter title={what} /><Waiting view={view} send={send} player={player} /></>);
+  }
+  if (mode === 'forge') {
+    return <DeckPicker cards={view.deck.filter((c: any) => !c.up)} title="Schmieden" hint="Wähle eine Karte – sie wird dauerhaft verbessert." confirm="Diese Karte schmieden" upgrade onCancel={() => setMode(null)} onPick={(uid) => { send({ type: 'camp', kind: 'forge', uid }); setMode(null); }} />;
+  }
+  if (mode === 'watch') {
+    return (
+      <>
+        <span className="ab-sc" style={{ fontSize: 22 }}>Für wen hältst du Wache?</span>
+        <span className="ab-fell" style={{ fontSize: 15, fontStyle: 'italic', color: C.muted }}>Diese Person heilt zusätzlich 30 % ihrer Leben. Du selbst rastest nicht.</span>
+        {view.allies.map((a: any) => (
+          <button key={a.id} type="button" onClick={() => { vibrate(20); send({ type: 'camp', kind: 'watch', target: a.id }); setMode(null); }} style={{ display: 'flex', alignItems: 'center', gap: 12, background: C.paper2, color: C.ink, padding: '8px 12px', border: 0, textAlign: 'left', cursor: 'pointer', fontFamily: BODY, clipPath: TORN2, minHeight: 64 }}>
+            <img src={IMG(a.img)} alt="" style={{ height: 54 }} />
+            <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 3 }}>
+              <span className="ab-sc" style={{ fontSize: 18 }}>{player(a.id)?.name}</span>
+              <Bar v={a.hp} max={a.maxHp} h={8} />
+              <span style={{ fontSize: 14 }}>{a.hp} / {a.maxHp}</span>
+            </span>
+          </button>
+        ))}
+        <button type="button" style={{ ...SMALL_BTN, minHeight: 48 }} onClick={() => setMode(null)}>Zurück</button>
+      </>
+    );
+  }
+  const heal30 = Math.min(Math.round(view.me.maxHp * 0.3), view.me.maxHp - view.me.hp);
+  const opt = (k: string, icon: ReactNode, title: string, text: string, onClick: () => void, disabled = false) => (
+    <button key={k} type="button" disabled={disabled} onClick={onClick} style={{ width: '100%', border: 0, cursor: disabled ? 'default' : 'pointer', textAlign: 'left', background: C.paper2, color: C.ink, padding: 16, display: 'flex', alignItems: 'center', gap: 14, fontFamily: BODY, clipPath: TORN2, opacity: disabled ? 0.5 : 1, touchAction: 'manipulation' }}>
+      <span style={{ width: 60, height: 60, flex: 'none', borderRadius: '50%', background: '#2a1f16', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{icon}</span>
+      <span style={{ flex: 1, display: 'flex', flexDirection: 'column' }}><b className="ab-sc" style={{ fontSize: 24 }}>{title}</b><span style={{ fontSize: 16, lineHeight: 1.25 }}>{text}</span></span>
+    </button>
+  );
+  return (
+    <>
+      <MeHeader view={view} />
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <span className="ab-sc" style={{ fontSize: 30 }}>Lagerfeuer</span>
+        <span className="ab-fell" style={{ fontSize: 16, fontStyle: 'italic', color: C.muted }}>Wähle eins.</span>
+      </div>
+      {opt('rest', <HeartIcon size={32} color="#f2a43a" />, 'Rasten', `Heile ${heal30} Leben (30 %) → ${view.me.hp + heal30}/${view.me.maxHp}`, () => { vibrate(20); send({ type: 'camp', kind: 'rest' }); })}
+      {opt('forge', <NodeIcon type="shop" size={32} color="#f2a43a" />, 'Schmieden', 'Eine Karte dauerhaft verbessern.', () => setMode('forge'), !view.deck.some((c: any) => !c.up))}
+      {!view.solo && opt('watch', <FlameIcon size={32} color="#f2a43a" />, 'Wache halten', 'Du rastest nicht – ein Mitspieler heilt deine 30 % zusätzlich.', () => setMode('watch'))}
+    </>
+  );
+}
+
+function PhoneEvent({ view, send, player, me }: ControllerViewProps) {
+  const [cardFor, setCardFor] = useState<string | null>(null);
+  const e = view.event;
+  if (!e) return <PhoneCenter title="Schau auf den Fernseher" />;
+  if (cardFor) {
+    const opt = e.options.find((o: any) => o.id === cardFor);
+    return <DeckPicker cards={view.deck} title={opt?.label ?? ''} hint={opt?.desc} confirm={cardFor === 'remove' ? 'Diese Karte entfernen' : 'Diese Karte verdoppeln'} onCancel={() => setCardFor(null)} onPick={(uid) => { send({ type: 'event', option: cardFor, uid }); setCardFor(null); }} />;
+  }
+  const v = view.vote;
+  const myPick = e.picked.includes(me.id);
+  const affordable = (o: any) => !(e.id === 'haendler' && ((o.id === 'remove' && view.me.gold < 40) || (o.id === 'relic' && view.me.gold < 90)));
+  return (
+    <>
+      <MeHeader view={view} />
+      <section style={{ background: C.paper, color: C.ink, padding: '16px 16px 18px', display: 'flex', flexDirection: 'column', gap: 10, boxShadow: 'inset 0 0 40px rgba(60,40,20,.35)' }}>
+        <EventPicture img={e.img} height={150} />
+        <span className="ab-sc" style={{ fontSize: 28, lineHeight: 1 }}>{e.name}</span>
+        <p className="ab-fell" style={{ margin: 0, fontSize: 17, lineHeight: 1.4 }}>{e.text}</p>
+        <span className="ab-fell" style={{ fontSize: 15, fontStyle: 'italic', color: '#4a3b29' }}>{e.stage === 'result' ? 'So ist es ausgegangen:' : e.group ? 'Die Gruppe stimmt ab.' : 'Du entscheidest für dich.'}</span>
+      </section>
+      {e.stage === 'result' ? (
+        <>
+          {e.results.map((r: any) => <span key={r.id} style={{ fontSize: 17 }}><b className="ab-sc" style={{ color: player(r.id)?.color }}>{r.id === me.id ? 'Du' : player(r.id)?.name}</b> · {r.text}</span>)}
+          {view.vip && <button type="button" style={{ ...SMALL_BTN, minHeight: 48 }} onClick={() => send({ type: 'next' })}>Weiter</button>}
+        </>
+      ) : e.group ? (
+        <>
+          {v?.deadline && !v.winner && <PhoneTimer deadline={v.deadline} duration={v.duration} />}
+          {e.options.map((o: any) => {
+            const mine = view.myVote === o.id;
+            return (
+              <button key={o.id} type="button" disabled={!!v?.winner} onClick={() => { vibrate(20); play('paper'); send({ type: 'vote', option: o.id }); }} style={{ width: '100%', border: `2px solid ${mine ? '#f2a43a' : '#3b2c1d'}`, cursor: 'pointer', textAlign: 'left', background: C.paper2, color: C.ink, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10, fontFamily: BODY }}>
+                <span style={{ flex: 1, display: 'flex', flexDirection: 'column' }}><b className="ab-sc" style={{ fontSize: 22 }}>{o.label}</b><span style={{ fontSize: 16 }}>{o.desc}</span></span>
+                <b style={{ fontSize: 18 }}>{v?.votes?.[o.id]?.length ?? 0}</b>
+              </button>
+            );
+          })}
+        </>
+      ) : myPick ? (
+        <Waiting view={view} send={send} player={player} />
+      ) : (
+        e.options.map((o: any) => {
+          const ok = affordable(o);
+          return (
+            <button key={o.id} type="button" disabled={!ok} onClick={() => { vibrate(20); play('paper'); if (o.id === 'remove' || o.id === 'copy') setCardFor(o.id); else send({ type: 'event', option: o.id }); }} style={{ width: '100%', border: '2px solid #3b2c1d', cursor: ok ? 'pointer' : 'default', textAlign: 'left', background: C.paper2, color: C.ink, padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 2, fontFamily: BODY, opacity: ok ? 1 : 0.5 }}>
+              <b className="ab-sc" style={{ fontSize: 22 }}>{o.label}</b><span style={{ fontSize: 16 }}>{o.desc}{!ok ? ' – zu wenig Gold' : ''}</span>
+            </button>
+          );
+        })
+      )}
+    </>
+  );
+}
+
+function PhoneTreasure({ view, send, player }: ControllerViewProps) {
+  return (
+    <>
+      <MeHeader view={view} />
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, paddingTop: 20 }}>
+        <span className="ab-sc" style={{ fontSize: 28 }}>Ein Schatz!</span>
+        {view.relic ? <RelicIcon r={view.relic} size={110} /> : null}
+      </div>
+      {view.relic ? <RelicRow r={view.relic} /> : <span className="ab-fell" style={{ fontStyle: 'italic', color: C.muted, textAlign: 'center' }}>Du hast schon alle Relikte – diesmal nichts Neues.</span>}
+      <div style={{ flex: 1 }} />
+      {view.done ? <Waiting view={view} send={send} player={player} /> : <button type="button" style={BIG_BTN} onClick={() => { vibrate(20); send({ type: 'done' }); }}>Weiter</button>}
+    </>
+  );
 }
 
 /* Unbenutzte Bausteine vermeiden */
