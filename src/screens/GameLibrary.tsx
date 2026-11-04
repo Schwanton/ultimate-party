@@ -25,6 +25,36 @@ export function fitOf(g: GameManifest, players: number): 'ok' | 'few' | 'many' {
   return 'ok';
 }
 
+/** „3–12 Spieler“ bzw. „2 Spieler“ (+ bei Publikum) */
+export function playersLabel(g: GameManifest, t: Translate) {
+  const base = g.minPlayers === g.maxPlayers ? t('lobby.playersExact', { n: g.minPlayers }) : t('lobby.playersRange', { min: g.minPlayers, max: g.maxPlayers });
+  return g.audience && g.minPlayers !== g.maxPlayers ? base.replace(/(\d+)(\D*)$/, '$1+$2') : base;
+}
+
+/**
+ * Titelbild eines Spiels. Füllt den Rahmen und wird passend zugeschnitten (jedes Bildformat geht).
+ * Ohne Bild (oder wenn es nicht lädt): Spielfarbe mit Streifen und großem Anfangsbuchstaben.
+ */
+export function GameCover({ g, lang, zoom, letterSize = 132 }: { g: GameManifest; lang: string; zoom?: boolean; letterSize?: number }) {
+  const [failed, setFailed] = useState(false);
+  const light = isLight(g.color);
+  if (g.coverUrl && !failed) {
+    return (
+      <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', background: shade(g.color, 0.6) }}>
+        <img key={g.coverUrl} src={g.coverUrl} alt="" className={zoom ? 'up-kenburns' : undefined} onError={() => setFailed(true)}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+      </div>
+    );
+  }
+  const letter = gameName(g, lang).replace(/^(Der|Die|Das|The)\s+/i, '').charAt(0).toUpperCase();
+  return (
+    <div aria-hidden="true" style={{ position: 'absolute', inset: 0, overflow: 'hidden', background: g.color }}>
+      <div style={{ position: 'absolute', inset: 0, background: 'repeating-linear-gradient(-35deg, rgba(0,0,0,.10) 0 14px, rgba(0,0,0,0) 14px 28px)' }} />
+      <span className="display" style={{ position: 'absolute', right: letterSize * 0.12, bottom: -letterSize * 0.17, fontSize: letterSize, fontWeight: 800, lineHeight: 1, color: light ? 'rgba(17,13,36,.28)' : 'rgba(255,255,255,.30)' }}>{letter}</span>
+    </div>
+  );
+}
+
 export function TagChip({ tag, t, small }: { tag: string; t: Translate; small?: boolean }) {
   return (
     <span style={{ fontSize: small ? 12 : 13, fontWeight: 700, padding: small ? '3px 8px' : '4px 10px', borderRadius: 999, background: 'rgba(17,13,36,.22)', whiteSpace: 'nowrap' }}>
@@ -33,7 +63,7 @@ export function TagChip({ tag, t, small }: { tag: string; t: Translate; small?: 
   );
 }
 
-const TAG_ICON: Record<string, string> = { words: '✍️', draw: '🎨', guess: '🎯', deceive: '🕵️', social: '💬', team: '🤝', quick: '⚡', other: '🎲' };
+const TAG_ICON: Record<string, string> = { words: '✍️', draw: '🎨', guess: '🎯', deceive: '🕵️', social: '💬', team: '🤝', quick: '⚡', duel: '⚔️', other: '🎲' };
 
 /** Filter-Reiter: Alle + Kategorien, die tatsächlich vorkommen */
 export function useTagFilter(games: GameManifest[]) {
@@ -79,7 +109,7 @@ export function GameLibrary({ games, selectedId, players, lang, t, onPick, onClo
         })}
       </nav>
       <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', margin: '0 -8px', padding: '8px 8px 16px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 18 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '20px 18px' }}>
           {list.map((g, i) => (
             <LibraryCard key={g.id} g={g} sel={g.id === selectedId} fit={fitOf(g, players)} players={players} lang={lang} t={t} delay={i * 0.03} onPick={() => onPick(g.id)} />
           ))}
@@ -91,26 +121,23 @@ export function GameLibrary({ games, selectedId, players, lang, t, onPick, onClo
 }
 
 function LibraryCard({ g, sel, fit, players, lang, t, delay, onPick }: { g: GameManifest; sel: boolean; players: number; fit: 'ok' | 'few' | 'many'; lang: string; t: Translate; delay: number; onPick: () => void }) {
-  const light = isLight(g.color);
   return (
     <button onClick={onPick} aria-pressed={sel} style={{
       border: 0, padding: 0, textAlign: 'left', borderRadius: 22, overflow: 'hidden', background: 'var(--surface)', color: '#fff',
-      display: 'flex', flexDirection: 'column', minHeight: 214, opacity: fit === 'ok' || sel ? 1 : 0.55,
+      display: 'flex', flexDirection: 'column', opacity: fit === 'ok' || sel ? 1 : 0.55,
       boxShadow: `${sel ? '0 0 0 4px #fff, ' : ''}0 6px 0 #0A0716`, animation: `upPop .35s ease-out ${delay.toFixed(2)}s both`,
     }}>
-      <div style={{ background: g.color, color: light ? '#110D24' : '#fff', padding: '14px 16px 12px', boxShadow: `inset 0 -5px 0 ${shade(g.color)}`, display: 'flex', flexDirection: 'column', gap: 8 }}>
-        <span style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-          <span className="display" style={{ fontSize: 24, fontWeight: 800, lineHeight: 1.1 }}>{gameName(g, lang)}</span>
-          {sel && <span style={{ background: '#fff', color: shade(g.color, 0.4), fontSize: 12, fontWeight: 700, padding: '3px 9px', borderRadius: 999 }}>{t('lobby.selected')}</span>}
-        </span>
-        <span style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>{gameTags(g).map((x) => <TagChip key={x} tag={x} t={t} small />)}</span>
+      <div style={{ height: 132, width: '100%', flex: 'none', position: 'relative' }}>
+        <GameCover g={g} lang={lang} />
+        {sel && <span style={{ position: 'absolute', left: 12, top: 12, background: '#fff', color: '#110D24', fontSize: 13, fontWeight: 700, padding: '4px 10px', borderRadius: 999 }}>{t('lobby.selected')}</span>}
       </div>
-      <div style={{ padding: '12px 16px 14px', display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
-        <p style={{ fontSize: 15, lineHeight: 1.35, color: 'var(--muted)', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{gameDesc(g, lang)}</p>
-        <span style={{ marginTop: 'auto', fontSize: 13, fontWeight: 700, color: fit === 'ok' ? 'var(--faint)' : 'var(--yellow)' }}>
-          {t('lobby.playersRange', { min: g.minPlayers, max: g.maxPlayers })}{g.audience ? ' +' : ''} · {t('lobby.minutes', { n: g.minutes })}
-          {fit === 'few' ? ` · ${t('lobby.needPlayers', { n: g.minPlayers - players })}` : ''}
+      <div style={{ padding: '12px 16px 14px', display: 'flex', flexDirection: 'column', gap: 6, width: '100%' }}>
+        <span className="display" style={{ fontSize: 22, fontWeight: 800, lineHeight: 1.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{gameName(g, lang)}</span>
+        <span style={{ fontSize: 14, fontWeight: 700, color: fit === 'ok' ? 'var(--muted)' : 'var(--yellow)' }}>
+          {playersLabel(g, t)} · {t('lobby.minutes', { n: g.minutes })}
+          {fit === 'few' ? ` · ${t('lobby.needPlayers', { n: g.minPlayers - players })}` : fit === 'many' ? ` · ${t('lobby.tooManyShort')}` : ''}
         </span>
+        <span style={{ fontSize: 13, color: 'var(--faint)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{gameTags(g).map((x) => t(`tag.${x}`)).join(' · ')}</span>
       </div>
     </button>
   );

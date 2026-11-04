@@ -2,6 +2,14 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.16.0
+
+- Neue Lobby: Das gewählte Spiel steht groß rechts, mit Titelbild, das langsam heranzoomt
+- Kleine Abzeichen zeigen Spielerzahl, Dauer und Kategorie; passt die Spielerzahl nicht, wird es gelb markiert
+- Die Spielauswahl zeigt zu jedem Spiel ein Bild; Spiele ohne Bild bekommen ihre Farbe und den Anfangsbuchstaben
+- Eigene Spiele bekommen ein Titelbild, wenn im Spielordner die Datei bilder/titelbild.webp (oder .png/.jpg) liegt
+- Behoben: In der Spielauswahl stand bei „Duell zu zweit“ „undefined“
+
 ## 0.15.0
 
 - Neue Namen: Bluff heißt jetzt Flunkerfakt, Crash heißt Cash Out or Crash Out!, Kritzelei heißt Vernissage, Mehrheit heißt Mainstream, Schlagfertig heißt Mic Drop und Verräter-Team heißt Maulwurf

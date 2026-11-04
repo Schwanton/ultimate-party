@@ -76,6 +76,20 @@ function loadPacks(dir: string, manifest: GameManifest) {
   return out;
 }
 
+/** Titelbild: aus dem Manifest ("cover") oder automatisch bilder/titelbild.webp|png|jpg. */
+function findCover(dir: string, manifest: GameManifest): string | undefined {
+  const candidates = manifest.cover ? [manifest.cover] : ['bilder/titelbild.webp', 'bilder/titelbild.png', 'bilder/titelbild.jpg'];
+  for (const rel of candidates) {
+    if (!/^(bilder)\/[\w.-]+\.(webp|png|jpg|svg)$/.test(rel)) {
+      console.warn(`[UP!] ${manifest.id}: Titelbild "${rel}" muss im Ordner bilder/ liegen (webp, png, jpg oder svg)`);
+      continue;
+    }
+    const file = path.join(dir, rel);
+    if (fs.existsSync(file)) return `/game/${manifest.id}/${rel}?v=${Math.round(fs.statSync(file).mtimeMs)}`;
+  }
+  return undefined;
+}
+
 export async function loadGames(): Promise<Map<string, LoadedGame>> {
   games.clear();
   if (!fs.existsSync(GAMES_DIR)) return games;
@@ -94,6 +108,7 @@ export async function loadGames(): Promise<Map<string, LoadedGame>> {
       const warning = manifest.sdkVersion !== SDK_VERSION
         ? `Gebaut für SDK ${manifest.sdkVersion}, UP! nutzt SDK ${SDK_VERSION}`
         : undefined;
+      manifest.coverUrl = findCover(dir, manifest);
       games.set(manifest.id, { manifest, dir, module, packs: loadPacks(dir, manifest), warning });
     } catch (e) {
       console.error(`[UP!] Spiel "${name}" konnte nicht geladen werden:`, (e as Error).message);

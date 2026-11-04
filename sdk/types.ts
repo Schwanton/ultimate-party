@@ -70,6 +70,14 @@ export interface GameManifest {
   secrets?: GameSecret[];
   /** Spiel-Einstellungen, die in der Lobby gewählt werden (Rundenanzahl usw.) */
   options?: GameOption[];
+  /**
+   * Titelbild für Lobby und Spielauswahl, relativ zum Spielordner (z. B. "bilder/titelbild.webp").
+   * Ohne Angabe nimmt UP! automatisch bilder/titelbild.webp, .png oder .jpg, falls vorhanden.
+   * Jedes Format geht (am besten 16:9, z. B. ein Screenshot vom TV); das Bild wird passend zugeschnitten.
+   */
+  cover?: string;
+  /** Adresse des Titelbilds – setzt der Server, nicht im Manifest eintragen */
+  coverUrl?: string;
 }
 
 /** Eine Spiel-Einstellung. Werte sind Zahlen oder Texte; `choices` macht daraus eine Auswahl. */

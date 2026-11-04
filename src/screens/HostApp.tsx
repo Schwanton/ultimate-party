@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import type React from 'react';
 import type { GameManifest, Lang, PlayerInfo, Translate } from '@up/sdk';
 import { net, useNet, loadSession, saveSession } from '../net';
 import { guessLang, useT } from '../i18n';
@@ -7,7 +8,7 @@ import { Avatar, Crown, FullscreenButton, Logo, QrCode, Stage, isLight, sfx, sha
 import { HostSettings } from './HostSettings';
 import { GameOptionsForm, optionsSummary } from './GameOptions';
 import { UpdateBanner } from './Update';
-import { GameLibrary, TagChip, fitOf, gameDesc, gameName, gameTags } from './GameLibrary';
+import { GameCover, GameLibrary, fitOf, gameDesc, gameName, gameTags, playersLabel } from './GameLibrary';
 
 async function connectHost() {
   const saved = loadSession('host');
@@ -251,81 +252,101 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
       )}
 
       <main style={{ flex: 1, minHeight: 0, display: 'flex', gap: 24 }}>
-        <section className="up-card" style={{ width: 480, padding: 32, display: 'flex', flexDirection: 'column', gap: 20, borderRadius: 28 }}>
-          <h2 style={{ fontSize: 40, fontWeight: 800 }}>{t('join.title')}</h2>
-          <div style={{ display: 'flex', gap: 24 }}>
-            <QrCode text={joinUrl} size={168} />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, minWidth: 0 }}>
-              <span className="muted" style={{ fontSize: 15, fontWeight: 500 }}>{t('join.scanOrOpen')}</span>
-              <span style={{ fontSize: 20, fontWeight: 700, wordBreak: 'break-all' }}>{room.joinUrl.replace(/^https?:\/\//, '')}</span>
-              <span className="muted" style={{ fontSize: 15, fontWeight: 500, marginTop: 8 }}>{t('join.code')}</span>
-              <div style={{ display: 'flex', gap: 8 }}>
-                {room.code.split('').map((ch, i) => (
-                  <span key={i} className="display" style={{ width: 52, height: 60, borderRadius: 14, background: 'var(--yellow)', color: '#110D24', fontSize: 36, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 5px 0 var(--yellow-d)' }}>{ch}</span>
-                ))}
+        <div style={{ width: 452, flex: 'none', display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <section className="up-card" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 14, borderRadius: 28 }}>
+            <h2 style={{ fontSize: 30, fontWeight: 800 }}>{t('join.title')}</h2>
+            <div style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
+              <QrCode text={joinUrl} size={124} />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0 }}>
+                <span className="muted" style={{ fontSize: 14, fontWeight: 500 }}>{t('join.scanOrOpen')}</span>
+                <span style={{ fontSize: 19, fontWeight: 700, wordBreak: 'break-all' }}>{room.joinUrl.replace(/^https?:\/\//, '')}</span>
+                <span className="muted" style={{ fontSize: 14, fontWeight: 500, marginTop: 6 }}>{t('join.code')}</span>
+                <div style={{ display: 'flex', gap: 7 }}>
+                  {room.code.split('').map((ch, i) => (
+                    <span key={i} className="display" style={{ width: 44, height: 52, borderRadius: 12, background: 'var(--yellow)', color: '#110D24', fontSize: 30, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 0 var(--yellow-d)' }}>{ch}</span>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-          <p className="muted" style={{ fontSize: 15 }}>{t('join.noApp')}</p>
-        </section>
+            <p className="faint" style={{ fontSize: 14 }}>{t('join.noApp')}</p>
+          </section>
 
-        <section className="up-card" style={{ flex: 1, minWidth: 0, padding: 32, display: 'flex', flexDirection: 'column', gap: 18, borderRadius: 28 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <h2 style={{ fontSize: 28, fontWeight: 700 }}>{t('lobby.players')}</h2>
-            <span style={{ background: 'var(--surface-2)', borderRadius: 999, padding: '6px 14px', fontSize: 16, fontWeight: 700 }}>
-              {active.length}{selected ? ` / ${selected.maxPlayers}` : ''}
-            </span>
-          </div>
-          <PlayerGrid players={players} vipId={room.vipId} max={selected?.maxPlayers} freeLabel={t('lobby.free')} />
-          <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-            <p className="muted" style={{ fontSize: 17 }}>
+          <section className="up-card" style={{ flex: 1, minHeight: 0, padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 14, borderRadius: 28 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <h2 style={{ fontSize: 24, fontWeight: 700 }}>{t('lobby.players')}</h2>
+              <span style={{ background: 'var(--surface-2)', borderRadius: 999, padding: '5px 13px', fontSize: 15, fontWeight: 700 }}>
+                {active.length}{selected ? ` / ${selected.maxPlayers}` : ''}
+              </span>
+            </div>
+            <PlayerGrid players={players} vipId={room.vipId} max={selected?.maxPlayers} freeLabel={t('lobby.free')} />
+            <p className="muted" style={{ marginTop: 'auto', fontSize: 15 }}>
               {lastWinner ? t('lobby.lastWinner', { name: lastWinner.name }) + ' · ' : ''}
               {vip ? t('lobby.vipPicks', { name: vip.name }) : t('lobby.waitingForPlayers')}
             </p>
-          </div>
-        </section>
-      </main>
+          </section>
+        </div>
 
-      <SelectedGameBar game={selected} players={active.length} canStart={canStart} gameCount={games.length} lang={room.lang} t={t}
-        summary={selected?.options?.length ? optionsSummary(selected, room.settings.gameOptions?.[selected.id], room.lang) : ''}
-        onLibrary={() => setLibraryOpen(true)} onOptions={() => setOptionsOpen(true)} />
+        <SelectedGame game={selected} players={active.length} canStart={canStart} gameCount={games.length} lang={room.lang} t={t} vipName={vip?.name}
+          summary={selected?.options?.length ? optionsSummary(selected, room.settings.gameOptions?.[selected.id], room.lang) : ''}
+          onLibrary={() => setLibraryOpen(true)} onOptions={() => setOptionsOpen(true)} />
+      </main>
     </>
   );
 }
 
-/** Unten in der Lobby: das gewählte Spiel mit Kurzbeschreibung, Einstellungen und Start */
-function SelectedGameBar({ game, players, canStart, gameCount, lang, t, summary, onLibrary, onOptions }: {
-  game?: GameManifest; players: number; canStart: boolean; gameCount: number; lang: Lang; t: Translate; summary: string; onLibrary: () => void; onOptions: () => void;
+const IconPlayers = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5" /><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5" /><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18.5 14.8c1.7.8 2.7 2.6 3 5.2" /></svg>
+);
+const IconClock = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>
+);
+const IconSliders = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" /><circle cx="16" cy="7" r="2.2" /><circle cx="10" cy="17" r="2.2" /></svg>
+);
+
+const badge = (bg: string, color: string): React.CSSProperties => ({ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 999, background: bg, color, fontSize: 15, fontWeight: 700, whiteSpace: 'nowrap' });
+
+/** Rechts in der Lobby: das gewählte Spiel groß mit Titelbild, Infos, Einstellungen und Start */
+function SelectedGame({ game, players, canStart, gameCount, lang, t, summary, vipName, onLibrary, onOptions }: {
+  game?: GameManifest; players: number; canStart: boolean; gameCount: number; lang: Lang; t: Translate; summary: string; vipName?: string; onLibrary: () => void; onOptions: () => void;
 }) {
   if (!game) {
     return (
-      <section style={{ height: 150, flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 24, borderRadius: 26, border: '3px dashed var(--line)' }}>
-        <span className="muted display" style={{ fontSize: 26, fontWeight: 700 }}>{t('lobby.noGame')}</span>
-        <button className="up-btn" onClick={onLibrary}>{t('lobby.pickGame')} · {t('lobby.gamesCount', { n: gameCount })}</button>
+      <section style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 24, borderRadius: 28, border: '3px dashed var(--line)' }}>
+        <span className="muted display" style={{ fontSize: 30, fontWeight: 700 }}>{t('lobby.noGame')}</span>
+        <button className="up-btn big" onClick={onLibrary}>{t('lobby.pickGame')} · {t('lobby.gamesCount', { n: gameCount })}</button>
       </section>
     );
   }
-  const light = isLight(game.color);
   const fit = fitOf(game, players);
+  const fitText = fit === 'few' ? t('lobby.needPlayers', { n: game.minPlayers - players }) : fit === 'many' ? t('lobby.tooManyShort') : t('lobby.fits');
   return (
-    <section key={game.id} className="anim-up" style={{ height: 150, flex: 'none', display: 'flex', borderRadius: 26, overflow: 'hidden', background: 'var(--surface)', boxShadow: `0 0 0 3px ${game.color}, 0 8px 0 ${shade(game.color)}` }}>
-      <div style={{ width: 300, flex: 'none', background: game.color, color: light ? '#110D24' : '#fff', padding: '18px 22px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-        <span className="display" style={{ fontSize: 32, fontWeight: 800, lineHeight: 1.05 }}>{gameName(game, lang)}</span>
-        <span style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>{gameTags(game).map((x) => <TagChip key={x} tag={x} t={t} small />)}</span>
+    <section key={game.id} className="anim-up" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', borderRadius: 28, overflow: 'hidden', background: 'var(--surface)', boxShadow: `0 0 0 3px ${game.color}, 0 8px 0 ${shade(game.color)}` }}>
+      <div style={{ flex: 1, minHeight: 180, position: 'relative' }}>
+        <GameCover g={game} lang={lang} zoom letterSize={240} />
+        {vipName && (
+          <span style={{ position: 'absolute', left: 18, top: 18, background: 'var(--bg)', borderRadius: 999, padding: '7px 14px', fontSize: 14, fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+            <Crown size={18} /> {t('lobby.pickedBy', { name: vipName })}
+          </span>
+        )}
       </div>
-      <div style={{ flex: 1, minWidth: 0, padding: '16px 22px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-        <p style={{ fontSize: 19, lineHeight: 1.35, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{gameDesc(game, lang)}</p>
-        <p style={{ marginTop: 'auto', fontSize: 15, fontWeight: 600, color: fit === 'ok' ? 'var(--faint)' : 'var(--yellow)' }}>
-          {t('lobby.playersRange', { min: game.minPlayers, max: game.maxPlayers })}{game.audience ? ' +' : ''} · {t('lobby.minutes', { n: game.minutes })}
-          {fit === 'few' ? ` · ${t('lobby.needPlayers', { n: game.minPlayers - players })}` : fit === 'many' ? ` · ${t('lobby.tooMany', { n: game.maxPlayers })}` : ''}
-          {summary ? <span style={{ display: 'block', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{summary}</span> : null}
-        </p>
-      </div>
-      <div style={{ flex: 'none', padding: '16px 20px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 10, minWidth: 250 }}>
-        {canStart && <button className="up-btn" onClick={() => net.request('start')}>{t('lobby.start')}</button>}
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button className="up-btn ghost small" style={{ flex: 1 }} onClick={onLibrary}>{t('lobby.changeGame')}</button>
-          {game.options?.length ? <button className="up-btn ghost small" aria-label={t('lobby.gameSettings')} title={t('lobby.gameSettings')} onClick={onOptions}>⚙︎</button> : null}
+      <div style={{ flex: 'none', padding: '18px 26px 22px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <h1 className="display" style={{ fontSize: 44, fontWeight: 800, lineHeight: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{gameName(game, lang)}</h1>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <span style={fit === 'ok' ? badge('rgba(75,227,161,.16)', 'var(--green)') : badge('rgba(255,212,71,.16)', 'var(--yellow)')}>
+            <IconPlayers /> {playersLabel(game, t)} · {fitText}
+          </span>
+          <span style={badge('var(--surface-2)', 'var(--text)')}><IconClock /> {t('lobby.minutes', { n: game.minutes })}</span>
+          {gameTags(game).map((x) => <span key={x} style={badge('var(--surface-2)', 'var(--muted)')}>{t(`tag.${x}`)}</span>)}
+        </div>
+        <p style={{ fontSize: 18, lineHeight: 1.38, color: '#D9D5EE', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{gameDesc(game, lang)}</p>
+        {summary && <p className="faint" style={{ fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{summary}</p>}
+        <div style={{ marginTop: 4, display: 'flex', gap: 12, alignItems: 'center' }}>
+          <button className="up-btn big" style={{ flex: 1 }} disabled={!canStart} onClick={() => net.request('start')}>{t('lobby.start')}</button>
+          <button className="up-btn ghost" onClick={onLibrary}>{t('lobby.changeGame')}</button>
+          {game.options?.length ? (
+            <button className="up-btn ghost" aria-label={t('lobby.gameSettings')} title={t('lobby.gameSettings')} onClick={onOptions} style={{ width: 56, padding: 0 }}><IconSliders /></button>
+          ) : null}
         </div>
       </div>
     </section>
@@ -334,25 +355,26 @@ function SelectedGameBar({ game, players, canStart, gameCount, lang, t, summary,
 
 function PlayerGrid({ players, vipId, max, freeLabel }: { players: PlayerInfo[]; vipId: string | null; max?: number; freeLabel: string }) {
   const many = players.length > 8;
-  const size = players.length > 24 ? 40 : many ? 52 : 72;
-  const cols = players.length > 24 ? 10 : many ? 6 : 4;
-  const shown = players.slice(0, cols * (many ? 4 : 2));
+  const crowd = players.length > 18;
+  const size = crowd ? 34 : many ? 44 : 56;
+  const cols = crowd ? 8 : many ? 6 : 4;
+  const shown = players.slice(0, cols * (crowd ? 4 : many ? 3 : 2));
   const free = many ? 0 : Math.max(0, Math.min(8, max ?? 8) - players.length);
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gap: many ? '10px 8px' : '20px 12px' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gap: crowd ? '8px 4px' : many ? '10px 8px' : '14px 10px' }}>
       {shown.map((p, i) => (
         <div key={p.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, animation: `upFloat 3.2s ease-in-out ${(-0.6 * i).toFixed(1)}s infinite` }}>
           <div style={{ position: 'relative' }} className="anim-pop">
             <Avatar player={p} size={size} />
             {p.id === vipId && <Crown size={size * 0.42} style={{ position: 'absolute', top: -size * 0.22, left: size * 0.29 }} />}
           </div>
-          <span style={{ fontSize: many ? 14 : 18, fontWeight: 700, maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', opacity: p.connected || p.isBot ? 1 : 0.5 }}>{p.name}</span>
+          <span style={{ fontSize: crowd ? 11 : many ? 13 : 15, fontWeight: 700, maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', opacity: p.connected || p.isBot ? 1 : 0.5 }}>{p.name}</span>
         </div>
       ))}
       {Array.from({ length: free }, (_, i) => (
         <div key={`free${i}`} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
           <div style={{ width: size, height: size, borderRadius: '50%', border: '3px dashed var(--line)', animation: `upPulse 2s ease-in-out ${(-0.5 * i).toFixed(1)}s infinite` }} />
-          <span className="faint" style={{ fontSize: 16 }}>{freeLabel}</span>
+          <span className="faint" style={{ fontSize: 15 }}>{freeLabel}</span>
         </div>
       ))}
       {players.length > shown.length && <div className="faint display" style={{ fontSize: 22, alignSelf: 'center', textAlign: 'center' }}>+{players.length - shown.length}</div>}

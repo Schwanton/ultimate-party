@@ -10,6 +10,7 @@
   "audience": true,
   "minutes": 30,
   "color": "#8E1A17",
+  "cover": "bilder/hintergrund-lager.webp",
   "tags": ["team"],
   "sdkVersion": 1,
   "autoSounds": false,
