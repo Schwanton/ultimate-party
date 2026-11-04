@@ -5,7 +5,82 @@
     "gpt-image-1"
   ],
   "qualitaet": "medium",
-  "nur": [],
+  "nur": [
+    "held-schildwacht-2",
+    "held-klingenlaeufer-2",
+    "held-kraeuterkundige-2",
+    "karte-schildstoss-2",
+    "karte-deckung-2",
+    "karte-abfangen-2",
+    "karte-schildwall-2",
+    "karte-schnitt-2",
+    "karte-ausweichen-2",
+    "karte-schneller-hieb-2",
+    "karte-hinrichtung-2",
+    "karte-dornenstich-2",
+    "karte-rindenhaut-2",
+    "karte-giftstachel-2",
+    "karte-heilkraeuter-2",
+    "figur-haendler",
+    "figur-lagerfeuer",
+    "gegner-rattenschwarm",
+    "gegner-knochenpriester",
+    "gegner-gruftwaechter",
+    "gegner-henker",
+    "gegner-brutling",
+    "boss-grubenmutter",
+    "boss-aschenfuerst",
+    "ereignis-gruft",
+    "ereignis-brunnen",
+    "ereignis-bruecke",
+    "ereignis-gefangener",
+    "ereignis-haendler",
+    "ereignis-blutaltar",
+    "ereignis-spiegel",
+    "ereignis-pilzhain",
+    "relikt-kerzenstumpf",
+    "relikt-eisenkette",
+    "relikt-blutstein",
+    "relikt-schleifstein",
+    "relikt-kraeuterbeutel",
+    "relikt-giftzahn",
+    "relikt-kriegsbanner",
+    "relikt-talisman",
+    "relikt-goldwaage",
+    "relikt-rabenfeder",
+    "relikt-knochenwuerfel",
+    "relikt-lebensfaden",
+    "relikt-schwarze-kerze",
+    "relikt-fluchklinge",
+    "relikt-seelenpakt",
+    "karte-schildschlag",
+    "karte-wachposten",
+    "karte-herausforderung",
+    "karte-gegenwehr",
+    "karte-ruestung-schmieden",
+    "karte-unerschuetterlich",
+    "karte-doppelschnitt",
+    "karte-kehlschnitt",
+    "karte-schattenschritt",
+    "karte-klingenwirbel",
+    "karte-blutrausch",
+    "karte-tausend-schnitte",
+    "karte-brennnessel",
+    "karte-heiltrank",
+    "karte-wurzelschild",
+    "karte-miasma",
+    "karte-schlafmohn",
+    "karte-elixier",
+    "karte-aegis",
+    "karte-letztes-gefecht",
+    "karte-unbeugsam",
+    "karte-todesreigen",
+    "karte-mondsichel",
+    "karte-schattenklon",
+    "karte-pestwind",
+    "karte-lebensbaum",
+    "karte-wiedergeburt"
+  ],
   "varianten": 2,
   "bilder": [
     {
@@ -154,6 +229,524 @@
       "groesse": "1024x1024",
       "transparent": true,
       "prompt": "A bundle of healing herbs tied with string, giving off a faint glow. Style: small antique ink etching vignette like the central emblem of an old tarot card, dense cross-hatching, sepia and bone-white tones, one small blood-red accent, simple clear silhouette that stays readable at small size, centered object only. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "held-schildwacht-2",
+      "art": "figur",
+      "groesse": "1024x1536",
+      "transparent": true,
+      "prompt": "A stern human shield warden, a weathered woman in her forties with a scarred but kind face and short grey hair, heavy dented plate armor under a tattered hooded cloak pushed back, a tall tower shield engraved with a single protective rune held in front, a short heavy mace in the other hand, steady protective stance, three-quarter view facing right. Style: antique black ink etching from a forbidden medieval bestiary, dense cross-hatching, fine engraved linework, sepia and bone-white tones on aged yellowed paper, a few muted steel blue (#3A5A78) hand-tinted accents only on cloth, cloak lining and the class emblem, like watercolor washed into an old engraving; no red anywhere on the face or around the eyes, natural skin tones in sepia, dramatic light from below. Paper-theatre cut-out: the whole figure is cut out of one piece of old paper with a narrow, slightly irregular torn paper edge following the silhouette; gaps between limbs are filled with paper, not empty. Everything outside the paper cut-out is fully transparent. Full body, centered, the complete figure and its paper edge are inside the image with some empty margin on all sides. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo, no cropped body parts, no extra limbs or fingers."
+    },
+    {
+      "id": "held-klingenlaeufer-2",
+      "art": "figur",
+      "groesse": "1024x1536",
+      "transparent": true,
+      "prompt": "A lean agile human blade runner, a young man with a sharp determined face and a scarf pulled down from the lower jaw, light layered leather armor with many straps, two curved daggers held low and ready, dynamic crouched stance as if about to leap, three-quarter view facing right. Style: antique black ink etching from a forbidden medieval bestiary, dense cross-hatching, fine engraved linework, sepia and bone-white tones on aged yellowed paper, a few muted deep night violet (#5B3A6E) hand-tinted accents only on cloth, cloak lining and the class emblem, like watercolor washed into an old engraving; no red anywhere on the face or around the eyes, natural skin tones in sepia, dramatic light from below. Paper-theatre cut-out: the whole figure is cut out of one piece of old paper with a narrow, slightly irregular torn paper edge following the silhouette; gaps between limbs are filled with paper, not empty. Everything outside the paper cut-out is fully transparent. Full body, centered, the complete figure and its paper edge are inside the image with some empty margin on all sides. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo, no cropped body parts, no extra limbs or fingers."
+    },
+    {
+      "id": "held-kraeuterkundige-2",
+      "art": "figur",
+      "groesse": "1024x1536",
+      "transparent": true,
+      "prompt": "A calm human herbalist, an older woman with braided hair and a wise face, a long hooded robe with pouches, bundles of dried herbs and small glass vials on her belt, holding a gnarled wooden staff with a sprig of thorny leaves, a small smoking mortar in the other hand, upright attentive stance, three-quarter view facing right. Style: antique black ink etching from a forbidden medieval bestiary, dense cross-hatching, fine engraved linework, sepia and bone-white tones on aged yellowed paper, a few muted moss green (#4F6B35) hand-tinted accents only on cloth, cloak lining and the class emblem, like watercolor washed into an old engraving; no red anywhere on the face or around the eyes, natural skin tones in sepia, dramatic light from below. Paper-theatre cut-out: the whole figure is cut out of one piece of old paper with a narrow, slightly irregular torn paper edge following the silhouette; gaps between limbs are filled with paper, not empty. Everything outside the paper cut-out is fully transparent. Full body, centered, the complete figure and its paper edge are inside the image with some empty margin on all sides. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo, no cropped body parts, no extra limbs or fingers."
+    },
+    {
+      "id": "karte-schildstoss-2",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A heavy tower shield thrusting forward with motion lines. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-deckung-2",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A raised kite shield with a glowing protective rune. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-abfangen-2",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A shield deflecting an incoming arrow, the arrow bending away. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-schildwall-2",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "Three overlapping shields forming a wall. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-schnitt-2",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A curved dagger with a crescent slash trail. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-ausweichen-2",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A swirling cloak in motion, empty inside, like a figure that just vanished. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-schneller-hieb-2",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "Two crossed daggers with lightning-fast streaks. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-hinrichtung-2",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A dagger plunged downward into a cracked skull. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-dornenstich-2",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A thorny vine curling into a sharp spike. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-rindenhaut-2",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A raised open hand covered in protective tree bark. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-giftstachel-2",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A dripping stinger with drops of poison, the poison in a thin sickly green as the only accent color instead of red. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-heilkraeuter-2",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A bundle of healing herbs tied with string, giving off a faint glow. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "figur-haendler",
+      "art": "figur",
+      "groesse": "1024x1536",
+      "transparent": true,
+      "prompt": "A mysterious hooded merchant of the abyss, tall and thin, face hidden in deep shadow except for a faint glint of eyes, long patched robe hung with keys, small bottles, bones and pouches, a large wooden pack on his back stacked with goods, one bony hand raised in an inviting gesture, front view, standing behind nothing. Style: antique black ink etching from a forbidden medieval bestiary, dense cross-hatching, fine engraved linework, sepia and bone-white tones on aged yellowed paper, very sparse blood-red accents only on eyes, wounds, runes or embers, dramatic light from below. Paper-theatre cut-out: the whole figure is cut out of one piece of old paper with a narrow, slightly irregular torn paper edge following the silhouette; gaps between limbs are filled with paper, not empty. Everything outside the paper cut-out is fully transparent. Full body, centered, the complete figure and its paper edge are inside the image with some empty margin on all sides. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo, no cropped body parts, no extra limbs or fingers."
+    },
+    {
+      "id": "figur-lagerfeuer",
+      "art": "figur",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A small campfire seen from the front: crossed logs, tall licking flames and rising sparks, a ring of stones around it, a blackened kettle hanging from a stick tripod. Style: antique black ink etching from a forbidden medieval bestiary, dense cross-hatching, fine engraved linework, sepia and bone-white tones on aged yellowed paper, the flames and embers tinted warm orange and blood-red, dramatic light from below. Paper-theatre cut-out: the whole figure is cut out of one piece of old paper with a narrow, slightly irregular torn paper edge following the silhouette; gaps between limbs are filled with paper, not empty. Everything outside the paper cut-out is fully transparent. Full body, centered, the complete figure and its paper edge are inside the image with some empty margin on all sides. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo, no cropped body parts, no extra limbs or fingers."
+    },
+    {
+      "id": "gegner-rattenschwarm",
+      "art": "figur",
+      "groesse": "1024x1536",
+      "transparent": true,
+      "prompt": "A writhing pile of a dozen mangy plague rats climbing over each other into a single tangled mound, bared yellow teeth, bald tails, red glinting eyes, facing left. Style: antique black ink etching from a forbidden medieval bestiary, dense cross-hatching, fine engraved linework, sepia and bone-white tones on aged yellowed paper, very sparse blood-red accents only on eyes, wounds, runes or embers, dramatic light from below. Paper-theatre cut-out: the whole figure is cut out of one piece of old paper with a narrow, slightly irregular torn paper edge following the silhouette; gaps between limbs are filled with paper, not empty. Everything outside the paper cut-out is fully transparent. Full body, centered, the complete figure and its paper edge are inside the image with some empty margin on all sides. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo, no cropped body parts, no extra limbs or fingers."
+    },
+    {
+      "id": "gegner-knochenpriester",
+      "art": "figur",
+      "groesse": "1024x1536",
+      "transparent": true,
+      "prompt": "A gaunt undead priest in tattered ceremonial robes, a skull face under a tall mitre, holding a staff topped with a ring of bones and hanging chains, one claw-like hand raised casting a curse, three-quarter view facing left. Style: antique black ink etching from a forbidden medieval bestiary, dense cross-hatching, fine engraved linework, sepia and bone-white tones on aged yellowed paper, very sparse blood-red accents only on eyes, wounds, runes or embers, dramatic light from below. Paper-theatre cut-out: the whole figure is cut out of one piece of old paper with a narrow, slightly irregular torn paper edge following the silhouette; gaps between limbs are filled with paper, not empty. Everything outside the paper cut-out is fully transparent. Full body, centered, the complete figure and its paper edge are inside the image with some empty margin on all sides. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo, no cropped body parts, no extra limbs or fingers."
+    },
+    {
+      "id": "gegner-gruftwaechter",
+      "art": "figur",
+      "groesse": "1024x1536",
+      "transparent": true,
+      "prompt": "A massive hunched stone gargoyle tomb guardian with cracked granite skin and moss, small horns, heavy stone hammer in both hands, sturdy wide stance, three-quarter view facing left. Style: antique black ink etching from a forbidden medieval bestiary, dense cross-hatching, fine engraved linework, sepia and bone-white tones on aged yellowed paper, very sparse blood-red accents only on eyes, wounds, runes or embers, dramatic light from below. Paper-theatre cut-out: the whole figure is cut out of one piece of old paper with a narrow, slightly irregular torn paper edge following the silhouette; gaps between limbs are filled with paper, not empty. Everything outside the paper cut-out is fully transparent. Full body, centered, the complete figure and its paper edge are inside the image with some empty margin on all sides. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo, no cropped body parts, no extra limbs or fingers."
+    },
+    {
+      "id": "gegner-henker",
+      "art": "figur",
+      "groesse": "1024x1536",
+      "transparent": true,
+      "prompt": "A huge executioner in a pointed black hood with eye holes, bare scarred chest with heavy leather straps and chains, a giant notched executioner's axe resting on his shoulder, menacing stance, three-quarter view facing left. Style: antique black ink etching from a forbidden medieval bestiary, dense cross-hatching, fine engraved linework, sepia and bone-white tones on aged yellowed paper, very sparse blood-red accents only on eyes, wounds, runes or embers, dramatic light from below. Paper-theatre cut-out: the whole figure is cut out of one piece of old paper with a narrow, slightly irregular torn paper edge following the silhouette; gaps between limbs are filled with paper, not empty. Everything outside the paper cut-out is fully transparent. Full body, centered, the complete figure and its paper edge are inside the image with some empty margin on all sides. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo, no cropped body parts, no extra limbs or fingers."
+    },
+    {
+      "id": "gegner-brutling",
+      "art": "figur",
+      "groesse": "1024x1536",
+      "transparent": true,
+      "prompt": "A small pale grub-like larva creature with many tiny legs, a gaping round mouth of needle teeth and translucent skin, crawling, side view facing left. Style: antique black ink etching from a forbidden medieval bestiary, dense cross-hatching, fine engraved linework, sepia and bone-white tones on aged yellowed paper, very sparse blood-red accents only on eyes, wounds, runes or embers, dramatic light from below. Paper-theatre cut-out: the whole figure is cut out of one piece of old paper with a narrow, slightly irregular torn paper edge following the silhouette; gaps between limbs are filled with paper, not empty. Everything outside the paper cut-out is fully transparent. Full body, centered, the complete figure and its paper edge are inside the image with some empty margin on all sides. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo, no cropped body parts, no extra limbs or fingers."
+    },
+    {
+      "id": "boss-grubenmutter",
+      "art": "figur",
+      "groesse": "1024x1536",
+      "transparent": true,
+      "prompt": "A colossal bloated insect queen of the pit, a swollen pale egg sac body full of wriggling shapes, many long jointed legs, a crowned chitin head with mandibles, a few small larvae clinging to her, towering stance, three-quarter view facing left. Style: antique black ink etching from a forbidden medieval bestiary, dense cross-hatching, fine engraved linework, sepia and bone-white tones on aged yellowed paper, very sparse blood-red accents only on eyes, wounds, runes or embers, dramatic light from below. Paper-theatre cut-out: the whole figure is cut out of one piece of old paper with a narrow, slightly irregular torn paper edge following the silhouette; gaps between limbs are filled with paper, not empty. Everything outside the paper cut-out is fully transparent. Full body, centered, the complete figure and its paper edge are inside the image with some empty margin on all sides. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo, no cropped body parts, no extra limbs or fingers."
+    },
+    {
+      "id": "boss-aschenfuerst",
+      "art": "figur",
+      "groesse": "1024x1536",
+      "transparent": true,
+      "prompt": "A towering lord made of charred armor and smoldering ash, a burning crown of iron spikes, glowing cracks across his body, a long cape that crumbles into embers, a huge burning greatsword planted in front of him, regal menacing stance, front view facing slightly left. Style: antique black ink etching from a forbidden medieval bestiary, dense cross-hatching, fine engraved linework, sepia and bone-white tones on aged yellowed paper, blood-red and ember-orange accents in the glowing cracks, crown and embers, dramatic light from below. Paper-theatre cut-out: the whole figure is cut out of one piece of old paper with a narrow, slightly irregular torn paper edge following the silhouette; gaps between limbs are filled with paper, not empty. Everything outside the paper cut-out is fully transparent. Full body, centered, the complete figure and its paper edge are inside the image with some empty margin on all sides. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo, no cropped body parts, no extra limbs or fingers."
+    },
+    {
+      "id": "ereignis-gruft",
+      "art": "ereignis",
+      "groesse": "1024x1024",
+      "transparent": false,
+      "prompt": "A massive stone crypt door sealed with heavy chains and a large wax seal, carved runes around the frame, a narrow stair leading down to it, faint red glow leaking through the cracks. Style: antique black ink etching on aged yellowed parchment, dense cross-hatching, fine engraved linework, sepia tones, very sparse blood-red accents, moody light, like a full-page illustration in a forbidden medieval book. Square composition, the scene fills the whole image, no characters unless described. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "ereignis-brunnen",
+      "art": "ereignis",
+      "groesse": "1024x1024",
+      "transparent": false,
+      "prompt": "An ancient stone well in a cave, its rim carved with faces, dark water deep below reflecting a faint red light, a rusted chain and bucket. Style: antique black ink etching on aged yellowed parchment, dense cross-hatching, fine engraved linework, sepia tones, very sparse blood-red accents, moody light, like a full-page illustration in a forbidden medieval book. Square composition, the scene fills the whole image, no characters unless described. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "ereignis-bruecke",
+      "art": "ereignis",
+      "groesse": "1024x1024",
+      "transparent": false,
+      "prompt": "A narrow rotten rope bridge stretched over a bottomless chasm, several planks missing, fog rising from the abyss below, distant glowing veins in the depths. Style: antique black ink etching on aged yellowed parchment, dense cross-hatching, fine engraved linework, sepia tones, very sparse blood-red accents, moody light, like a full-page illustration in a forbidden medieval book. Square composition, the scene fills the whole image, no characters unless described. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "ereignis-gefangener",
+      "art": "ereignis",
+      "groesse": "1024x1024",
+      "transparent": false,
+      "prompt": "A prisoner hanging in a rusted iron cage from a chain over a pit, ragged clothes, reaching out through the bars, a sleeping guard's lantern nearby. Style: antique black ink etching on aged yellowed parchment, dense cross-hatching, fine engraved linework, sepia tones, very sparse blood-red accents, moody light, like a full-page illustration in a forbidden medieval book. Square composition, the scene fills the whole image, no characters unless described. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "ereignis-haendler",
+      "art": "ereignis",
+      "groesse": "1024x1024",
+      "transparent": false,
+      "prompt": "A wandering peddler's cart pulled into a cave niche, lantern hanging from a pole, shelves of strange goods, bottles and skulls, a closed curtain. Style: antique black ink etching on aged yellowed parchment, dense cross-hatching, fine engraved linework, sepia tones, very sparse blood-red accents, moody light, like a full-page illustration in a forbidden medieval book. Square composition, the scene fills the whole image, no characters unless described. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "ereignis-blutaltar",
+      "art": "ereignis",
+      "groesse": "1024x1024",
+      "transparent": false,
+      "prompt": "A black stone altar warm with dripping blood, carved with screaming faces, a ceremonial knife lying on it, candles melted around the base. Style: antique black ink etching on aged yellowed parchment, dense cross-hatching, fine engraved linework, sepia tones, very sparse blood-red accents, moody light, like a full-page illustration in a forbidden medieval book. Square composition, the scene fills the whole image, no characters unless described. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "ereignis-spiegel",
+      "art": "ereignis",
+      "groesse": "1024x1024",
+      "transparent": false,
+      "prompt": "A tall ornate standing mirror with a cracked glass in a ruined chapel, the reflection showing a second ghostly copy of the room, shards on the floor. Style: antique black ink etching on aged yellowed parchment, dense cross-hatching, fine engraved linework, sepia tones, very sparse blood-red accents, moody light, like a full-page illustration in a forbidden medieval book. Square composition, the scene fills the whole image, no characters unless described. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "ereignis-pilzhain",
+      "art": "ereignis",
+      "groesse": "1024x1024",
+      "transparent": false,
+      "prompt": "A grove of giant glowing mushrooms in a cave, soft spores drifting in the air, a small clear stream, bones half hidden in the moss. Style: antique black ink etching on aged yellowed parchment, dense cross-hatching, fine engraved linework, sepia tones, very sparse blood-red accents, moody light, like a full-page illustration in a forbidden medieval book. Square composition, the scene fills the whole image, no characters unless described. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "relikt-kerzenstumpf",
+      "art": "relikt",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A short melted candle stump with a tiny flame, accent: warm amber flame. Style: a single small relic object drawn as a bold antique ink engraving, heavy black outlines, deep cross-hatching, sepia and bone-white tones with one small accent color as described; simple iconic silhouette readable at 40 pixels, centered, object only. Everything around the object is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "relikt-eisenkette",
+      "art": "relikt",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A coil of heavy iron chain links, accent: steel blue sheen. Style: a single small relic object drawn as a bold antique ink engraving, heavy black outlines, deep cross-hatching, sepia and bone-white tones with one small accent color as described; simple iconic silhouette readable at 40 pixels, centered, object only. Everything around the object is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "relikt-blutstein",
+      "art": "relikt",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A polished faceted gemstone pulsing with inner light on a leather cord, accent: deep blood red. Style: a single small relic object drawn as a bold antique ink engraving, heavy black outlines, deep cross-hatching, sepia and bone-white tones with one small accent color as described; simple iconic silhouette readable at 40 pixels, centered, object only. Everything around the object is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "relikt-schleifstein",
+      "art": "relikt",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A whetstone with a small blade leaning on it, sparks, accent: tiny amber sparks. Style: a single small relic object drawn as a bold antique ink engraving, heavy black outlines, deep cross-hatching, sepia and bone-white tones with one small accent color as described; simple iconic silhouette readable at 40 pixels, centered, object only. Everything around the object is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "relikt-kraeuterbeutel",
+      "art": "relikt",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A small cloth pouch tied with string, herbs and leaves spilling out, accent: moss green. Style: a single small relic object drawn as a bold antique ink engraving, heavy black outlines, deep cross-hatching, sepia and bone-white tones with one small accent color as described; simple iconic silhouette readable at 40 pixels, centered, object only. Everything around the object is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "relikt-giftzahn",
+      "art": "relikt",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A long curved serpent fang dripping venom, accent: sickly green drop. Style: a single small relic object drawn as a bold antique ink engraving, heavy black outlines, deep cross-hatching, sepia and bone-white tones with one small accent color as described; simple iconic silhouette readable at 40 pixels, centered, object only. Everything around the object is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "relikt-kriegsbanner",
+      "art": "relikt",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A tattered war banner on a short pole with a stitched emblem, accent: bronze. Style: a single small relic object drawn as a bold antique ink engraving, heavy black outlines, deep cross-hatching, sepia and bone-white tones with one small accent color as described; simple iconic silhouette readable at 40 pixels, centered, object only. Everything around the object is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "relikt-talisman",
+      "art": "relikt",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A round protective amulet with an engraved eye and a shield rune, accent: bronze. Style: a single small relic object drawn as a bold antique ink engraving, heavy black outlines, deep cross-hatching, sepia and bone-white tones with one small accent color as described; simple iconic silhouette readable at 40 pixels, centered, object only. Everything around the object is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "relikt-goldwaage",
+      "art": "relikt",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A small pair of brass merchant scales with a coin on one side, accent: gold. Style: a single small relic object drawn as a bold antique ink engraving, heavy black outlines, deep cross-hatching, sepia and bone-white tones with one small accent color as described; simple iconic silhouette readable at 40 pixels, centered, object only. Everything around the object is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "relikt-rabenfeder",
+      "art": "relikt",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A single black raven feather, accent: faint violet sheen. Style: a single small relic object drawn as a bold antique ink engraving, heavy black outlines, deep cross-hatching, sepia and bone-white tones with one small accent color as described; simple iconic silhouette readable at 40 pixels, centered, object only. Everything around the object is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "relikt-knochenwuerfel",
+      "art": "relikt",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "Two carved bone dice, one showing a skull face, accent: blood red pips. Style: a single small relic object drawn as a bold antique ink engraving, heavy black outlines, deep cross-hatching, sepia and bone-white tones with one small accent color as described; simple iconic silhouette readable at 40 pixels, centered, object only. Everything around the object is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "relikt-lebensfaden",
+      "art": "relikt",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A spindle of thread with a single glowing strand running out, accent: warm red thread. Style: a single small relic object drawn as a bold antique ink engraving, heavy black outlines, deep cross-hatching, sepia and bone-white tones with one small accent color as described; simple iconic silhouette readable at 40 pixels, centered, object only. Everything around the object is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "relikt-schwarze-kerze",
+      "art": "relikt",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A tall black candle with black dripping wax and a dark flame, accent: blood red glow. Style: a single small relic object drawn as a bold antique ink engraving, heavy black outlines, deep cross-hatching, sepia and bone-white tones with one small accent color as described; simple iconic silhouette readable at 40 pixels, centered, object only. Everything around the object is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "relikt-fluchklinge",
+      "art": "relikt",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A short cursed dagger with a twisted blade and thorny hilt wrapped in wire, accent: blood red runes. Style: a single small relic object drawn as a bold antique ink engraving, heavy black outlines, deep cross-hatching, sepia and bone-white tones with one small accent color as described; simple iconic silhouette readable at 40 pixels, centered, object only. Everything around the object is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "relikt-seelenpakt",
+      "art": "relikt",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A rolled parchment contract sealed with a red wax seal and a drop of blood, accent: blood red seal. Style: a single small relic object drawn as a bold antique ink engraving, heavy black outlines, deep cross-hatching, sepia and bone-white tones with one small accent color as described; simple iconic silhouette readable at 40 pixels, centered, object only. Everything around the object is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-schildschlag",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A shield used as a weapon, its rim smashing down with impact lines. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-wachposten",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "Two overlapping shields side by side, one held up to protect the other. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-herausforderung",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A raised clenched gauntlet fist in front of a shield, a defiant gesture. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-gegenwehr",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A shield covered in sharp iron spikes. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-ruestung-schmieden",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A breastplate on an anvil with a hammer striking sparks. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-unerschuetterlich",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A shield planted firmly in the ground with deep cracks spreading through the rock around it. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-doppelschnitt",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "Two parallel slash marks cut through the air by a single dagger. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-kehlschnitt",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A thin curved dagger with a fine drop of blood at its tip. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-schattenschritt",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A cloaked figure's silhouette dissolving into smoke and shadow. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-klingenwirbel",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "Several daggers spinning in a circle like a whirlwind. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-blutrausch",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A clenched fist with bulging veins gripping a dagger, blood dripping. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-tausend-schnitte",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A storm of many small thrown knives flying in all directions. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-brennnessel",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A sprig of stinging nettle with tiny needle hairs. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-heiltrank",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A small round glass potion bottle with a cork, liquid glowing faintly. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-wurzelschild",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "Twisted roots weaving together into a round shield. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-miasma",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A cloud of poisonous green-grey fumes rising from a cracked clay pot. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-schlafmohn",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A drooping poppy flower with seed pod and drifting sleepy spores. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-elixier",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "An ornate crystal flask with a heart-shaped stopper and radiant liquid. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-aegis",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A great radiant shield with a sunburst emblem and rays of light behind it. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-letztes-gefecht",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A battered shield and broken sword crossed, standing in front of a pile of fallen foes. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-unbeugsam",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A knight's helmet with a crack, a laurel wreath around it. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-todesreigen",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "Five daggers arranged in a deadly circle around a skull. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-mondsichel",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A crescent moon shaped blade with a sharp edge. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-schattenklon",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A dagger and its dark shadow double striking side by side. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-pestwind",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A swirling wind full of plague spores and a dead crow. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-lebensbaum",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A small gnarled tree with deep roots and fresh leaves glowing softly. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
+    },
+    {
+      "id": "karte-wiedergeburt",
+      "art": "karte",
+      "groesse": "1024x1024",
+      "transparent": true,
+      "prompt": "A phoenix-like bird rising from a cracked egg made of bone. Style: bold antique woodcut and copperplate engraving like the central emblem of a 16th-century tarot card: heavy confident black ink outlines, deep high-contrast cross-hatching, strong dark shadows, sepia and bone-white tones, one small blood-red accent; a simple bold silhouette that stays clearly readable at 60 pixels, centered object only, no background scenery. Everything around the emblem is fully transparent. No text, no letters, no numbers, no signature, no watermark, no logo, no frame or border, no cartoon or anime style, no 3D render, no photo."
     }
   ],
   "_auswahl": {
@@ -178,5 +771,6 @@
     "karte-schildwall": "2",
     "karte-schneller-hieb": "2",
     "karte-schnitt": "1"
-  }
+  },
+  "_hinweis2": "Etappe 2: neue Bilder und überarbeitete Fassungen (-2) der Helden (Klassenfarbe) und Kartenmotive (kräftiger)."
 }
