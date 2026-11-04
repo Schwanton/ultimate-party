@@ -108,7 +108,6 @@ Technik: TypeScript, React, Node.js mit WebSockets (`ws`), esbuild. Keine Datenb
 
 - [Spiele entwickeln](docs/SPIELE-ENTWICKELN.md) – das Game-SDK Schritt für Schritt
 - [Inhalte & Content-Packs](docs/INHALTE.md) – eigene Fragen schreiben oder mit KI erzeugen
-- [Entscheidungen & Stand](docs/ENTSCHEIDUNGEN.md) – was wie gelöst ist und was noch kommt
 
 ## Lizenz
 
