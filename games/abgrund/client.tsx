@@ -288,7 +288,7 @@ function Backdrop({ img, opacity = 0.5 }: { img: string; opacity?: number }) {
 }
 
 const CLASS_NAME: Record<string, string> = { schildwacht: 'Schildwacht', klingenlaeufer: 'Klingenläufer', kraeuterkundige: 'Kräuterkundige' };
-const CLASS_IMG: Record<string, string> = { schildwacht: 'held-schildwacht', klingenlaeufer: 'held-klingenlaeufer', kraeuterkundige: 'held-kraeuterkundige' };
+const CLASS_IMG: Record<string, string> = { schildwacht: 'held-schildwacht-2', klingenlaeufer: 'held-klingenlaeufer-2', kraeuterkundige: 'held-kraeuterkundige-2' };
 
 function HostLager({ view, player }: HostViewProps) {
   const chosen = view.players.filter((p: any) => p.cls);
@@ -788,7 +788,7 @@ function CardFace({ c, w = 112, onClick, dim, sel }: { c: any; w?: number; onCli
       opacity: dim ? 0.45 : 1, fontFamily: BODY, touchAction: 'manipulation',
     }}>
       <span style={{ position: 'absolute', left: -9, top: -9, zIndex: 1, width: w * 0.25, height: w * 0.25, minWidth: 24, minHeight: 24, borderRadius: '50%', background: darker(classColor(c.cls), 0.8), border: '2px solid #eadcb9', color: '#f3e6c8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: DISPLAY, fontSize: Math.max(15, w * 0.15), boxShadow: 'inset 0 0 0 3px rgba(0,0,0,.25)' }}>{c.cost}</span>
-      <span className="ab-sc" style={{ alignSelf: 'stretch', margin: `0 -${w * 0.06}px`, padding: `${w * 0.035}px ${c.speed !== 'normal' ? w * 0.19 : w * 0.06}px ${w * 0.04}px`, background: classColor(c.cls), color: '#f3e6c8', fontSize: w < 120 ? (String(c.name).length > 11 ? 12 : 13.5) : Math.max(13, w * 0.13), lineHeight: 1.05, textAlign: 'center', position: 'relative', overflowWrap: 'anywhere', hyphens: 'auto' }}>
+      <span className="ab-sc" style={{ alignSelf: 'stretch', margin: `0 -${w * 0.06}px`, padding: `${w * 0.035}px ${w * 0.17}px ${w * 0.04}px`, background: classColor(c.cls), color: '#f3e6c8', fontSize: w < 120 ? (String(c.name).length > 11 ? 12 : 13.5) : Math.max(13, w * 0.13), lineHeight: 1.05, textAlign: 'center', position: 'relative', overflowWrap: 'anywhere', hyphens: 'auto' }}>
         {c.name}
         {c.speed !== 'normal' && <span style={{ position: 'absolute', right: 4, top: '50%', transform: 'translateY(-50%)', display: 'flex', background: '#eadcb9', borderRadius: '50%', padding: 2 }}><SpeedIcon speed={c.speed} size={Math.max(12, w * 0.12)} /></span>}
       </span>

@@ -2,6 +2,11 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.11.1
+
+- Abgrund: Alle neuen Bilder sind da – Händler, Lagerfeuer, neue Gegner, beide Bosse, 8 Ereignisbilder, 15 Relikte und 27 Kartenmotive; die alten Kartenmotive im kräftigeren Holzschnitt-Stil, die Klassenfiguren mit Akzenten in ihrer Klassenfarbe
+- Abgrund: Kartennamen werden nicht mehr vom Kostensiegel verdeckt
+
 ## 0.11.0
 
 - Abgrund: **Akt I** – statt drei fester Kämpfe eine Pfadkarte mit 10 Stufen und einem Boss. Ihr stimmt auf dem Handy ab, wohin es geht (20 s, Mehrheit, bei Gleichstand Zufall); man sieht nur drei Stufen voraus
