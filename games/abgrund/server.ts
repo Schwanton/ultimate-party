@@ -190,13 +190,14 @@ export default {
       vote?.timer?.cancel();
       const t = ++token;
       vote = { kind, options, votes: new Map(), deadline: 0, timer: null };
-      if (options.length === 1 || !voters().length) {
-        // nur ein Weg oder niemand zum Abstimmen: kurz zeigen, dann weiter
-        vote.winner = options.length === 1 ? options[0] : pick(options);
+      if (!voters().length) {
+        // niemand zum Abstimmen (nur Bots): kurz zeigen, dann weiter
+        vote.winner = pick(options);
         broadcast();
-        ctx.after(options.length === 1 ? 4 : 2.5, () => t === token && finishVote());
+        ctx.after(2.5, () => t === token && finishVote());
         return;
       }
+      // Auch bei nur einem Weg wird gewählt und bestätigt – so bleibt Zeit, z. B. Sticker aufzukleben.
       // Kein Zeitlimit: es geht weiter, sobald alle (verbundenen) Spieler abgestimmt haben.
       // Regelmäßig prüfen, falls jemand die Verbindung verliert.
       const poll = () => {

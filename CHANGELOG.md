@@ -2,6 +2,10 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.12.2
+
+- Abgrund: Auf der Karte geht es nie mehr automatisch weiter – auch bei nur einem Weg wählen und bestätigen alle selbst (Zeit zum Sticker-Aufkleben)
+
 ## 0.12.1
 
 - Abgrund: Relikte kann man jetzt behalten oder liegen lassen (Elite, Schatz, Gruft, Brücke)
