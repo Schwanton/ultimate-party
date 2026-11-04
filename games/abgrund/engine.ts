@@ -390,6 +390,8 @@ function resolveTier(f: Fight, tier: Speed, push: (e: Ev) => void) {
 
 function enemyPhase(f: Fight, push: (e: Ev) => void) {
   let first = true;
+  // Gegner-Block hält bis zu ihrem nächsten Zug (schützt also während der Spielerzüge der nächsten Runde)
+  for (const e of f.enemies) e.block = 0;
   f.enemies.forEach((e, i) => {
     if (e.dead || !e.intent) return;
     if (first) { push({ k: 'tier', tier: 'enemies' }); first = false; }
@@ -467,8 +469,8 @@ function endOfRound(f: Fight, push: (e: Ev) => void) {
     x.st.weak = Math.max(0, x.st.weak - 1);
     x.st.vuln = Math.max(0, x.st.vuln - 1);
     x.st.mark = 0;
-    x.block = 0;
   }
+  for (const h of f.heroes) h.block = 0;
   for (const h of f.heroes) {
     h.covers = [];
     h.taunt = false;

@@ -13,14 +13,21 @@ import {
 
 interface SavedRun {
   fightNo: number;
-  heroes: { name: string; hero: Hero }[];
+  /** comp = Begleiter (vom Spiel gesteuert) */
+  heroes: { name: string; hero: Hero; comp?: Comp }[];
   at: number;
 }
+
+/** Begleiter: vom Spiel gesteuerte Mitstreiter, die der VIP im Lager dazuholt */
+interface Comp { id: string; name: string; color: string }
+const COMP_NAMES = ['Alrik', 'Brann', 'Cora', 'Dorn', 'Elva', 'Fenn', 'Hagen', 'Ilsa', 'Jorin', 'Kara', 'Lute'];
+const COMP_COLORS = ['#c9a26b', '#9fb8a0', '#b79bc4', '#d08f6c', '#8fb2c9', '#c4b26b', '#a8a8a8', '#c98f9f', '#8fc9b7', '#b9a58a', '#9f9fd0'];
+const MAX_HEROES = 12;
 
 export default {
   create(ctx: GameContext) {
     const ids = ctx.players.map((p) => p.id);
-    const solo = ids.length === 1;
+    const isSolo = () => allIds().length === 1;
     const planTime = Number(ctx.options.planTime) || 0;
     let phase: 'lager' | 'plan' | 'resolve' | 'reward' | 'end' = 'lager';
     const choice = new Map<string, ClassId>();
@@ -37,28 +44,46 @@ export default {
     let planTimer: { cancel(): void } | null = null;
     let planDeadline = 0;
 
-    const isBot = (id: string) => !!ctx.player(id)?.isBot;
+    let comps: Comp[] = [];
+    const compOf = (id: string) => comps.find((c) => c.id === id);
+    /** Alle Helden-IDs: Mitspieler, dann Begleiter */
+    const allIds = () => [...ids, ...comps.map((c) => c.id)];
+    const isBot = (id: string) => !!compOf(id) || !!ctx.player(id)?.isBot;
     const connected = (id: string) => !!ctx.player(id)?.connected || isBot(id);
     const heroOf = (id: string) => heroes.find((h) => h.id === id);
-    const nameOf = (id: string) => ctx.player(id)?.name ?? '?';
+    const nameOf = (id: string) => compOf(id)?.name ?? ctx.player(id)?.name ?? '?';
+    const randomClass = () => CLASS_IDS[Math.floor(Math.random() * CLASS_IDS.length)];
 
+    /** Gespeicherter Run passt, wenn gleich viele echte Spieler mitspielen (Begleiter kommen aus dem Speicher) */
     const saved = () => {
       const s = ctx.store.get<SavedRun>('run');
-      return s && s.heroes.length === ids.length ? s : null;
+      return s && s.heroes.filter((x) => !x.comp).length === ids.length ? s : null;
     };
+
+    function setComps(n: number) {
+      n = Math.max(0, Math.min(MAX_HEROES - ids.length, n));
+      while (comps.length > n) { const c = comps.pop()!; choice.delete(c.id); lagerReady.delete(c.id); }
+      while (comps.length < n) {
+        const k = comps.length;
+        const c = { id: `comp-${k}`, name: COMP_NAMES[k % COMP_NAMES.length], color: COMP_COLORS[k % COMP_COLORS.length] };
+        comps.push(c);
+        choice.set(c.id, randomClass());
+        lagerReady.add(c.id);
+      }
+    }
 
     /* ---------------- Lager ---------------- */
 
     function startLager() {
       phase = 'lager';
-      for (const id of ids) if (isBot(id)) { choice.set(id, CLASS_IDS[Math.floor(Math.random() * CLASS_IDS.length)]); lagerReady.add(id); }
+      for (const id of ids) if (isBot(id)) { choice.set(id, randomClass()); lagerReady.add(id); }
       // Nur Testspieler (z. B. Simulation): sofort losspielen
       if (ids.every(isBot)) return newRun();
       broadcast();
     }
 
     function newRun() {
-      heroes = ids.map((id) => newHero(id, choice.get(id) ?? CLASS_IDS[0]));
+      heroes = allIds().map((id) => newHero(id, choice.get(id) ?? CLASS_IDS[0]));
       fightNo = 0;
       startFight();
     }
@@ -66,8 +91,9 @@ export default {
     function continueRun() {
       const s = saved();
       if (!s) return;
-      const free = [...s.heroes];
+      const free = s.heroes.filter((x) => !x.comp);
       heroes = [];
+      comps = s.heroes.filter((x) => x.comp).map((x) => x.comp!);
       // gleiche Namen zuerst, Rest der Reihe nach
       const byName = new Map<string, Hero>();
       for (const id of ids) {
@@ -78,6 +104,7 @@ export default {
         const h = byName.get(id) ?? free.shift()!.hero;
         heroes.push({ ...h, id });
       }
+      for (const x of s.heroes) if (x.comp) heroes.push({ ...x.hero, id: x.comp.id });
       fightNo = s.fightNo;
       startFight();
     }
@@ -152,7 +179,7 @@ export default {
         if (c) addCard(h, c);
       }
       fightNo++;
-      ctx.store.set('run', { fightNo, heroes: heroes.map((h) => ({ name: nameOf(h.id), hero: h })), at: Date.now() } satisfies SavedRun);
+      ctx.store.set('run', { fightNo, heroes: heroes.map((h) => ({ name: nameOf(h.id), hero: h, comp: compOf(h.id) })), at: Date.now() } satisfies SavedRun);
       ctx.after(2.5, startFight);
       broadcast();
     }
@@ -194,17 +221,17 @@ export default {
       const def = CARD[c.id];
       return {
         uid, id: c.id, up: c.up, name: def.name + (c.up ? '+' : ''), cost: cost(c), speed: def.speed, rarity: def.rarity,
-        text: cardText(def, c.up, solo), img: def.img, target: def.target, otherAlly: !!def.otherAlly && !solo,
+        text: cardText(def, c.up, isSolo()), img: def.img, target: def.target, otherAlly: !!def.otherAlly && !isSolo(),
       };
     };
 
     function hostView() {
-      const base = { phase, screen: phase, fightNo, fights: FIGHTS.length, solo };
+      const base = { phase, screen: phase, fightNo, fights: FIGHTS.length, solo: isSolo(), comps };
       if (phase === 'lager') {
-        return { ...base, players: ids.map((id) => ({ id, cls: choice.get(id) ?? null, ready: lagerReady.has(id) })), saved: saved() ? { fightNo: saved()!.fightNo, at: saved()!.at } : null };
+        return { ...base, players: allIds().map((id) => ({ id, cls: choice.get(id) ?? null, ready: lagerReady.has(id) })), saved: saved() ? { fightNo: saved()!.fightNo, at: saved()!.at } : null };
       }
       if (phase === 'reward') {
-        return { ...base, heroes: heroesView(), picked: ids.map((id) => ({ id, done: picked.has(id), card: picked.get(id) ? CARD[picked.get(id)!].name : null })) };
+        return { ...base, heroes: heroesView(), picked: allIds().map((id) => ({ id, done: picked.has(id), card: picked.get(id) ? CARD[picked.get(id)!].name : null })) };
       }
       if (phase === 'end') return { ...base, result, heroes: heroesView() };
       const f = fight!;
@@ -215,11 +242,12 @@ export default {
     }
 
     function phoneView(id: string) {
-      const base = { phase, fightNo, fights: FIGHTS.length, solo };
+      const base = { phase, fightNo, fights: FIGHTS.length, solo: isSolo(), comps };
       if (phase === 'lager') {
         return {
           ...base, input: !lagerReady.has(id), cls: choice.get(id) ?? null, ready: lagerReady.has(id), vip: ctx.vip() === id,
-          allChosen: ids.every((x) => choice.has(x)), saved: saved() ? { fightNo: saved()!.fightNo } : null,
+          allChosen: ids.every((x) => choice.has(x)), compCount: comps.length, compMax: MAX_HEROES - ids.length,
+          savedComps: saved()?.heroes.filter((x) => x.comp).length ?? 0, saved: saved() ? { fightNo: saved()!.fightNo } : null,
           classes: CLASS_IDS.map((c) => {
             const d = CLASSES[c];
             return { id: c, name: d.name, role: d.role, hp: d.hp, desc: d.desc, img: d.img, start: d.start.map(([cid, n]) => `${n}× ${CARD[cid].name}`) };
@@ -235,7 +263,7 @@ export default {
           ...base, me, input: !picked.has(id), done: picked.has(id), pickedName: picked.get(id) ? CARD[picked.get(id)!].name : null,
           offer: o.map((cid) => {
             const d = CARD[cid];
-            return { id: cid, name: d.name, cost: d.cost[0], speed: d.speed, rarity: d.rarity, text: cardText(d, false, solo), img: d.img };
+            return { id: cid, name: d.name, cost: d.cost[0], speed: d.speed, rarity: d.rarity, text: cardText(d, false, isSolo()), img: d.img };
           }),
         };
       }
@@ -256,7 +284,7 @@ export default {
         }),
         plan: h.plan.map((p) => ({ uid: p.uid, target: p.target })),
         drawPile: deckNames(h.draw), discardPile: deckNames(h.discard),
-        enemies: enemiesView(f).map((e) => ({ uid: e.uid, name: e.name, img: e.img, hp: e.hp, maxHp: e.maxHp, block: e.block, st: e.st, dead: e.dead, intent: e.intent })),
+        enemies: enemiesView(f).map((e) => ({ uid: e.uid, id: e.id, name: e.name, img: e.img, elite: e.elite, hp: e.hp, maxHp: e.maxHp, block: e.block, st: e.st, buff: e.buff, dead: e.dead, intent: e.intent })),
         allies: heroes.map((x) => ({ id: x.id, cls: x.cls, img: CLASSES[x.cls].img, hp: x.hp, maxHp: x.maxHp })),
         vip: ctx.vip() === id,
         waitingFor: phase === 'plan' ? heroes.filter((x) => !x.ready).map((x) => x.id) : [],
@@ -280,6 +308,7 @@ export default {
         if (phase === 'lager') {
           if (a.type === 'class' && CLASS_IDS.includes(a.cls) && ids.includes(id)) { choice.set(id, a.cls); lagerReady.add(id); return broadcast(); }
           if (a.type === 'unready') { lagerReady.delete(id); return broadcast(); }
+          if (vip && a.type === 'comps') { setComps(Number(a.n) || 0); return broadcast(); }
           if (vip && a.type === 'start' && ids.every((x) => choice.has(x))) return newRun();
           if (vip && a.type === 'continue') return continueRun();
           return;

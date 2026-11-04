@@ -2,6 +2,16 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.10.1
+
+- Fernseher: Taste **F** schaltet Vollbild an und aus
+- Abgrund: Begleiter – der VIP holt im Lager bis zu 11 vom Spiel gesteuerte Mitstreiter dazu (werden mit dem Run gespeichert)
+- Abgrund: Gegner auf dem Handy zeigen ihre Leben, Block, Stärke und Zustände; Antippen öffnet eine Detailseite mit allen Zuständen und was sie bewirken
+- Abgrund: Karten erklären ihre Schlüsselwörter (Block, Gift, Schwächung, Schnell …) in der Großansicht, bei der Belohnung und im Deck/Ablage
+- Abgrund: Absichten der Gegner mit Symbolen – Schwert für Schaden, Schild für Block, Arm für Stärke; Lebensanzeige bricht nicht mehr um
+- Abgrund: Besiegte Gegner zerreißen nur noch (kein Verbrennen)
+- Abgrund: Gegner-Block hält bis zu ihrem nächsten Zug (vorher verfiel er sofort wirkungslos); Block-Werte dafür etwas kleiner
+
 ## 0.10.0
 
 - Neues Spiel (Prototyp): **Abgrund** – kooperatives Deckbau-Abenteuer im Papiertheater-Stil für 1–12 Spieler. Im Lager wählt jeder per Wischen seine Klasse (Schildwacht, Klingenläufer, Kräuterkundige), dann plant ihr gleichzeitig eure Karten auf dem Handy; der TV zeigt die Gegner mit roten Fäden zu ihren Zielen und spielt die Runde Schritt für Schritt aus. Drei Kämpfe mit Kartenbelohnungen, der letzte gegen den Knochenkoloss. Wer fällt, verliert den Run für alle. Allein spielbar oder mit bis zu 11 Testspielern. Der Run wird nach jedem Kampf gespeichert und lässt sich fortsetzen

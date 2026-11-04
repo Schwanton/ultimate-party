@@ -156,7 +156,7 @@ export interface EnemyDef {
 export const ENEMIES: Record<string, EnemyDef> = {
   skelett: {
     id: 'skelett', name: 'Skelett', hp: 24, img: 'gegner-skelett', size: 1,
-    moves: [{ name: 'Hieb', dmg: 8 }, { name: 'Hieb', dmg: 8 }, { name: 'Schild hoch', block: 8, dmg: 5 }],
+    moves: [{ name: 'Hieb', dmg: 8 }, { name: 'Hieb', dmg: 8 }, { name: 'Schild hoch', block: 6, dmg: 5 }],
   },
   schlundhund: {
     id: 'schlundhund', name: 'Schlundhund', hp: 20, img: 'gegner-schlundhund', size: 0.8,
@@ -168,7 +168,7 @@ export const ENEMIES: Record<string, EnemyDef> = {
   },
   knochenkoloss: {
     id: 'knochenkoloss', name: 'Knochenkoloss', hp: 70, elite: true, img: 'gegner-knochenkoloss', size: 1.3,
-    moves: [{ name: 'Zermalmen', dmg: 16 }, { name: 'Knochensturm', dmg: 7, all: true }, { name: 'Sammeln', block: 12, buff: 3 }],
+    moves: [{ name: 'Zermalmen', dmg: 16 }, { name: 'Knochensturm', dmg: 7, all: true }, { name: 'Sammeln', block: 8, buff: 3 }],
   },
 };
 

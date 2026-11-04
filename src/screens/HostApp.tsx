@@ -3,7 +3,7 @@ import type { GameManifest, Lang, PlayerInfo, Translate } from '@up/sdk';
 import { net, useNet, loadSession, saveSession } from '../net';
 import { guessLang, useT } from '../i18n';
 import { clientGame } from '../registry';
-import { Avatar, Crown, FullscreenButton, Logo, QrCode, Stage, isLight, sfx, shade } from '../ui';
+import { Avatar, Crown, FullscreenButton, Logo, QrCode, Stage, isLight, sfx, shade, toggleFullscreen } from '../ui';
 import { HostSettings } from './HostSettings';
 import { GameOptionsForm, optionsSummary } from './GameOptions';
 import { UpdateBanner } from './Update';
@@ -39,6 +39,10 @@ export function HostApp() {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setSettingsOpen((o) => !o);
+      // F = Vollbild an/aus (nicht beim Tippen in ein Feld)
+      const el = e.target as HTMLElement | null;
+      const typing = !!el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT' || el.isContentEditable);
+      if ((e.key === 'f' || e.key === 'F') && !typing && !e.metaKey && !e.ctrlKey && !e.altKey && !e.repeat) toggleFullscreen();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
