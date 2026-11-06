@@ -23,7 +23,7 @@ Party-Spiele für zu Hause: Ein Bildschirm (Fernseher, Laptop, Beamer) zeigt das
 | **Der Abgrund** (Akt I) | 1–12 | Kooperatives Deckbau-Abenteuer im Papiertheater: Klasse wählen, gemeinsam Karten planen, auf der Pfadkarte abstimmen, Händler, Lagerfeuer, Ereignisse, Relikte und ein Boss. Allein, mit Freunden oder mit Begleitern. |
 | **Maulwurf** | 5–30 | Heimliche Verräter sabotieren Missionen. Diskutiert, werft die Richtigen raus – oder gewinnt als Verräter. |
 
-Neue Spiele lassen sich mit wenig Code hinzufügen und teilen – siehe [Spiele entwickeln](docs/SPIELE-ENTWICKELN.md).
+Neue Spiele lassen sich mit wenig Code hinzufügen und teilen – auch als eigenes GitHub-Repository, das Hosts mit einem Klick installieren und aktualisieren. Siehe [Spiele entwickeln](docs/SPIELE-ENTWICKELN.md).
 
 ---
 
@@ -98,6 +98,7 @@ server/     Server: Räume, Verbindungen, Spielablauf
 src/        Browser-App: TV-Lobby, Handy-Lobby, Einstellungen, UI-Baukasten (src/ui)
 sdk/        Schnittstelle für Spiele (Typen, Hilfsfunktionen, Baustein „Täuschen“)
 games/      Ein Ordner pro Spiel (manifest.json, server.ts, client.tsx, i18n/, content/)
+spiele/     Installierte Spiele aus eigenen Repositories (nicht Teil von UP!)
 scripts/    Tests und Werkzeuge
 docs/       Anleitungen
 ```

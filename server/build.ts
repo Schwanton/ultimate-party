@@ -3,8 +3,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import * as esbuild from 'esbuild';
-import { BUILD_DIR, DEV, GAMES_DIR, ROOT } from './config';
+import { BUILD_DIR, DEV, GAMES_DIR, INSTALLED_DIR, ROOT } from './config';
+import { allGames, markBroken } from './registry';
 import { LANGS } from '../sdk/types';
+
+/** Spiele, deren Ansichten sich nicht bauen ließen – werden beim nächsten Bauen weggelassen */
+const excluded = new Set<string>();
 
 /** Virtuelles Modul "up:games": bindet alle Spiele (Ansichten, Manifest, Texte) in die App ein. */
 function gamesPlugin(): esbuild.Plugin {
@@ -15,14 +19,13 @@ function gamesPlugin(): esbuild.Plugin {
       build.onLoad({ filter: /.*/, namespace: 'up-games' }, () => {
         const lines: string[] = [];
         const entries: string[] = [];
-        const watchDirs: string[] = [GAMES_DIR];
-        fs.readdirSync(GAMES_DIR).sort().forEach((name, i) => {
-          const dir = path.join(GAMES_DIR, name);
+        const watchDirs: string[] = [GAMES_DIR, ...(fs.existsSync(INSTALLED_DIR) ? [INSTALLED_DIR] : [])];
+        // nur Spiele, die der Server erfolgreich geladen hat
+        allGames().filter((g) => !excluded.has(g.manifest.id)).sort((a, b) => a.manifest.id.localeCompare(b.manifest.id)).forEach((g, i) => {
+          const dir = g.dir;
           const manifestPath = path.join(dir, 'manifest.json');
           const clientPath = path.join(dir, 'client.tsx');
-          if (name.startsWith('.') || !fs.existsSync(manifestPath) || !fs.existsSync(clientPath)) return;
-          const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-          if (manifest.hidden && !DEV) return;
+          if (!fs.existsSync(clientPath)) return;
           watchDirs.push(dir);
           lines.push(`import c${i} from ${JSON.stringify(clientPath)};`);
           lines.push(`import m${i} from ${JSON.stringify(manifestPath)};`);
@@ -34,7 +37,8 @@ function gamesPlugin(): esbuild.Plugin {
               i18n.push(`${lang}: t${i}_${lang}`);
             }
           }
-          entries.push(`{ manifest: m${i}, client: c${i}, i18n: { ${i18n.join(', ')} } }`);
+          // Herkunft mitgeben (im Manifest auf der Platte steht sie nicht)
+          entries.push(`{ manifest: { ...m${i}, source: ${JSON.stringify(g.source)} }, client: c${i}, i18n: { ${i18n.join(', ')} } }`);
         });
         lines.push(`export default [${entries.join(',\n')}];`);
         return { contents: lines.join('\n'), loader: 'ts', resolveDir: ROOT, watchDirs };
@@ -84,10 +88,39 @@ const options: esbuild.BuildOptions = {
   plugins: [gamesPlugin()],
 };
 
+/** Zu welchem installierten Spiel gehört eine Datei aus einer Fehlermeldung? */
+function installedGameOf(file: string | undefined) {
+  if (!file) return undefined;
+  const abs = path.resolve(ROOT, file.replace(/^[\w-]+:/, ''));
+  return allGames().find((g) => g.source === 'installed' && abs.startsWith(g.dir + path.sep));
+}
+
+/**
+ * Baut die App. Lassen sich die Ansichten eines installierten Spiels nicht bauen, wird nur dieses Spiel
+ * weggelassen (und als defekt markiert) – ein fremdes Spiel darf nie ganz UP! lahmlegen.
+ */
 export async function buildClient(): Promise<void> {
   fs.mkdirSync(path.join(BUILD_DIR, 'assets'), { recursive: true });
-  const result = await esbuild.build(options);
-  if (result.errors.length) throw new Error(result.errors.map((e) => e.text).join('\n'));
+  for (let attempt = 0; ; attempt++) {
+    try {
+      const result = await esbuild.build(options);
+      if (result.errors.length) throw Object.assign(new Error('build'), { errors: result.errors });
+      break;
+    } catch (e) {
+      const errors: esbuild.Message[] = (e as { errors?: esbuild.Message[] }).errors ?? [];
+      const broken = new Set(errors.map((m) => installedGameOf(m.location?.file)).filter((g) => !!g));
+      if (!broken.size || attempt > 10) {
+        throw new Error(errors.length ? errors.map((m) => `${m.location?.file ?? ''}:${m.location?.line ?? ''} ${m.text}`).join('\n') : (e as Error).message);
+      }
+      for (const g of broken) {
+        const msg = errors.find((m) => installedGameOf(m.location?.file) === g);
+        const reason = `Ansichten (client.tsx) lassen sich nicht bauen: ${msg?.text ?? ''}`;
+        console.error(`[UP!] Spiel "${g!.manifest.id}" wird übersprungen – ${reason}`);
+        excluded.add(g!.manifest.id);
+        markBroken(g!.manifest.id, reason);
+      }
+    }
+  }
   writeIndexHtml();
 }
 

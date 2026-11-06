@@ -8,11 +8,12 @@ import {
 } from '../sdk/types';
 import { shuffle } from '../sdk/util';
 import { allGames, getGame, type LoadedGame } from './registry';
-import { DEV, QUIET, TIME_SCALE } from './config';
+import { BOOT_ID, DEV, QUIET, TIME_SCALE } from './config';
 import { getSecret, secretStatus, setSecret } from './secrets';
 import { storeGet, storeSet } from './store';
 import { deckStatus, drawnSet, markDrawn, refill, resetDeck, unmarkDrawn } from './decks';
 import { updateStatus } from './update';
+import { spieleStatus } from './spiele';
 import { rememberRoom, rememberedRoom } from './roomstore';
 
 export const PALETTE = [
@@ -626,6 +627,8 @@ export class Room {
       notice: this.notice,
       results: this.results,
       update: updateStatus(),
+      spiele: spieleStatus(),
+      boot: BOOT_ID,
     };
   }
 

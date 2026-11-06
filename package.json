@@ -1,13 +1,13 @@
 {
   "name": "ultimate-party",
-  "version": "0.16.0",
+  "version": "0.17.0",
   "description": "UP! – Ultimate Party: Party-Spiele, bei denen das Handy der Controller ist",
   "license": "MIT",
   "private": true,
   "type": "module",
   "scripts": {
     "start": "tsx server/index.ts",
-    "dev": "tsx watch --clear-screen=false --include \"games/*/server.ts\" server/index.ts --dev",
+    "dev": "tsx watch --clear-screen=false --include \"games/*/server.ts\" --include \"spiele/*/server.ts\" server/index.ts --dev",
     "test": "tsx scripts/simulate.ts",
     "check-packs": "tsx scripts/check-packs.ts",
     "check-levels": "tsx scripts/check-schwarmsinn.ts",
@@ -33,6 +33,7 @@
   },
   "upUpdate": {
     "repo": "Schwanton/ultimate-party",
-    "branch": "main"
+    "branch": "main",
+    "catalog": "Schwanton/up-spiele"
   }
 }

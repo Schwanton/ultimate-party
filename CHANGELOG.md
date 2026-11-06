@@ -2,6 +2,15 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.17.0
+
+- Spiele aus eigenen Repositories: Einstellungen → „Spiele verwalten“ zeigt installierte Spiele und den Katalog „Mehr Spiele“ – ein Klick installiert, ganz ohne Neustart
+- Spiele lassen sich auch direkt aus einem GitHub-Repository installieren
+- Nach Updates suchen für ein einzelnes Spiel oder für alle; „Nach Updates suchen“ in den Einstellungen prüft UP! und alle Spiele
+- Der grüne Update-Hinweis in der Lobby zeigt auch Spiel-Updates – „Jetzt aktualisieren“ bringt UP! und alle Spiele auf einmal auf den neuesten Stand
+- Lässt sich ein aktualisiertes Spiel nicht starten, stellt UP! automatisch die vorherige Version wieder her
+- Ein fehlerhaftes installiertes Spiel wird übersprungen, statt UP! am Start zu hindern
+
 ## 0.16.0
 
 - Neue Lobby: Das gewählte Spiel steht groß rechts, mit Titelbild, das langsam heranzoomt

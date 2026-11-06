@@ -3,7 +3,7 @@
  *
  * - Version = "version" in package.json. Neue Versionen werden auf GitHub (Branch main) veröffentlicht.
  * - Installieren: ZIP von GitHub laden, entpacken, Dateien überschreiben. Nicht angefasst werden:
- *   .up-data (Einstellungen, API-Schlüssel), node_modules und eigene Content-Packs/Spiele.
+ *   .up-data (Einstellungen, API-Schlüssel), node_modules, eigene Content-Packs/Spiele und installierte Spiele (spiele/).
  * - Danach Neustart: Das Startskript („UP starten“) startet UP! automatisch neu.
  */
 
@@ -40,7 +40,7 @@ const RAW = process.env.UP_UPDATE_RAW ?? `https://raw.githubusercontent.com/${RE
 const ZIP = process.env.UP_UPDATE_ZIP ?? `https://codeload.github.com/${REPO}/zip/refs/heads/${BRANCH}`;
 /** Ordner, die komplett von UP! verwaltet werden (dort werden alte Dateien auch gelöscht) */
 const MANAGED = ['server', 'src', 'sdk', 'scripts', 'docs'];
-const KEEP = new Set(['.up-data', 'node_modules', '.git', '.up-build']);
+const KEEP = new Set(['.up-data', 'node_modules', '.git', '.up-build', 'spiele']);
 
 let status: UpdateStatus = { state: 'idle', current: CURRENT, git: fs.existsSync(path.join(ROOT, '.git')) };
 const listeners = new Set<() => void>();
@@ -68,14 +68,14 @@ export function newer(a: string, b: string) {
   return false;
 }
 
-async function fetchText(url: string) {
+export async function fetchText(url: string) {
   const res = await fetch(`${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`, { signal: AbortSignal.timeout(15_000), headers: { 'Cache-Control': 'no-cache' } });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.text();
 }
 
 /** Änderungen der neuen Version aus CHANGELOG.md (Abschnitt „## <version>“) */
-function notesFor(changelog: string, version: string): string[] {
+export function notesFor(changelog: string, version: string): string[] {
   const lines = changelog.split('\n');
   const start = lines.findIndex((l) => l.trim().startsWith(`## ${version}`));
   if (start < 0) return [];
@@ -111,7 +111,7 @@ export function startUpdateChecks() {
   setInterval(() => void checkForUpdate(), 30 * 60_000).unref();
 }
 
-function extract(zip: string, dest: string) {
+export function extract(zip: string, dest: string) {
   fs.mkdirSync(dest, { recursive: true });
   // macOS und Windows 10+ haben „tar“ (bsdtar), das ZIP-Dateien entpacken kann
   const tries: [string, string[]][] = [['tar', ['-xf', zip, '-C', dest]], ['unzip', ['-q', '-o', zip, '-d', dest]]];

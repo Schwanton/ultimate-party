@@ -1,7 +1,7 @@
 /**
  * UP! Game-SDK – gemeinsame Typen für Plattform und Spiele.
  *
- * Ein Spiel besteht aus:
+ * Ein Spiel besteht aus (mitgeliefert in games/<id>/, installiert in spiele/<id>/):
  *   games/<id>/manifest.json   – Beschreibung (GameManifest)
  *   games/<id>/server.ts       – Spiellogik (default export: GameServerModule)
  *   games/<id>/client.tsx      – Ansichten für TV und Handy (default export: GameClientModule)
@@ -78,6 +78,13 @@ export interface GameManifest {
   cover?: string;
   /** Adresse des Titelbilds – setzt der Server, nicht im Manifest eintragen */
   coverUrl?: string;
+  /**
+   * GitHub-Repository des Spiels ("besitzer/repo"). Daraus installiert UP! das Spiel und sucht nach Updates.
+   * Siehe docs/SPIELE-ENTWICKELN.md, Abschnitt „Eigenes Repository“.
+   */
+  repo?: string;
+  /** Mitgeliefert (games/) oder installiert (spiele/) – setzt der Server, nicht im Manifest eintragen */
+  source?: 'builtin' | 'installed';
 }
 
 /** Eine Spiel-Einstellung. Werte sind Zahlen oder Texte; `choices` macht daraus eine Auswahl. */

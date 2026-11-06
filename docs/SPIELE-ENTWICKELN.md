@@ -1,6 +1,6 @@
 # Spiele entwickeln
 
-Ein UP!-Spiel ist ein Ordner in `games/`. Die Plattform kümmert sich um Räume, Beitreten, Lobby, Wiederverbinden, Sprachen, Avatare und Einstellungen. Ein Spiel liefert nur seine **Regeln** (Server) und seine **Ansichten** (TV und Handy).
+Ein UP!-Spiel ist ein Ordner in `games/` (mitgeliefert) oder `spiele/` (aus einem eigenen Repository, siehe [Teilen](#teilen-eigenes-repository)). Die Plattform kümmert sich um Räume, Beitreten, Lobby, Wiederverbinden, Sprachen, Avatare und Einstellungen. Ein Spiel liefert nur seine **Regeln** (Server) und seine **Ansichten** (TV und Handy).
 
 ## In 5 Minuten zum eigenen Spiel
 
@@ -214,11 +214,84 @@ Farben und Schriften kommen aus `src/ui/theme.css` (CSS-Variablen wie `var(--yel
 - **Entwicklermodus** (`npm run dev`, `/dev`) – TV + Handys + Bots.
 - **Automatisch** – trage dein Spiel in `scripts/simulate.ts` ein und starte `npm test`. Alle Zeiten laufen dort 50× schneller, und Bots spielen komplett durch. Dafür braucht dein Spiel eine `bot()`-Funktion.
 
-## Teilen
+## Teilen: eigenes Repository
 
-Ein Spiel ist nur ein Ordner. Zum Weitergeben den Ordner zippen; zum Installieren in `games/` entpacken und UP! neu starten. (Ein Import per Drag & Drop in der App ist geplant.)
+Ein Spiel muss nicht in das UP!-Repository. Jedes Spiel kann ein **eigenes GitHub-Repository** haben – Hosts installieren es dann mit einem Klick und bekommen Updates genauso bequem wie Updates von UP! selbst.
 
-Achtung: Spiele enthalten Code. Installiere nur Spiele aus Quellen, denen du vertraust.
+### Wo Spiele liegen
+
+| Ordner | Was | Updates |
+|---|---|---|
+| `games/` | mitgelieferte Spiele | kommen mit dem UP!-Update |
+| `spiele/` | installierte Spiele aus eigenen Repositories | pro Spiel, aus seinem Repository |
+
+`spiele/` gehört nicht zu UP!: Der Ordner steht in `.gitignore`, und das UP!-Update fasst ihn nie an. Gibt es ein Spiel mit gleichem Namen in beiden Ordnern, gewinnt das mitgelieferte.
+
+### Ein Spiel als eigenes Repository anlegen
+
+```bash
+npm run new-game mein-spiel -- --repo
+```
+
+Das legt `spiele/mein-spiel/` an (mit `CHANGELOG.md`). Der Spielordner selbst ist das Repository: `manifest.json`, `server.ts` und `client.tsx` liegen direkt im Hauptordner des Repositories (oder in genau einem Unterordner).
+
+1. In `manifest.json` bei `"repo"` dein Repository eintragen, z. B. `"repo": "anna/mein-spiel"`.
+2. Im Ordner `spiele/mein-spiel` ein Git-Repository anlegen und auf GitHub hochladen.
+3. Entwickeln wie gewohnt mit `npm run dev` – UP! lädt Spiele aus `spiele/` genauso wie aus `games/`. Ein Ordner mit `.git` gilt als Entwickler-Checkout: UP! bietet dafür keine Updates an (du arbeitest ja selbst daran).
+
+Ein vorhandenes Spiel-Repository zum Mitentwickeln einfach nach `spiele/` klonen: `git clone https://github.com/anna/mein-spiel spiele/mein-spiel`.
+
+### Versionen veröffentlichen
+
+- `version` im Manifest erhöhen (z. B. `1.2.0`) und im `CHANGELOG.md` einen Abschnitt `## 1.2.0` mit Stichpunkten schreiben – die zeigt UP! beim Update an.
+- Auf GitHub eine **Release** mit passendem Tag anlegen (z. B. `v1.2.0`). UP! nimmt immer die neueste Release; gibt es keine, den aktuellen Stand des Hauptzweigs.
+- `sdkVersion` ist die SDK-Version, die das Spiel mindestens braucht. Braucht ein Spiel ein neueres SDK, als UP! hat, wird es nicht geladen und Updates darauf erst nach einem UP!-Update angeboten.
+
+### Installieren und Updates (für Hosts)
+
+Einstellungen (Zahnrad) → **Spiele verwalten**:
+
+- **Mehr Spiele** – der Katalog geprüfter Spiele, mit einem Klick installieren. Installieren geht ohne Neustart.
+- **Aus GitHub installieren** – Repository eingeben (`anna/mein-spiel`, eine GitHub-Adresse oder `anna/mein-spiel@v1.2.0` für eine bestimmte Version).
+- **Nach Updates suchen** – für ein einzelnes Spiel oder für alle. Der Knopf „Nach Updates suchen“ in den Einstellungen sucht nach Updates für UP! und alle Spiele; außerdem sucht UP! alle 30 Minuten von selbst.
+- **Aktualisieren** – einzeln oder alle auf einmal. Gibt es Updates, erscheint in der Lobby derselbe grüne Hinweis wie für UP!-Updates; „Jetzt aktualisieren“ installiert UP! und alle Spiele in einem Rutsch und startet einmal neu.
+
+Bei Updates bleiben eigene Content-Packs in `content/` erhalten, ebenso gespeicherte Daten in `.up-data`. Vor jedem Update sichert UP! die alte Version. Lässt sich die neue Version nicht starten (Fehler in `server.ts` oder `client.tsx`), stellt UP! automatisch die alte wieder her und bietet die kaputte Version nicht noch einmal an. Ein fehlerhaftes installiertes Spiel legt nie ganz UP! lahm – es wird nur übersprungen.
+
+### Der Katalog
+
+Der Katalog ist die Datei `katalog.json` im Repository [Schwanton/up-spiele](https://github.com/Schwanton/up-spiele) (einstellbar in `package.json` unter `upUpdate.catalog`). Neue Spiele und neue Versionen kommen per Pull Request dazu. Jeder Eintrag zeigt auf eine **feste Version** (Tag oder Commit) – geprüft wird also genau der Code, der installiert wird.
+
+```json
+{
+  "spiele": [
+    {
+      "id": "mein-spiel",
+      "repo": "anna/mein-spiel",
+      "ref": "v1.2.0",
+      "version": "1.2.0",
+      "sdkVersion": 1,
+      "name": { "de": "Mein Spiel", "en": "My Game" },
+      "description": { "de": "Kurze Beschreibung", "en": "Short description" },
+      "author": "Anna",
+      "color": "#FF66AA",
+      "minPlayers": 3,
+      "maxPlayers": 8,
+      "minutes": 15,
+      "cover": "https://raw.githubusercontent.com/anna/mein-spiel/v1.2.0/bilder/titelbild.webp",
+      "older": [{ "version": "1.1.0", "ref": "v1.1.0", "sdkVersion": 1 }]
+    }
+  ]
+}
+```
+
+- `id` muss der `id` im Manifest entsprechen und darf nicht schon bei UP! dabei sein.
+- `path` (optional): Unterordner im Repository, falls das Spiel nicht im Hauptordner liegt.
+- `older` (optional): ältere Versionen. Wer noch eine ältere UP!-Version hat, bekommt automatisch die neueste Version, die dazu passt.
+
+### Sicherheit
+
+Spiele enthalten Code, der auf dem Rechner des Hosts läuft – mit denselben Rechten wie UP! selbst (er könnte z. B. gespeicherte API-Schlüssel lesen). Deshalb: Katalog-Einträge vor dem Aufnehmen ansehen und immer auf eine feste Version zeigen lassen. Beim Installieren aus GitHub warnt UP! vorher. Installiere nur Spiele aus Quellen, denen du vertraust.
 
 ## Regeln für gute UP!-Spiele
 

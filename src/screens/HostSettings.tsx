@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { net, useNet } from '../net';
 import { useT } from '../i18n';
 import { Avatar, sfx } from '../ui';
+import { GameManager } from './GameManager';
 
 export function HostSettings({ onClose }: { onClose: () => void }) {
   const s = useNet();
@@ -17,6 +18,7 @@ export function HostSettings({ onClose }: { onClose: () => void }) {
     else next.add(key);
     set({ disabledPacks: [...next] });
   };
+  const [manager, setManager] = useState(false);
   const times: [number, string][] = [[0.75, t('settings.timeLess')], [1, t('settings.timeNormal')], [1.5, t('settings.timeMore')], [2, t('settings.timeMuchMore')]];
 
   return (
@@ -58,7 +60,7 @@ export function HostSettings({ onClose }: { onClose: () => void }) {
                 })}
               </div>
             </div>
-            <UpdateSection t={t} />
+            <UpdateSection t={t} onManage={() => setManager(true)} />
             {host.decks?.length ? (
               <div>
                 <div className="up-label" style={{ marginBottom: 4 }}>{t('settings.decks')}</div>
@@ -105,6 +107,7 @@ export function HostSettings({ onClose }: { onClose: () => void }) {
           </div>
         </div>
       </div>
+      {manager && <div onClick={(e) => e.stopPropagation()}><GameManager onClose={() => setManager(false)} /></div>}
     </div>
   );
 }
@@ -149,10 +152,11 @@ function SoundSettings({ t }: { t: (k: string) => string }) {
   );
 }
 
-/** Updates: aktuelle Version, „Nach Updates suchen“, ggf. installieren */
-function UpdateSection({ t }: { t: (k: string, v?: Record<string, string | number>) => string }) {
+/** Updates: aktuelle Version, „Nach Updates suchen“ (UP! und alle Spiele), ggf. installieren; Spiele verwalten */
+function UpdateSection({ t, onManage }: { t: (k: string, v?: Record<string, string | number>) => string; onManage: () => void }) {
   const s = useNet();
   const u = s.host?.update;
+  const sp = s.host?.spiele;
   const [confirm, setConfirm] = useState(false);
   if (!u) return null;
   const players = s.room?.players.filter((p) => !p.isBot).length ?? 0;
@@ -176,6 +180,9 @@ function UpdateSection({ t }: { t: (k: string, v?: Record<string, string | numbe
         {(u.state === 'available' || u.state === 'error') && (
           <button className="up-btn small" disabled={busy} onClick={install}>{confirm ? t('update.confirmShort') : u.state === 'error' ? t('update.retry') : t('update.install')}</button>
         )}
+        <button className="up-btn ghost small" onClick={onManage}>
+          {t('spiele.manage')}{sp?.updates ? <b style={{ color: 'var(--green)' }}> · {sp.updates === 1 ? t('update.gamesOne') : t('update.gamesMany', { n: sp.updates })}</b> : null}
+        </button>
       </div>
       {confirm && <p className="faint" style={{ fontSize: 14, marginTop: 6 }}>{t('update.confirm')}</p>}
     </div>

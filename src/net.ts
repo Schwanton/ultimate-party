@@ -13,6 +13,34 @@ export interface PackInfo {
   error?: string;
 }
 
+/** Installierte Spiele und Katalog (siehe server/spiele.ts) */
+export interface SpieleStatus {
+  installed: {
+    id: string;
+    name?: Record<string, string>;
+    color?: string;
+    version: string;
+    repo?: string;
+    from?: 'katalog' | 'repo';
+    error?: string;
+    git?: boolean;
+    failedVersion?: string;
+    update?: { latest?: string; ref?: string; notes?: string[]; needsNewerUp?: boolean; checking?: boolean; checkedAt?: number; error?: string };
+  }[];
+  updates: number;
+  catalog?: {
+    id: string; repo: string; version: string; sdkVersion: number; name: Record<string, string>; description: Record<string, string>;
+    author?: string; color?: string; minPlayers?: number; maxPlayers?: number; minutes?: number; cover?: string;
+    compatible: boolean; installedVersion?: string;
+  }[];
+  catalogUrl: string;
+  catalogFailed?: boolean;
+  catalogCheckedAt?: number;
+  busy?: { id: string; step: 'checking' | 'downloading' | 'installing' | 'restarting' };
+  message?: { kind: 'ok' | 'error' | 'rolledBack'; key: string; vars?: Record<string, string>; at: number };
+  restartNeeded?: boolean;
+}
+
 export interface HostData {
   games: (GameManifest & { warning?: string; secretsSet?: Record<string, boolean> })[];
   packs: PackInfo[];
@@ -21,6 +49,9 @@ export interface HostData {
   notice: string | null;
   results: { gameId: string; ranking: { playerId: string; score: number }[] }[];
   update?: { state: string; current: string; latest?: string; notes?: string[]; error?: string; git?: boolean; checking?: boolean; checkedAt?: number; checkFailed?: boolean };
+  spiele?: SpieleStatus;
+  /** Kennung des Server-Starts */
+  boot?: string;
   view: any;
 }
 
@@ -48,6 +79,7 @@ class Net {
   private retry = 0;
   private started = false;
   private serverVersion: string | null = null;
+  private serverBoot: string | null = null;
   /** wird nach jedem (Wieder-)Verbinden aufgerufen */
   onOpen: (() => void) | null = null;
   /** Live-Daten eines Spiels (ctx.stream) – getrennt vom normalen Zustand, damit nicht alles neu rendert */
@@ -78,8 +110,10 @@ class Net {
       // Nach einem Update läuft auf dem Server eine neue Version → Seite neu laden, um die neue App zu bekommen
       try {
         const info = await (await fetch('/api/info', { cache: 'no-store' })).json();
-        if (this.serverVersion && info.version && info.version !== this.serverVersion) return location.reload();
+        // … oder der Server wurde neu gestartet (z. B. nach Spiel-Updates) und hat die App neu gebaut
+        if (this.serverBoot && info.boot && info.boot !== this.serverBoot) return location.reload();
         this.serverVersion = info.version ?? this.serverVersion;
+        this.serverBoot = info.boot ?? this.serverBoot;
       } catch { /* egal */ }
       this.set({ status: 'open' });
       this.syncClock();

@@ -5,11 +5,12 @@ import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
 import { WebSocketServer, type WebSocket } from 'ws';
-import { BUILD_DIR, DEV, GAMES_DIR, PORT, QUIET } from './config';
+import { BOOT_ID, BUILD_DIR, DEV, PORT, QUIET } from './config';
 import { lanAddress } from './network';
 import { getGame, loadGames } from './registry';
 import { setSecret } from './secrets';
-import { installUpdate, onUpdateChange, startUpdateChecks, updateStatus } from './update';
+import { checkForUpdate, installUpdate, onUpdateChange, startUpdateChecks, updateStatus } from './update';
+import { checkAllGames, checkGame, dismissMessage, installGame, onSpieleChange, setSpieleHooks, startSpieleChecks, uninstallGame, updatableGames, updateGames, verifyAfterStart } from './spiele';
 import { allRooms, createRoom, getRoom, restoreRoom, type Room } from './room';
 import { buildClient, watchClient } from './build';
 
@@ -51,14 +52,15 @@ const server = http.createServer((req, res) => {
 
   if (url.pathname === '/api/info') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    return void res.end(JSON.stringify({ baseUrl, dev: DEV, version: updateStatus().current }));
+    return void res.end(JSON.stringify({ baseUrl, dev: DEV, version: updateStatus().current, boot: BOOT_ID }));
   }
 
   // Dateien eines Spiels (Bilder, Schriften, Klänge): /game/<spiel>/<ordner>/<datei>
   const gameFile = /^\/game\/([a-z0-9-]+)\/(bilder|schriften|klaenge)\/([\w.-]+\.(?:webp|png|jpg|woff2|mp3|ogg|svg))$/.exec(url.pathname);
   if (gameFile) {
-    const file = path.join(GAMES_DIR, gameFile[1], gameFile[2], gameFile[3]);
-    if (!fs.existsSync(file)) return void res.writeHead(404).end();
+    const dir = getGame(gameFile[1])?.dir;
+    const file = dir ? path.join(dir, gameFile[2], gameFile[3]) : '';
+    if (!file || !fs.existsSync(file)) return void res.writeHead(404).end();
     res.writeHead(200, {
       'Content-Type': MIME[path.extname(file)] ?? 'application/octet-stream',
       'Cache-Control': DEV ? 'no-cache' : 'public, max-age=86400',
@@ -223,10 +225,38 @@ function handle(ws: WebSocket, msg: any) {
       return reply(ws, msg, { ok: true });
     }
     case 'update:check':
-      if (isHost) void import('./update').then((u) => u.checkForUpdate());
+      // Nach Updates suchen: UP! und alle installierten Spiele
+      if (isHost) {
+        void checkForUpdate();
+        void checkAllGames();
+      }
       return;
     case 'update:install':
       if (room && isHost && room.phase === 'lobby') void installUpdate(shutdown);
+      return;
+    case 'update:all':
+      // Alles auf einmal: erst Spiele (ohne Neustart), dann UP! (startet neu); ohne UP!-Update starten die Spiele neu
+      if (room && isHost && room.phase === 'lobby') void installEverything();
+      return;
+
+    /* ---- Installierte Spiele (nur Host) ---- */
+    case 'spiele:check':
+      if (isHost) void (msg.gameId ? checkGame(String(msg.gameId)) : checkAllGames());
+      return;
+    case 'spiele:install':
+      if (!room || !isHost || room.phase !== 'lobby') return reply(ws, msg, { ok: false, error: 'busy' });
+      void installGame({ catalogId: msg.catalogId ? String(msg.catalogId) : undefined, repo: msg.repo ? String(msg.repo) : undefined }).then((r) => reply(ws, msg, r));
+      return;
+    case 'spiele:update':
+      if (!room || !isHost || room.phase !== 'lobby') return reply(ws, msg, { ok: false, error: 'busy' });
+      void updateGames(msg.gameId ? [String(msg.gameId)] : undefined).then((r) => reply(ws, msg, r));
+      return;
+    case 'spiele:uninstall':
+      if (!room || !isHost || room.phase !== 'lobby') return reply(ws, msg, { ok: false, error: 'busy' });
+      void uninstallGame(String(msg.gameId)).then((r) => reply(ws, msg, r));
+      return;
+    case 'spiele:dismiss':
+      if (isHost) dismissMessage();
       return;
     case 'kick':
       if (room && isHost) room.kick(String(msg.playerId));
@@ -245,23 +275,56 @@ function handle(ws: WebSocket, msg: any) {
 
 /* ---------------- Start ---------------- */
 
+/** Alle Browser neu laden lassen (neue App-Version) */
+function reloadBrowsers() {
+  for (const ws of wss.clients) if (ws.readyState === 1) ws.send('{"t":"reload"}');
+}
+
+/** Spiele neu einlesen und App neu bauen – nach Installieren oder Entfernen, ohne Neustart */
+async function reloadGames() {
+  const games = await loadGames();
+  log(`${games.size} Spiel(e) geladen: ${[...games.keys()].join(', ')}`);
+  // Im Entwicklermodus baut watchClient von selbst neu
+  if (!DEV && process.env.UP_NO_CLIENT !== '1') {
+    await buildClient();
+    reloadBrowsers();
+  }
+  for (const r of allRooms().values()) r.touch();
+}
+
+/** „Alles aktualisieren“ in der Lobby */
+async function installEverything() {
+  const upAvailable = updateStatus().state === 'available';
+  if (updatableGames().length) await updateGames(undefined, { restart: !upAvailable });
+  if (upAvailable) await installUpdate(shutdown);
+}
+
 async function main() {
   const games = await loadGames();
-  onUpdateChange(() => {
+  const touchAll = () => {
     for (const r of allRooms().values()) r.touch();
-  });
-  startUpdateChecks();
+  };
+  onUpdateChange(touchAll);
+  onSpieleChange(touchAll);
+  setSpieleHooks({ reload: reloadGames, shutdown });
   log(`${games.size} Spiel(e) geladen: ${[...games.keys()].join(', ')}`);
   if (process.env.UP_NO_CLIENT === '1') {
     // nur Server (für automatische Tests)
   } else if (DEV) {
     await watchClient(() => {
       log('App neu gebaut – Browser laden neu');
-      for (const ws of wss.clients) if (ws.readyState === 1) ws.send('{"t":"reload"}');
+      reloadBrowsers();
     });
   } else {
     await buildClient();
   }
+  // Frisch aktualisierte Spiele prüfen; lädt eines nicht, kommt die alte Version zurück (Neustart über das Startskript)
+  if (await verifyAfterStart()) {
+    log('Ein Spiel-Update ließ sich nicht laden – alte Version wiederhergestellt, UP! startet neu');
+    process.exit(0);
+  }
+  startUpdateChecks();
+  startSpieleChecks();
   server.listen(PORT, () => {
     console.log('');
     console.log('  ╭──────────────────────────────────────────────╮');

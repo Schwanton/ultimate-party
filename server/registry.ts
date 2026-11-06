@@ -1,9 +1,14 @@
-/** Findet alle Spiele im Ordner games/ und lädt Manifeste, Spiellogik und Content-Packs. */
+/**
+ * Findet alle Spiele und lädt Manifeste, Spiellogik und Content-Packs.
+ *
+ * - games/   mitgelieferte Spiele (kommen mit UP!-Updates)
+ * - spiele/  installierte Spiele aus eigenen Repositories (siehe server/spiele.ts)
+ */
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { GAMES_DIR, DEV } from './config';
+import { GAMES_DIR, DEV, INSTALLED_DIR } from './config';
 import { migrateRenamedGames } from './migrate';
 import { LANGS, SDK_VERSION, type ContentPack, type GameManifest, type GameServerModule, type Lang } from '../sdk/types';
 
@@ -17,15 +22,53 @@ export interface PackInfo {
   error?: string;
 }
 
+export type GameSource = 'builtin' | 'installed';
+
 export interface LoadedGame {
   manifest: GameManifest;
   dir: string;
+  source: GameSource;
   module: GameServerModule;
   packs: { info: PackInfo; pack?: ContentPack }[];
   warning?: string;
 }
 
 const games = new Map<string, LoadedGame>();
+
+/** Spiele, die nicht geladen werden konnten (Ordnername → Grund) */
+export interface LoadFailure {
+  id: string;
+  dir: string;
+  source: GameSource;
+  error: string;
+}
+const failures = new Map<string, LoadFailure>();
+
+export interface GameFolder {
+  name: string;
+  dir: string;
+  source: GameSource;
+}
+
+/** Alle Spielordner: zuerst mitgelieferte, dann installierte (gleicher Name → mitgeliefertes gewinnt) */
+export function gameFolders(): GameFolder[] {
+  const out: GameFolder[] = [];
+  const seen = new Set<string>();
+  for (const [root, source] of [[GAMES_DIR, 'builtin'], [INSTALLED_DIR, 'installed']] as const) {
+    if (!fs.existsSync(root)) continue;
+    for (const name of fs.readdirSync(root).sort()) {
+      const dir = path.join(root, name);
+      if (name.startsWith('.') || name.startsWith('_tmp') || !fs.existsSync(path.join(dir, 'manifest.json'))) continue;
+      if (seen.has(name)) {
+        if (source === 'installed') failures.set(name, { id: name, dir, source, error: `Es gibt schon ein mitgeliefertes Spiel „${name}“ – das installierte wird ignoriert` });
+        continue;
+      }
+      seen.add(name);
+      out.push({ name, dir, source });
+    }
+  }
+  return out;
+}
 
 export function validatePack(raw: unknown, manifest: GameManifest, expected: { lang: Lang; id: string }): { pack?: ContentPack; error?: string } {
   if (!raw || typeof raw !== 'object') return { error: 'Datei ist kein JSON-Objekt' };
@@ -92,16 +135,16 @@ function findCover(dir: string, manifest: GameManifest): string | undefined {
 
 export async function loadGames(): Promise<Map<string, LoadedGame>> {
   games.clear();
-  if (!fs.existsSync(GAMES_DIR)) return games;
-  migrateRenamedGames();
-  for (const name of fs.readdirSync(GAMES_DIR).sort()) {
-    const dir = path.join(GAMES_DIR, name);
-    const manifestPath = path.join(dir, 'manifest.json');
-    if (name.startsWith('.') || !fs.existsSync(manifestPath)) continue;
+  failures.clear();
+  if (fs.existsSync(GAMES_DIR)) migrateRenamedGames();
+  for (const { name, dir, source } of gameFolders()) {
     try {
-      const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8')) as GameManifest;
+      const manifest = JSON.parse(fs.readFileSync(path.join(dir, 'manifest.json'), 'utf8')) as GameManifest;
       if (manifest.id !== name) throw new Error(`manifest.id ("${manifest.id}") muss dem Ordnernamen ("${name}") entsprechen`);
       if (manifest.hidden && !DEV) continue;
+      if (Number(manifest.sdkVersion) > SDK_VERSION) {
+        throw new Error(`Braucht eine neuere UP!-Version (SDK ${manifest.sdkVersion}, UP! hat SDK ${SDK_VERSION})`);
+      }
       const mod = await import(pathToFileURL(path.join(dir, 'server.ts')).href);
       const module = (mod.default ?? mod) as GameServerModule;
       if (typeof module.create !== 'function') throw new Error('server.ts muss "export default { create }" liefern');
@@ -109,12 +152,26 @@ export async function loadGames(): Promise<Map<string, LoadedGame>> {
         ? `Gebaut für SDK ${manifest.sdkVersion}, UP! nutzt SDK ${SDK_VERSION}`
         : undefined;
       manifest.coverUrl = findCover(dir, manifest);
-      games.set(manifest.id, { manifest, dir, module, packs: loadPacks(dir, manifest), warning });
+      manifest.source = source;
+      games.set(manifest.id, { manifest, dir, source, module, packs: loadPacks(dir, manifest), warning });
     } catch (e) {
-      console.error(`[UP!] Spiel "${name}" konnte nicht geladen werden:`, (e as Error).message);
+      const error = (e as Error).message;
+      failures.set(name, { id: name, dir, source, error });
+      console.error(`[UP!] Spiel "${name}" konnte nicht geladen werden:`, error);
     }
   }
   return games;
+}
+
+/** Spiel aus dem Verkehr ziehen (z. B. wenn seine Ansichten nicht gebaut werden können) */
+export function markBroken(id: string, error: string) {
+  const g = games.get(id);
+  games.delete(id);
+  failures.set(id, { id, dir: g?.dir ?? '', source: g?.source ?? 'installed', error });
+}
+
+export function loadFailures() {
+  return [...failures.values()];
 }
 
 export function getGame(id: string) {

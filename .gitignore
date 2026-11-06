@@ -6,3 +6,5 @@ dist/
 .up-data/
 games/*/bilder/roh/
 games/*/bilder/protokoll.txt
+# installierte Spiele aus eigenen Repositories
+spiele/

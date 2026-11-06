@@ -19,5 +19,5 @@
       "@up/ui": ["src/ui/index.ts"]
     }
   },
-  "include": ["sdk", "server", "src", "games", "scripts"]
+  "include": ["sdk", "server", "src", "games", "spiele", "scripts"]
 }
