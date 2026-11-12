@@ -15,6 +15,7 @@ import { deckStatus, drawnSet, markDrawn, refill, resetDeck, unmarkDrawn } from 
 import { updateStatus } from './update';
 import { spieleStatus } from './spiele';
 import { rememberRoom, rememberedRoom } from './roomstore';
+import { joinBaseUrl } from './network';
 
 export const PALETTE = [
   '#E8336F', '#36D6F5', '#FFD447', '#9B7BFF', '#4BE3A1', '#FF9F43',
@@ -72,7 +73,12 @@ export class Room {
   private flushQueued = false;
   private lastHostSent = new WeakMap<WebSocket, string>();
 
-  constructor(code: string, lang: Lang, readonly joinUrl: string, hostToken: string = randomUUID()) {
+  /** immer die aktuelle Adresse im WLAN (nicht die vom Start) */
+  get joinUrl(): string {
+    return joinBaseUrl();
+  }
+
+  constructor(code: string, lang: Lang, hostToken: string = randomUUID()) {
     this.code = code;
     this.lang = lang;
     this.hostToken = hostToken;
@@ -670,12 +676,12 @@ function send(ws: WebSocket, msg: string) {
 const rooms = new Map<string, Room>();
 const LETTERS = 'BCDFGHJKLMNPQRSTVWXZ';
 
-export function createRoom(lang: Lang, joinUrl: string): Room {
+export function createRoom(lang: Lang): Room {
   let code = '';
   do {
     code = Array.from({ length: 4 }, () => LETTERS[Math.floor(Math.random() * LETTERS.length)]).join('');
   } while (rooms.has(code));
-  const room = new Room(code, lang, joinUrl);
+  const room = new Room(code, lang);
   rooms.set(code, room);
   room.remember();
   return room;
@@ -685,13 +691,13 @@ export function createRoom(lang: Lang, joinUrl: string): Room {
  * Nach einem Neustart: Der Fernseher meldet sich mit seinem alten Code und Schlüssel –
  * dann gibt es den Raum mit genau diesem Code wieder (Einstellungen inklusive).
  */
-export function restoreRoom(code: unknown, token: unknown, joinUrl: string): Room | undefined {
+export function restoreRoom(code: unknown, token: unknown): Room | undefined {
   if (typeof code !== 'string' || typeof token !== 'string') return undefined;
   const c = code.toUpperCase().trim();
   if (!/^[BCDFGHJKLMNPQRSTVWXZ]{4}$/.test(c) || rooms.has(c) || token.length < 8 || token.length > 64) return undefined;
   const saved = rememberedRoom(c);
   if (saved && saved.token !== token) return undefined;
-  const room = new Room(c, saved?.lang === 'en' ? 'en' : 'de', joinUrl, token);
+  const room = new Room(c, saved?.lang === 'en' ? 'en' : 'de', token);
   if (saved?.settings) room.settings = { ...room.settings, ...saved.settings };
   room.restored = true;
   rooms.set(c, room);

@@ -6,7 +6,7 @@ import http from 'node:http';
 import path from 'node:path';
 import { WebSocketServer, type WebSocket } from 'ws';
 import { BOOT_ID, BUILD_DIR, DEV, PORT, QUIET } from './config';
-import { lanAddress } from './network';
+import { initNetwork, joinBaseUrl, watchJoinBaseUrl } from './network';
 import { getGame, loadGames } from './registry';
 import { setSecret } from './secrets';
 import { checkForUpdate, installUpdate, onUpdateChange, startUpdateChecks, updateStatus } from './update';
@@ -29,8 +29,6 @@ const MIME: Record<string, string> = {
   '.ogg': 'audio/ogg',
 };
 
-const lanIp = lanAddress();
-const baseUrl = `http://${lanIp}:${PORT}`;
 
 function log(...args: unknown[]) {
   if (!QUIET) console.log('[UP!]', ...args);
@@ -52,7 +50,7 @@ const server = http.createServer((req, res) => {
 
   if (url.pathname === '/api/info') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    return void res.end(JSON.stringify({ baseUrl, dev: DEV, version: updateStatus().current, boot: BOOT_ID }));
+    return void res.end(JSON.stringify({ baseUrl: joinBaseUrl(), dev: DEV, version: updateStatus().current, boot: BOOT_ID }));
   }
 
   // Dateien eines Spiels (Bilder, Schriften, Klänge): /game/<spiel>/<ordner>/<datei>
@@ -150,7 +148,7 @@ function handle(ws: WebSocket, msg: any) {
 
     /* ---- Host ---- */
     case 'host:create': {
-      const r = createRoom(msg.lang === 'en' ? 'en' : 'de', baseUrl);
+      const r = createRoom(msg.lang === 'en' ? 'en' : 'de');
       r.hosts.add(ws);
       Object.assign(s, { room: r, role: 'host' });
       log(`Raum ${r.code} erstellt`);
@@ -158,7 +156,7 @@ function handle(ws: WebSocket, msg: any) {
       return r.touch();
     }
     case 'host:resume': {
-      const r = getRoom(msg.code) ?? restoreRoom(msg.code, msg.token, baseUrl);
+      const r = getRoom(msg.code) ?? restoreRoom(msg.code, msg.token);
       if (!r || r.hostToken !== msg.token) return reply(ws, msg, { ok: false, error: 'room_not_found' });
       r.hosts.add(ws);
       Object.assign(s, { room: r, role: 'host' });
@@ -325,13 +323,19 @@ async function main() {
   }
   startUpdateChecks();
   startSpieleChecks();
+  await initNetwork();
+  // Anderes WLAN? Neue Adresse sofort im QR-Code anzeigen
+  watchJoinBaseUrl((url) => {
+    console.log(`[UP!] Netzwerk gewechselt – Handys jetzt über: ${url}`);
+    for (const r of allRooms().values()) r.flush();
+  });
   server.listen(PORT, () => {
     console.log('');
     console.log('  ╭──────────────────────────────────────────────╮');
     console.log('  │  UP! – Ultimate Party läuft                   │');
     console.log('  ╰──────────────────────────────────────────────╯');
     console.log(`  Fernseher / Laptop:  http://localhost:${PORT}/host`);
-    console.log(`  Handys:              ${baseUrl}`);
+    console.log(`  Handys:              ${joinBaseUrl()}`);
     if (DEV) console.log(`  Entwicklermodus:     http://localhost:${PORT}/dev`);
     console.log('');
     console.log('  Beenden: dieses Fenster schließen oder Strg+C drücken.');
