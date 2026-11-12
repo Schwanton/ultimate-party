@@ -53,5 +53,9 @@
   "extend.tv": "Mehr Zeit? {n}/{need}",
   "extend.done": "Zeit verdoppelt! ×{n}",
   "reveal.real": "Echte Zahl",
-  "reveal.above": "Und wer lag drüber?"
+  "reveal.above": "Und wer lag drüber?",
+  "reveal.placing": "Alle Tipps auf den Strahl …",
+  "reveal.zoom": "Wir zoomen rein …",
+  "reveal.out": "Am weitesten daneben: {names}",
+  "reveal.drum": "Trommelwirbel …"
 }

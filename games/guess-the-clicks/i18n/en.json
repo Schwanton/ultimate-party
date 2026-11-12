@@ -53,5 +53,9 @@
   "extend.tv": "More time? {n}/{need}",
   "extend.done": "Time doubled! ×{n}",
   "reveal.real": "Actual views",
-  "reveal.above": "Who went higher?"
+  "reveal.above": "Who went higher?",
+  "reveal.placing": "All guesses on the line …",
+  "reveal.zoom": "Zooming in …",
+  "reveal.out": "Furthest off: {names}",
+  "reveal.drum": "Drumroll …"
 }

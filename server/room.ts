@@ -205,6 +205,14 @@ export class Room {
     }
   }
 
+  /** Host macht einen anderen (verbundenen, echten) Spieler zum VIP. */
+  setVip(id: string) {
+    const p = this.players.get(id);
+    if (!p || p.info.isBot || !p.info.connected) return;
+    this.vipId = id;
+    this.touch();
+  }
+
   removeBots() {
     for (const p of [...this.players.values()]) if (p.info.isBot) this.players.delete(p.info.id);
     this.updateVip();

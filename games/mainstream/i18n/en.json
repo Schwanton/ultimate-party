@@ -23,5 +23,8 @@
   "final.title": "Final standings",
   "me.place": "Place {place} of {of}",
   "me.score": "{n} points",
-  "lookAtTv": "Look at the TV."
+  "lookAtTv": "Look at the TV.",
+  "reveal.phaseGuesses": "Where do you think the majority is?",
+  "reveal.phaseVotes": "And this is how you really answered:",
+  "reveal.guessLabel": "Guesses"
 }

@@ -3,9 +3,9 @@
  * Wer am nächsten dran ist (absolute Differenz), bekommt 1 Punkt; bei Gleichstand alle Gleichnahen.
  */
 
-import { INPUT_GRACE, Scores, type GameContext, type GameServerModule } from '@up/sdk';
+import { INPUT_GRACE, Scores, shuffle, type GameContext, type GameServerModule } from '@up/sdk';
 import { YouTubeError, checkKey, fakeVideo, randomVideo, type Video } from './youtube';
-import { revealSeconds } from './reveal';
+import { answerSeconds, revealSeconds } from './reveal';
 
 const LAST_CHANCE = 5;
 const MAX_GUESS = 100_000_000_000;
@@ -161,10 +161,12 @@ export default {
       const winners = best === undefined ? [] : entries.filter((e) => e.player && e.diff === best).map((e) => e.playerId);
       winners.forEach((w) => scores.add(w, 1));
       // Zahlenstrahl: startet gleich, Handys zeigen ihr Ergebnis erst, wenn die Säule angekommen ist
+      // Auf dem Strahl stehen nur die Spieler, gemischt – die Reihenfolge darf nichts verraten
+      const shown = shuffle(entries.filter((e) => e.player));
       const startAt = Date.now() + 300;
-      const rideSeconds = revealSeconds(v.views, entries.map((e) => e.guess));
-      const doneAt = startAt + rideSeconds * 1000;
-      ctx.setHostView({ screen: 'reveal', n: round + 1, total: ROUNDS, video: { id: v.id, title: v.title, channel: v.channel }, views: v.views, entries, winners, crowd: members().length, startAt });
+      const rideSeconds = revealSeconds(v.views, shown);
+      const doneAt = startAt + answerSeconds(v.views, shown) * 1000;
+      ctx.setHostView({ screen: 'reveal', n: round + 1, total: ROUNDS, video: { id: v.id, title: v.title, channel: v.channel }, views: v.views, entries: shown, winners, crowd: members().length, startAt });
       const ranked = entries.filter((e) => e.player);
       for (const id of members()) {
         const mine = entries.find((e) => e.playerId === id);

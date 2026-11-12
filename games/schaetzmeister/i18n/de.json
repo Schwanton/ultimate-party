@@ -26,5 +26,9 @@
   "final.title": "Endstand",
   "me.place": "Platz {place} von {of}",
   "me.score": "{n} Punkte",
-  "lookAtTv": "Schau auf den Fernseher."
+  "lookAtTv": "Schau auf den Fernseher.",
+  "reveal.placing": "Alle Tipps auf den Strahl …",
+  "reveal.zoom": "Wir zoomen rein …",
+  "reveal.out": "Am weitesten daneben: {names}",
+  "reveal.drum": "Trommelwirbel …"
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { ControllerViewProps, GameClientModule, HostViewProps, PlayerInfo, Translate } from '@up/sdk';
 import { Avatar, Confetti, Crown, HostHeader, HostPrompt, HostTimer, PhoneTimer, PhoneWait, Podium, Scoreboard, VoterChips, sfx, useServerNow } from '@up/ui';
-import { voterSchedule, votersSeconds } from './timing';
+import { revealPlan, voterSchedule } from './timing';
 
 const ORANGE = '#FF9F1C';
 const COLORS = ['#FF9F1C', '#36D6F5', '#E8336F', '#4BE3A1'];
@@ -92,18 +92,34 @@ const FROM = 0.9;
 function HostReveal({ view, t, player }: HostViewProps) {
   const key = `${view.n}`;
   const voters = view.voters as string[][];
+  const guessers = (view.guessers ?? view.voters.map(() => [])) as string[][];
   const counts = voters.map((v) => v.length);
+  const gCounts = guessers.map((g) => g.length);
   const totalVotes = Math.max(1, counts.reduce((a, b) => a + b, 0));
-  const V = votersSeconds(counts.reduce((a, b) => a + b, 0));
-  const elapsed = useElapsed(key, FROM + V + 3) - FROM;
-  const sched = voterSchedule(counts);
-  const shown = sched.map((s) => s.filter((at) => at <= elapsed).length);
-  const showMajority = elapsed >= V + 0.8;
-  const showPredictors = elapsed >= V + 2.2;
+  const plan = revealPlan(gCounts.reduce((a, b) => a + b, 0), counts.reduce((a, b) => a + b, 0));
+  const elapsed = useElapsed(key, FROM + plan.votesDone + 3) - FROM;
+  const gSched = voterSchedule(gCounts);
+  const gShown = gSched.map((s) => s.filter((at) => at <= elapsed).length);
+  const vSched = voterSchedule(counts);
+  const shown = vSched.map((s) => s.filter((at) => at <= elapsed - plan.votesFrom).length);
+  const votesPhase = elapsed >= plan.votesFrom - 0.6;
+  const showMajority = elapsed >= plan.votesDone + 0.8;
+  const showPredictors = elapsed >= plan.votesDone + 2.2;
   const majority = new Set<number>(view.majority);
   const predictors: PlayerInfo[] = (view.predictors as string[]).map((id) => player(id)).filter(Boolean) as PlayerInfo[];
   const maxShown = Math.max(1, ...counts);
+  const totalGuessShown = gShown.reduce((a, b) => a + b, 0);
+  const totalVoteShown = shown.reduce((a, b) => a + b, 0);
 
+  useEffect(() => {
+    if (totalGuessShown > 0) sfx.play('pop');
+  }, [totalGuessShown]);
+  useEffect(() => {
+    if (totalVoteShown > 0) sfx.play('select');
+  }, [totalVoteShown]);
+  useEffect(() => {
+    if (votesPhase) sfx.play('whoosh');
+  }, [votesPhase]);
   useEffect(() => {
     if (showMajority) sfx.play(majority.size ? 'stamp' : 'wrong');
   }, [showMajority]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -116,33 +132,42 @@ function HostReveal({ view, t, player }: HostViewProps) {
     <>
       {showPredictors && predictors.length > 0 && <Confetti silent />}
       <HostHeader title={t('title')} color={ORANGE} info={info(view, t)} />
-      <p className="display muted" style={{ textAlign: 'center', fontSize: 28, fontWeight: 700 }}>{view.question}</p>
+      <p className="display muted" style={{ textAlign: 'center', fontSize: 26, fontWeight: 700 }}>{view.question}</p>
+      <p key={votesPhase ? 'b' : 'a'} className="display anim-pop" style={{ textAlign: 'center', fontSize: 30, fontWeight: 800, color: votesPhase ? '#fff' : 'var(--yellow)' }}>
+        {votesPhase ? t('reveal.phaseVotes') : t('reveal.phaseGuesses')}
+      </p>
       <div style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: `repeat(${n}, minmax(0, 1fr))`, gap: 20 }}>
         {view.answers.map((a: string, i: number) => {
           const k = Math.max(0, shown[i]);
           const pct = Math.round((k / totalVotes) * 100);
           const win = showMajority && majority.has(i);
           const lose = showMajority && !majority.has(i);
+          const gs: PlayerInfo[] = guessers[i].slice(0, gShown[i]).map((id) => player(id)).filter(Boolean) as PlayerInfo[];
           const vs: PlayerInfo[] = voters[i].slice(0, k).map((id) => player(id)).filter(Boolean) as PlayerInfo[];
           return (
             <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 10, minHeight: 0, opacity: lose ? 0.45 : 1, transition: 'opacity .4s' }}>
-              {/* Säule */}
-              <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center', position: 'relative' }}>
-                {win && <Crown size={46} style={{ marginBottom: 4, animation: 'upBadge .5s ease-out both' }} />}
-                <span className="display" style={{ fontSize: 34, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: win ? 'var(--yellow)' : '#fff' }}>{k}<span style={{ fontSize: 20, opacity: 0.7 }}> · {pct} %</span></span>
-                <div style={{ width: '62%', height: Math.max(10, (k / maxShown) * 230), marginTop: 6, borderRadius: '18px 18px 6px 6px', background: COLORS[i], boxShadow: win ? '0 0 0 5px var(--yellow)' : undefined, transition: 'height .35s cubic-bezier(.2,.9,.3,1.2)' }} />
+              {/* Tipps: wer glaubt, dass hier die Mehrheit ist */}
+              <div style={{ minHeight: 66, borderRadius: 18, padding: '8px 10px', background: 'var(--surface)', boxShadow: `inset 0 0 0 2px ${votesPhase ? 'transparent' : COLORS[i]}`, display: 'flex', flexDirection: 'column', gap: 6, transition: 'box-shadow .3s' }}>
+                <span className="up-label" style={{ fontSize: 12 }}>{t('reveal.guessLabel')} · {gShown[i]}</span>
+                <VoterChips voters={gs.slice(0, 12)} crowdSize={view.crowd > 10 ? 20 : view.crowd} stagger={0} />
               </div>
-              {/* Antwort + Stimmen */}
-              <div style={{ position: 'relative', background: COLORS[i], color: '#110D24', borderRadius: 22, padding: '14px 16px', minHeight: 120, boxShadow: `0 6px 0 ${DARK[i]}`, display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {/* Säule der echten Stimmen */}
+              <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center', position: 'relative', opacity: votesPhase ? 1 : 0, transition: 'opacity .4s' }}>
+                {win && <Crown size={42} style={{ marginBottom: 4, animation: 'upBadge .5s ease-out both' }} />}
+                <span className="display" style={{ fontSize: 32, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: win ? 'var(--yellow)' : '#fff' }}>{k}<span style={{ fontSize: 19, opacity: 0.7 }}> · {pct} %</span></span>
+                <div style={{ width: '62%', height: Math.max(10, (k / maxShown) * 150), marginTop: 6, borderRadius: '18px 18px 6px 6px', background: COLORS[i], boxShadow: win ? '0 0 0 5px var(--yellow)' : undefined, transition: 'height .35s cubic-bezier(.2,.9,.3,1.2)' }} />
+              </div>
+              {/* Antwort + echte Stimmen */}
+              <div style={{ position: 'relative', background: COLORS[i], color: '#110D24', borderRadius: 22, padding: '12px 16px', minHeight: 104, boxShadow: `0 6px 0 ${DARK[i]}`, display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {win && <span className="up-tag" style={{ position: 'absolute', top: -20, right: 12, background: 'var(--yellow)', color: '#110D24', boxShadow: '0 5px 0 var(--yellow-d)', fontSize: 18, animation: 'upBadge .5s ease-out both' }}>{t('reveal.majority')}</span>}
-                <p className="display" style={{ fontSize: 24, fontWeight: 800, lineHeight: 1.15 }}>{LETTERS[i]} · {a}</p>
+                <p className="display" style={{ fontSize: 23, fontWeight: 800, lineHeight: 1.15 }}>{LETTERS[i]} · {a}</p>
                 <VoterChips voters={vs.slice(0, 12)} crowdSize={view.crowd > 10 ? 20 : view.crowd} onDark={false} stagger={0} />
               </div>
             </div>
           );
         })}
       </div>
-      <footer style={{ minHeight: 64, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14 }}>
+      <footer style={{ minHeight: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14 }}>
         {showPredictors && (
           <div className="anim-up" style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--surface)', borderRadius: 999, padding: '8px 20px 8px 10px' }}>
             {predictors.length ? (

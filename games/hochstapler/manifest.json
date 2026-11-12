@@ -5,7 +5,7 @@
     "en": "Undercover"
   },
   "description": {
-    "de": "Alle bekommen eine Aufgabe – nur einer nicht. Der Hochstapler muss mitmachen, ohne aufzufliegen.",
+    "de": "Alle bekommen eine Aufgabe – nur einer nicht. Der Hochstapler muss die ganze Partie über mitmachen, ohne aufzufliegen.",
     "en": "Everyone gets a task – except one. The undercover player must blend in without getting caught."
   },
   "minPlayers": 3,
@@ -21,7 +21,7 @@
     "category",
     "task"
   ],
-  "version": "1.0.0",
+  "version": "2.0.0",
   "author": "UP!",
   "options": [
     {
@@ -114,8 +114,8 @@
         }
       ],
       "help": {
-        "de": "Automatisch: so viele Runden wie Spieler (höchstens 5) – jeder ist einmal Hochstapler.",
-        "en": "Auto: as many rounds as players (max. 5) – everyone is undercover once."
+        "de": "Automatisch: 6 Runden. Das Spiel endet früher, sobald der Hochstapler erwischt wird.",
+        "en": "Auto: 6 rounds. The game ends early once the undercover player is caught."
       }
     }
   ]

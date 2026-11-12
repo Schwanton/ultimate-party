@@ -23,5 +23,8 @@
   "final.title": "Endstand",
   "me.place": "Platz {place} von {of}",
   "me.score": "{n} Punkte",
-  "lookAtTv": "Schau auf den Fernseher."
+  "lookAtTv": "Schau auf den Fernseher.",
+  "reveal.phaseGuesses": "Wo glaubt ihr, ist die Mehrheit?",
+  "reveal.phaseVotes": "Und so habt ihr wirklich geantwortet:",
+  "reveal.guessLabel": "Tipps"
 }

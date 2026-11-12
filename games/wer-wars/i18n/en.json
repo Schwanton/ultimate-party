@@ -3,7 +3,7 @@
   "round": "Round {n} of {total}",
   "answerOf": "Answer {n} of {total}",
   "mult": "×{n} points",
-  "intro.text": "Everyone answers the same question – anonymously. Then each answer is shown and you guess who wrote it.",
+  "intro.text": "Everyone answers the same question – anonymously. Then you see all answers at once and match each one to the person who wrote it.",
   "intro.points": "Correct guess: 500 points · As the author: 200 for everyone who gets it wrong",
   "write.label": "Answer honestly (or in disguise):",
   "write.hint": "Type your answer on your phone. Nobody sees who wrote what.",
@@ -12,10 +12,6 @@
   "write.send": "Send",
   "written.title": "Saved!",
   "written.text": "Now don't give anything away …",
-  "guess.title": "Who wrote this?",
-  "guess.count": "{n} of {total} have guessed",
-  "guess.pick": "Tap the person you suspect",
-  "guess.change": "You can change until time runs out.",
   "mine.title": "That's your answer!",
   "mine.text": "Poker face! The others are guessing.",
   "reveal.votes": "The guesses …",
@@ -32,5 +28,11 @@
   "final.title": "Final standings",
   "me.place": "Place {place} of {of}",
   "me.score": "{n} points",
-  "lookAtTv": "Look at the TV."
+  "lookAtTv": "Look at the TV.",
+  "assign.title": "Who wrote what?",
+  "assign.hint": "Match every answer to a person. Each person only once – pick them elsewhere and they swap.",
+  "assign.usedAt": "at no. {n}",
+  "assign.done": "Done",
+  "assign.missing": "{n} left",
+  "assign.waiting": "Done! You can still change until time runs out."
 }

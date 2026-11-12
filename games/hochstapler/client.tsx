@@ -1,7 +1,7 @@
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import type { ControllerViewProps, GameClientModule, HostViewProps, PlayerInfo, Translate } from '@up/sdk';
 import {
-  Avatar, ChoiceList, Confetti, HostHeader, HostTimer, PhoneTimer, PhoneWait, Podium, Scoreboard, VoterChips, sfx, useServerNow, vibrate,
+  Avatar, ChoiceList, Confetti, HostHeader, HostTimer, PhoneTimer, PhoneWait, Podium, VoterChips, sfx, useServerNow, vibrate,
 } from '@up/ui';
 
 const PURPLE = '#9B7BFF';
@@ -57,7 +57,7 @@ export function Pictogram({ category, size = 120, color = INK }: { category: str
 }
 
 function info(view: any, t: Translate) {
-  return `${t('round', { n: view.round, total: view.totalRounds })} · ${t('taskOf', { n: view.taskNo })}`;
+  return t('round', { n: view.round, total: view.totalRounds });
 }
 
 function CatTag({ category, t, size = 26 }: { category: string; t: Translate; size?: number }) {
@@ -89,7 +89,7 @@ function Host(props: HostViewProps) {
           <div className="anim-up" style={{ display: 'flex', gap: 18, animationDelay: '.7s' }}>
             {(['hands', 'number', 'point'] as const).filter((c) => view.mode === 'rotate' || view.mode === 'random' || view.mode === c).map((c) => <CatTag key={c} category={c} t={t} size={22} />)}
           </div>
-          <p className="muted anim-up" style={{ fontSize: 21, maxWidth: 960, animationDelay: '1s' }}>{t('intro.rules')}</p>
+          <p className="muted anim-up" style={{ fontSize: 21, maxWidth: 960, animationDelay: '1s' }}>{t('intro.rules', { n: view.totalRounds })}</p>
           <p className="anim-up" style={{ fontSize: 21, maxWidth: 960, color: 'var(--yellow)', animationDelay: '1.3s' }}>{t('intro.physical')}</p>
         </div>
       );
@@ -134,20 +134,13 @@ function Host(props: HostViewProps) {
     }
     case 'result':
       return <HostResult {...props} />;
-    case 'scores': {
-      const rows = Object.keys(view.after).map((id) => ({ player: player(id)!, before: view.before[id] ?? 0, after: view.after[id] })).filter((r) => r.player);
-      return (
-        <>
-          <HostHeader title={t('title')} color={PURPLE} info={t('round', { n: view.round, total: view.totalRounds })} />
-          <h1 style={{ fontSize: 36 }}>{t('scores.title')}</h1>
-          <Scoreboard rows={rows} />
-        </>
-      );
-    }
+    case 'tally':
+      return <HostTally {...props} />;
     case 'final':
       return (
         <>
           <HostHeader title={t('title')} color={PURPLE} info={t('final.title')} />
+          <h1 style={{ fontSize: 36 }}>{t('final.title')}</h1>
           <Podium ranking={view.ranking} player={player} pointsLabel={t('common.points')} />
         </>
       );
@@ -201,46 +194,32 @@ function HostGo({ view, t }: HostViewProps) {
 }
 
 function HostResult({ view, t, player }: HostViewProps) {
-  const faker = view.faker ? player(view.faker) : undefined;
   const accused = view.accused ? player(view.accused) : undefined;
-  const titles: Record<string, [string, string]> = {
-    caught: [t('result.caught'), t('result.caughtText', { name: faker?.name ?? '' })],
-    wrong: [t('result.wrong'), t('result.wrongText', { name: accused?.name ?? '', faker: faker?.name ?? '' })],
-    none: [t('result.noMajority'), t('result.noMajorityText')],
-    escaped: [t('result.escaped'), t('result.escapedText', { name: faker?.name ?? '' })],
+  const titles: Record<string, [string, string, string]> = {
+    caught: [t('result.caught'), t('result.caughtSoon'), 'var(--green)'],
+    wrong: [t('result.wrong'), view.last ? t('result.lastRound') : t('result.wrongText', { name: accused?.name ?? '' }), 'var(--red)'],
+    none: [t('result.noMajority'), view.last ? t('result.lastRound') : t('result.noMajorityText'), 'var(--yellow)'],
   };
-  const [title, text] = titles[view.outcome];
-  const good = view.outcome === 'caught';
+  const [title, text, color] = titles[view.outcome];
   useEffect(() => {
-    sfx.play(view.outcome === 'caught' ? 'fanfare' : view.outcome === 'none' ? 'wrong' : 'sneaky');
-  }, [view.outcome, view.round, view.taskNo]);
+    sfx.play(view.outcome === 'caught' ? 'fanfare' : 'wrong');
+  }, [view.outcome, view.round]);
   return (
     <>
-      {view.faker && <Confetti pieces={good ? 30 : 16} silent={!good} />}
       <HostHeader title={t('title')} color={PURPLE} info={info(view, t)} />
       <div style={{ flex: 1, display: 'flex', gap: 40, alignItems: 'center' }}>
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 18 }}>
           <CatTag category={view.category} t={t} size={20} />
-          <h1 className="anim-pop" style={{ fontSize: 64, color: good ? 'var(--green)' : view.outcome === 'none' ? 'var(--yellow)' : 'var(--red)' }}>{title}</h1>
+          <h1 className="anim-pop" style={{ fontSize: 64, color }}>{title}</h1>
           <p style={{ fontSize: 26 }}>{text}</p>
-          {view.task && (
-            <div className="anim-up" style={{ animationDelay: '.6s' }}>
-              <span className="up-label">{t('result.task')}</span>
-              {(view.task as string[]).map((x, i) => <p key={i} className="display" style={{ fontSize: 22, fontWeight: 700, marginTop: 6 }}>„{x}“</p>)}
+          {view.outcome === 'wrong' && accused && (
+            <div className="up-card anim-pop" style={{ display: 'flex', alignItems: 'center', gap: 16, alignSelf: 'flex-start', animationDelay: '.4s' }}>
+              <Avatar player={accused} size={64} />
+              <p className="display" style={{ fontSize: 26, fontWeight: 800 }}>{t('result.innocent', { name: accused.name })}</p>
             </div>
           )}
         </div>
         <div style={{ width: 460, display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {faker && (
-            <div className="up-card anim-pop" style={{ display: 'flex', alignItems: 'center', gap: 16, background: PURPLE, color: INK, boxShadow: '0 6px 0 #6B4FD1', animationDelay: '.3s' }}>
-              <Avatar player={faker} size={72} />
-              <div>
-                <b style={{ fontSize: 15 }}>{t('title')}</b>
-                <p className="display" style={{ fontSize: 30, fontWeight: 800 }}>{faker.name}</p>
-              </div>
-              {view.gained?.[faker.id] > 0 && <span className="display" style={{ marginLeft: 'auto', fontSize: 30, fontWeight: 800 }}>+{view.gained[faker.id]}</span>}
-            </div>
-          )}
           {(view.tally as any[]).map((row, i) => {
             const p = player(row.playerId);
             const voters = (row.voters as string[]).map((id) => player(id)).filter(Boolean) as PlayerInfo[];
@@ -257,6 +236,92 @@ function HostResult({ view, t, player }: HostViewProps) {
             ) : null;
           })}
         </div>
+      </div>
+    </>
+  );
+}
+
+/** Auszählung am Ende: erst wird der Hochstapler enthüllt, dann Zeile für Zeile alle Tipps aller Runden */
+const REVEAL_AT = 3.2;
+/** Zeigt den Inhalt erst nach `at` Sekunden */
+function Later({ at, children }: { at: number; children: ReactNode }) {
+  const [show, setShow] = useState(false);
+  useEffect(() => { const id = setTimeout(() => setShow(true), at * 1000); return () => clearTimeout(id); }, [at]);
+  return show ? <>{children}</> : null;
+}
+const TABLE_AT = 6;
+const ROW_STEP = 0.9;
+
+function HostTally({ view, t, player }: HostViewProps) {
+  const faker = player(view.faker);
+  const rounds = view.rounds as { round: number; category: string; votes: Record<string, string>; outcome: string }[];
+  const order = view.order as string[];
+  useEffect(() => {
+    sfx.play('drumroll');
+    const a = setTimeout(() => sfx.play(view.caught ? 'fanfare' : 'sneaky'), REVEAL_AT * 1000);
+    const timers = order.map((_, i) => setTimeout(() => sfx.play('pop'), (TABLE_AT + i * ROW_STEP) * 1000));
+    return () => { clearTimeout(a); timers.forEach(clearTimeout); };
+  }, [view.faker]);
+  const cell = rounds.length > 7 ? 40 : 52;
+  return (
+    <>
+      <Later at={REVEAL_AT}><Confetti pieces={view.caught ? 30 : 16} silent /></Later>
+      <HostHeader title={t('title')} color={PURPLE} info={t('tally.title')} />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 22 }}>
+        <p className="anim-fade" style={{ fontSize: 30, fontWeight: 700 }}>{t('tally.was')}</p>
+        {faker && (
+          <div className="up-card" style={{ display: 'flex', alignItems: 'center', gap: 14, background: PURPLE, color: INK, boxShadow: '0 6px 0 #6B4FD1', padding: '8px 22px 8px 10px', animation: `upPop .6s ease-out ${REVEAL_AT}s both` }}>
+            <Avatar player={faker} size={58} />
+            <span className="display" style={{ fontSize: 34, fontWeight: 800 }}>{faker.name}</span>
+          </div>
+        )}
+        <p className="display" style={{ fontSize: 26, fontWeight: 800, color: view.caught ? 'var(--green)' : 'var(--red)', animation: `upPop .5s ease-out ${REVEAL_AT + 0.8}s both` }}>
+          {view.caught ? t('tally.caughtIn', { n: view.caughtRound }) : t('tally.escaped')}
+        </p>
+      </div>
+      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 6, marginTop: 6 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 14px', animation: `upFade .4s ease-out ${TABLE_AT - 0.4}s both` }}>
+          <span className="up-label" style={{ width: 210 }}>{t('tally.player')}</span>
+          {rounds.map((r) => (
+            <span key={r.round} title={t(`cat.${r.category}`)} style={{ width: cell, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+              <Pictogram category={r.category} size={22} color={cat(r.category).color} />
+              <span className="up-label" style={{ fontSize: 12 }}>{r.round}</span>
+            </span>
+          ))}
+          <span className="up-label" style={{ flex: 1, textAlign: 'right' }}>{t('tally.points')}</span>
+        </div>
+        {order.map((id, i) => {
+          const p = player(id);
+          if (!p) return null;
+          const isFaker = id === view.faker;
+          const parts = (view.breakdown[id] as { label: string; points: number; n?: number }[]).map((b) => t(`tally.${b.label}`, { n: b.n ?? b.points })).join(' · ');
+          return (
+            <div key={id} className="up-card" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 14px', background: isFaker ? '#2A2150' : undefined, boxShadow: isFaker ? `inset 0 0 0 3px ${PURPLE}` : undefined, animation: `upSlideUp .4s ease-out ${(TABLE_AT + i * ROW_STEP).toFixed(2)}s both` }}>
+              <span style={{ width: 210, display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+                <Avatar player={p} size={38} flat />
+                <b style={{ fontSize: 18, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</b>
+              </span>
+              {rounds.map((r) => {
+                if (isFaker) return <span key={r.round} className="display" style={{ width: cell, textAlign: 'center', color: r.outcome === 'caught' ? 'var(--red)' : PURPLE, fontWeight: 800, fontSize: 22 }}>{r.outcome === 'caught' ? '✗' : '✓'}</span>;
+                const target = r.votes[id] ? player(r.votes[id]) : undefined;
+                const hit = r.votes[id] === view.faker;
+                return (
+                  <span key={r.round} style={{ width: cell, display: 'flex', justifyContent: 'center' }}>
+                    {target ? (
+                      <span style={{ borderRadius: '50%', boxShadow: hit ? '0 0 0 4px var(--green), 0 0 14px rgba(75,227,161,.7)' : undefined, opacity: hit ? 1 : 0.3, filter: hit ? undefined : 'grayscale(.6)', display: 'inline-flex' }}>
+                        <Avatar player={target} size={cell - 16} flat />
+                      </span>
+                    ) : <span className="faint">–</span>}
+                  </span>
+                );
+              })}
+              <span style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 12 }}>
+                <span className="muted" style={{ fontSize: 13, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{parts}</span>
+                <span className="display" style={{ fontSize: 26, fontWeight: 800, color: 'var(--yellow)' }}>{view.totals[id] ?? 0}</span>
+              </span>
+            </div>
+          );
+        })}
       </div>
     </>
   );
@@ -338,24 +403,33 @@ function Controller(props: ControllerViewProps) {
       );
     case 'outcome': {
       let title = t('me.next');
-      if (view.roundOver) {
-        if (view.isFaker) title = view.outcome === 'caught' ? t('me.caught') : t('me.escaped');
-        else title = view.correct ? t('me.found') : t('me.missed');
-      }
-      const happy = view.roundOver && (view.isFaker ? view.outcome !== 'caught' : view.correct && view.outcome === 'caught');
+      let text = '';
+      if (view.last) { title = view.outcome === 'caught' ? t('result.caught') : t('me.lastRound'); text = t('me.tallySoon'); }
+      else if (view.accusedMe) { title = t('me.innocent'); text = t('me.next'); }
+      else if (view.isFaker) { title = t('me.stillHidden'); text = view.accusedName ? t('result.wrongText', { name: view.accusedName }) : ''; }
+      else if (view.accusedName) text = t('result.wrongText', { name: view.accusedName });
       return (
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, textAlign: 'center' }} className="anim-fade">
-          {happy && <Confetti pieces={14} silent />}
           <Avatar player={me} size={104} />
           <h1 style={{ fontSize: 30 }}>{title}</h1>
-          {view.fakerName && !view.isFaker && <p style={{ fontSize: 18 }}>{t('result.caughtText', { name: view.fakerName })}</p>}
-          {view.points > 0 && <span className="display" style={{ fontSize: 56, fontWeight: 800, color: 'var(--yellow)', animation: 'upPop .6s ease-out both' }}>+{view.points}</span>}
+          {text && <p style={{ fontSize: 18 }}>{text}</p>}
         </div>
       );
     }
-    case 'scoresMe':
-    case 'finalMe':
-      return <PhoneWait title={t('me.place', { place: view.place, of: view.of })} text={t('me.score', { n: view.score })} emoji={<Avatar player={me} size={110} />} />;
+    case 'end': {
+      const title = view.isFaker ? (view.caught ? t('me.caught') : t('me.escaped')) : t('result.caughtText', { name: view.fakerName });
+      const happy = view.isFaker ? !view.caught : view.hits > 0;
+      return (
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, textAlign: 'center' }} className="anim-fade">
+          {happy && <Confetti pieces={14} silent />}
+          <Avatar player={me} size={104} />
+          <h1 style={{ fontSize: 28 }}>{title}</h1>
+          {!view.isFaker && <p style={{ fontSize: 18 }}>{t('me.hits', { n: view.hits, total: view.rounds })}</p>}
+          <span className="display" style={{ fontSize: 52, fontWeight: 800, color: 'var(--yellow)', animation: 'upPop .6s ease-out both' }}>{t('me.score', { n: view.score })}</span>
+          <p className="muted" style={{ fontSize: 18 }}>{t('me.place', { place: view.place, of: view.of })}</p>
+        </div>
+      );
+    }
     default:
       return <PhoneWait title={t('lookAtTv')} emoji={<Avatar player={me} size={96} />} />;
   }

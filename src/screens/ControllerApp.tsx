@@ -332,6 +332,17 @@ function AvatarPicker({ onDone }: { onDone: () => void }) {
   const current = me.avatar;
 
   const pick = (avatar: AvatarData) => net.send('profile', { avatar });
+  // Name ändern: Entwurf lokal, gesendet beim Verlassen des Felds, mit Enter oder „Fertig“
+  const [nameDraft, setNameDraft] = useState(me.name);
+  const [nameFocus, setNameFocus] = useState(false);
+  useEffect(() => { if (!nameFocus) setNameDraft(me.name); }, [me.name, nameFocus]);
+  const saveName = () => {
+    const name = nameDraft.replace(/\s+/g, ' ').trim();
+    if (!name) { setNameDraft(me.name); return; }
+    if (name === me.name) return;
+    net.send('profile', { name });
+    try { localStorage.setItem('up:name', name); } catch { /* egal */ }
+  };
   const onFile = async (file?: File) => {
     if (!file) return;
     setError(null);
@@ -352,8 +363,12 @@ function AvatarPicker({ onDone }: { onDone: () => void }) {
       </div>
       <section className="up-card" style={{ display: 'flex', alignItems: 'center', gap: 18, padding: '16px 20px' }}>
         <span className="anim-pop" key={JSON.stringify(current)}><Avatar player={me} size={96} /></span>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <span className="display" style={{ fontSize: 24, fontWeight: 800 }}>{me.name}</span>
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <label className="up-label" htmlFor="rename" style={{ fontSize: 13 }}>{t('avatar.name')}</label>
+          <input id="rename" className="up-input display" value={nameDraft} maxLength={16} autoComplete="nickname" enterKeyHint="done"
+            style={{ fontSize: 22, fontWeight: 800, padding: '8px 12px', minHeight: 48, width: '100%' }}
+            onFocus={() => setNameFocus(true)} onBlur={() => { setNameFocus(false); saveName(); }}
+            onChange={(e) => setNameDraft(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur(); }} />
           <span className="muted" style={{ fontSize: 15 }}>{current.kind === 'animal' ? t(`animal.${current.animal}`) : t('animal.photo')}</span>
         </div>
       </section>
@@ -385,7 +400,7 @@ function AvatarPicker({ onDone }: { onDone: () => void }) {
       )}
       {error && <p className="up-error">{error}</p>}
       <div style={{ flex: 1 }} />
-      <button className="up-btn big full" onClick={onDone}>{t('avatar.done')}</button>
+      <button className="up-btn big full" onClick={() => { saveName(); onDone(); }}>{t('avatar.done')}</button>
     </>
   );
 }

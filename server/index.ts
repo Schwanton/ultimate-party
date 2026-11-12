@@ -259,6 +259,9 @@ function handle(ws: WebSocket, msg: any) {
     case 'kick':
       if (room && isHost) room.kick(String(msg.playerId));
       return;
+    case 'vip':
+      if (room && isHost) room.setVip(String(msg.playerId));
+      return;
     case 'deck:reset':
       if (room && isHost) room.shuffleDeck(String(msg.gameId));
       return;

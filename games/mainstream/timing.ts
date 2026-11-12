@@ -28,3 +28,16 @@ export function voterSchedule(counts: number[]): number[][] {
   }
   return out;
 }
+
+/** Pause zwischen „Tipps“ und „echten Stimmen“ (Sekunden) */
+export const PHASE_GAP = 1.6;
+
+/**
+ * Ablauf der Auflösung (seit 0.18.0): erst erscheinen alle Tipps („Wo ist die Mehrheit?“) nacheinander,
+ * dann – nach einer kurzen Pause – die echten Antworten, ebenfalls Spieler für Spieler.
+ * Gibt zurück, ab wann (Sekunden ab Beginn) die echten Stimmen kommen und wann alles gezeigt ist.
+ */
+export function revealPlan(guessTotal: number, voteTotal: number) {
+  const votesFrom = votersSeconds(guessTotal) + PHASE_GAP;
+  return { votesFrom, votesDone: votesFrom + votersSeconds(voteTotal) };
+}

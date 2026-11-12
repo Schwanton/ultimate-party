@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { ControllerViewProps, GameClientModule, HostViewProps, PlayerInfo, Translate } from '@up/sdk';
 import { Avatar, Confetti, Crown, HostHeader, HostTimer, PhoneTimer, PhoneWait, Podium, Scoreboard, sfx, useDraft, useServerNow, vibrate } from '@up/ui';
-import { START_DELAY, buildTimeline, lg, positionAt, scaleTop, unlg } from './reveal';
+import { Strahl } from './strahl';
 
 const GREEN = '#4BE3A1';
 const GREEN_D = '#1E9E6A';
@@ -96,134 +96,41 @@ interface Entry { playerId: string; guess: number; diff: number; place: number; 
 function HostReveal({ view, t, player, room }: HostViewProps) {
   const lang = room.lang;
   const entries = (view.entries as Entry[]).filter((e) => player(e.playerId));
-  const tl = useMemo(() => buildTimeline(view.answer, entries.map((e) => e.guess)), [view.startAt]); // eslint-disable-line react-hooks/exhaustive-deps
-  const now = useServerNow(33);
-  const elapsed = (now - view.startAt) / 1000 - START_DELAY;
-  const pos = positionAt(tl, elapsed);
-  const target = lg(view.answer);
-  const hitTarget = elapsed >= tl.targetAt;
-  const goingOver = tl.hasOver && elapsed >= tl.overFrom;
-  const done = elapsed >= tl.seconds;
-  const value = hitTarget ? view.answer : Math.round(unlg(pos));
-  const podium = entries.filter((e) => e.place <= 3);
-
-  useEffect(() => {
-    if (hitTarget) sfx.play('ding');
-  }, [hitTarget]);
-  useEffect(() => {
-    if (done && podium.length) sfx.play('fanfare');
-  }, [done]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const H = 560, bottom = H - 24, topY = 24;
-  const top = scaleTop(pos);
-  const y = (x: number) => bottom - (x / top) * (bottom - topY);
-  const axisX = 470, barW = 36;
-  const crowd = entries.length > 12;
-  const colW = crowd ? 46 : 212, rowGap = crowd ? 40 : 54, maxCols = crowd ? 15 : 3;
-
-  const columns = useMemo(() => {
-    const endTop = scaleTop(tl.end);
-    const yEnd = (x: number) => bottom - (x / endTop) * (bottom - topY);
-    const sorted = [...entries].sort((a, b) => a.guess - b.guess);
-    const lastY: number[] = [];
-    const map = new Map<string, number>();
-    for (const e of sorted) {
-      const yy = yEnd(lg(e.guess));
-      let col = lastY.findIndex((ly) => Math.abs(ly - yy) >= rowGap);
-      if (col < 0) col = lastY.length < maxCols ? lastY.length : lastY.indexOf(Math.min(...lastY));
-      lastY[col] = yy;
-      map.set(e.playerId, col);
-    }
-    return map;
-  }, [view.startAt]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const ticks = Array.from({ length: Math.floor(top) }, (_, i) => i + 1);
-  const headY = y(pos);
-  const targetY = y(target);
+  const podium = entries.filter((e) => e.place <= 3).sort((a, b) => a.place - b.place);
   const medal = ['🥇', '🥈', '🥉'];
-
   return (
     <>
-      {done && podium.length > 0 && <Confetti silent />}
       <HostHeader title={t('title')} color={GREEN} info={info(view, t)} />
-      <div style={{ flex: 1, position: 'relative', minHeight: 0 }}>
-        {/* Links: Frage, Zähler, Platzierungen */}
-        <div style={{ position: 'absolute', left: 0, top: 6, width: 340, display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <p className="display" style={{ fontSize: 24, fontWeight: 800, lineHeight: 1.2 }}>{view.question}</p>
-          <p key={hitTarget ? 'hit' : 'run'} className={`display${hitTarget ? ' anim-pop' : ''}`} style={{ fontSize: value >= 1e8 ? 46 : 56, fontWeight: 800, lineHeight: 1, color: hitTarget ? 'var(--yellow)' : '#fff', fontVariantNumeric: 'tabular-nums', marginTop: 6 }}>
-            {fmt(value, lang)}{view.unit ? <span style={{ fontSize: 26 }}> {view.unit}</span> : null}
-          </p>
-          <p className="muted" style={{ fontSize: 17 }}>{hitTarget ? t('reveal.answer') : t('reveal.counting')}</p>
-          {goingOver && !done && <p className="display anim-pop" style={{ fontSize: 24, fontWeight: 800, color: '#B9B2FF' }}>{t('reveal.above')}</p>}
-          {done && (
-            <div className="anim-pop" style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 4 }}>
-              {podium.length === 0 && <b style={{ fontSize: 18 }}>{t('reveal.noGuess')}</b>}
-              {podium.slice(0, 5).map((e) => {
-                const p = player(e.playerId)!;
-                return (
-                  <div key={e.playerId} style={{ display: 'flex', alignItems: 'center', gap: 10, background: e.place === 1 ? GREEN : 'var(--surface)', color: e.place === 1 ? '#110D24' : '#fff', borderRadius: 14, padding: '6px 12px 6px 8px' }}>
-                    <span style={{ fontSize: 22 }}>{medal[e.place - 1]}</span>
-                    <Avatar player={p} size={32} flat={e.place === 1} />
-                    <b style={{ flex: 1, fontSize: 16, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}{e.diff === 0 ? ` · ${t('reveal.exact')}` : ''}</b>
-                    <b className="display" style={{ fontSize: 18 }}>+{e.points}</b>
-                  </div>
-                );
-              })}
-              {view.source && <span className="faint" style={{ fontSize: 13 }}>{t('reveal.source', { source: view.source })}</span>}
-            </div>
-          )}
-        </div>
-
-        <svg width={1168} height={H} viewBox={`0 0 1168 ${H}`} style={{ position: 'absolute', left: 0, top: 0, overflow: 'visible', pointerEvents: 'none' }} aria-hidden="true">
-          {ticks.map((i) => {
-            const ty = y(lg(10 ** i));
-            const fade = Math.max(0, Math.min(1, (ty - topY) / 50));
-            return (
-              <g key={i} opacity={fade}>
-                <line x1={axisX - 8} x2={1168} y1={ty} y2={ty} stroke="#262048" strokeWidth={1} />
-                <text x={axisX - 16} y={ty + 6} textAnchor="end" fontSize={16} fontWeight={700} fill="#8F88B8" fontFamily="DM Sans, sans-serif">{short(10 ** i, lang, t)}</text>
-              </g>
-            );
-          })}
-          <rect x={axisX} y={topY} width={barW} height={bottom - topY} rx={barW / 2} fill="#1C1738" />
-          {pos > target && <rect x={axisX} y={headY} width={barW} height={Math.max(0, targetY - headY + barW / 2)} rx={barW / 2} fill="#6B5CE7" />}
-          <rect x={axisX} y={Math.max(headY, targetY)} width={barW} height={Math.max(barW, bottom - Math.max(headY, targetY))} rx={barW / 2} fill={GREEN} />
-          {hitTarget && <line x1={axisX - 10} x2={1168} y1={targetY} y2={targetY} stroke="#FFD447" strokeWidth={4} strokeDasharray="10 8" />}
-          {!done && <circle cx={axisX + barW / 2} cy={headY} r={barW / 2 + 6} fill="none" stroke="#fff" strokeWidth={3} opacity={0.8} />}
-          {goingOver && !done && (
-            <text x={axisX - 16} y={headY + 6} textAnchor="end" fontSize={18} fontWeight={800} fill="#B9B2FF" stroke="#110D24" strokeWidth={8} paintOrder="stroke" fontFamily="DM Sans, sans-serif">{short(Math.round(unlg(pos)), lang, t)}</text>
-          )}
-        </svg>
-
-        {entries.map((e) => {
-          const g = lg(e.guess);
-          if (g > pos + 1e-9) return null;
-          const p = player(e.playerId)!;
-          const col = columns.get(e.playerId) ?? 0;
-          const yy = y(g);
-          const over = g > target;
-          const win = done && e.place === 1;
-          const left = axisX + barW + 22 + col * colW;
-          return (
-            <div key={e.playerId} style={{
-              position: 'absolute', left, top: yy - (crowd ? 18 : 24), display: 'flex', alignItems: 'center', gap: 8,
-              opacity: done && e.place > 3 ? 0.5 : 1, transition: 'opacity .4s', animation: 'upPop .35s ease-out both', zIndex: win ? 3 : 2,
-            }}>
-              {col === 0 && <span style={{ position: 'absolute', left: -22, top: crowd ? 17 : 23, width: 18, height: 3, background: win ? 'var(--yellow)' : over ? '#6B5CE7' : '#4A4378' }} />}
-              <span style={{ position: 'relative' }}>
-                <Avatar player={p} size={crowd ? 36 : 48} />
-                {win && <Crown size={crowd ? 22 : 30} style={{ position: 'absolute', top: crowd ? -14 : -19, left: crowd ? 7 : 9 }} />}
-              </span>
-              {!crowd && (
-                <span style={{ background: win ? GREEN : 'var(--surface)', color: win ? '#110D24' : '#fff', borderRadius: 12, padding: '4px 10px', boxShadow: win ? '0 0 0 3px var(--yellow)' : undefined, whiteSpace: 'nowrap' }}>
-                  <b style={{ fontSize: 15 }}>{p.name}</b>
-                  <span className="display" style={{ display: 'block', fontSize: 17, fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>{short(e.guess, lang, t)}{done && e.points ? ` · +${e.points}` : ''}</span>
-                </span>
-              )}
-            </div>
-          );
-        })}
-      </div>
+      <Strahl
+        answer={view.answer} startAt={view.startAt} player={player} color={GREEN}
+        entries={entries.map((e) => ({ playerId: e.playerId, guess: e.guess, win: e.place === 1, badge: e.points ? `+${e.points}` : undefined }))}
+        short={(n) => short(n, lang, t)}
+        answerText={`${fmt(view.answer, lang)}${view.unit ? ` ${view.unit}` : ''}`}
+        labels={{ placing: t('reveal.placing'), zoom: t('reveal.zoom'), out: (names) => t('reveal.out', { names }), drum: t('reveal.drum'), answer: t('reveal.answer') }}
+      >
+        {(phase) => (
+          <div style={{ width: 600, display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <p className="display" style={{ fontSize: 26, fontWeight: 800, lineHeight: 1.2 }}>{view.question}</p>
+            {phase === 'done' && (
+              <div className="anim-pop" style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+                {podium.length === 0 && <b style={{ fontSize: 18 }}>{t('reveal.noGuess')}</b>}
+                {podium.slice(0, 4).map((e) => {
+                  const p = player(e.playerId)!;
+                  return (
+                    <span key={e.playerId} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: e.place === 1 ? GREEN : 'var(--surface)', color: e.place === 1 ? '#110D24' : '#fff', borderRadius: 14, padding: '5px 12px 5px 6px' }}>
+                      <span style={{ fontSize: 20 }}>{medal[e.place - 1]}</span>
+                      <Avatar player={p} size={28} flat={e.place === 1} />
+                      <b style={{ fontSize: 15 }}>{p.name}{e.diff === 0 ? ` · ${t('reveal.exact')}` : ''}</b>
+                      <b className="display" style={{ fontSize: 16 }}>+{e.points}</b>
+                    </span>
+                  );
+                })}
+                {view.source && <span className="faint" style={{ fontSize: 13, width: '100%' }}>{t('reveal.source', { source: view.source })}</span>}
+              </div>
+            )}
+          </div>
+        )}
+      </Strahl>
     </>
   );
 }

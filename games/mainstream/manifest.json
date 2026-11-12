@@ -13,7 +13,7 @@
   "tags": ["social", "quick"],
   "sdkVersion": 1,
   "contentFields": ["question"],
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "UP!",
   "options": [
     { "id": "rounds", "label": { "de": "Fragen", "en": "Questions" }, "default": 8, "min": 4, "max": 15 },

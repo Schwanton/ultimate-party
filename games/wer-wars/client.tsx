@@ -71,21 +71,27 @@ function Host(props: HostViewProps) {
         </>
       );
     }
-    case 'guess':
+    case 'assign': {
+      const n = (view.answers as string[]).length;
+      const cols = n > 6 ? 3 : 2;
+      const size = n > 6 ? 21 : 25;
       return (
         <>
           <HostHeader title={t('title')} color={PINK} info={info(view, t)} right={<HostTimer deadline={view.deadline} duration={view.duration} />} />
-          <p className="display muted" style={{ textAlign: 'center', fontSize: 26, fontWeight: 700 }}>{view.question}</p>
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 44 }}>
-            <Quote key={view.n} text={view.text} />
-            <p className="display" style={{ textAlign: 'center', fontSize: 30, fontWeight: 800, color: PINK }}>{t('guess.title')}</p>
+          <p className="display muted" style={{ textAlign: 'center', fontSize: 24, fontWeight: 700 }}>{view.question}</p>
+          <div style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gap: '14px 18px', alignContent: 'center' }}>
+            {(view.answers as string[]).map((text, i) => (
+              <div key={i} style={{ background: '#fff', color: '#110D24', borderRadius: 20, padding: '12px 16px', boxShadow: `0 6px 0 ${PINK}`, display: 'flex', gap: 12, alignItems: 'center', animation: `upPop .35s ease-out ${(0.08 * i).toFixed(2)}s both` }}>
+                <span className="display" style={{ flex: 'none', width: 34, height: 34, borderRadius: '50%', background: PINK, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 800 }}>{i + 1}</span>
+                <p className="display" style={{ fontSize: size, fontWeight: 800, lineHeight: 1.2 }}>„{text}“</p>
+              </div>
+            ))}
           </div>
-          <Candidates ids={view.candidates} player={player} />
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <span className="up-chip" style={{ fontSize: 17 }}>{t('guess.count', { n: view.guessed, total: view.guessers })}</span>
-          </div>
+          <p className="display" style={{ textAlign: 'center', fontSize: 24, fontWeight: 800, color: PINK }}>{t('assign.title')}</p>
+          <AssignProgress ids={view.candidates} done={view.done} player={player} />
         </>
       );
+    }
     case 'reveal':
       return <HostReveal {...props} />;
     case 'scores': {
@@ -107,6 +113,24 @@ function Host(props: HostViewProps) {
       );
   }
   return null;
+}
+
+function AssignProgress({ ids, done, player }: { ids: string[]; done: string[]; player: HostViewProps['player'] }) {
+  const d = new Set(done);
+  return (
+    <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap', paddingBottom: 6 }}>
+      {ids.map((id) => {
+        const p = player(id);
+        if (!p) return null;
+        return (
+          <div key={id} style={{ position: 'relative', animation: d.has(id) ? 'upPop .4s ease-out' : undefined }}>
+            <Avatar player={p} size={52} dim={!d.has(id)} />
+            {d.has(id) && <span style={{ position: 'absolute', right: -6, bottom: -4, width: 22, height: 22, borderRadius: '50%', background: 'var(--green)', color: '#110D24', fontWeight: 800, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✓</span>}
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
 function Candidates({ ids, player, votes, author, dimOthers }: { ids: string[]; player: HostViewProps['player']; votes?: number[]; author?: string; dimOthers?: boolean }) {
@@ -191,6 +215,67 @@ function HostReveal({ view, t, player }: HostViewProps) {
 
 /* ================= Handy ================= */
 
+/** Alle Antworten auf einmal zuordnen: Antwort antippen, dann die Person wählen */
+function PhoneAssign({ view, t, send, player }: Pick<ControllerViewProps, 'view' | 't' | 'send' | 'player'>) {
+  const list = view.answers as { i: number; text: string }[];
+  const picks = view.picks as Record<string, string>;
+  const [open, setOpen] = useState<number | null>(() => list.find((x) => !picks[x.i])?.i ?? null);
+  const all = list.every((x) => picks[x.i]);
+  const usedBy = new Map(Object.entries(picks).map(([i, id]) => [id, Number(i)]));
+  return (
+    <>
+      <PhoneTimer deadline={view.deadline} duration={view.duration} hurryText={view.done ? undefined : t('timer.hurry')} />
+      <span className="up-label">{t('assign.title')}</span>
+      <p className="muted" style={{ fontSize: 14, marginTop: -6 }}>{t('assign.hint')}</p>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {list.map((a, n) => {
+          const who = picks[a.i] ? player(picks[a.i]) : undefined;
+          const isOpen = open === a.i;
+          return (
+            <div key={a.i} style={{ borderRadius: 18, background: isOpen ? 'var(--surface-2)' : 'var(--surface)', boxShadow: isOpen ? `0 0 0 3px ${PINK}` : undefined }}>
+              <button type="button" aria-expanded={isOpen} onClick={() => setOpen(isOpen ? null : a.i)} style={{ width: '100%', minHeight: 60, border: 0, background: 'transparent', color: '#fff', padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 10, textAlign: 'left' }}>
+                <span className="display" style={{ flex: 'none', width: 28, height: 28, borderRadius: '50%', background: PINK, color: '#110D24', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 800 }}>{n + 1}</span>
+                <span className="display" style={{ flex: 1, fontSize: 17, fontWeight: 800, lineHeight: 1.25 }}>„{a.text}“</span>
+                {who ? <Avatar player={who} size={38} flat /> : <span style={{ flex: 'none', width: 38, height: 38, borderRadius: '50%', border: '3px dashed #5A5290', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8F88B8', fontWeight: 800 }}>?</span>}
+              </button>
+              {isOpen && (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, padding: '0 10px 12px' }}>
+                  {(view.options as string[]).map((id) => {
+                    const p = player(id);
+                    if (!p) return null;
+                    const on = picks[a.i] === id;
+                    const elsewhere = !on && usedBy.has(id);
+                    return (
+                      <button key={id} type="button" aria-pressed={on} onClick={() => {
+                        send({ type: 'assign', answer: a.i, target: id });
+                        const next = list.find((x) => x.i !== a.i && !picks[x.i]);
+                        setOpen(next ? next.i : null);
+                      }} style={{
+                        minHeight: 52, border: 0, borderRadius: 14, padding: '6px 8px', display: 'flex', alignItems: 'center', gap: 8, textAlign: 'left',
+                        background: on ? PINK : '#1C1738', color: on ? '#110D24' : '#fff', opacity: elsewhere ? 0.55 : 1,
+                      }}>
+                        <Avatar player={p} size={32} flat={on} />
+                        <span style={{ minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+                          <b style={{ fontSize: 15, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</b>
+                          {elsewhere && <span style={{ fontSize: 12 }}>{t('assign.usedAt', { n: list.findIndex((x) => x.i === usedBy.get(id)) + 1 })}</span>}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ flex: 1 }} />
+      {view.done
+        ? <p className="muted" style={{ textAlign: 'center', fontSize: 15 }}>{t('assign.waiting')}</p>
+        : <button className="up-btn big full" disabled={!all} onClick={() => send({ type: 'done' })}>{all ? t('assign.done') : t('assign.missing', { n: list.filter((x) => !picks[x.i]).length })}</button>}
+    </>
+  );
+}
+
 function Controller({ view, t, send, me, player }: ControllerViewProps) {
   const now = useServerNow(250);
   switch (view.screen) {
@@ -209,38 +294,15 @@ function Controller({ view, t, send, me, player }: ControllerViewProps) {
       );
     case 'written':
       return <PhoneWait title={t('written.title')} text={t('written.text')} emoji={<span className="display" style={{ fontSize: 24, fontWeight: 800, color: PINK }}>„{view.text}“</span>} />;
-    case 'mine':
+    case 'onlyMine':
       return (
         <>
           <PhoneTimer deadline={view.deadline} duration={view.duration} />
           <PhoneWait title={t('mine.title')} text={t('mine.text')} emoji={<span style={{ fontSize: 72 }}>😐</span>} />
         </>
       );
-    case 'guess':
-      return (
-        <>
-          <PhoneTimer deadline={view.deadline} duration={view.duration} hurryText={view.selected ? undefined : t('timer.hurry')} />
-          <span className="up-label">{t('guess.title')}</span>
-          <p className="display" style={{ fontSize: 22, fontWeight: 800, lineHeight: 1.25, background: '#fff', color: '#110D24', borderRadius: 18, padding: '14px 16px' }}>„{view.text}“</p>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-            {(view.options as string[]).map((id) => {
-              const p = player(id);
-              if (!p) return null;
-              const on = view.selected === id;
-              return (
-                <button key={id} type="button" aria-pressed={on} onClick={() => send({ type: 'guess', target: id })} style={{
-                  minHeight: 60, border: 0, borderRadius: 16, padding: '8px 10px', display: 'flex', alignItems: 'center', gap: 10, textAlign: 'left',
-                  background: on ? PINK : 'var(--surface)', color: on ? '#110D24' : '#fff', boxShadow: on ? '0 0 0 3px #fff' : undefined,
-                }}>
-                  <Avatar player={p} size={40} flat={on} />
-                  <b style={{ fontSize: 16, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</b>
-                </button>
-              );
-            })}
-          </div>
-          <p className="muted" style={{ textAlign: 'center', marginTop: 'auto', fontSize: 15 }}>{view.selected ? t('guess.change') : t('guess.pick')}</p>
-        </>
-      );
+    case 'assign':
+      return <PhoneAssign view={view} t={t} send={send} player={player} />;
     case 'result':
       if (now < view.showAt) return <PhoneWait title={t('lookAtTv')} emoji={<Avatar player={me} size={96} />} />;
       return (

@@ -127,10 +127,10 @@ function SoundButton({ label }: { label: string }) {
 /** Raumcode + QR-Code klein unten links (im Randbereich), damit Nachzügler jederzeit beitreten können */
 function CornerJoin({ code, url }: { code: string; url: string }) {
   return (
-    <div aria-label={code} style={{ position: 'absolute', left: 4, bottom: 4, width: 50, zIndex: 44, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, opacity: 0.9 }}>
-      <span className="display" style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1, color: 'var(--yellow)' }}>{code}</span>
-      <div style={{ width: 50, height: 50, background: '#fff', borderRadius: 7, padding: 3 }}>
-        <QrCode text={url} size={44} bare />
+    <div aria-label={code} style={{ position: 'absolute', left: 6, bottom: 6, width: 72, zIndex: 44, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, opacity: 0.92 }}>
+      <span className="display" style={{ fontSize: 17, fontWeight: 800, letterSpacing: 1.5, color: 'var(--yellow)' }}>{code}</span>
+      <div style={{ width: 72, height: 72, background: '#fff', borderRadius: 9, padding: 4 }}>
+        <QrCode text={url} size={64} bare />
       </div>
     </div>
   );

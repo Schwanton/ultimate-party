@@ -26,5 +26,9 @@
   "final.title": "Final standings",
   "me.place": "Place {place} of {of}",
   "me.score": "{n} points",
-  "lookAtTv": "Look at the TV."
+  "lookAtTv": "Look at the TV.",
+  "reveal.placing": "All guesses on the line …",
+  "reveal.zoom": "Zooming in …",
+  "reveal.out": "Furthest off: {names}",
+  "reveal.drum": "Drumroll …"
 }

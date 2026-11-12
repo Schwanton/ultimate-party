@@ -4,8 +4,8 @@
  * Punkte nach Platz: 1000 / 600 / 300, genau getroffen +500. Letzte Frage ×2. Gleich nah = gleicher Platz.
  */
 
-import { INPUT_GRACE, Scores, type GameContext, type GameServerModule } from '@up/sdk';
-import { revealSeconds } from './reveal';
+import { INPUT_GRACE, Scores, shuffle, type GameContext, type GameServerModule } from '@up/sdk';
+import { answerSeconds, revealSeconds } from './reveal';
 
 interface Item {
   id: string;
@@ -92,10 +92,12 @@ export default {
         if (points) scores.add(e.playerId, points);
         return { ...e, place, points };
       });
+      // Gemischt schicken: Die Reihenfolge auf dem Strahl darf nichts verraten
+      const shown = shuffle(placed);
       const startAt = Date.now() + 300;
-      const ride = revealSeconds(truth, placed.map((e) => e.guess));
-      const doneAt = startAt + ride * 1000;
-      ctx.setHostView({ screen: 'reveal', ...base(), answer: truth, source: item().source ?? null, entries: placed, startAt });
+      const ride = revealSeconds(truth, shown);
+      const doneAt = startAt + answerSeconds(truth, shown) * 1000;
+      ctx.setHostView({ screen: 'reveal', ...base(), answer: truth, source: item().source ?? null, entries: shown, startAt });
       ctx.setAllPlayerViews((p) => {
         const mine = placed.find((e) => e.playerId === p.id);
         return { screen: 'result', doneAt, answer: truth, unit: item().unit ?? '', guess: mine?.guess ?? null, place: mine?.place ?? null, points: mine?.points ?? 0, exact: mine?.diff === 0 };

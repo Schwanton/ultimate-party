@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { net, useNet } from '../net';
 import { useT } from '../i18n';
-import { Avatar, sfx } from '../ui';
+import { Avatar, Crown, sfx } from '../ui';
 import { GameManager } from './GameManager';
 
 export function HostSettings({ onClose }: { onClose: () => void }) {
@@ -98,7 +98,12 @@ export function HostSettings({ onClose }: { onClose: () => void }) {
               {room.players.map((p) => (
                 <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--surface-2)', borderRadius: 16, padding: '6px 8px 6px 6px' }}>
                   <Avatar player={p} size={36} flat />
-                  <span style={{ flex: 1, fontWeight: 700 }}>{p.name}</span>
+                  <span style={{ flex: 1, fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                    {p.name}{p.id === room.vipId && <Crown size={18} />}
+                  </span>
+                  {p.id === room.vipId
+                    ? <span className="muted" style={{ fontSize: 14, fontWeight: 700, padding: '0 8px' }}>{t('settings.isVip')}</span>
+                    : !p.isBot && p.connected && <button className="up-btn ghost small" onClick={() => net.send('vip', { playerId: p.id })}>{t('settings.makeVip')}</button>}
                   <button className="up-btn ghost small" onClick={() => net.send('kick', { playerId: p.id })}>{t('settings.kick')}</button>
                 </div>
               ))}

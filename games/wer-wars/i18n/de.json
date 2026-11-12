@@ -3,7 +3,7 @@
   "round": "Runde {n} von {total}",
   "answerOf": "Antwort {n} von {total}",
   "mult": "×{n} Punkte",
-  "intro.text": "Alle beantworten dieselbe Frage – anonym. Danach wird jede Antwort gezeigt und ihr ratet, von wem sie stammt.",
+  "intro.text": "Alle beantworten dieselbe Frage – anonym. Danach seht ihr alle Antworten auf einmal und ordnet jede der Person zu, die sie geschrieben hat.",
   "intro.points": "Richtig geraten: 500 Punkte · Als Autor: 200 für jeden, der danebenliegt",
   "write.label": "Beantwortet ehrlich (oder gut getarnt):",
   "write.hint": "Schreibt eure Antwort aufs Handy. Niemand sieht, von wem sie ist.",
@@ -12,10 +12,6 @@
   "write.send": "Abschicken",
   "written.title": "Gespeichert!",
   "written.text": "Jetzt bloß nichts verraten …",
-  "guess.title": "Wer hat das geschrieben?",
-  "guess.count": "{n} von {total} haben getippt",
-  "guess.pick": "Tippe auf die Person, die du verdächtigst",
-  "guess.change": "Ändern geht, solange die Zeit läuft.",
   "mine.title": "Das ist deine Antwort!",
   "mine.text": "Pokerface! Die anderen raten gerade.",
   "reveal.votes": "Die Tipps …",
@@ -32,5 +28,11 @@
   "final.title": "Endstand",
   "me.place": "Platz {place} von {of}",
   "me.score": "{n} Punkte",
-  "lookAtTv": "Schau auf den Fernseher."
+  "lookAtTv": "Schau auf den Fernseher.",
+  "assign.title": "Wer hat was geschrieben?",
+  "assign.hint": "Ordne jede Antwort einer Person zu. Jede Person nur einmal – wählst du sie woanders, wird getauscht.",
+  "assign.usedAt": "bei Nr. {n}",
+  "assign.done": "Fertig",
+  "assign.missing": "Noch {n} offen",
+  "assign.waiting": "Fertig! Ändern geht, solange die Zeit läuft."
 }

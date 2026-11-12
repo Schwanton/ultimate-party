@@ -6,7 +6,7 @@
  */
 
 import { Scores, shuffle, type GameContext, type GameServerModule } from '@up/sdk';
-import { votersSeconds } from './timing';
+import { revealPlan } from './timing';
 
 interface Item {
   id: string;
@@ -99,10 +99,12 @@ export default {
         }
       }
       const predictors = ids.filter((id) => majority.includes(guess.get(id) ?? -1));
-      ctx.setHostView({ screen: 'reveal', ...base(), voters, majority, predictors, crowd: ids.length });
-      // Pause passt zur Länge der Auflösung (Stimmen erscheinen nacheinander)
-      const seconds = 1 + votersSeconds(voters.flat().length) + 6;
-      const doneAt = Date.now() + (1 + votersSeconds(voters.flat().length) + 1.2) * 1000;
+      // Erst die Tipps, dann die echten Antworten – jeweils Spieler für Spieler
+      const guessers = answers.map((_, i) => shuffle(ids.filter((id) => guess.get(id) === i)));
+      ctx.setHostView({ screen: 'reveal', ...base(), voters, guessers, majority, predictors, crowd: ids.length });
+      const plan = revealPlan(guessers.flat().length, voters.flat().length);
+      const seconds = 1 + plan.votesDone + 6;
+      const doneAt = Date.now() + (1 + plan.votesDone + 1.2) * 1000;
       ctx.setAllPlayerViews((p) => ({
         screen: 'result', doneAt, points: gained.get(p.id) ?? 0,
         predicted: majority.includes(guess.get(p.id) ?? -1), inMajority: majority.includes(own.get(p.id) ?? -1),

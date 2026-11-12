@@ -2,6 +2,16 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.18.0
+
+- VIP wechseln: In den Einstellungen am Fernseher kann jeder verbundene Spieler mit „Zum VIP machen“ VIP werden
+- Umbenennen: Im Avatar-Bildschirm auf dem Handy lässt sich jetzt auch der Name ändern
+- Der QR-Code mit Raumcode unten links im Spiel ist größer
+- Hochstapler: Ein zufälliger Hochstapler für die ganze Partie. Falsch getippt? Es geht einfach weiter. Erwischt oder alle Runden gespielt: große Auszählung über alle Runden – erst dann gibt es Punkte
+- Mainstream: Bei der Auflösung erscheinen erst nacheinander alle Tipps, wo die Mehrheit liegt, danach Spieler für Spieler die echten Antworten
+- Schätzmeister und Guess the Clicks: Neue Auflösung – erst stehen alle Tipps auf dem Strahl, dann wird hineingezoomt und Schritt für Schritt fliegt raus, wer am weitesten weg liegt. Bei den letzten zweien gibt es einen Trommelwirbel, dann erst die richtige Zahl
+- Wer war's?: Alle Antworten werden gleichzeitig zugeordnet, danach wird Antwort für Antwort aufgelöst – niemand bleibt mehr „übrig“
+
 ## 0.17.0
 
 - Spiele aus eigenen Repositories: Einstellungen → „Spiele verwalten“ zeigt installierte Spiele und den Katalog „Mehr Spiele“ – ein Klick installiert, ganz ohne Neustart

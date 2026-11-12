@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ControllerViewProps, GameClientModule, HostViewProps, PlayerInfo, Translate } from '@up/sdk';
 import { Avatar, Confetti, Crown, HostHeader, HostTimer, PhoneTimer, PhoneWait, Podium, QrCode, Scoreboard, TextAnswer, sfx, useServerNow, vibrate, useDraft } from '@up/ui';
-import { START_DELAY, buildTimeline, lg, positionAt, scaleTop, unlg } from './reveal';
+import { Strahl } from './strahl';
 
 const RED = '#FF5A4E';
 
@@ -260,128 +260,33 @@ interface Entry { playerId: string; guess: number; diff: number; player: boolean
 function HostReveal({ view, t, player, room }: HostViewProps) {
   const lang = room.lang;
   const entries = (view.entries as Entry[]).filter((e) => player(e.playerId));
-  const tl = useMemo(() => buildTimeline(view.views, entries.map((e) => e.guess)), [view.startAt]); // eslint-disable-line react-hooks/exhaustive-deps
-  const now = useServerNow(33);
-  const elapsed = (now - view.startAt) / 1000 - START_DELAY;
-  const pos = positionAt(tl, elapsed);
-  const target = lg(view.views);
-  const hitTarget = elapsed >= tl.targetAt;
-  const goingOver = tl.hasOver && elapsed >= tl.overFrom;
-  const done = elapsed >= tl.seconds;
-  const value = hitTarget ? view.views : Math.round(unlg(pos));
   const winners = new Set<string>(view.winners);
-
-  // Geometrie (Bühnenpixel); die Skala reicht immer etwas über die Säule hinaus
-  const H = 560, bottom = H - 24, topY = 24;
-  const top = scaleTop(pos);
-  const y = (x: number) => bottom - (x / top) * (bottom - topY);
-  const axisX = 460, barW = 36;
-  const crowd = entries.length > 12;
-  const colW = crowd ? 46 : 212, rowGap = crowd ? 40 : 54, maxCols = crowd ? 15 : 3;
-
-  // Spalten so verteilen, dass sich Tipps nicht überlappen – berechnet für die engste (letzte) Skala
-  const columns = useMemo(() => {
-    const endTop = scaleTop(tl.end);
-    const yEnd = (x: number) => bottom - (x / endTop) * (bottom - topY);
-    const sorted = [...entries].sort((a, b) => a.guess - b.guess);
-    const lastY: number[] = [];
-    const map = new Map<string, number>();
-    for (const e of sorted) {
-      const yy = yEnd(lg(e.guess));
-      let col = lastY.findIndex((ly) => Math.abs(ly - yy) >= rowGap);
-      if (col < 0) col = lastY.length < maxCols ? lastY.length : lastY.indexOf(Math.min(...lastY));
-      lastY[col] = yy;
-      map.set(e.playerId, col);
-    }
-    return map;
-  }, [view.startAt]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Nur Skalenstriche, die schon sichtbar sind; neue erscheinen oben, während die Skala wächst
-  const ticks = Array.from({ length: Math.floor(top) }, (_, i) => i + 1);
   const winnerNames = entries.filter((e) => winners.has(e.playerId)).map((e) => player(e.playerId)!.name);
-  const headY = y(pos);
-  const targetY = y(target);
-
   return (
     <>
-      {done && winners.size > 0 && <Confetti silent />}
       <HostHeader title={t('title')} color={RED} info={t('video', { n: view.n, total: view.total })} />
-      <div style={{ flex: 1, position: 'relative', minHeight: 0 }}>
-        {/* Links: Video und Zähler */}
-        <div style={{ position: 'absolute', left: 0, top: 10, width: 330, display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <img src={`https://i.ytimg.com/vi/${view.video.id}/mqdefault.jpg`} alt="" width={320} height={180} style={{ borderRadius: 16, objectFit: 'cover' }} />
-          <p className="muted" style={{ fontSize: 17, lineHeight: 1.25, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{view.video.title}</p>
-          <p key={hitTarget ? 'hit' : 'run'} className={`display${hitTarget ? ' anim-pop' : ''}`} style={{ fontSize: value >= 1e8 ? 48 : 56, fontWeight: 800, lineHeight: 1, color: hitTarget ? 'var(--yellow)' : '#fff', fontVariantNumeric: 'tabular-nums', transition: 'color .3s' }}>{fmt(value, lang)}</p>
-          <p className="muted" style={{ fontSize: 18 }}>{hitTarget ? t('reveal.real') : t('reveal.views')}</p>
-          {goingOver && !done && (
-            <p className="display anim-pop" style={{ marginTop: 8, fontSize: 26, fontWeight: 800, color: '#B9B2FF' }}>{t('reveal.above')}</p>
-          )}
-          {done && (
-            <div className="anim-pop" style={{ marginTop: 8, background: RED, borderRadius: 18, padding: '12px 16px', boxShadow: '0 5px 0 #C22E24' }}>
-              <span style={{ fontSize: 15, fontWeight: 700 }}>{winnerNames.length ? t('reveal.closest') : t('reveal.noGuess')}</span>
-              {winnerNames.length > 0 && <p className="display" style={{ fontSize: 26, fontWeight: 800 }}>{winnerNames.join(' & ')} <span style={{ color: 'var(--yellow)' }}>+1</span></p>}
-            </div>
-          )}
-        </div>
-
-        {/* Rechts: Zahlenstrahl */}
-        <svg width={1168} height={H} viewBox={`0 0 1168 ${H}`} style={{ position: 'absolute', left: 0, top: 0, overflow: 'visible', pointerEvents: 'none' }} aria-hidden="true">
-          {ticks.map((i) => {
-            const ty = y(lg(10 ** i));
-            // oben langsam einblenden, damit neue Striche nicht aufploppen
-            const fade = Math.max(0, Math.min(1, (ty - topY) / 50));
-            return (
-              <g key={i} opacity={fade}>
-                <line x1={axisX - 8} x2={1168} y1={ty} y2={ty} stroke="#262048" strokeWidth={1} />
-                <text x={axisX - 16} y={ty + 6} textAnchor="end" fontSize={16} fontWeight={700} fill="#8F88B8" fontFamily="DM Sans, sans-serif">{short(10 ** i, lang, t)}</text>
-              </g>
-            );
-          })}
-          <rect x={axisX} y={topY} width={barW} height={bottom - topY} rx={barW / 2} fill="#1C1738" />
-          {/* Teil über der echten Zahl in anderer Farbe */}
-          {pos > target && <rect x={axisX} y={headY} width={barW} height={Math.max(0, targetY - headY + barW / 2)} rx={barW / 2} fill="#6B5CE7" />}
-          <rect x={axisX} y={Math.max(headY, targetY)} width={barW} height={Math.max(barW, bottom - Math.max(headY, targetY))} rx={barW / 2} fill={RED} />
-          {hitTarget && (
-            <g>
-              <line x1={axisX - 10} x2={1168} y1={targetY} y2={targetY} stroke="#FFD447" strokeWidth={4} strokeDasharray="10 8" />
-            </g>
-          )}
-          {!done && <circle cx={axisX + barW / 2} cy={headY} r={barW / 2 + 6} fill="none" stroke="#fff" strokeWidth={3} opacity={0.8} />}
-          {goingOver && !done && (
-            <text x={axisX - 16} y={headY + 6} textAnchor="end" fontSize={18} fontWeight={800} fill="#B9B2FF" stroke="#110D24" strokeWidth={8} paintOrder="stroke" fontFamily="DM Sans, sans-serif">{short(Math.round(unlg(pos)), lang, t)}</text>
-          )}
-        </svg>
-
-        {/* Tipps: erscheinen, sobald die Säule sie erreicht – auch die über der echten Zahl */}
-        {entries.map((e) => {
-          const g = lg(e.guess);
-          if (g > pos + 1e-9) return null;
-          const p = player(e.playerId)!;
-          const col = columns.get(e.playerId) ?? 0;
-          const yy = y(g);
-          const over = g > target;
-          const win = done && winners.has(e.playerId);
-          const left = axisX + barW + 22 + col * colW;
-          return (
-            <div key={e.playerId} style={{
-              position: 'absolute', left, top: yy - (crowd ? 18 : 24), display: 'flex', alignItems: 'center', gap: 8,
-              opacity: done && !win ? 0.5 : 1, transition: 'opacity .4s', animation: 'upPop .35s ease-out both', zIndex: win ? 3 : 2,
-            }}>
-              {col === 0 && <span style={{ position: 'absolute', left: -22, top: crowd ? 17 : 23, width: 18, height: 3, background: win ? 'var(--yellow)' : over ? '#6B5CE7' : '#4A4378' }} />}
-              <span style={{ position: 'relative' }}>
-                <Avatar player={p} size={crowd ? 36 : 48} />
-                {win && <Crown size={crowd ? 22 : 30} style={{ position: 'absolute', top: crowd ? -14 : -19, left: crowd ? 7 : 9 }} />}
-              </span>
-              {!crowd && (
-                <span style={{ background: win ? RED : 'var(--surface)', borderRadius: 12, padding: '4px 10px', boxShadow: win ? '0 0 0 3px var(--yellow)' : undefined, whiteSpace: 'nowrap' }}>
-                  <b style={{ fontSize: 15 }}>{p.name}{!e.player ? ' ·' : ''}</b>
-                  <span className="display" style={{ display: 'block', fontSize: 17, fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>{short(e.guess, lang, t)}{win ? ' +1' : ''}</span>
-                </span>
+      <Strahl
+        answer={view.views} startAt={view.startAt} player={player} color={RED}
+        entries={entries.map((e) => ({ playerId: e.playerId, guess: e.guess, win: winners.has(e.playerId), badge: winners.has(e.playerId) ? '+1' : undefined }))}
+        short={(n) => short(n, lang, t)}
+        answerText={fmt(view.views, lang)}
+        labels={{ placing: t('reveal.placing'), zoom: t('reveal.zoom'), out: (names) => t('reveal.out', { names }), drum: t('reveal.drum'), answer: t('reveal.real') }}
+      >
+        {(phase) => (
+          <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start', width: 600 }}>
+            <img src={`https://i.ytimg.com/vi/${view.video.id}/mqdefault.jpg`} alt="" width={224} height={126} style={{ borderRadius: 14, objectFit: 'cover', flex: 'none' }} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minWidth: 0 }}>
+              <p className="muted" style={{ fontSize: 17, lineHeight: 1.25, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{view.video.title}</p>
+              {phase === 'done' && (
+                <div className="anim-pop" style={{ background: RED, borderRadius: 16, padding: '8px 14px', boxShadow: '0 5px 0 #C22E24' }}>
+                  <span style={{ fontSize: 14, fontWeight: 700 }}>{winnerNames.length ? t('reveal.closest') : t('reveal.noGuess')}</span>
+                  {winnerNames.length > 0 && <p className="display" style={{ fontSize: 22, fontWeight: 800 }}>{winnerNames.join(' & ')} <span style={{ color: 'var(--yellow)' }}>+1</span></p>}
+                </div>
               )}
             </div>
-          );
-        })}
-      </div>
+          </div>
+        )}
+      </Strahl>
     </>
   );
 }
