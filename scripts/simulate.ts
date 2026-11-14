@@ -52,6 +52,9 @@ const scenarios: { game: string; players: number; options?: Record<string, numbe
   { game: 'sumo', players: 2 },
   { game: 'sumo', players: 12 },
   { game: 'sumo', players: 60 },
+  { game: 'bonk', players: 2 },
+  { game: 'bonk', players: 5 },
+  { game: 'bonk', players: 12 },
   { game: 'montagsmaler', players: 2 },
   { game: 'montagsmaler', players: 7 },
   { game: 'montagsmaler', players: 30 },
@@ -78,6 +81,7 @@ const scenarios: { game: string; players: number; options?: Record<string, numbe
   { game: 'cash-out', players: 5, options: { rounds: 4, lastMan: 'on' } },
   { game: 'heisse-kartoffel', players: 5, options: { lives: 2 } },
   { game: 'sumo', players: 4, options: { rounds: 1 } },
+  { game: 'bonk', players: 3, options: { rounds: 3, controls: 'gesten' } },
   { game: 'montagsmaler', players: 5, options: { mode: 'team', rounds: 4 } },
   { game: 'montagsmaler', players: 3, options: { mode: 'team' } },
 ];

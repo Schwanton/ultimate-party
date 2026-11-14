@@ -2,6 +2,14 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.19.0
+
+- Neues Spiel (Prototyp): Bonk! – Arena-Kampf von oben für 2 bis 12 Spieler. Haut euch mit Hammer oder Schleuder von leuchtenden Neon-Inseln! Schaden tötet nicht, aber je mehr Prozent du hast, desto weiter fliegst du. Wer im Abgrund landet, verliert ein Leben – 3 Leben pro Runde
+- Jede Runde eine neue, zufällige Arena mit Inseln, Brücken, Rissen, Säulen, Eis und Prallkissen. Nach einer Weile brennt der Rand und die Arena wird kleiner
+- Handy als Controller: Joystick, Waffe, Ausweichrolle und eine Spezialaktion. Quer gehalten fühlt es sich an wie ein Gamepad
+- Zum Ausprobieren in den Spiel-Einstellungen: Spezialaktion auf eigener Taste oder per Doppeltippen
+- Powerups, Shop und weitere Waffen folgen in den nächsten Versionen
+
 ## 0.18.0
 
 - VIP wechseln: In den Einstellungen am Fernseher kann jeder verbundene Spieler mit „Zum VIP machen“ VIP werden

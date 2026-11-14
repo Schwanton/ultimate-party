@@ -1,0 +1,40 @@
+{
+  "id": "bonk",
+  "name": { "de": "Bonk!", "en": "Bonk!" },
+  "description": {
+    "de": "Arena-Kampf von oben: Haut euch mit Hammer oder Schleuder von den Neon-Inseln! Je mehr Schaden du hast, desto weiter fliegst du. 3 Leben pro Runde. (Prototyp)",
+    "en": "Top-down arena brawl: bonk each other off the neon islands with hammer or slingshot! The more damage you have, the further you fly. 3 lives per round. (Prototype)"
+  },
+  "minPlayers": 2,
+  "maxPlayers": 12,
+  "audience": false,
+  "minutes": 10,
+  "color": "#FF4FB8",
+  "tags": ["quick"],
+  "sdkVersion": 1,
+  "version": "0.1.0",
+  "author": "UP!",
+  "options": [
+    {
+      "id": "rounds",
+      "label": { "de": "Runden", "en": "Rounds" },
+      "default": 5,
+      "choices": [
+        { "value": 3, "label": { "de": "3", "en": "3" } },
+        { "value": 5, "label": { "de": "5", "en": "5" } },
+        { "value": 8, "label": { "de": "8", "en": "8" } },
+        { "value": 12, "label": { "de": "12", "en": "12" } }
+      ]
+    },
+    {
+      "id": "controls",
+      "label": { "de": "Bedienung", "en": "Controls" },
+      "help": { "de": "Zum Ausprobieren: Zweite Aktion auf eigener Taste C oder per Doppeltippen auf A.", "en": "To try out: second action on its own button C or by double-tapping A." },
+      "default": "tasten",
+      "choices": [
+        { "value": "tasten", "label": { "de": "Eigene Taste", "en": "Own button" } },
+        { "value": "gesten", "label": { "de": "Doppeltippen", "en": "Double tap" } }
+      ]
+    }
+  ]
+}
