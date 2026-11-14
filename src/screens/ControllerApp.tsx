@@ -185,25 +185,30 @@ function InRoom() {
   );
 }
 
-/** VIP: laufendes Spiel abbrechen und alle zurück in die Lobby holen (mit Rückfrage) */
+/** VIP: kleiner Knopf oben links über dem Spiel – öffnet eine Rückfrage, dann alle zurück in die Lobby */
 function EndGameButton({ t }: { t: (k: string, v?: Record<string, string | number>) => string }) {
   const [ask, setAsk] = useState(false);
-  if (!ask) {
-    return (
-      <button type="button" onClick={() => setAsk(true)} style={{ marginTop: 'auto', alignSelf: 'center', minHeight: 44, border: 0, borderRadius: 999, padding: '8px 18px', background: 'transparent', color: 'var(--faint)', font: "700 14px 'DM Sans', sans-serif", display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
-        {t('game.end')}
-      </button>
-    );
-  }
   return (
-    <div role="alertdialog" aria-label={t('game.end')} className="up-card anim-up" style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 12, padding: 16 }}>
-      <p style={{ fontSize: 17, fontWeight: 700 }}>{t('game.endConfirm')}</p>
-      <div style={{ display: 'flex', gap: 10 }}>
-        <button className="up-btn ghost full" onClick={() => setAsk(false)}>{t('common.cancel')}</button>
-        <button className="up-btn full" style={{ background: 'var(--red)', boxShadow: '0 5px 0 #A81B2B', color: '#fff' }} onClick={() => { setAsk(false); net.send('lobby'); }}>{t('game.end')}</button>
-      </div>
-    </div>
+    <>
+      <button type="button" aria-label={t('game.end')} title={t('game.end')} onClick={() => setAsk(true)} style={{
+        position: 'fixed', top: 'calc(env(safe-area-inset-top, 0px) + 6px)', left: 'calc(env(safe-area-inset-left, 0px) + 6px)', zIndex: 90,
+        width: 36, height: 36, padding: 0, border: 0, borderRadius: '50%', background: 'rgba(17,13,36,.72)', color: '#fff',
+        boxShadow: '0 0 0 1.5px rgba(255,255,255,.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.85,
+      }}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+      </button>
+      {ask && (
+        <div onClick={() => setAsk(false)} style={{ position: 'fixed', inset: 0, zIndex: 95, background: 'rgba(10,7,22,.78)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+          <div role="alertdialog" aria-modal="true" aria-label={t('game.end')} className="up-card anim-pop" onClick={(e) => e.stopPropagation()} style={{ width: '100%', maxWidth: 360, display: 'flex', flexDirection: 'column', gap: 14, padding: 20 }}>
+            <p style={{ fontSize: 18, fontWeight: 700 }}>{t('game.endConfirm')}</p>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button className="up-btn ghost full" onClick={() => setAsk(false)}>{t('common.cancel')}</button>
+              <button className="up-btn full" style={{ background: 'var(--red)', boxShadow: '0 5px 0 #A81B2B', color: '#fff' }} onClick={() => { setAsk(false); net.send('lobby'); }}>{t('game.end')}</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 

@@ -2,6 +2,10 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.22.1
+
+- „Spiel beenden“ für den VIP ist jetzt ein kleiner Knopf oben links über dem Spiel (mit Rückfrage), statt ganz unten auf dem Handy
+
 ## 0.22.0
 
 - Abstimmung: Neue Einstellung „Zur Wahl“ – 4 Vorschläge (wie bisher) oder alle Spiele (dann 60 Sekunden Zeit)
