@@ -2,6 +2,11 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.19.1
+
+- Bonk!: Man fällt erst, wenn die ganze Figur über dem Abgrund ist – am Rand stehen ist jetzt sicher
+- Bonk!: Neue leuchtende Wände am Inselrand und manchmal mitten auf einer Insel. Wer dagegen fliegt, prallt ab; Schleuderkugeln bleiben daran hängen
+
 ## 0.19.0
 
 - Neues Spiel (Prototyp): Bonk! – Arena-Kampf von oben für 2 bis 12 Spieler. Haut euch mit Hammer oder Schleuder von leuchtenden Neon-Inseln! Schaden tötet nicht, aber je mehr Prozent du hast, desto weiter fliegst du. Wer im Abgrund landet, verliert ein Leben – 3 Leben pro Runde

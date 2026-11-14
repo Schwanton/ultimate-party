@@ -10,7 +10,7 @@ const FLAG = { air: 1, roll: 2, invuln: 4, gone: 8, out: 16, charge: 32, stun: 6
 /** [x, y, Winkel°, Flags, Schaden, Leben, Ladung%] */
 type PFrame = [number, number, number, number, number, number, number];
 interface Frame { round: number; t: number; fire: number | null; p: PFrame[]; s: [number, number, number][]; e: (string | number)[][] }
-interface ArenaView { cols: number; rows: number; grid: string[]; bumpers: { x: number; y: number }[]; ring: number[]; ringMax: number; center: { x: number; y: number }; seed: number }
+interface ArenaView { cols: number; rows: number; grid: string[]; walls?: [number, number, number, number][]; bumpers: { x: number; y: number }[]; ring: number[]; ringMax: number; center: { x: number; y: number }; seed: number }
 
 const heat = (d: number) => (d >= 100 ? '#FF3B4E' : d >= 60 ? '#FF9F43' : d >= 30 ? '#FFD447' : '#FFFFFF');
 
@@ -502,6 +502,16 @@ function drawFloor(arena: ArenaView, cell: number, scale: number, ox: number, oy
     g.stroke();
   }
   glow(g);
+  // Wände
+  g.lineCap = 'round';
+  for (const [x1, y1, x2, y2] of arena.walls ?? []) {
+    glow(g, '#C29BFF', 16);
+    g.strokeStyle = '#C29BFF'; g.lineWidth = 9;
+    g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke();
+    glow(g);
+    g.strokeStyle = '#FFFFFF'; g.lineWidth = 3;
+    g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke();
+  }
   // Säulen
   for (let y = 0; y < arena.rows; y++) for (let x = 0; x < arena.cols; x++) {
     if (at(x, y) !== 'o') continue;

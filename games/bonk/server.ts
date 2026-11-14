@@ -7,7 +7,7 @@
  */
 
 import { Scores, shuffle, type GameContext, type GameServerModule } from '@up/sdk';
-import { CELL, COOLDOWN, T_PILLAR, WEAPONS, edgeDistance, generateArena, walkable, type Arena, type WeaponId } from './arena';
+import { CELL, COOLDOWN, T_PILLAR, WEAPONS, distToSegment, edgeDistance, generateArena, onGround, walkable, type Arena, type WeaponId } from './arena';
 
 const TICK = 1 / 30;
 const T = { intro: 8, weapon: 20, ready: 3, roundEnd: 5, scores: 6, respawn: 2.2, invuln: 1.5, credit: 3 };
@@ -142,7 +142,7 @@ export default {
       ctx.setHostView({
         screen: 'arena', phase, round, total, ids,
         weapons: Object.fromEntries(ids.map((id) => [id, fighters.get(id)?.weapon ?? weapons.get(id)])),
-        arena: { cols: arena.cols, rows: arena.rows, grid: arena.grid, bumpers: arena.bumpers, ring: arena.ring, ringMax: arena.ringMax, center: arena.center, seed: arena.seed },
+        arena: { cols: arena.cols, rows: arena.rows, grid: arena.grid, walls: arena.walls, bumpers: arena.bumpers, ring: arena.ring, ringMax: arena.ringMax, center: arena.center, seed: arena.seed },
         fireStart, fireDur, cell: CELL, radius: PHY.radius,
         ...extra,
       });
@@ -211,6 +211,24 @@ export default {
             if (hard && f.air) { f.stunUntil = t + 0.3; events.push(['wall', Math.round(f.x), Math.round(f.y)]); }
           }
         }
+        // Wände: abprallen
+        for (const w of arena.walls) {
+          const [x1, y1, x2, y2] = w;
+          const dx = x2 - x1, dy = y2 - y1, l2 = dx * dx + dy * dy || 1;
+          const k = Math.max(0, Math.min(1, ((f.x - x1) * dx + (f.y - y1) * dy) / l2));
+          const cx = x1 + k * dx, cy = y1 + k * dy;
+          const ox = f.x - cx, oy = f.y - cy, d = Math.hypot(ox, oy), min = PHY.radius + 3;
+          if (d >= min) continue;
+          const nx = d ? ox / d : -dy / Math.sqrt(l2), ny = d ? oy / d : dx / Math.sqrt(l2);
+          f.x = cx + nx * min; f.y = cy + ny * min;
+          const vn = f.vx * nx + f.vy * ny;
+          if (vn < 0) {
+            const fast = Math.hypot(f.vx, f.vy) > 260;
+            f.vx -= (fast ? 1.8 : 1) * vn * nx;
+            f.vy -= (fast ? 1.8 : 1) * vn * ny;
+            if (fast) { if (f.air) f.stunUntil = t + 0.25; events.push(['wall', Math.round(cx), Math.round(cy)]); }
+          }
+        }
         // Prallkissen
         for (const b of arena.bumpers) {
           const dx = f.x - b.x, dy = f.y - b.y, d = Math.hypot(dx, dy);
@@ -248,7 +266,7 @@ export default {
       const outNow: Fighter[] = [];
       for (const f of fighters.values()) {
         if (f.state !== 'alive' || f.air) continue;
-        if (walkable(cellAt(f.x, f.y))) continue;
+        if (onGround(grid, f.x, f.y, PHY.radius * 0.95)) continue;
         fall(f);
         if ((f.state as State) === 'out') outNow.push(f);
       }
@@ -403,7 +421,7 @@ export default {
       for (const s of shots) {
         s.x += s.vx * TICK;
         s.y += s.vy * TICK;
-        if (t > s.until || cellAt(s.x, s.y) === T_PILLAR || s.x < -CELL || s.y < -CELL || s.x > (arena.cols + 1) * CELL || s.y > (arena.rows + 1) * CELL) continue;
+        if (t > s.until || cellAt(s.x, s.y) === T_PILLAR || arena.walls.some((w) => distToSegment(s.x, s.y, w) < 5) || s.x < -CELL || s.y < -CELL || s.x > (arena.cols + 1) * CELL || s.y > (arena.rows + 1) * CELL) continue;
         const r = s.big ? SLING.bigR : SLING.r;
         let used = false;
         for (const o of fighters.values()) {

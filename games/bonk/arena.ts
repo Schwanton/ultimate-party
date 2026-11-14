@@ -19,6 +19,8 @@ export interface Arena {
   rows: number;
   /** Zeilen als Text, je Feld ein Zeichen (siehe T_*) */
   grid: string[];
+  /** Wände zum Abprallen: Strecken [x1, y1, x2, y2] auf Feldgrenzen (Spiel-Einheiten) */
+  walls: [number, number, number, number][];
   /** Prallkissen (Feldmitte in Spiel-Einheiten) */
   bumpers: { x: number; y: number }[];
   /** Startplätze (Spiel-Einheiten) */
@@ -176,6 +178,40 @@ function tryGenerate(players: number, seed: number): Arena | null {
     bumpers.push({ x: px, y: py });
   }
 
+  // 6) Wände: einige Stücke am Inselrand (dort prallt man ab statt runterzufallen) und manchmal eine kurze Wand mitten auf einer Insel
+  const walls: [number, number, number, number][] = [];
+  const faces: [number, number, number, number][] = []; // x, y, dx, dy (Seite des Feldes, die zum Abgrund zeigt)
+  for (const [x, y] of walk) {
+    if (g[y][x] === T_BRIDGE) continue;
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      const c = g[y + dy]?.[x + dx];
+      if (c === undefined || c === T_ABYSS) faces.push([x, y, dx, dy]);
+    }
+  }
+  const has = (x: number, y: number, dx: number, dy: number) => faces.some((f) => f[0] === x && f[1] === y && f[2] === dx && f[3] === dy);
+  const runs = 1 + Math.floor(R() * 3);
+  for (let k = 0; k < runs * 5 && walls.length < runs && faces.length; k++) {
+    const [x, y, dx, dy] = faces[Math.floor(R() * faces.length)];
+    const len = 2 + Math.floor(R() * 3);
+    // entlang der Kante weitergehen (senkrecht zur Blickrichtung)
+    const sx = dy !== 0 ? 1 : 0, sy = dx !== 0 ? 1 : 0;
+    let n = 1;
+    while (n < len && has(x + sx * n, y + sy * n, dx, dy)) n++;
+    if (n < 2) continue;
+    const ex = dx === 1 ? x + 1 : x, ey = dy === 1 ? y + 1 : y; // Linie auf der Feldgrenze
+    const seg: [number, number, number, number] = dx !== 0 ? [ex * CELL, y * CELL, ex * CELL, (y + n) * CELL] : [x * CELL, ey * CELL, (x + n) * CELL, ey * CELL];
+    if (walls.some((w) => Math.hypot(w[0] - seg[0], w[1] - seg[1]) < CELL * 3)) continue;
+    walls.push(seg);
+  }
+  if (R() < 0.6) {
+    const inner = walk.filter(([x, y]) => g[y][x] !== T_BRIDGE && edgeDistance(g, x, y) >= 2);
+    if (inner.length) {
+      const [x, y] = inner[Math.floor(R() * inner.length)];
+      const seg: [number, number, number, number] = R() < 0.5 ? [x * CELL, y * CELL, (x + 2) * CELL, y * CELL] : [x * CELL, y * CELL, x * CELL, (y + 2) * CELL];
+      if (!spawns.some((s) => distToSegment(s.x, s.y, seg) < CELL)) walls.push(seg);
+    }
+  }
+
   // Feuer-Mitte: Feld mit dem größten Abstand zum Abgrund, nahe am Schwerpunkt
   let mx = 0, my = 0;
   for (const [x, y] of walk) { mx += x; my += y; }
@@ -197,10 +233,29 @@ function tryGenerate(players: number, seed: number): Arena | null {
   return {
     seed, cols, rows,
     grid: g.map((row) => row.join('')),
-    bumpers, spawns,
+    walls, bumpers, spawns,
     center: { x: (best[0] + 0.5) * CELL, y: (best[1] + 0.5) * CELL },
     ring, ringMax: Math.round(ringMax * 10) / 10,
   };
+}
+
+/** Abstand eines Punktes zu einer Strecke */
+export function distToSegment(px: number, py: number, s: [number, number, number, number]) {
+  const [x1, y1, x2, y2] = s;
+  const dx = x2 - x1, dy = y2 - y1, l2 = dx * dx + dy * dy || 1;
+  const k = Math.max(0, Math.min(1, ((px - x1) * dx + (py - y1) * dy) / l2));
+  return Math.hypot(px - (x1 + k * dx), py - (y1 + k * dy));
+}
+
+/** Steht ein Kreis noch auf Boden? Erst wenn der ganze Kreis über dem Abgrund ist, fällt man. */
+export function onGround(grid: string[], x: number, y: number, r: number) {
+  const at = (px: number, py: number) => walkable(grid[Math.floor(py / CELL)]?.[Math.floor(px / CELL)]);
+  if (at(x, y)) return true;
+  for (let i = 0; i < 12; i++) {
+    const a = (i / 12) * Math.PI * 2;
+    if (at(x + Math.cos(a) * r, y + Math.sin(a) * r)) return true;
+  }
+  return false;
 }
 
 /** Sind alle begehbaren Felder miteinander verbunden? */
@@ -265,7 +320,7 @@ function fallback(players: number, seed: number): Arena {
     ring.push(Math.round(d * 10) / 10);
     if (walkable(g[y][x])) ringMax = Math.max(ringMax, d);
   }
-  return { seed, cols, rows, grid: g.map((r) => r.join('')), bumpers: [], spawns: farthestPoints(walk, players, rng(seed)), center: { x: (cx + 0.5) * CELL, y: (cy + 0.5) * CELL }, ring, ringMax };
+  return { seed, cols, rows, grid: g.map((r) => r.join('')), walls: [], bumpers: [], spawns: farthestPoints(walk, players, rng(seed)), center: { x: (cx + 0.5) * CELL, y: (cy + 0.5) * CELL }, ring, ringMax };
 }
 
 /* ---------- Waffen (gemeinsam für Server und Handy/TV) ---------- */
