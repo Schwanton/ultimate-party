@@ -288,8 +288,10 @@ export type PickMode = 'vip' | 'vote' | 'random';
 
 export interface GameVote {
   candidates: string[];
-  /** Spieler-ID → Spiel-ID */
-  votes: Record<string, string>;
+  /** Spieler-ID → gewählte Spiel-IDs (1 oder bis zu 3 Stimmen pro Person) */
+  votes: Record<string, string[]>;
+  /** Stimmen pro Person */
+  maxVotes: number;
   deadline: number;
   duration: number;
   /** Sieger, sobald ausgewertet */
@@ -306,6 +308,10 @@ export interface RoomSettings {
   gameOptions: Record<string, GameOptionValues>;
   /** wie das nächste Spiel gewählt wird */
   pickMode?: PickMode;
+  /** Abstimmung: alle Spiele statt 4 Vorschläge */
+  voteAll?: boolean;
+  /** Abstimmung: Stimmen pro Person (1 oder 3) */
+  votesPerPlayer?: number;
 }
 
 export interface HostViewProps<V = any> {

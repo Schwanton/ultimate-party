@@ -6,7 +6,7 @@ import registry, { clientGame } from '../registry';
 import { Avatar, Crown, FullscreenButton, Logo, isLight, shade, vibrate } from '../ui';
 import { GameOptionsForm, optionsSummary } from './GameOptions';
 import { fitOf, gameDesc, useTagFilter } from './GameLibrary';
-import { PhoneVote, PickModeSwitch, pickModeOf } from './PickMode';
+import { PhoneVote, PickModeSwitch, VoteOptions, pickModeOf, votesFor } from './PickMode';
 
 const params = new URLSearchParams(location.search);
 
@@ -256,6 +256,7 @@ function PhoneLobby({ onEditAvatar }: { onEditAvatar: () => void }) {
         <section style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           <span className="up-label">{t('pick.label')}</span>
           <PickModeSwitch mode={mode} t={t} />
+          {mode === 'vote' && <VoteOptions room={room} t={t} />}
         </section>
       )}
       {voting && room.vote && <PhoneVote vote={room.vote} games={all} room={room} me={me} t={t} isVip={isVip} />}
@@ -269,7 +270,7 @@ function PhoneLobby({ onEditAvatar }: { onEditAvatar: () => void }) {
       )}
       {!isVip && !voting && mode !== 'vip' && selected && (
         <p className="up-card" style={{ padding: '12px 16px', fontSize: 16 }}>
-          <b>{selected.name[room.lang] ?? selected.name.en}</b> · <span className="muted">{mode === 'random' ? t('pick.byRandom') : t('pick.byVote', { n: Object.values(room.vote?.votes ?? {}).filter((g) => g === selected.id).length })}</span>
+          <b>{selected.name[room.lang] ?? selected.name.en}</b> · <span className="muted">{mode === 'random' ? t('pick.byRandom') : t('pick.byVote', { n: votesFor(room.vote, selected.id) })}</span>
         </p>
       )}
       {isVip && selected && !voting && (

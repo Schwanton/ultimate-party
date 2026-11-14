@@ -213,6 +213,9 @@ function handle(ws: WebSocket, msg: any) {
     case 'pickMode':
       if (room && (isHost || isVip)) room.setPickMode(String(msg.mode));
       return;
+    case 'vote:options':
+      if (room && (isHost || isVip)) room.setVoteOptions(msg);
+      return;
     case 'vote:start':
       if (room && (isHost || isVip)) room.startVote();
       return;

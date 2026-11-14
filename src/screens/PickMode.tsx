@@ -55,8 +55,40 @@ export function useRoll(room: RoomSnapshot, games: GameManifest[]) {
 
 function tally(vote: GameVote) {
   const m = new Map<string, string[]>();
-  for (const [pid, gid] of Object.entries(vote.votes)) m.set(gid, [...(m.get(gid) ?? []), pid]);
+  for (const [pid, gids] of Object.entries(vote.votes)) for (const gid of gids) m.set(gid, [...(m.get(gid) ?? []), pid]);
   return m;
+}
+
+export const votesFor = (vote: GameVote | null | undefined, gameId: string) =>
+  vote ? Object.values(vote.votes).filter((g) => g.includes(gameId)).length : 0;
+
+/** Kleiner Umschalter mit zwei bis drei Werten */
+function Seg<T extends string | number | boolean>({ label, value, items, onPick }: { label: string; value: T; items: [T, string][]; onPick: (v: T) => void }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <span className="faint" style={{ fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap' }}>{label}</span>
+      <div role="radiogroup" aria-label={label} style={{ display: 'flex', background: 'var(--surface-2)', borderRadius: 999, padding: 3 }}>
+        {items.map(([v, text]) => (
+          <button key={String(v)} type="button" role="radio" aria-checked={v === value} onClick={() => onPick(v)} style={{
+            border: 0, minHeight: 36, padding: '4px 12px', borderRadius: 999, font: "700 13px 'DM Sans', sans-serif", whiteSpace: 'nowrap',
+            background: v === value ? '#fff' : 'transparent', color: v === value ? '#110D24' : 'var(--muted)',
+          }}>{text}</button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Einstellungen der Abstimmung: was steht zur Wahl, wie viele Stimmen hat jeder */
+export function VoteOptions({ room, t }: { room: RoomSnapshot; t: Translate }) {
+  const all = !!room.settings.voteAll;
+  const per = room.settings.votesPerPlayer === 3 ? 3 : 1;
+  return (
+    <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
+      <Seg label={t('pick.choice')} value={all} items={[[false, t('pick.choice4')], [true, t('pick.choiceAll')]]} onPick={(v) => net.send('vote:options', { voteAll: v })} />
+      <Seg label={t('pick.perPlayer')} value={per} items={[[1, '1'], [3, '3']]} onPick={(v) => net.send('vote:options', { votesPerPlayer: v })} />
+    </div>
+  );
 }
 
 /** TV: laufende Abstimmung mit 2–4 Spielen */
@@ -64,17 +96,35 @@ export function HostVoteBoard({ vote, games, room, t, player }: { vote: GameVote
   const byGame = tally(vote);
   const cands = vote.candidates.map((id) => games.find((g) => g.id === id)).filter(Boolean) as GameManifest[];
   const voters = room.players.filter((p) => p.connected || p.isBot);
-  const done = Object.keys(vote.votes).length;
+  const done = Object.values(vote.votes).filter((g) => g.length >= vote.maxVotes).length;
+  const many = vote.candidates.length > 4;
+  const best = Math.max(1, ...[...byGame.values()].map((v) => v.length));
   return (
     <section className="anim-up" style={{ flex: 1, minWidth: 0, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 14, borderRadius: 28, background: 'var(--surface)', padding: 20 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
         <div>
           <h2 style={{ fontSize: 30, fontWeight: 800 }}>{t('pick.voteTitle')}</h2>
-          <p className="muted" style={{ fontSize: 16 }}>{t('pick.voteHint')} · {t('pick.voted', { n: done, total: voters.length })}</p>
+          <p className="muted" style={{ fontSize: 16 }}>{vote.maxVotes > 1 ? t('pick.voteHintN', { n: vote.maxVotes }) : t('pick.voteHint')} · {t('pick.voted', { n: done, total: voters.length })}</p>
         </div>
         <HostTimer deadline={vote.deadline} duration={vote.duration} size={60} />
       </div>
-      <div style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gridAutoRows: 'minmax(0, 1fr)', gap: 14 }}>
+      {many ? (
+        <div style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gridAutoRows: 'minmax(0, 1fr)', gap: 8 }}>
+          {cands.map((g) => {
+            const who = (byGame.get(g.id) ?? []).map(player).filter(Boolean) as PlayerInfo[];
+            const lead = who.length > 0 && who.length === best;
+            return (
+              <div key={g.id} style={{ display: 'flex', alignItems: 'center', gap: 8, minHeight: 0, borderRadius: 12, padding: '0 10px 0 0', overflow: 'hidden', background: lead ? 'var(--surface-2)' : '#1C1738', boxShadow: lead ? `0 0 0 3px ${g.color}` : undefined }}>
+                <span style={{ width: 8, alignSelf: 'stretch', background: g.color, flex: 'none' }} />
+                <span className="display" style={{ flex: 1, minWidth: 0, fontSize: 16, fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{gameName(g, room.lang)}</span>
+                <span style={{ display: 'flex' }}>{who.slice(0, 4).map((p, j) => <span key={p.id} style={{ marginLeft: j ? -8 : 0 }}><Avatar player={p} size={22} flat /></span>)}</span>
+                <span className="display" style={{ minWidth: 22, textAlign: 'right', fontSize: 20, fontWeight: 800, color: lead ? 'var(--yellow)' : 'var(--muted)' }}>{who.length}</span>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gridAutoRows: 'minmax(0, 1fr)', gap: 14 }}>
         {cands.map((g, i) => {
           const who = (byGame.get(g.id) ?? []).map(player).filter(Boolean) as PlayerInfo[];
           return (
@@ -94,6 +144,7 @@ export function HostVoteBoard({ vote, games, room, t, player }: { vote: GameVote
           );
         })}
       </div>
+      )}
       <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
         <button className="up-btn ghost" onClick={() => net.send('vote:start')}>{t('pick.newVote')}</button>
         <button className="up-btn" onClick={() => net.send('vote:end')}>{t('pick.endVote')}</button>
@@ -105,20 +156,23 @@ export function HostVoteBoard({ vote, games, room, t, player }: { vote: GameVote
 /** Handy: abstimmen (alle) – der VIP kann zusätzlich auswerten */
 export function PhoneVote({ vote, games, room, me, t, isVip }: { vote: GameVote; games: GameManifest[]; room: RoomSnapshot; me: PlayerInfo; t: Translate; isVip: boolean }) {
   const byGame = tally(vote);
-  const mine = vote.votes[me.id];
+  const mine = vote.votes[me.id] ?? [];
+  const left = vote.maxVotes - mine.length;
   const cands = vote.candidates.map((id) => games.find((g) => g.id === id)).filter(Boolean) as GameManifest[];
   return (
     <section style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <PhoneTimer deadline={vote.deadline} duration={vote.duration} />
       <h2 style={{ fontSize: 24, fontWeight: 800 }}>{t('pick.voteTitle')}</h2>
-      <p className="muted" style={{ fontSize: 15, marginTop: -6 }}>{mine ? t('pick.voteChange') : t('pick.votePhone')}</p>
-      <div role="radiogroup" aria-label={t('pick.voteTitle')} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <p className="muted" style={{ fontSize: 15, marginTop: -6 }}>
+        {vote.maxVotes > 1 ? (left > 0 ? t('pick.votesLeft', { n: left, max: vote.maxVotes }) : t('pick.voteChangeN')) : mine.length ? t('pick.voteChange') : t('pick.votePhone')}
+      </p>
+      <div role={vote.maxVotes > 1 ? 'group' : 'radiogroup'} aria-label={t('pick.voteTitle')} style={{ display: 'flex', flexDirection: 'column', gap: vote.candidates.length > 4 ? 8 : 10 }}>
         {cands.map((g) => {
-          const on = mine === g.id;
+          const on = mine.includes(g.id);
           const n = (byGame.get(g.id) ?? []).length;
           return (
-            <button key={g.id} type="button" role="radio" aria-checked={on} onClick={() => net.send('gamevote', { gameId: g.id })} style={{
-              minHeight: 76, border: `3px solid ${on ? g.color : 'transparent'}`, borderRadius: 20, padding: 0, overflow: 'hidden', display: 'flex', alignItems: 'stretch', textAlign: 'left',
+            <button key={g.id} type="button" role={vote.maxVotes > 1 ? 'checkbox' : 'radio'} aria-checked={on} onClick={() => net.send('gamevote', { gameId: g.id })} style={{
+              minHeight: vote.candidates.length > 4 ? 60 : 76, border: `3px solid ${on ? g.color : 'transparent'}`, borderRadius: 20, padding: 0, overflow: 'hidden', display: 'flex', alignItems: 'stretch', textAlign: 'left',
               background: on ? 'var(--surface-2)' : 'var(--surface)', color: '#fff',
             }}>
               <span style={{ width: 92, flex: 'none', position: 'relative' }}><GameCover g={g} lang={room.lang} letterSize={64} /></span>
@@ -132,7 +186,7 @@ export function PhoneVote({ vote, games, room, me, t, isVip }: { vote: GameVote;
         })}
       </div>
       {isVip && (
-        <div style={{ display: 'flex', gap: 10 }}>
+        <div style={{ display: 'flex', gap: 10, position: 'sticky', bottom: 0, background: 'var(--bg)', padding: '10px 0 8px', margin: '0 -2px' }}>
           <button className="up-btn ghost full" onClick={() => net.send('vote:start')}>{t('pick.newVote')}</button>
           <button className="up-btn full" onClick={() => net.send('vote:end')}>{t('pick.endVote')}</button>
         </div>
@@ -144,7 +198,7 @@ export function PhoneVote({ vote, games, room, me, t, isVip }: { vote: GameVote;
 /** Hinweis am gewählten Spiel: wie es ausgewählt wurde */
 export function PickedBadge({ room, t, vipName }: { room: RoomSnapshot; t: Translate; vipName?: string }) {
   const mode = pickModeOf(room);
-  const text = mode === 'vote' && room.vote?.result ? t('pick.byVote', { n: Object.values(room.vote.votes).filter((g) => g === room.vote!.result).length })
+  const text = mode === 'vote' && room.vote?.result ? t('pick.byVote', { n: votesFor(room.vote, room.vote.result) })
     : mode === 'random' ? t('pick.byRandom')
       : vipName ? t('lobby.pickedBy', { name: vipName }) : null;
   if (!text) return null;

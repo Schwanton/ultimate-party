@@ -9,7 +9,7 @@ import { HostSettings } from './HostSettings';
 import { GameOptionsForm, optionsSummary } from './GameOptions';
 import { UpdateBanner } from './Update';
 import { GameCover, GameLibrary, fitOf, gameDesc, gameName, gameTags, playersLabel } from './GameLibrary';
-import { HostVoteBoard, PickModeSwitch, PickedBadge, pickModeOf, useRoll } from './PickMode';
+import { HostVoteBoard, PickModeSwitch, PickedBadge, VoteOptions, pickModeOf, useRoll } from './PickMode';
 
 async function connectHost() {
   const saved = loadSession('host');
@@ -298,6 +298,7 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
             {pickModeOf(room) === 'vote' && room.vote?.result && <button className="up-btn ghost small" style={{ whiteSpace: 'nowrap' }} onClick={() => net.send('vote:start')}>{t('pick.newVote')}</button>}
             {pickModeOf(room) === 'vote' && !room.vote && <button className="up-btn ghost small" style={{ whiteSpace: 'nowrap' }} onClick={() => net.send('vote:start')}>{t('pick.startVote')}</button>}
           </div>
+          {pickModeOf(room) === 'vote' && <VoteOptions room={room} t={t} />}
           {pickModeOf(room) === 'vote' && room.vote && !room.vote.result ? (
             <HostVoteBoard vote={room.vote} games={games} room={room} t={t} player={(id) => room.players.find((p) => p.id === id)} />
           ) : (

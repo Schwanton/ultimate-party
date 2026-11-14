@@ -2,6 +2,12 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.22.0
+
+- Abstimmung: Neue Einstellung „Zur Wahl“ – 4 Vorschläge (wie bisher) oder alle Spiele (dann 60 Sekunden Zeit)
+- Abstimmung: Neue Einstellung „Stimmen pro Person“ – 1 oder 3. Mit 3 Stimmen tippt jeder bis zu drei Spiele an; erneut tippen nimmt eine Stimme zurück
+- Beides lässt sich am Fernseher und beim VIP auf dem Handy umstellen, sobald „Abstimmung“ gewählt ist
+
 ## 0.21.0
 
 - Nächstes Spiel: Am Fernseher und beim VIP lässt sich einstellen, wie das nächste Spiel gewählt wird – „VIP wählt“ (wie bisher), „Abstimmung“ oder „Zufall“

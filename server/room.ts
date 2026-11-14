@@ -328,29 +328,50 @@ export class Room {
     this.vote = null;
   }
 
+  /** Abstimmungs-Einstellungen ändern (startet eine laufende Abstimmung neu) */
+  setVoteOptions(patch: { voteAll?: unknown; votesPerPlayer?: unknown }) {
+    if (typeof patch.voteAll === 'boolean') this.settings.voteAll = patch.voteAll;
+    if (patch.votesPerPlayer === 1 || patch.votesPerPlayer === 3) this.settings.votesPerPlayer = patch.votesPerPlayer;
+    this.remember();
+    if (this.phase === 'lobby' && this.settings.pickMode === 'vote') this.startVote();
+    this.touch();
+  }
+
   startVote() {
     if (this.phase !== 'lobby') return;
     this.clearVote();
     this.roll = null;
-    const candidates = shuffle(this.pickPool()).slice(0, 4);
-    const duration = 45_000;
-    this.vote = { candidates, votes: {}, deadline: Date.now() + duration, duration, result: null };
+    const pool = this.settings.voteAll
+      ? allGames().map((g) => g.manifest).filter((m) => !m.hidden || DEV).sort((a, b) => (a.name[this.lang] ?? a.name.en).localeCompare(b.name[this.lang] ?? b.name.en, this.lang)).map((m) => m.id)
+      : shuffle(this.pickPool()).slice(0, 4);
+    const maxVotes = Math.min(this.settings.votesPerPlayer === 3 ? 3 : 1, pool.length);
+    const duration = this.settings.voteAll ? 60_000 : 45_000;
+    this.vote = { candidates: pool, votes: {}, maxVotes, deadline: Date.now() + duration, duration, result: null };
     this.voteTimer = setTimeout(() => this.finishVote(), duration);
     // Bots stimmen zufällig ab (zum Testen)
     for (const p of this.players.values()) {
       if (!p.info.isBot) continue;
-      setTimeout(() => this.castVote(p.info.id, candidates[Math.floor(Math.random() * candidates.length)]), 800 + Math.random() * 2500);
+      for (const id of shuffle(pool).slice(0, maxVotes)) {
+        setTimeout(() => this.castVote(p.info.id, id), 800 + Math.random() * 2500);
+      }
     }
     this.touch();
   }
 
+  /** Stimme an- oder abwählen. Sind alle Stimmen vergeben, ersetzt eine neue die älteste. */
   castVote(playerId: string, gameId: string) {
     const v = this.vote;
     if (!v || v.result || this.phase !== 'lobby' || !v.candidates.includes(gameId) || !this.players.has(playerId)) return;
-    v.votes[playerId] = gameId;
-    // Alle (verbundenen) haben abgestimmt → kurz danach auswerten
+    let mine = v.votes[playerId] ?? [];
+    if (mine.includes(gameId)) mine = mine.filter((g) => g !== gameId);
+    else {
+      mine = [...mine, gameId];
+      if (mine.length > v.maxVotes) mine = mine.slice(mine.length - v.maxVotes);
+    }
+    v.votes[playerId] = mine;
+    // Alle (verbundenen) haben alle Stimmen vergeben → kurz danach auswerten
     const voters = [...this.players.values()].filter((p) => p.info.connected || p.info.isBot);
-    if (voters.every((p) => v.votes[p.info.id])) {
+    if (voters.every((p) => (v.votes[p.info.id]?.length ?? 0) >= v.maxVotes)) {
       if (this.voteTimer) clearTimeout(this.voteTimer);
       v.deadline = Date.now() + 2500;
       this.voteTimer = setTimeout(() => this.finishVote(), 2500);
@@ -364,7 +385,7 @@ export class Room {
     if (this.voteTimer) clearTimeout(this.voteTimer);
     this.voteTimer = null;
     const counts = new Map<string, number>();
-    for (const id of Object.values(v.votes)) counts.set(id, (counts.get(id) ?? 0) + 1);
+    for (const ids of Object.values(v.votes)) for (const id of ids) counts.set(id, (counts.get(id) ?? 0) + 1);
     const best = Math.max(0, ...counts.values());
     const top = v.candidates.filter((id) => (counts.get(id) ?? 0) === best);
     v.result = top[Math.floor(Math.random() * top.length)];
