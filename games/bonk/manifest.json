@@ -2,8 +2,8 @@
   "id": "bonk",
   "name": { "de": "Bonk!", "en": "Bonk!" },
   "description": {
-    "de": "Arena-Kampf von oben: Haut euch mit Hammer oder Schleuder von den Neon-Inseln! Je mehr Schaden du hast, desto weiter fliegst du. 3 Leben pro Runde. (Prototyp)",
-    "en": "Top-down arena brawl: bonk each other off the neon islands with hammer, slingshot, hook, bombs, sword or boomerang! The more damage you have, the further you fly. 3 lives per round. (Prototype)"
+    "de": "Arena-Kampf von oben: Haut euch mit Hammer, Schleuder, Enterhaken, Bomben, Schwert oder Bumerang von den Neon-Inseln! Je mehr Schaden du hast, desto weiter fliegst du. 3 Leben pro Runde, Powerups nach jeder Runde, alle 4 Runden ein Shop.",
+    "en": "Top-down arena brawl: bonk each other off the neon islands with hammer, slingshot, hook, bombs, sword or boomerang! The more damage you have, the further you fly. 3 lives per round, power-ups after every round, a shop every 4 rounds."
   },
   "minPlayers": 2,
   "maxPlayers": 12,
