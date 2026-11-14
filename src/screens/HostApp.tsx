@@ -4,7 +4,7 @@ import type { GameManifest, Lang, PlayerInfo, Translate } from '@up/sdk';
 import { net, useNet, loadSession, saveSession } from '../net';
 import { guessLang, useT } from '../i18n';
 import { clientGame } from '../registry';
-import { Avatar, Crown, FullscreenButton, Logo, QrCode, Stage, isLight, sfx, shade, toggleFullscreen } from '../ui';
+import { Avatar, Crown, FullscreenButton, useKeepAwake, Logo, QrCode, Stage, isLight, sfx, shade, toggleFullscreen } from '../ui';
 import { HostSettings } from './HostSettings';
 import { GameOptionsForm, optionsSummary } from './GameOptions';
 import { UpdateBanner } from './Update';
@@ -30,6 +30,8 @@ function announce(code: string) {
 }
 
 export function HostApp() {
+  // TV und Laptop sollen nicht einschlafen, solange UP! offen ist
+  useKeepAwake();
   const s = useNet();
   const [settingsOpen, setSettingsOpen] = useState(false);
   useEffect(() => {

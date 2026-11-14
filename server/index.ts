@@ -362,7 +362,30 @@ async function main() {
     console.log('  Beenden: dieses Fenster schließen oder Strg+C drücken.');
     console.log('');
     if (!DEV && process.env.UP_NO_OPEN !== '1' && process.env.UP_NO_CLIENT !== '1') openBrowser(`http://localhost:${PORT}/host`);
+    if (!DEV) keepComputerAwake();
   });
+}
+
+/**
+ * Rechner nicht einschlafen lassen, solange UP! läuft (wie beim Filmschauen).
+ * macOS: caffeinate (Bildschirm und Ruhezustand), endet automatisch mit UP!.
+ * Windows: PowerShell setzt „System und Bildschirm benötigt“, solange UP! läuft.
+ * Den Bildschirm hält zusätzlich die TV-Seite im Browser wach (Wake Lock).
+ */
+function keepComputerAwake() {
+  try {
+    if (process.platform === 'darwin') {
+      spawn('caffeinate', ['-di', '-w', String(process.pid)], { stdio: 'ignore', detached: true }).on('error', () => {}).unref();
+    } else if (process.platform === 'win32') {
+      const ps = [
+        "Add-Type -Namespace UP -Name Power -MemberDefinition '[DllImport(\"kernel32.dll\")] public static extern uint SetThreadExecutionState(uint f);'",
+        // ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED
+        '[UP.Power]::SetThreadExecutionState(0x80000003) | Out-Null',
+        `while (Get-Process -Id ${process.pid} -ErrorAction SilentlyContinue) { Start-Sleep -Seconds 30 }`,
+      ].join('; ');
+      spawn('powershell', ['-NoProfile', '-WindowStyle', 'Hidden', '-Command', ps], { stdio: 'ignore', detached: true, windowsHide: true }).on('error', () => {}).unref();
+    }
+  } catch { /* nicht schlimm – dann greift nur die Browser-Sperre */ }
 }
 
 /** TV-Ansicht automatisch im Standardbrowser öffnen */

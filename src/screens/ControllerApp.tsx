@@ -3,7 +3,7 @@ import { ANIMALS, type Animal, type Avatar as AvatarData } from '@up/sdk';
 import { net, useNet, loadSession, saveSession } from '../net';
 import { guessLang, useT } from '../i18n';
 import registry, { clientGame } from '../registry';
-import { Avatar, Crown, FullscreenButton, Logo, isLight, shade, vibrate } from '../ui';
+import { Avatar, Crown, FullscreenButton, Logo, useKeepAwake, isLight, shade, vibrate } from '../ui';
 import { GameOptionsForm, optionsSummary } from './GameOptions';
 import { fitOf, gameDesc, useTagFilter } from './GameLibrary';
 import { PhoneVote, PickModeSwitch, VoteOptions, pickModeOf, votesFor } from './PickMode';
@@ -124,6 +124,8 @@ function JoinForm({ onJoined }: { onJoined: () => void }) {
 /* ---------------- Im Raum ---------------- */
 
 function InRoom() {
+  // Handy bleibt wach, solange man im Raum ist
+  useKeepAwake();
   const s = useNet();
   const room = s.room!;
   const me = s.me!;
