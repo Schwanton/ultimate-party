@@ -1,17 +1,17 @@
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as RPointerEvent } from 'react';
 import type { ControllerViewProps, GameClientModule, HostViewProps, PlayerInfo } from '@up/sdk';
 import { Avatar, Confetti, Crown, HostHeader, HostTimer, PhoneTimer, PhoneWait, Podium, Scoreboard, sfx, useServerNow, useStream, vibrate } from '@up/ui';
-import { ICON, WEAPON_COLOR, walkable } from './arena';
-import { POWERUP, PRICE, RARITY_COLOR, REROLL_PRICE } from './powerups';
+import { BELTS, ICON, WEAPON_COLOR, walkable } from './arena';
+import { POWERUP, PRICE, RARITY_COLOR, REROLL_PRICE, WEAPON_PRICE } from './powerups';
 
 const PINK = '#FF4FB8';
 const INK = '#07051A';
-const FLAG = { air: 1, roll: 2, invuln: 4, gone: 8, out: 16, charge: 32, stun: 64, block: 128 };
+const FLAG = { air: 1, roll: 2, invuln: 4, gone: 8, out: 16, charge: 32, stun: 64, block: 128, meteor: 256 };
 
 /** [x, y, Winkel°, Flags, Schaden, Leben, Ladung%] */
 type PFrame = [number, number, number, number, number, number, number];
-interface Frame { round: number; t: number; fire: number | null; p: PFrame[]; o: number[][]; e: (string | number)[][] }
-interface ArenaView { cols: number; rows: number; grid: string[]; walls?: [number, number, number, number][]; bumpers: { x: number; y: number }[]; ring: number[]; ringMax: number; center: { x: number; y: number }; seed: number }
+interface Frame { round: number; t: number; fire: number | null; p: PFrame[]; o: number[][]; e: (string | number)[][]; cr?: [number, number][] }
+interface ArenaView { cols: number; rows: number; grid: string[]; walls?: [number, number, number, number][]; pads?: { x: number; y: number }[]; teleports?: { ax: number; ay: number; bx: number; by: number }[]; bumpers: { x: number; y: number }[]; ring: number[]; ringMax: number; center: { x: number; y: number }; seed: number }
 
 const heat = (d: number) => (d >= 100 ? '#FF3B4E' : d >= 60 ? '#FF9F43' : d >= 30 ? '#FFD447' : '#FFFFFF');
 
@@ -76,10 +76,18 @@ function Host(props: HostViewProps) {
               <p className="muted" style={{ fontSize: 22 }}>{t('pick.startText')}</p>
             </div>
           ) : (
-            <>
-              <h1 style={{ fontSize: 32 }}>{t('scores.title')}</h1>
-              <Scoreboard rows={rows} max={6} />
-            </>
+            <div style={{ display: 'flex', gap: 24, flex: 1, minHeight: 0 }}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 10, minWidth: 0 }}>
+                <h1 style={{ fontSize: 32 }}>{t('scores.title')}</h1>
+                <Scoreboard rows={rows} max={6} />
+              </div>
+              {view.preview && (
+                <div style={{ width: 440, flex: 'none', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <b className="display" style={{ fontSize: 22, color: '#36D6F5' }}>{t('pick.next')}</b>
+                  <ArenaPreview arena={view.preview} W={440} H={270} />
+                </div>
+              )}
+            </div>
           )}
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, flex: 'none', marginLeft: 40 }}>
             <b className="display" style={{ fontSize: 22 }}>{t('pick.waiting')}</b>
@@ -171,15 +179,8 @@ function HostArena({ view, t, player }: HostViewProps) {
   useEffect(() => {
     if (!arena) return;
     const cell = view.cell as number;
-    let minX = arena.cols, minY = arena.rows, maxX = 0, maxY = 0;
-    arena.grid.forEach((row, y) => [...row].forEach((c, x) => {
-      if (c === '.') return;
-      minX = Math.min(minX, x); minY = Math.min(minY, y); maxX = Math.max(maxX, x); maxY = Math.max(maxY, y);
-    }));
-    const bw = (maxX - minX + 1.6) * cell, bh = (maxY - minY + 1.6) * cell;
-    const scale = Math.min(2, W / bw, H / bh);
-    layout.current = { scale, ox: (W - (maxX + minX + 1) * cell * scale) / 2, oy: (H - (maxY + minY + 1) * cell * scale) / 2 };
-    floorCanvas.current = drawFloor(arena, cell, scale, layout.current.ox, layout.current.oy, W, H);
+    layout.current = fitArena(arena, cell, W, H, 2);
+    floorCanvas.current = drawFloor(arena, cell, layout.current.scale, layout.current.ox, layout.current.oy, W, H);
   }, [arena, view.cell]);
 
   // Neue Server-Bilder: Effekte und Klänge
@@ -257,6 +258,21 @@ function HostArena({ view, t, player }: HostViewProps) {
         sfx.custom((s) => s.tone(500, 0.1, { type: 'triangle', vol: 0.12, to: 300 }));
       } else if (kind === 'hook' || kind === 'throw' || kind === 'toss') {
         sfx.custom((s) => s.noise(0.14, { filter: 1200, sweepTo: 3500, vol: 0.06 }));
+      } else if (kind === 'pad') {
+        const [, x, y] = e as [string, number, number];
+        bumpAt.current.set(`p${x},${y}`, n);
+        sfx.custom((s) => s.tone(220, 0.25, { type: 'sine', vol: 0.25, to: 880 }));
+      } else if (kind === 'tele') {
+        const [, x, y] = e as [string, number, number];
+        effects.current.push({ kind: 'ring', x, y, at: n, v: 34, color: '#C29BFF' });
+        sfx.custom((s) => s.tone(900, 0.18, { type: 'sine', vol: 0.12, to: 300 }));
+      } else if (kind === 'crumble') {
+        sfx.custom((s) => s.noise(0.25, { filter: 700, type: 'lowpass', vol: 0.25 }));
+      } else if (kind === 'special') {
+        const [, i] = e as [string, number];
+        const p = fr.p[i];
+        if (p) { effects.current.push({ kind: 'ring', x: p[0], y: p[1], at: n, v: 90, color: info.current.colors[i] }); effects.current.push({ kind: 'text', x: p[0], y: p[1] - 50, at: n, v: 0, text: 'SPEZIAL!', color: info.current.colors[i] }); }
+        sfx.custom((s) => { s.tone(330, 0.3, { type: 'sawtooth', vol: 0.12, to: 990 }); s.noise(0.3, { filter: 3000, sweepTo: 8000, vol: 0.08 }); });
       } else if (kind === 'fizzle') {
         const [, x, y] = e as [string, number, number];
         effects.current.push({ kind: 'ring', x, y, at: n, v: 14, color: '#8F88B8' });
@@ -309,18 +325,13 @@ function HostArena({ view, t, player }: HostViewProps) {
           }
         }
       }
-      // Prallkissen
-      for (const b of arena.bumpers) {
-        const hitAt = bumpAt.current.get(`${b.x},${b.y}`) ?? 0;
-        const k = Math.max(0, 1 - (n - hitAt) / 250);
-        glow(g, '#FF7EB6', 12);
-        g.strokeStyle = '#FF7EB6';
-        g.lineWidth = 4;
-        circle(g, b.x, b.y, 20 + 6 * k); g.stroke();
-        g.lineWidth = 3;
-        circle(g, b.x, b.y, 10 + 3 * k); g.stroke();
-        glow(g);
+      // Bröckelplatten: Warnung und weggebrochen
+      for (const [k, st] of cur?.cr ?? []) {
+        const x = (k % arena.cols) * cell, y = Math.floor(k / arena.cols) * cell;
+        if (st === 2) { g.fillStyle = '#07051A'; g.fillRect(x - 1, y - 1, cell + 2, cell + 2); }
+        else { g.fillStyle = `rgba(255,107,44,${0.25 + 0.25 * Math.sin(n / 50)})`; g.fillRect(x, y, cell, cell); }
       }
+      drawObstacles(g, arena, n, bumpAt.current);
       if (!cur || !prev) return;
       const a = Math.min(1, (n - at) / 34);
       const lerp = (p: number, q: number) => p + (q - p) * a;
@@ -349,6 +360,11 @@ function HostArena({ view, t, player }: HostViewProps) {
           g.fillStyle = '#110D24'; g.strokeStyle = '#FF3B4E'; g.lineWidth = 3;
           circle(g, ox2, oy2, o[4] ? 11 : 10); g.fill(); g.stroke();
           g.fillStyle = blink ? '#FFD447' : '#FF9F43'; circle(g, ox2 + 7, oy2 - 9, 3); g.fill();
+        } else if (k === 6) {
+          g.strokeStyle = 'rgba(255,59,78,0.6)'; g.lineWidth = 2; g.setLineDash([6, 6]);
+          circle(g, ox2, oy2, 130); g.stroke(); g.setLineDash([]);
+          glow(g, '#FF3B4E', 20); g.fillStyle = '#110D24'; g.strokeStyle = '#FF3B4E'; g.lineWidth = 4;
+          circle(g, ox2, oy2, 17); g.fill(); g.stroke();
         } else if (k === 4) {
           g.save(); g.translate(ox2, oy2); g.rotate(n / 50);
           glow(g, '#4BE3A1', 12); g.strokeStyle = '#4BE3A1'; g.lineWidth = 5; g.lineCap = 'round';
@@ -369,8 +385,9 @@ function HostArena({ view, t, player }: HostViewProps) {
         const color = colors[i];
         if (flags & FLAG.invuln && Math.floor(n / 90) % 2 === 0) g.globalAlpha = 0.35;
         const air = flags & FLAG.air;
-        const sc = air ? 1.14 : 1;
-        if (air) { g.fillStyle = 'rgba(0,0,0,0.45)'; g.beginPath(); g.ellipse(x + 6, y + 12, R, R * 0.5, 0, 0, Math.PI * 2); g.fill(); }
+        const meteor = flags & FLAG.meteor;
+        const sc = meteor ? 1.45 : air ? 1.14 : 1;
+        if (air) { g.fillStyle = 'rgba(0,0,0,0.45)'; g.beginPath(); g.ellipse(x + (meteor ? 14 : 6), y + (meteor ? 26 : 12), R, R * 0.5, 0, 0, Math.PI * 2); g.fill(); }
         if (flags & FLAG.roll) {
           g.strokeStyle = color + '88'; g.lineWidth = 3;
           for (let k = 1; k <= 3; k++) { g.beginPath(); g.moveTo(x - Math.cos(ang) * (R + k * 8), y - Math.sin(ang) * (R + k * 8) - 6 + k * 3); g.lineTo(x - Math.cos(ang) * (R + k * 8 + 10), y - Math.sin(ang) * (R + k * 8 + 10) - 6 + k * 3); g.stroke(); }
@@ -390,6 +407,23 @@ function HostArena({ view, t, player }: HostViewProps) {
           g.font = '700 12px "DM Sans", sans-serif';
           g.strokeText(names[i], x, y + R + 18); g.fillStyle = '#E4E0F5'; g.fillText(names[i], x, y + R + 18);
         }
+      });
+
+      // Hohes Gras verdeckt Figuren (nur der Umriss bleibt sichtbar)
+      for (let y = 0; y < arena.rows; y++) for (let x = 0; x < arena.cols; x++) {
+        if (arena.grid[y][x] !== 'g') continue;
+        g.fillStyle = 'rgba(28,92,58,0.93)'; g.fillRect(x * cell, y * cell, cell + 0.5, cell + 0.5);
+        g.strokeStyle = '#4BE3A1'; g.lineWidth = 2;
+        for (let k = 0; k < 4; k++) {
+          const bx = x * cell + 6 + k * 9, sway = Math.sin(n / 400 + x + k) * 2;
+          g.beginPath(); g.moveTo(bx, y * cell + 32); g.lineTo(bx + sway + 3, y * cell + 12 + (k % 2) * 6); g.stroke();
+        }
+      }
+      cur.p.forEach((p, i) => {
+        if (p[3] & (FLAG.gone | FLAG.out)) return;
+        if (arena.grid[Math.floor(p[1] / cell)]?.[Math.floor(p[0] / cell)] !== 'g') return;
+        g.strokeStyle = info.current.colors[i] + '99'; g.lineWidth = 2; g.setLineDash([4, 4]);
+        circle(g, p[0], p[1], R); g.stroke(); g.setLineDash([]);
       });
 
       // Effekte
@@ -522,6 +556,72 @@ function HostArena({ view, t, player }: HostViewProps) {
 
 /* ---------- Zeichenhilfen ---------- */
 
+/** Ausschnitt, der alle Inseln zeigt */
+function fitArena(arena: ArenaView, cell: number, W: number, H: number, max: number) {
+  let minX = arena.cols, minY = arena.rows, maxX = 0, maxY = 0;
+  arena.grid.forEach((row, y) => [...row].forEach((c, x) => {
+    if (c === '.') return;
+    minX = Math.min(minX, x); minY = Math.min(minY, y); maxX = Math.max(maxX, x); maxY = Math.max(maxY, y);
+  }));
+  const bw = (maxX - minX + 1.6) * cell, bh = (maxY - minY + 1.6) * cell;
+  const scale = Math.min(max, W / bw, H / bh);
+  return { scale, ox: (W - (maxX + minX + 1) * cell * scale) / 2, oy: (H - (maxY + minY + 1) * cell * scale) / 2 };
+}
+
+/** Kleine Vorschau der nächsten Arena */
+function ArenaPreview({ arena, W, H }: { arena: ArenaView; W: number; H: number }) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const c = ref.current;
+    if (!c) return;
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    c.width = W * dpr; c.height = H * dpr;
+    const g = c.getContext('2d')!;
+    const { scale, ox, oy } = fitArena(arena, 40, W, H, 1);
+    g.drawImage(drawFloor(arena, 40, scale, ox, oy, W, H), 0, 0);
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    g.translate(ox, oy); g.scale(scale, scale);
+    drawObstacles(g, arena, 0, new Map());
+  }, [arena, W, H]);
+  return <canvas ref={ref} style={{ width: W, height: H, display: 'block', borderRadius: 18, background: 'radial-gradient(ellipse at center, #140F3A, #05030F 75%)' }} />;
+}
+
+/** Prallkissen, Sprungpilze, Teleporter */
+function drawObstacles(g: CanvasRenderingContext2D, arena: ArenaView, n: number, bumpAt: Map<string, number>) {
+  for (const b of arena.bumpers) {
+    const hitAt = bumpAt.get(`${b.x},${b.y}`) ?? 0;
+    const k = Math.max(0, 1 - (n - hitAt) / 250);
+    glow(g, '#FF7EB6', 12);
+    g.strokeStyle = '#FF7EB6';
+    g.lineWidth = 4;
+    circle(g, b.x, b.y, 20 + 6 * k); g.stroke();
+    g.lineWidth = 3;
+    circle(g, b.x, b.y, 10 + 3 * k); g.stroke();
+    glow(g);
+  }
+  for (const pd of arena.pads ?? []) {
+    const hitAt = bumpAt.get(`p${pd.x},${pd.y}`) ?? 0;
+    const k = Math.max(0, 1 - (n - hitAt) / 300);
+    glow(g, '#E8336F', 12);
+    g.fillStyle = '#3A0F24'; g.strokeStyle = '#E8336F'; g.lineWidth = 4;
+    circle(g, pd.x, pd.y, 15 + 5 * k); g.fill(); g.stroke();
+    glow(g);
+    g.fillStyle = '#FFFFFF';
+    for (const [dx, dy, r] of [[-5, -4, 3], [5, 3, 3.5], [-2, 6, 2]]) { circle(g, pd.x + dx, pd.y + dy, r); g.fill(); }
+  }
+  for (const tp of arena.teleports ?? []) {
+    for (const [x, y] of [[tp.ax, tp.ay], [tp.bx, tp.by]]) {
+      glow(g, '#C29BFF', 14);
+      g.strokeStyle = '#C29BFF'; g.lineWidth = 3;
+      g.setLineDash([6, 5]); g.lineDashOffset = -n / 30;
+      circle(g, x, y, 17); g.stroke();
+      g.setLineDash([]);
+      g.strokeStyle = '#36D6F5'; circle(g, x, y, 8 + 2 * Math.sin(n / 200)); g.stroke();
+      glow(g);
+    }
+  }
+}
+
 function glow(g: CanvasRenderingContext2D, color?: string, blur = 0) {
   g.shadowColor = color ?? 'transparent';
   g.shadowBlur = color ? blur : 0;
@@ -601,12 +701,26 @@ function drawFloor(arena: ArenaView, cell: number, scale: number, ox: number, oy
   for (let y = 0; y < arena.rows; y++) for (let x = 0; x < arena.cols; x++) {
     const ch = at(x, y);
     if (!solid(ch)) continue;
-    g.fillStyle = ch === '=' ? '#1A1540' : ch === 'i' ? '#123352' : '#16123A';
+    g.fillStyle = ch === '=' ? '#1A1540' : ch === 'i' ? '#123352' : ch === 'c' ? '#2A1A30' : ch === 'g' ? '#14301F' : '#16123A';
     g.fillRect(x * cell, y * cell, cell + 0.5, cell + 0.5);
     g.strokeStyle = ch === '=' ? 'rgba(255,212,71,0.25)' : ch === 'i' ? 'rgba(127,230,255,0.35)' : '#2A2463';
     g.lineWidth = 1.5;
     g.strokeRect(x * cell + 0.75, y * cell + 0.75, cell - 1.5, cell - 1.5);
     if (ch === 'i') { g.beginPath(); g.moveTo(x * cell + 8, y * cell + 28); g.lineTo(x * cell + 20, y * cell + 16); g.stroke(); }
+    if (ch in BELTS) {
+      const [dx, dy] = BELTS[ch];
+      g.fillStyle = '#1E2A4A'; g.fillRect(x * cell + 2, y * cell + 2, cell - 4, cell - 4);
+      g.strokeStyle = '#36D6F5'; g.lineWidth = 3;
+      const cx = (x + 0.5) * cell, cy = (y + 0.5) * cell;
+      for (const off of [-8, 6]) {
+        const px = cx + dx * off, py = cy + dy * off;
+        g.beginPath(); g.moveTo(px - dx * 6 - dy * 8, py - dy * 6 - dx * 8); g.lineTo(px, py); g.lineTo(px - dx * 6 + dy * 8, py - dy * 6 + dx * 8); g.stroke();
+      }
+    }
+    if (ch === 'c') {
+      g.strokeStyle = '#FF9F43'; g.lineWidth = 2;
+      g.beginPath(); g.moveTo(x * cell + 6, y * cell + 10); g.lineTo(x * cell + 18, y * cell + 20); g.lineTo(x * cell + 14, y * cell + 32); g.moveTo(x * cell + 18, y * cell + 20); g.lineTo(x * cell + 33, y * cell + 16); g.stroke();
+    }
   }
   // Leuchtende Kanten zum Abgrund
   g.lineCap = 'round';
@@ -771,6 +885,10 @@ function PlayController({ view, t, send, me }: ControllerViewProps) {
     lastUp.current = performance.now();
     sendRef.current({ type: 'a', down: false });
   };
+  const hasSpecial = view.special !== null && view.special !== undefined;
+  const w2 = view.weapon2 as string | null;
+  const doSpecial = () => { if ((view.special ?? 0) < 100) return; vibrate([40, 30, 60]); sendRef.current({ type: 'sp' }); };
+  const b2 = (down: boolean) => { if (down) vibrate(15); sendRef.current({ type: 'b2', down }); };
   const doRoll = () => {
     if (!multiRoll) { if (!roll.isReady()) return; roll.start(); }
     vibrate(20);
@@ -798,7 +916,7 @@ function PlayController({ view, t, send, me }: ControllerViewProps) {
   );
 
   const buttons = (
-    <div style={{ position: 'relative', width: S * 2.25, height: gesture ? S * 1.6 : S * 2.2, flex: 'none' }}>
+    <div style={{ position: 'relative', width: S * 2.25, height: w2 ? S * 2.8 : gesture && !hasSpecial ? S * 1.6 : S * 2.2, flex: 'none' }}>
       <RoundButton size={S} color={wColor} icon={view.weapon} label={t(`a.${view.weapon}`)}
         sub={gesture ? t('phone.double', { name: altName }) : undefined}
         ready={gesture ? altCd.ready : 1}
@@ -809,6 +927,14 @@ function PlayController({ view, t, send, me }: ControllerViewProps) {
       {!gesture && (
         <RoundButton size={S * 0.74} color="#9B7BFF" label={altName} ready={altCd.ready} ariaLabel={`C: ${altName}`} onDown={doAlt} onUp={altUp}
           style={{ position: 'absolute', right: S * 0.13, bottom: S * 1.16 }} />
+      )}
+      {hasSpecial && (
+        <RoundButton size={S * 0.7} color="#FF4FB8" label={t(`sp.${view.weapon}`)} ready={Math.min(1, (view.special ?? 0) / 100)} ariaLabel={`D: ${t('phone.special')}`} onDown={doSpecial}
+          style={{ position: 'absolute', right: S * 1.2, bottom: S * 0.95, boxShadow: (view.special ?? 0) >= 100 ? '0 0 30px #FF4FB8' : undefined }} />
+      )}
+      {w2 && (
+        <RoundButton size={S * 0.7} color={WEAPON_COLOR[w2 as 'hammer']} icon={w2} label={w2 === 'schwert' ? t('alt.schwert') : t(`a.${w2}`)} ariaLabel={`E: ${t(`w.${w2}`)}`}
+          onDown={() => b2(true)} onUp={() => b2(false)} style={{ position: 'absolute', right: S * 0.2, bottom: S * 2.0 }} />
       )}
     </div>
   );
@@ -936,6 +1062,21 @@ function ShopScreen({ view, t, send }: ControllerViewProps) {
       <PhoneTimer deadline={view.deadline} duration={view.duration} />
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 9 }}>
         {offers.map((id) => {
+          if (id.startsWith('waffe:')) {
+            const w = id.slice(6), own = bought.includes(id), c = WEAPON_COLOR[w as 'hammer'];
+            return (
+              <button key={id} type="button" disabled={view.done || own || WEAPON_PRICE > money} onClick={() => { vibrate(30); send({ type: 'buy', id }); }}
+                style={{ textAlign: 'left', border: `3px solid ${c}`, borderRadius: 20, padding: '11px 13px', background: own ? '#262048' : '#110D24', color: '#fff', display: 'flex', flexDirection: 'column', gap: 6, boxShadow: `0 0 14px ${c}55`, opacity: !own && WEAPON_PRICE > money ? 0.45 : 1 }}>
+                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ background: c, color: '#110D24', borderRadius: 999, padding: '2px 9px', fontSize: 11, fontWeight: 700 }}>{t('shop.weapon')}</span>
+                  <WeaponIcon weapon={w} size={22} />
+                </span>
+                <b className="display" style={{ fontSize: 17, lineHeight: 1.1 }}>{t(`w.${w}`)}</b>
+                <span style={{ fontSize: 13, color: '#E4E0F5', lineHeight: 1.3 }}>{view.weapon2 ? t('shop.weaponSwap', { name: t(`w.${view.weapon2}`) }) : w === 'schwert' ? t('shop.weaponShield') : t('shop.weaponText')}</span>
+                <b className="display" style={{ alignSelf: 'flex-end', fontSize: 17, color: '#FFD447' }}>{own ? t('shop.bought') : WEAPON_PRICE}</b>
+              </button>
+            );
+          }
           const def = POWERUP[id];
           const own = bought.includes(id);
           const maxed = def?.max !== undefined && (view.owned?.[id] ?? 0) >= def.max;

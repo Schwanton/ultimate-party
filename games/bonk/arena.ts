@@ -12,6 +12,15 @@ export const T_FLOOR = '#';
 export const T_BRIDGE = '=';
 export const T_PILLAR = 'o';
 export const T_ICE = 'i';
+/** Bröckelplatte (bricht kurz nach dem Betreten, kommt wieder); 'x' = gerade weggebrochen */
+export const T_CRUMBLE = 'c';
+export const T_BROKEN = 'x';
+/** Hohes Gras (versteckt Figuren) */
+export const T_GRASS = 'g';
+/** Förderbänder in Richtung > < ^ v */
+export const BELTS: Record<string, [number, number]> = { '>': [1, 0], '<': [-1, 0], '^': [0, -1], v: [0, 1] };
+
+export type Feature = 'ice' | 'bumpers' | 'belts' | 'crumble' | 'grass' | 'pads' | 'teleport';
 
 export interface Arena {
   seed: number;
@@ -23,6 +32,12 @@ export interface Arena {
   walls: [number, number, number, number][];
   /** Prallkissen (Feldmitte in Spiel-Einheiten) */
   bumpers: { x: number; y: number }[];
+  /** Sprungpilze (Feldmitte) */
+  pads: { x: number; y: number }[];
+  /** Teleporter-Paare */
+  teleports: { ax: number; ay: number; bx: number; by: number }[];
+  /** gewählte Zusatzelemente dieser Arena */
+  features: Feature[];
   /** Startplätze (Spiel-Einheiten) */
   spawns: { x: number; y: number }[];
   /** Mitte, in die sich das Feuer zurückzieht */
@@ -44,7 +59,7 @@ export function rng(seed: number) {
 }
 
 export function walkable(c: string | undefined) {
-  return c === T_FLOOR || c === T_BRIDGE || c === T_ICE;
+  return c === T_FLOOR || c === T_BRIDGE || c === T_ICE || c === T_CRUMBLE || c === T_GRASS || (c !== undefined && c in BELTS);
 }
 
 export function arenaSize(players: number) {
@@ -158,7 +173,12 @@ function tryGenerate(players: number, seed: number): Arena | null {
     g[y][x] = T_PILLAR;
     if (!connected(g)) g[y][x] = T_FLOOR;
   }
-  if (R() < 0.55) {
+  // Zusatzelemente: 2–3 aus der Liste, jede Arena anders
+  const allFeatures: Feature[] = ['ice', 'bumpers', 'belts', 'crumble', 'grass', 'pads', 'teleport'];
+  for (let i = allFeatures.length - 1; i > 0; i--) { const j = Math.floor(R() * (i + 1)); [allFeatures[i], allFeatures[j]] = [allFeatures[j], allFeatures[i]]; }
+  const features = allFeatures.slice(0, 2 + Math.floor(R() * 2));
+  const hasF = (f: Feature) => features.includes(f);
+  if (hasF('ice')) {
     const c = centers[Math.floor(R() * centers.length)];
     for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) {
       if (g[y][x] === T_FLOOR && Math.hypot(x + 0.5 - c.x, (y + 0.5 - c.y) * 1.3) < c.r * 0.75) g[y][x] = T_ICE;
@@ -177,7 +197,7 @@ function tryGenerate(players: number, seed: number): Arena | null {
   if (players > 1 && safe.length < players * 4) return null;
   const spawns = farthestPoints(safe, players, R);
   const bumpers: { x: number; y: number }[] = [];
-  const bumperCount = Math.floor(R() * 3);
+  const bumperCount = hasF('bumpers') ? 1 + Math.floor(R() * 2) : 0;
   const bumperCells = walk.filter(([x, y]) => g[y][x] === T_FLOOR && edgeDistance(g, x, y) >= 1);
   for (let k = 0; k < bumperCount * 6 && bumpers.length < bumperCount && bumperCells.length; k++) {
     const [x, y] = bumperCells[Math.floor(R() * bumperCells.length)];
@@ -185,6 +205,70 @@ function tryGenerate(players: number, seed: number): Arena | null {
     if (spawns.some((s) => Math.hypot(s.x - px, s.y - py) < CELL * 2.5)) continue;
     if (bumpers.some((b) => Math.hypot(b.x - px, b.y - py) < CELL * 3)) continue;
     bumpers.push({ x: px, y: py });
+  }
+
+  const nearSpawn = (x: number, y: number, cells: number) => spawns.some((s) => Math.hypot(s.x - (x + 0.5) * CELL, s.y - (y + 0.5) * CELL) < CELL * cells);
+  const free = () => walk.filter(([x, y]) => g[y][x] === T_FLOOR);
+  // Sprungpilze
+  const pads: { x: number; y: number }[] = [];
+  if (hasF('pads')) {
+    const cells = free().filter(([x, y]) => edgeDistance(g, x, y) >= 1 && !nearSpawn(x, y, 2.5));
+    for (let k = 0; k < 12 && pads.length < 2 && cells.length; k++) {
+      const [x, y] = cells[Math.floor(R() * cells.length)];
+      const px = (x + 0.5) * CELL, py = (y + 0.5) * CELL;
+      if ([...pads, ...bumpers].some((b) => Math.hypot(b.x - px, b.y - py) < CELL * 3)) continue;
+      pads.push({ x: px, y: py });
+    }
+  }
+  // Teleporter-Paar, weit auseinander
+  const teleports: { ax: number; ay: number; bx: number; by: number }[] = [];
+  if (hasF('teleport')) {
+    const cells = free().filter(([x, y]) => edgeDistance(g, x, y) >= 1 && !nearSpawn(x, y, 2.5));
+    for (let k = 0; k < 30 && !teleports.length && cells.length > 1; k++) {
+      const a = cells[Math.floor(R() * cells.length)], b = cells[Math.floor(R() * cells.length)];
+      if (Math.hypot(a[0] - b[0], a[1] - b[1]) < 9) continue;
+      const pts = [a, b].map(([x, y]) => ({ x: (x + 0.5) * CELL, y: (y + 0.5) * CELL }));
+      if (pts.some((p) => [...pads, ...bumpers].some((o) => Math.hypot(o.x - p.x, o.y - p.y) < CELL * 2.5))) continue;
+      teleports.push({ ax: pts[0].x, ay: pts[0].y, bx: pts[1].x, by: pts[1].y });
+    }
+  }
+  const taken = (x: number, y: number) => [...pads, ...bumpers, ...teleports.flatMap((p) => [{ x: p.ax, y: p.ay }, { x: p.bx, y: p.by }])]
+    .some((o) => Math.hypot(o.x - (x + 0.5) * CELL, o.y - (y + 0.5) * CELL) < CELL * 1.5);
+  // Förderbänder: 1–2 Streifen aus 3–5 Feldern
+  if (hasF('belts')) {
+    const cells = free().filter(([x, y]) => edgeDistance(g, x, y) >= 2 && !nearSpawn(x, y, 1.5));
+    let made = 0;
+    for (let k = 0; k < 20 && made < 1 + Math.floor(R() * 2) && cells.length; k++) {
+      const [x, y] = cells[Math.floor(R() * cells.length)];
+      const dir = Object.keys(BELTS)[Math.floor(R() * 4)];
+      const [dx, dy] = BELTS[dir];
+      const len = 3 + Math.floor(R() * 3);
+      const run: [number, number][] = [];
+      for (let i = 0; i < len; i++) {
+        const cx = x + dx * i, cy = y + dy * i;
+        if (g[cy]?.[cx] !== T_FLOOR || edgeDistance(g, cx, cy) < 1 || nearSpawn(cx, cy, 1.2) || taken(cx, cy)) break;
+        run.push([cx, cy]);
+      }
+      if (run.length < 3) continue;
+      for (const [cx, cy] of run) g[cy][cx] = dir;
+      made++;
+    }
+  }
+  // Bröckelplatten: auf Brücken, sonst am Inselrand
+  if (hasF('crumble')) {
+    let cells = walk.filter(([x, y]) => g[y][x] === T_BRIDGE && !nearSpawn(x, y, 1.5));
+    if (cells.length < 3) cells = free().filter(([x, y]) => edgeDistance(g, x, y) === 0 && !nearSpawn(x, y, 1.5) && !taken(x, y));
+    const count = Math.min(cells.length, 3 + Math.floor(R() * 4));
+    for (let k = 0; k < count; k++) { const [x, y] = cells.splice(Math.floor(R() * cells.length), 1)[0]; g[y][x] = T_CRUMBLE; }
+  }
+  // Hohes Gras: ein Fleck
+  if (hasF('grass')) {
+    const cells = free().filter(([x, y]) => edgeDistance(g, x, y) >= 2);
+    if (cells.length) {
+      const [gx, gy] = cells[Math.floor(R() * cells.length)];
+      const r = 1.3 + R();
+      for (const [x, y] of free()) if (Math.hypot(x - gx, y - gy) <= r && !taken(x, y)) g[y][x] = T_GRASS;
+    }
   }
 
   // 6) Wände: einige Stücke am Inselrand (dort prallt man ab statt runterzufallen) und manchmal eine kurze Wand mitten auf einer Insel
@@ -243,7 +327,7 @@ function tryGenerate(players: number, seed: number): Arena | null {
   return {
     seed, cols, rows,
     grid: g.map((row) => row.join('')),
-    walls, bumpers, spawns,
+    walls, bumpers, spawns, pads, teleports, features,
     center: { x: (best[0] + 0.5) * CELL, y: (best[1] + 0.5) * CELL },
     ring, ringMax: Math.round(ringMax * 10) / 10,
   };
@@ -330,7 +414,7 @@ function fallback(players: number, seed: number): Arena {
     ring.push(Math.round(d * 10) / 10);
     if (walkable(g[y][x])) ringMax = Math.max(ringMax, d);
   }
-  return { seed, cols, rows, grid: g.map((r) => r.join('')), walls: [], bumpers: [], spawns: farthestPoints(walk, players, rng(seed)), center: { x: (cx + 0.5) * CELL, y: (cy + 0.5) * CELL }, ring, ringMax };
+  return { seed, cols, rows, grid: g.map((r) => r.join('')), walls: [], bumpers: [], pads: [], teleports: [], features: [], spawns: farthestPoints(walk, players, rng(seed)), center: { x: (cx + 0.5) * CELL, y: (cy + 0.5) * CELL }, ring, ringMax };
 }
 
 /* ---------- Waffen (gemeinsam für Server und Handy/TV) ---------- */

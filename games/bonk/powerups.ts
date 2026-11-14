@@ -8,6 +8,7 @@ export const RARITIES: Rarity[] = ['common', 'rare', 'epic', 'legendary'];
 export const RARITY_COLOR: Record<Rarity, string> = { common: '#4BE3A1', rare: '#5B8CFF', epic: '#9B7BFF', legendary: '#FFD447' };
 export const PRICE: Record<Rarity, number> = { common: 15, rare: 30, epic: 50, legendary: 80 };
 export const REROLL_PRICE = 10;
+export const WEAPON_PRICE = 50;
 
 export interface PowerupDef { id: string; rarity: Rarity; weapon: 'alle' | 'hammer' | 'schleuder' | 'haken' | 'bomben' | 'schwert' | 'bumerang'; max?: number }
 
@@ -23,6 +24,7 @@ export const POWERUPS: PowerupDef[] = [
   { id: 'siegeshunger', rarity: 'epic', weapon: 'alle' },
   { id: 'flipper', rarity: 'epic', weapon: 'alle', max: 1 },
   { id: 'viertesleben', rarity: 'legendary', weapon: 'alle', max: 1 },
+  { id: 'spezial', rarity: 'epic', weapon: 'alle', max: 1 },
   // Hammer
   { id: 'schnelllader', rarity: 'common', weapon: 'hammer', max: 3 },
   { id: 'langerstiel', rarity: 'common', weapon: 'hammer', max: 3 },
@@ -93,7 +95,7 @@ export function rollRarity(chances: number[], R = Math.random): Rarity {
  * Zieht `count` verschiedene Powerups, die der Spieler noch nehmen darf.
  * `weaponFirst`: das erste ist auf jeden Fall eins für die eigene Waffe.
  */
-export function drawPowerups(opts: { weapon: string; owned: Record<string, number>; chances: number[]; count: number; weaponFirst?: boolean; onlyWeapon?: boolean }) {
+export function drawPowerups(opts: { weapon: string; weapon2?: string; owned: Record<string, number>; chances: number[]; count: number; weaponFirst?: boolean; onlyWeapon?: boolean }) {
   const out: string[] = [];
   for (let i = 0; i < opts.count; i++) {
     const wantWeapon = opts.onlyWeapon || (opts.weaponFirst && i === 0);
@@ -104,7 +106,7 @@ export function drawPowerups(opts: { weapon: string; owned: Record<string, numbe
     for (const rarity of order) {
       const pool = POWERUPS.filter((p) =>
         p.rarity === rarity && !out.includes(p.id) && (p.max === undefined || (opts.owned[p.id] ?? 0) < p.max)
-        && (wantWeapon ? p.weapon === opts.weapon : p.weapon === 'alle' || p.weapon === opts.weapon));
+        && (wantWeapon ? p.weapon === opts.weapon : p.weapon === 'alle' || p.weapon === opts.weapon || p.weapon === opts.weapon2));
       if (pool.length) { out.push(pool[Math.floor(Math.random() * pool.length)].id); break; }
     }
   }

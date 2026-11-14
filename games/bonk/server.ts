@@ -10,20 +10,21 @@
 
 import { Scores, shuffle, type GameContext, type GameServerModule } from '@up/sdk';
 import { POWERUP, PRICE, REROLL_PRICE, drawPowerups, rarityChances } from './powerups';
-import { CELL, COOLDOWN, T_PILLAR, WALL_HALF, WEAPONS, distToSegment, edgeDistance, generateArena, onGround, walkable, type Arena, type WeaponId } from './arena';
+import { BELTS, CELL, COOLDOWN, T_BROKEN, T_CRUMBLE, T_PILLAR, WALL_HALF, WEAPONS, distToSegment, edgeDistance, generateArena, onGround, walkable, type Arena, type WeaponId } from './arena';
 
 const TICK = 1 / 30;
 const T = { intro: 8, weapon: 20, pick: 20, shop: 45, ready: 3, roundEnd: 5, scores: 6, respawn: 2.2, invuln: 1.5, credit: 3 };
 const PHY = {
   radius: 15, accel: 1500, drag: 7, airDrag: 2.4, airControl: 0.15, landSpeed: 150,
   roll: 480, rollTime: 0.28, rollInvuln: 0.25, pillarR: 17, bumperR: 20, bumpSpeed: 560,
-  kbScale: 1.3, kbMul: 0.85, fireDps: 12, firePush: 900,
+  kbScale: 1.2, kbMul: 0.72, dmgMul: 0.8, fireDps: 10, firePush: 900, padSpeed: 720, beltPush: 1100,
 };
 const HAMMER = { maxCharge: 1.2, cooldown: 0.35, chargeSlow: 0.45, stompR: 78 };
 const SLING = { every: 0.24, speed: 560, life: 0.6, r: 6, bigSpeed: 460, bigLife: 0.85, bigR: 10 };
 const POINTS = { knockout: 100, place: [300, 150, 75] };
 const MONEY = { knockout: 10, place: [15, 10, 5], round: 5 };
-const FLAG = { air: 1, roll: 2, invuln: 4, gone: 8, out: 16, charge: 32, stun: 64, block: 128 };
+const WEAPON_PRICE = 50;
+const FLAG = { air: 1, roll: 2, invuln: 4, gone: 8, out: 16, charge: 32, stun: 64, block: 128, meteor: 256 };
 const HOOK = { speed: 760, range: 300, cooldown: 0.9, pull: 420 };
 const BOMB = { speed: 350, flight: 0.4, fuse: 1.5, radius: 70, cooldown: 0.6, max: 2 };
 const SWORD = { gap: 0.22, finisher: 0.4, comboWindow: 0.8, reach: 20, r: 30 };
@@ -40,10 +41,12 @@ interface Fighter {
   botRelease: number; botRoll: number;
   pu: Record<string, number>; rollStock: number; rollRecharge: number; shots: number;
   combo: number; comboAt: number; blocking: boolean; blockStart: number;
+  weapon2: WeaponId | null; special: number; meteorUntil: number; hailUntil: number; nextHail: number; spinUntil: number; nextSpin: number;
+  stormUntil: number; stormHit: Record<string, number>; padUntil: number; teleUntil: number;
 }
 interface Shot { x: number; y: number; vx: number; vy: number; owner: string; until: number; big: boolean; bounces: number; pierce: boolean; hit: string[]; dmg: number; base: number; kind: number }
 interface Hook { owner: string; x: number; y: number; vx: number; vy: number; dist: number; max: number; mode: 'pull' | 'push' }
-interface Bomb { owner: string; x: number; y: number; vx: number; vy: number; landAt: number; fuseAt: number; stuck: string | null; flying: boolean; gone?: boolean }
+interface Bomb { owner: string; x: number; y: number; vx: number; vy: number; landAt: number; fuseAt: number; stuck: string | null; flying: boolean; gone?: boolean; big?: boolean }
 interface Boom { owner: string; x: number; y: number; vx: number; vy: number; back: boolean; traveled: number; range: number; until: number; hitOut: string[]; hitBack: string[] }
 type Ev = (string | number)[];
 
@@ -61,6 +64,11 @@ export default {
     let bombs: Bomb[] = [];
     let booms: Boom[] = [];
     const weaponOpts = new Map<string, WeaponId[]>(ids.map((id) => [id, shuffle(WEAPONS).slice(0, 3)]));
+    const weapon2 = new Map<string, WeaponId | null>(ids.map((id) => [id, null]));
+    let nextArena: Arena | null = null;
+    let crumbleAt = new Map<number, number>(); // Feld → wann es bricht
+    let brokenUntil = new Map<number, number>(); // Feld → wann es wiederkommt
+    const lastRound = () => round === total;
     let events: Ev[] = [];
     let arena: Arena = generateArena(N);
     let grid: string[] = arena.grid;
@@ -151,8 +159,11 @@ export default {
       bombs = [];
       booms = [];
       events = [];
-      arena = generateArena(N);
-      grid = arena.grid;
+      arena = nextArena ?? generateArena(N);
+      nextArena = null;
+      grid = arena.grid.slice();
+      crumbleAt = new Map();
+      brokenUntil = new Map();
       flow = flowField();
       fireStart = 40 + 3 * N;
       const order = shuffle(ids);
@@ -165,6 +176,8 @@ export default {
           charging: null, swingReady: 0, altReady: 0, fireHeld: false, nextShot: 0, hitBy: null, hitAt: -9, kos: 0, place: 0, botRelease: 0, botRoll: 0,
           pu: owned.get(id) ?? {}, rollStock: 1 + ((owned.get(id) ?? {}).doppelrolle ?? 0), rollRecharge: 0, shots: 0,
           combo: 0, comboAt: -9, blocking: false, blockStart: 0,
+          weapon2: weapon2.get(id) ?? null, special: 0, meteorUntil: 0, hailUntil: 0, nextHail: 0, spinUntil: 0, nextSpin: 0,
+          stormUntil: 0, stormHit: {}, padUntil: 0, teleUntil: 0,
         });
       });
       // Blickrichtung zur Mitte
@@ -186,7 +199,7 @@ export default {
       ctx.setHostView({
         screen: 'arena', phase, round, total, ids,
         weapons: Object.fromEntries(ids.map((id) => [id, fighters.get(id)?.weapon ?? weapons.get(id)])),
-        arena: { cols: arena.cols, rows: arena.rows, grid: arena.grid, walls: arena.walls, bumpers: arena.bumpers, ring: arena.ring, ringMax: arena.ringMax, center: arena.center, seed: arena.seed },
+        arena: { cols: arena.cols, rows: arena.rows, grid: arena.grid, walls: arena.walls, bumpers: arena.bumpers, pads: arena.pads, teleports: arena.teleports, ring: arena.ring, ringMax: arena.ringMax, center: arena.center, seed: arena.seed },
         fireStart, fireDur, cell: CELL, radius: PHY.radius,
         ...extra,
       });
@@ -228,7 +241,10 @@ export default {
         else if (ice) { ax *= 0.45; ay *= 0.45; }
         f.vx += ax * TICK;
         f.vy += ay * TICK;
-        const drag = f.air ? PHY.airDrag : ice ? 0.9 : PHY.drag;
+        if (t < f.meteorUntil) { ax = 0; ay = 0; }
+        const belt = !f.air ? BELTS[cellAt(f.x, f.y) ?? ''] : undefined;
+        if (belt) { ax += belt[0] * PHY.beltPush; ay += belt[1] * PHY.beltPush; }
+        const drag = t < f.meteorUntil ? 0 : f.air ? PHY.airDrag : ice ? 0.9 : PHY.drag;
         const damp = Math.exp(-drag * TICK);
         f.vx *= damp;
         f.vy *= damp;
@@ -295,6 +311,32 @@ export default {
           f.air = true; f.airMin = t + 0.15; f.bumpUntil = t + 0.3;
           events.push(['bump', Math.round(b.x), Math.round(b.y)]);
         }
+        // Sprungpilze
+        for (const pd of arena.pads) {
+          if (f.air || t < f.padUntil || Math.hypot(f.x - pd.x, f.y - pd.y) > PHY.radius + 12) continue;
+          let dx = f.ix, dy = f.iy;
+          if (Math.hypot(dx, dy) < 0.2) [dx, dy] = [f.vx, f.vy];
+          if (Math.hypot(dx, dy) < 1e-3) [dx, dy] = [f.fx, f.fy];
+          const l = Math.hypot(dx, dy) || 1;
+          f.vx = (dx / l) * PHY.padSpeed; f.vy = (dy / l) * PHY.padSpeed;
+          f.air = true; f.airMin = t + 0.35; f.padUntil = t + 0.7;
+          events.push(['pad', Math.round(pd.x), Math.round(pd.y)]);
+        }
+        // Teleporter
+        for (const tp of arena.teleports) {
+          if (f.air || t < f.teleUntil) continue;
+          const atA = Math.hypot(f.x - tp.ax, f.y - tp.ay) < 16, atB = Math.hypot(f.x - tp.bx, f.y - tp.by) < 16;
+          if (!atA && !atB) continue;
+          events.push(['tele', Math.round(f.x), Math.round(f.y)]);
+          [f.x, f.y] = atA ? [tp.bx, tp.by] : [tp.ax, tp.ay];
+          f.teleUntil = t + 1.2;
+          events.push(['tele', Math.round(f.x), Math.round(f.y)]);
+        }
+        // Bröckelplatten
+        if (!f.air) {
+          const gx = Math.floor(f.x / CELL), gy = Math.floor(f.y / CELL), k = gy * arena.cols + gx;
+          if (grid[gy]?.[gx] === T_CRUMBLE && !crumbleAt.has(k)) crumbleAt.set(k, t + 0.9);
+        }
         // Feuer: Schaden und Schubs zur Mitte
         if (!f.air && burning(f.x, f.y)) {
           const k = 0.5 ** n(f, 'feuerfest');
@@ -302,6 +344,11 @@ export default {
           const dx = arena.center.x - f.x, dy = arena.center.y - f.y, l = Math.hypot(dx, dy) || 1;
           f.vx += (dx / l) * PHY.firePush * k * TICK;
           f.vy += (dy / l) * PHY.firePush * k * TICK;
+        }
+        // Meteorsprung landet
+        if (f.meteorUntil && t >= f.meteorUntil) {
+          f.meteorUntil = 0; f.vx = 0; f.vy = 0; f.air = false;
+          shockwave(f, 100, 10, 360);
         }
         // Landen
         if (f.air && t >= f.airMin && t >= f.rollUntil && Math.hypot(f.vx, f.vy) < PHY.landSpeed) f.air = false;
@@ -317,6 +364,8 @@ export default {
         a.x -= nx * o; a.y -= ny * o; b.x += nx * o; b.y += ny * o;
       }
 
+      stepCrumble();
+      stepSpecials();
       stepShots();
       stepHooks();
       stepBombs();
@@ -347,8 +396,9 @@ export default {
       f.fireHeld = false;
       events.push(['fall', ids.indexOf(f.id), Math.round(f.x), Math.round(f.y)]);
       if (f.hitBy && f.hitBy !== f.id && t - f.hitAt < T.credit) {
-        scores.add(f.hitBy, POINTS.knockout);
-        gains[f.hitBy] = (gains[f.hitBy] ?? 0) + POINTS.knockout;
+        const pts = POINTS.knockout * (lastRound() ? 2 : 1);
+        scores.add(f.hitBy, pts);
+        gains[f.hitBy] = (gains[f.hitBy] ?? 0) + pts;
         const by = fighters.get(f.hitBy);
         money.set(f.hitBy, (money.get(f.hitBy) ?? 0) + MONEY.knockout);
         if (by) { by.kos++; by.dmg = Math.max(0, by.dmg - 20 * n(by, 'siegeshunger')); }
@@ -370,10 +420,14 @@ export default {
       let best: [number, number] | null = null, bestD = -1;
       for (let y = 0; y < arena.rows; y++) for (let x = 0; x < arena.cols; x++) {
         const c = grid[y][x];
-        if (c !== '#' && c !== 'i') continue;
+        if (c !== '#' && c !== 'i' && c !== 'g') continue;
         if (t >= fireStart && arena.ring[y * arena.cols + x] > r) continue;
         if (edgeDistance(grid, x, y) < 1) continue;
         const px = (x + 0.5) * CELL, py = (y + 0.5) * CELL;
+        const obstacles = [...arena.bumpers, ...arena.pads, ...arena.teleports.flatMap((tp) => [{ x: tp.ax, y: tp.ay }, { x: tp.bx, y: tp.by }])];
+        if (obstacles.some((o) => Math.hypot(o.x - px, o.y - py) < CELL * 1.6)) continue;
+        if (arena.walls.some((w) => distToSegment(px, py, w) < CELL * 0.75)) continue;
+        if (bombs.some((b) => Math.hypot(b.x - px, b.y - py) < CELL * 2)) continue;
         const d = others.length ? Math.min(...others.map((o) => Math.hypot(o.x - px, o.y - py))) : 0;
         const score = Math.min(d, CELL * 6) + Math.random() * CELL;
         if (score > bestD) { bestD = score; best = [px, py]; }
@@ -407,7 +461,7 @@ export default {
 
     /** Schild: Treffer von vorn werden abgeblockt */
     function blocks(v: Fighter, dx: number, dy: number) {
-      if (!v.blocking || v.weapon !== 'schwert' || v.state !== 'alive') return false;
+      if (!v.blocking || v.state !== 'alive') return false;
       const l = Math.hypot(dx, dy) || 1;
       const arc = ((70 + 30 * n(v, 'dickerschild')) * Math.PI) / 180;
       return (-dx * v.fx - dy * v.fy) / l > Math.cos(arc);
@@ -421,6 +475,8 @@ export default {
         dmg = 0;
         base *= 0.2;
       }
+      dmg *= PHY.dmgMul;
+      if (by !== v && n(by, 'spezial')) by.special = Math.min(100, by.special + dmg / 1.2);
       v.dmg += dmg;
       const kb = base * PHY.kbMul * (1 + (v.dmg / 100) * PHY.kbScale) * (1 + 0.1 * n(by, 'wucht')) * 0.85 ** n(v, 'brocken');
       const l = Math.hypot(dx, dy) || 1;
@@ -475,9 +531,9 @@ export default {
       }
     }
 
-    function attackDown(f: Fighter) {
+    function attackDown(f: Fighter, w: WeaponId = f.weapon) {
       if (!canAct(f)) return;
-      switch (f.weapon) {
+      switch (w) {
         case 'hammer':
           if (f.charging === null && t >= f.swingReady) f.charging = t;
           break;
@@ -500,17 +556,115 @@ export default {
       }
     }
 
-    function attackUp(f: Fighter) {
-      if (f.weapon === 'hammer') { if (f.state === 'alive') swing(f); }
-      else if (f.weapon === 'schleuder') f.fireHeld = false;
+    function attackUp(f: Fighter, w: WeaponId = f.weapon) {
+      if (w === 'hammer') { if (f.state === 'alive') swing(f); }
+      else if (w === 'schleuder') f.fireHeld = false;
+    }
+
+    /** Zweite Waffe (aus dem Shop): eigene Taste. Bei Schwert und Schild nur das Schild. */
+    function second(f: Fighter, down: boolean) {
+      const w = f.weapon2;
+      if (!w) return;
+      if (w === 'schwert') return shield(f, down);
+      if (down) attackDown(f, w); else attackUp(f, w);
+    }
+
+    function shield(f: Fighter, down: boolean) {
+      if (down && canAct(f)) { f.blocking = true; f.blockStart = t; }
+      else if (!down) f.blocking = false;
+    }
+
+    /* ---------- Spezialangriff (Ladeleiste) ---------- */
+
+    function special(f: Fighter) {
+      if (!n(f, 'spezial') || f.special < 100 || !canAct(f)) return;
+      f.special = 0;
+      events.push(['special', ids.indexOf(f.id)]);
+      switch (f.weapon) {
+        case 'hammer': { // Meteorsprung
+          const dist = 210;
+          f.vx = f.fx * dist / 0.55; f.vy = f.fy * dist / 0.55;
+          f.air = true; f.airMin = t + 0.55; f.meteorUntil = t + 0.55; f.invulnUntil = Math.max(f.invulnUntil, t + 0.55); f.charging = null;
+          break;
+        }
+        case 'schleuder': f.hailUntil = t + 2; f.nextHail = t; break;
+        case 'haken': // Kettenzug: alle in Reichweite heranziehen
+          for (const v of fighters.values()) {
+            if (v === f || v.state !== 'alive') continue;
+            const dx = f.x - v.x, dy = f.y - v.y, l = Math.hypot(dx, dy);
+            if (l > 280 || l === 0) continue;
+            hit(v, f, 4, 0, -dx, -dy);
+            v.vx = (dx / l) * (HOOK.pull + l * 0.8); v.vy = (dy / l) * (HOOK.pull + l * 0.8); v.air = true; v.airMin = t + 0.2;
+            events.push(['grab', Math.round(v.x), Math.round(v.y)]);
+          }
+          break;
+        case 'bomben':
+          aim(f, 220);
+          bombs.push({ owner: f.id, x: f.x + f.fx * PHY.radius, y: f.y + f.fy * PHY.radius, vx: f.fx * BOMB.speed, vy: f.fy * BOMB.speed, landAt: t + BOMB.flight, fuseAt: t + 2.2, stuck: null, flying: true, big: true });
+          break;
+        case 'schwert': f.spinUntil = t + 1.5; f.nextSpin = t; f.blocking = false; break;
+        case 'bumerang': f.stormUntil = t + 3; f.stormHit = {}; break;
+      }
+    }
+
+    function stepSpecials() {
+      for (const f of fighters.values()) {
+        if (f.state !== 'alive') { f.hailUntil = 0; f.spinUntil = 0; f.stormUntil = 0; continue; }
+        if (t < f.hailUntil && t >= f.nextHail) {
+          f.nextHail = t + 0.12;
+          for (const a of [-0.25, 0, 0.25]) {
+            const dx = f.fx * Math.cos(a) - f.fy * Math.sin(a), dy = f.fx * Math.sin(a) + f.fy * Math.cos(a);
+            shots.push({ x: f.x + dx * (PHY.radius + 6), y: f.y + dy * (PHY.radius + 6), vx: dx * SLING.speed, vy: dy * SLING.speed, owner: f.id, until: t + SLING.life, big: false, bounces: 0, pierce: false, hit: [], dmg: 2, base: 45, kind: 0 });
+          }
+        }
+        if (t < f.spinUntil && t >= f.nextSpin) {
+          f.nextSpin = t + 0.25;
+          events.push(['swing', ids.indexOf(f.id), 60, 1]);
+          for (const o of fighters.values()) {
+            if (o === f || o.state !== 'alive') continue;
+            const dx = o.x - f.x, dy = o.y - f.y;
+            if (Math.hypot(dx, dy) > PHY.radius * 2 + 38) continue;
+            hit(o, f, 4, 200, dx, dy);
+          }
+        }
+        if (t < f.stormUntil) {
+          for (let k = 0; k < 3; k++) {
+            const a = t * 6 + (k * Math.PI * 2) / 3, bx = f.x + Math.cos(a) * 55, by = f.y + Math.sin(a) * 55;
+            for (const o of fighters.values()) {
+              if (o === f || o.state !== 'alive' || t < (f.stormHit[o.id] ?? 0)) continue;
+              if (Math.hypot(o.x - bx, o.y - by) > PHY.radius + 12) continue;
+              f.stormHit[o.id] = t + 0.4;
+              hit(o, f, 5, 200, o.x - f.x, o.y - f.y);
+            }
+          }
+        }
+      }
+    }
+
+    /* ---------- Bröckelplatten ---------- */
+
+    function setCell(k: number, ch: string) {
+      const x = k % arena.cols, y = Math.floor(k / arena.cols);
+      grid[y] = grid[y].slice(0, x) + ch + grid[y].slice(x + 1);
+    }
+
+    function stepCrumble() {
+      for (const [k, at] of crumbleAt) {
+        if (t < at) continue;
+        crumbleAt.delete(k);
+        setCell(k, T_BROKEN);
+        brokenUntil.set(k, t + 8);
+        events.push(['crumble', k]);
+      }
+      for (const [k, at] of brokenUntil) {
+        if (t < at) continue;
+        brokenUntil.delete(k);
+        setCell(k, T_CRUMBLE);
+      }
     }
 
     function alt(f: Fighter, down = true) {
-      if (f.weapon === 'schwert') { // Schild: halten
-        if (down && canAct(f)) { f.blocking = true; f.blockStart = t; }
-        else if (!down) f.blocking = false;
-        return;
-      }
+      if (f.weapon === 'schwert') return shield(f, down); // Schild: halten
       if (!down || !canAct(f) || t < f.altReady) return;
       if (f.weapon === 'bumerang') { for (const b of booms) if (b.owner === f.id) b.back = true; return; }
       f.altReady = t + altCd(f);
@@ -583,8 +737,23 @@ export default {
         if (b.stuck) {
           const v = fighters.get(b.stuck);
           if (v && v.state === 'alive') { b.x = v.x; b.y = v.y; } else b.stuck = null;
-        } else if (b.flying) {
+        } else {
           b.x += b.vx * TICK; b.y += b.vy * TICK;
+          if (!b.flying) { const d = Math.exp(-6 * TICK); b.vx *= d; b.vy *= d; }
+          // Bomben sind kleine Hindernisse: Spieler prallen leicht ab und werden etwas gebremst
+          for (const v of fighters.values()) {
+            if (v.state !== 'alive' || (b.flying && v === o) || (n(o, 'haftbombe') && b.flying && v !== o)) continue;
+            const dx = b.x - v.x, dy = b.y - v.y, d = Math.hypot(dx, dy), min = PHY.radius + 10;
+            if (d >= min || d === 0) continue;
+            const nx = dx / d, ny = dy / d;
+            b.x = v.x + nx * min; b.y = v.y + ny * min;
+            const vn = (b.vx - v.vx) * nx + (b.vy - v.vy) * ny;
+            if (vn < 0) { b.vx -= 1.3 * vn * nx; b.vy -= 1.3 * vn * ny; b.vx *= 0.35; b.vy *= 0.35; }
+            if (!b.flying) { b.vx += v.vx * 0.3; b.vy += v.vy * 0.3; v.vx *= 0.82; v.vy *= 0.82; }
+          }
+          if (!b.flying && Math.hypot(b.vx, b.vy) > 5 && !onGround(grid, b.x, b.y, 4)) { events.push(['fizzle', Math.round(b.x), Math.round(b.y)]); continue; }
+        }
+        if (b.flying && !b.stuck) {
           if (n(o, 'haftbombe')) {
             for (const v of fighters.values()) if (v !== o && v.state === 'alive' && Math.hypot(v.x - b.x, v.y - b.y) < PHY.radius + 8) { b.stuck = v.id; b.flying = false; break; }
           }
@@ -602,14 +771,14 @@ export default {
     function explode(b: Bomb) {
       b.gone = true;
       const o = fighters.get(b.owner)!;
-      const r = BOMB.radius * (1 + 0.2 * n(o, 'grossebombe'));
+      const r = (b.big ? 130 : BOMB.radius) * (1 + 0.2 * n(o, 'grossebombe'));
       events.push(['boom', Math.round(b.x), Math.round(b.y), Math.round(r)]);
       for (const v of fighters.values()) {
         if (v.state !== 'alive') continue;
         const dx = v.x - b.x, dy = v.y - b.y;
         if (Math.hypot(dx, dy) > r + PHY.radius) continue;
-        if (v === o) hit(v, o, 6, 170, dx || 1, dy);
-        else hit(v, o, 12, 300, dx || 1, dy);
+        if (v === o) hit(v, o, b.big ? 9 : 6, b.big ? 220 : 170, dx || 1, dy);
+        else hit(v, o, b.big ? 18 : 12, b.big ? 400 : 300, dx || 1, dy);
       }
       if (n(o, 'kettenreaktion')) for (const c of bombs) if (c !== b && Math.hypot(c.x - b.x, c.y - b.y) < r) c.fuseAt = Math.min(c.fuseAt, t + 0.08);
     }
@@ -849,6 +1018,7 @@ export default {
         }
       }
       if (t >= f.botRoll && Math.random() < 0.004) { roll(f); f.botRoll = t + 3; }
+      if (f.special >= 100 && best < 200 && Math.random() < 0.05) special(f);
     }
 
     /* ---------- Senden ---------- */
@@ -859,7 +1029,7 @@ export default {
         p: ids.map((id) => {
           const f = fighters.get(id)!;
           const flags = (f.air ? FLAG.air : 0) | (t < f.rollUntil ? FLAG.roll : 0) | (t < f.invulnUntil ? FLAG.invuln : 0)
-            | (f.state === 'gone' ? FLAG.gone : 0) | (f.state === 'out' ? FLAG.out : 0) | (f.charging !== null ? FLAG.charge : 0) | (t < f.stunUntil ? FLAG.stun : 0) | (f.blocking ? FLAG.block : 0);
+            | (f.state === 'gone' ? FLAG.gone : 0) | (f.state === 'out' ? FLAG.out : 0) | (f.charging !== null ? FLAG.charge : 0) | (t < f.stunUntil ? FLAG.stun : 0) | (f.blocking ? FLAG.block : 0) | (t < f.meteorUntil ? FLAG.meteor : 0);
           const ang = Math.round((Math.atan2(f.fy, f.fx) * 180) / Math.PI);
           const charge = f.charging !== null ? Math.round(Math.min(1, (t - f.charging) / maxCharge(f)) * 100) : 0;
           return [Math.round(f.x), Math.round(f.y), ang, flags, Math.floor(f.dmg), f.lives, charge];
@@ -869,7 +1039,13 @@ export default {
           ...hooks.map((h) => [2, Math.round(h.x), Math.round(h.y), ids.indexOf(h.owner), h.mode === 'push' ? 1 : 0]),
           ...bombs.map((b) => [3, Math.round(b.x), Math.round(b.y), Math.max(0, Math.round((b.fuseAt - t) * 10)), b.flying ? 1 : 0]),
           ...booms.map((b) => [4, Math.round(b.x), Math.round(b.y), ids.indexOf(b.owner)]),
+          ...[...fighters.values()].filter((f) => t < f.stormUntil && f.state === 'alive').flatMap((f) => [0, 1, 2].map((k) => {
+            const a = t * 6 + (k * Math.PI * 2) / 3;
+            return [4, Math.round(f.x + Math.cos(a) * 55), Math.round(f.y + Math.sin(a) * 55), ids.indexOf(f.id)];
+          })),
+          ...bombs.filter((b) => b.big).map((b) => [6, Math.round(b.x), Math.round(b.y)]),
         ],
+        cr: [...[...crumbleAt.keys()].map((k) => [k, 1]), ...[...brokenUntil.keys()].map((k) => [k, 2])],
         e: events,
       });
       events = [];
@@ -882,6 +1058,7 @@ export default {
         dmg: Math.floor(f.dmg), lives: f.lives, state: f.state, place: f.place,
         respawnAt: f.state === 'gone' ? Date.now() + (f.respawnAt - t) * 1000 : undefined,
         kos: f.kos, color: ctx.player(id)?.color,
+        weapon2: f.weapon2, special: n(f, 'spezial') ? Math.floor(f.special) : null,
         rollCd: Math.round(rollCd(f) * 100) / 100, altCd: Math.round(altCd(f) * 100) / 100, rolls: 1 + n(f, 'doppelrolle'),
       };
     }
@@ -910,7 +1087,7 @@ export default {
       left.forEach((f, i) => (f.place = i + 1));
       const winners = left.filter((f) => f.place === 1).map((f) => f.id);
       for (const f of fighters.values()) {
-        const pts = f.place >= 1 && f.place <= 3 && (f.place === 1 || N >= f.place + 1) ? POINTS.place[f.place - 1] : 0;
+        const pts = (f.place >= 1 && f.place <= 3 && (f.place === 1 || N >= f.place + 1) ? POINTS.place[f.place - 1] : 0) * (lastRound() ? 2 : 1);
         if (pts) { scores.add(f.id, pts); gains[f.id] = (gains[f.id] ?? 0) + pts; }
         const m = MONEY.round + (f.place >= 1 && f.place <= 3 ? MONEY.place[f.place - 1] : 0);
         money.set(f.id, (money.get(f.id) ?? 0) + m);
@@ -930,7 +1107,7 @@ export default {
       if (offers.has(id)) return;
       const best = Math.max(0, ...ids.map((x) => scores.get(x)));
       const chances = rarityChances(start ? 0 : round, scores.get(id), best);
-      const list = drawPowerups({ weapon: weapons.get(id) ?? 'hammer', owned: owned.get(id) ?? {}, chances, count: 3, weaponFirst: true, onlyWeapon: start });
+      const list = drawPowerups({ weapon: weapons.get(id) ?? 'hammer', weapon2: weapon2.get(id) ?? undefined, owned: owned.get(id) ?? {}, chances, count: 3, weaponFirst: true, onlyWeapon: start });
       offers.set(id, list);
       if (isBot(id) && list.length) choose(id, list[Math.floor(Math.random() * list.length)]);
     }
@@ -950,6 +1127,7 @@ export default {
 
     let pickStart = false;
     function pickPhase(start: boolean) {
+      if (round < total) nextArena = generateArena(N);
       phase = 'pick';
       pickStart = start;
       ctx.clearTimers();
@@ -964,6 +1142,7 @@ export default {
     function showPick(first = false) {
       ctx.setHostView({
         screen: 'pick', start: pickStart, round, total, ids,
+        preview: nextArena ? { cols: nextArena.cols, rows: nextArena.rows, grid: nextArena.grid, walls: nextArena.walls, bumpers: nextArena.bumpers, pads: nextArena.pads, teleports: nextArena.teleports, ring: nextArena.ring, ringMax: nextArena.ringMax, center: nextArena.center, seed: nextArena.seed } : null,
         before: roundStart, after: scores.snapshot(), gains, animate: first,
         chosen: Object.fromEntries(ids.map((id) => [id, picked.has(id)])), deadline: phaseTimer.deadline, duration: phaseTimer.duration,
       });
@@ -993,7 +1172,8 @@ export default {
       shopDone.clear();
       for (const id of ids) {
         const chances = rarityChances(round, 0, 0);
-        shopOffers.set(id, drawPowerups({ weapon: weapons.get(id) ?? 'hammer', owned: owned.get(id) ?? {}, chances, count: 6, weaponFirst: true }));
+        shopOffers.set(id, drawPowerups({ weapon: weapons.get(id) ?? 'hammer', weapon2: weapon2.get(id) ?? undefined, owned: owned.get(id) ?? {}, chances, count: 6, weaponFirst: true }));
+        addWeaponOffer(id);
         shopBought.set(id, []);
         if (isBot(id)) {
           for (const pu of shuffle(shopOffers.get(id)!)) buy(id, pu);
@@ -1007,10 +1187,20 @@ export default {
       if (shopDone.size === ids.length) ctx.after(1.5, finishShop);
     }
 
+    /** Ab und zu eine Zweitwaffe im Angebot (nicht die eigene) */
+    function addWeaponOffer(id: string) {
+      if (Math.random() > 0.6) return;
+      const list = shopOffers.get(id) ?? [];
+      const choices = WEAPONS.filter((w) => w !== weapons.get(id) && w !== weapon2.get(id));
+      if (!choices.length) return;
+      list[list.length - 1] = `waffe:${shuffle(choices)[0]}`;
+      shopOffers.set(id, list);
+    }
+
     function sendShop(id: string) {
       ctx.setPlayerView(id, {
         screen: 'shop', offers: shopOffers.get(id) ?? [], bought: shopBought.get(id) ?? [], money: money.get(id) ?? 0, owned: owned.get(id) ?? {},
-        weapon: weapons.get(id), done: shopDone.has(id), deadline: phaseTimer.deadline, duration: phaseTimer.duration,
+        weapon: weapons.get(id), weapon2: weapon2.get(id) ?? null, done: shopDone.has(id), deadline: phaseTimer.deadline, duration: phaseTimer.duration,
       });
     }
 
@@ -1023,6 +1213,16 @@ export default {
     }
 
     function buy(id: string, pu: string) {
+      if (pu.startsWith('waffe:')) {
+        const w = pu.slice(6) as WeaponId;
+        const list = shopOffers.get(id) ?? [], bought = shopBought.get(id) ?? [], cash = money.get(id) ?? 0;
+        if (!list.includes(pu) || bought.includes(pu) || !WEAPONS.includes(w) || w === weapons.get(id) || cash < WEAPON_PRICE) return false;
+        money.set(id, cash - WEAPON_PRICE);
+        weapon2.set(id, w);
+        bought.push(pu);
+        shopBought.set(id, bought);
+        return true;
+      }
       const def = POWERUP[pu];
       const list = shopOffers.get(id) ?? [];
       const bought = shopBought.get(id) ?? [];
@@ -1081,7 +1281,8 @@ export default {
             const cash = money.get(id) ?? 0;
             if (cash >= REROLL_PRICE) {
               money.set(id, cash - REROLL_PRICE);
-              shopOffers.set(id, drawPowerups({ weapon: weapons.get(id) ?? 'hammer', owned: owned.get(id) ?? {}, chances: rarityChances(round, 0, 0), count: 6, weaponFirst: true }));
+              shopOffers.set(id, drawPowerups({ weapon: weapons.get(id) ?? 'hammer', weapon2: weapon2.get(id) ?? undefined, owned: owned.get(id) ?? {}, chances: rarityChances(round, 0, 0), count: 6, weaponFirst: true }));
+              addWeaponOffer(id);
               shopBought.set(id, []);
             }
           } else shopDone.add(id);
@@ -1103,6 +1304,8 @@ export default {
           case 'a': action.down ? attackDown(f) : attackUp(f); break;
           case 'roll': roll(f); break;
           case 'alt': alt(f, action.down !== false); break;
+          case 'b2': second(f, action.down !== false); break;
+          case 'sp': special(f); break;
         }
       },
       onPlayerRejoin(id) {
