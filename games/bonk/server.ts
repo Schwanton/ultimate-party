@@ -337,7 +337,7 @@ export default {
           const gx = Math.floor(f.x / CELL), gy = Math.floor(f.y / CELL), k = gy * arena.cols + gx;
           if (grid[gy]?.[gx] === T_CRUMBLE && !crumbleAt.has(k)) crumbleAt.set(k, t + 0.9);
         }
-        // Feuer: Schaden und Schubs zur Mitte
+        // Feuer: nur Schaden (seit 0.25.2 kein Schubs)
         if (!f.air && burning(f.x, f.y)) {
           const k = 0.5 ** n(f, 'feuerfest');
           f.dmg += PHY.fireDps * k * TICK;
