@@ -1,0 +1,62 @@
+{
+  "id": "sternenpakt",
+  "name": { "de": "Sternenpakt", "en": "Star Pact" },
+  "description": {
+    "de": "Weltraum-Strategie im Zeitraffer: Sterne erobern, ausbauen, Pakte schmieden – und im richtigen Moment verraten. Wer mehr als die Hälfte der Sterne hält, gewinnt.",
+    "en": "Space strategy in fast-forward: conquer stars, build them up, forge pacts – and betray them at the right moment. Hold more than half the stars to win."
+  },
+  "minPlayers": 1,
+  "maxPlayers": 12,
+  "audience": true,
+  "minutes": 18,
+  "color": "#3DF5FF",
+  "tags": ["social", "deceive"],
+  "sdkVersion": 1,
+  "version": "0.1.0",
+  "author": "UP!",
+  "options": [
+    {
+      "id": "takt",
+      "label": { "de": "Takt", "en": "Pace" },
+      "default": "realtime",
+      "choices": [
+        { "value": "realtime", "label": { "de": "Echtzeit", "en": "Real time" } },
+        { "value": "rounds", "label": { "de": "Runden", "en": "Rounds" } }
+      ],
+      "help": {
+        "de": "Echtzeit: Alles läuft gleichzeitig, Befehle wirken sofort. Runden: Jedes Jahr 40 s geheim planen, dann 15 s Auflösung auf dem Fernseher.",
+        "en": "Real time: everything runs at once, orders act immediately. Rounds: each year 40 s of secret planning, then 15 s of resolution on the TV."
+      }
+    },
+    {
+      "id": "years",
+      "label": { "de": "Dauer", "en": "Length" },
+      "default": 15,
+      "choices": [
+        { "value": 10, "label": { "de": "10 Jahre (ca. 12 Min.)", "en": "10 years (about 12 min)" } },
+        { "value": 15, "label": { "de": "15 Jahre (ca. 17 Min.)", "en": "15 years (about 17 min)" } },
+        { "value": 20, "label": { "de": "20 Jahre (ca. 22 Min.)", "en": "20 years (about 22 min)" } }
+      ]
+    },
+    {
+      "id": "ships",
+      "label": { "de": "Fremde Schiffszahlen", "en": "Other players' ships" },
+      "default": "exact",
+      "choices": [
+        { "value": "exact", "label": { "de": "Genau", "en": "Exact" } },
+        { "value": "rough", "label": { "de": "Grob (auf 5 gerundet)", "en": "Rough (rounded to 5)" } }
+      ]
+    },
+    {
+      "id": "ai",
+      "label": { "de": "Computer-Reiche", "en": "Computer empires" },
+      "default": 0,
+      "min": 0,
+      "max": 4,
+      "help": {
+        "de": "Vom Spiel gesteuerte Reiche, die ausbauen, forschen und den schwächsten Nachbarn angreifen. Allein gespielt kommt immer mindestens eins dazu.",
+        "en": "Empires run by the game: they build, research and attack their weakest neighbour. When playing alone, at least one is always added."
+      }
+    }
+  ]
+}

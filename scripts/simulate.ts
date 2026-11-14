@@ -64,6 +64,10 @@ const scenarios: { game: string; players: number; options?: Record<string, numbe
   { game: 'abgrund', players: 14 }, // 2 davon Publikum
   { game: 'kronenduell', players: 2 },
   { game: 'kronenduell', players: 4 }, // 2 davon Publikum
+  { game: 'sternenpakt', players: 1 },
+  { game: 'sternenpakt', players: 4 },
+  { game: 'sternenpakt', players: 12 },
+  { game: 'sternenpakt', players: 14 }, // 2 davon Publikum
   // mit Spiel-Einstellungen
   { game: 'mic-drop', players: 4, options: { rounds: 5, answerTime: 0.75 } },
   { game: 'flunkerfakt', players: 4, options: { questions: 3 } },
@@ -85,6 +89,8 @@ const scenarios: { game: string; players: number; options?: Record<string, numbe
   { game: 'bonk', players: 3, options: { rounds: 3, controls: 'gesten' } },
   { game: 'montagsmaler', players: 5, options: { mode: 'team', rounds: 4 } },
   { game: 'montagsmaler', players: 3, options: { mode: 'team' } },
+  { game: 'sternenpakt', players: 3, options: { takt: 'rounds', years: 10 } },
+  { game: 'sternenpakt', players: 2, options: { ai: 4, ships: 'rough', years: 20 } },
 ];
 // Nur bestimmte Spiele testen:  npm test -- mehrheit wer-wars
 const only = process.argv.slice(2);

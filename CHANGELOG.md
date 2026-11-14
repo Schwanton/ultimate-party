@@ -2,6 +2,15 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.26.0
+
+- Neues Spiel: Sternenpakt – Weltraum-Strategie im Zeitraffer für 1–12 Spieler (ca. 17 Minuten). Erobert Sterne, baut Wirtschaft, Industrie und Wissenschaft aus, forscht und schließt Pakte – das Spiel kennt keine Bündnisse, Verrat ist erlaubt
+- Der Fernseher zeigt die Sternkarte mit allen Flotten und Kämpfen, das Handy ist das Kommandopult: Flotte schicken in drei Berührungen, Sterne ausbauen, Forschung wählen
+- Geheimer Chat zu zweit auf dem Handy, mit Geld (freier Betrag) und Technik verschenken – der Fernseher verrät nur „Jemand hat jemandem etwas geschickt“
+- Wer alle Sterne verliert, wird Pirat und bekommt jedes Jahr eine neue Flotte
+- Einstellungen: Echtzeit oder Runden, 10/15/20 Jahre, fremde Schiffszahlen genau oder grob, 0–4 Computer-Reiche
+- Erste spielbare Version – die Zahlen werden nach euren Testrunden angepasst
+
 ## 0.25.4
 
 - Cash Out: Neue Risiko-Farbe – der Hintergrund färbt sich von Grün bis Rot, dazu eine Risiko-Leiste auf TV und Handy. Bei Rot kracht es öfter, bei Grün seltener (sicher ist es nie)
