@@ -2,6 +2,12 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.25.0
+
+- Kein Einschlafen mehr: Solange UP! läuft, bleiben Laptop/Fernseher und Handys wach – wie beim Filmschauen
+- Laptop: Auf dem Mac und unter Windows verhindert UP! den Ruhezustand, bis es beendet wird. Zusätzlich hält die Fernseher-Seite den Bildschirm an
+- Handys: Der Bildschirm bleibt an, solange man im Raum ist (wirkt ab der ersten Berührung)
+
 ## 0.22.2
 
 - Bonk!: Die Arena füllt jetzt den ganzen Fernseher und ist dadurch größer. Die Runde steht klein oben links in der Ecke, die Spieler-Leiste liegt unten am Rand
