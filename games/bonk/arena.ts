@@ -92,6 +92,15 @@ function tryGenerate(players: number, seed: number): Arena | null {
     }
   }
 
+  // Dünne Stellen der Inseln auf 2 Felder verbreitern
+  for (let pass = 0; pass < 2; pass++) {
+    for (let y = 1; y < rows - 1; y++) for (let x = 1; x < cols - 1; x++) {
+      if (g[y][x] !== T_FLOOR) continue;
+      if (g[y][x - 1] === T_ABYSS && g[y][x + 1] === T_ABYSS && inside(x + 1, y)) g[y][x + 1] = T_FLOOR;
+      if (g[y - 1][x] === T_ABYSS && g[y + 1][x] === T_ABYSS && inside(x, y + 1)) g[y + 1][x] = T_FLOOR;
+    }
+  }
+
   // 2) Brücken: Inseln über einen minimalen Spannbaum verbinden (+ eine Extra-Brücke für Rundwege)
   const edges: [number, number, number][] = [];
   for (let i = 0; i < centers.length; i++) for (let j = i + 1; j < centers.length; j++) edges.push([Math.hypot(centers[i].x - centers[j].x, centers[i].y - centers[j].y), i, j]);
@@ -108,7 +117,7 @@ function tryGenerate(players: number, seed: number): Arena | null {
     const a = centers[i], b = centers[j];
     let x = Math.floor(a.x), y = Math.floor(a.y);
     const tx = Math.floor(b.x), ty = Math.floor(b.y);
-    const wide = R() < 0.4;
+    const wide = R() < 0.8; // meist 2 Felder breit, selten nur 1
     const horizontalFirst = R() < 0.5;
     const mark = (cx: number, cy: number, horizontal: boolean) => {
       for (const [ox, oy] of wide ? [[0, 0], [horizontal ? 0 : 1, horizontal ? 1 : 0]] : [[0, 0]]) {

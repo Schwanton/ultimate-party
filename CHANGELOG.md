@@ -2,6 +2,15 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.20.0
+
+- Bonk!: Powerups! Am Anfang wählt jeder ein Start-Powerup für seine Waffe, nach jeder Runde 1 von 3 – in den Seltenheiten gewöhnlich (grün), selten (blau), episch (lila) und legendär (gold). Wer weit zurückliegt, bekommt ab Runde 3 bessere Chancen
+- Bonk!: 21 Powerups, zum Beispiel Doppelrolle, Dornenhaut, Viertes Leben, Erdbeben und Wirbelsturm für den Hammer, Streuschuss und Durchschlag für die Schleuder
+- Bonk!: Geld für Rauswürfe und gute Plätze – nach jeder 4. Runde öffnet der Shop zum Einkaufen (mit „Neu würfeln“)
+- Bonk!: Wer alle Leben verloren hat, sucht sich schon während der Runde sein nächstes Powerup aus
+- Bonk!: Laufen führt nicht mehr in den Abgrund – runter geht es nur noch durch Treffer oder eine Rolle über die Kante
+- Bonk!: Wege und Brücken sind meist 2 Felder breit, der Rückstoß ist etwas schwächer
+
 ## 0.19.1
 
 - Bonk!: Man fällt erst, wenn die ganze Figur über dem Abgrund ist – am Rand stehen ist jetzt sicher

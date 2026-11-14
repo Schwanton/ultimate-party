@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as RPointerEvent } from 'react';
 import type { ControllerViewProps, GameClientModule, HostViewProps, PlayerInfo } from '@up/sdk';
 import { Avatar, Confetti, Crown, HostHeader, HostTimer, PhoneTimer, PhoneWait, Podium, Scoreboard, sfx, useServerNow, useStream, vibrate } from '@up/ui';
-import { COOLDOWN, ICON, WEAPON_COLOR, walkable } from './arena';
+import { ICON, WEAPON_COLOR, walkable } from './arena';
+import { POWERUP, PRICE, RARITY_COLOR, REROLL_PRICE } from './powerups';
 
 const PINK = '#FF4FB8';
 const INK = '#07051A';
@@ -63,6 +64,61 @@ function Host(props: HostViewProps) {
     }
     case 'arena':
       return <HostArena {...props} />;
+    case 'pick': {
+      const ids = view.ids as string[];
+      const rows = ids.map((id) => ({ player: player(id)!, before: view.before[id] ?? 0, after: view.after[id] ?? 0 })).filter((r) => r.player);
+      return (
+        <>
+          <HostHeader title={t('title')} color={PINK} info={view.start ? undefined : t('round', { n: view.round, total: view.total })} right={<HostTimer deadline={view.deadline} duration={view.duration} />} />
+          {view.start ? (
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 18, textAlign: 'center' }}>
+              <h1 style={{ fontSize: 50 }}>{t('pick.startTitle')}</h1>
+              <p className="muted" style={{ fontSize: 22 }}>{t('pick.startText')}</p>
+            </div>
+          ) : (
+            <>
+              <h1 style={{ fontSize: 32 }}>{t('scores.title')}</h1>
+              <Scoreboard rows={rows} max={6} />
+            </>
+          )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, flex: 'none', marginLeft: 40 }}>
+            <b className="display" style={{ fontSize: 22 }}>{t('pick.waiting')}</b>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              {ids.map((id) => {
+                const p = player(id);
+                return p ? <span key={id} style={{ opacity: view.chosen[id] ? 1 : 0.3, transition: 'opacity .3s', borderRadius: '50%', boxShadow: view.chosen[id] ? `0 0 0 3px ${p.color}, 0 0 14px ${p.color}` : undefined }}><Avatar player={p} size={44} /></span> : null;
+              })}
+            </div>
+          </div>
+        </>
+      );
+    }
+    case 'shop': {
+      const ids = view.ids as string[];
+      return (
+        <>
+          <HostHeader title={t('title')} color={PINK} info={t('round', { n: view.round, total: view.total })} right={<HostTimer deadline={view.deadline} duration={view.duration} />} />
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+            <h1 className="display" style={{ fontSize: 64, color: '#FFD447', textShadow: '0 0 24px #FFD447' }}>{t('shop.title')}</h1>
+            <p className="muted" style={{ fontSize: 22 }}>{t('shop.tv')}</p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(6, ids.length)}, minmax(0, 1fr))`, gap: 14, marginTop: 10 }}>
+            {ids.map((id) => {
+              const p = player(id);
+              if (!p) return null;
+              const done = view.done[id];
+              return (
+                <div key={id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: 14, borderRadius: 20, background: '#110D24', border: `3px solid ${done ? '#4BE3A1' : '#2A2463'}` }}>
+                  <Avatar player={p} size={60} />
+                  <b style={{ fontSize: 16 }}>{p.name}</b>
+                  <span className="muted" style={{ fontSize: 14 }}>{done ? t('shop.ready') : t('shop.shopping')}{view.bought[id] ? ` · ${t('shop.boughtN', { n: view.bought[id] })}` : ''}</span>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      );
+    }
     case 'scores': {
       const rows = Object.keys(view.after).map((id) => ({ player: player(id)!, before: view.before[id] ?? 0, after: view.after[id] })).filter((r) => r.player);
       return (
@@ -155,14 +211,14 @@ function HostArena({ view, t, player }: HostViewProps) {
         const p = fr.p[by];
         if (p) effects.current.push({ kind: 'text', x: p[0], y: p[1] - 40, at: n, v: 0, text: '+100', color: info.current.colors[by] });
       } else if (kind === 'stomp') {
-        const [, x, y] = e as [string, number, number];
-        effects.current.push({ kind: 'ring', x, y, at: n, v: 78, color: '#FFD447' });
+        const [, x, y, r] = e as [string, number, number, number];
+        effects.current.push({ kind: 'ring', x, y, at: n, v: r ?? 78, color: '#FFD447' });
         shake.current = { until: n + 180, power: 5 };
         sfx.custom((s) => { s.tone(90, 0.25, { type: 'sine', vol: 0.4, to: 40 }); s.noise(0.2, { filter: 400, type: 'lowpass', vol: 0.3 }); });
       } else if (kind === 'swing') {
-        const [, i, c] = e as [string, number, number];
+        const [, i, c, whirl] = e as [string, number, number, number];
         const p = fr.p[i];
-        if (p) effects.current.push({ kind: 'swoosh', x: p[0], y: p[1], at: n, v: p[2], text: String(c), color: info.current.colors[i] });
+        if (p) effects.current.push({ kind: whirl ? 'whirl' : 'swoosh', x: p[0], y: p[1], at: n, v: p[2], text: String(c), color: info.current.colors[i] });
         sfx.custom((s) => s.noise(0.16, { filter: 800, sweepTo: 3000, vol: 0.06 + c / 1200 }));
       } else if (kind === 'shot') {
         const [, , big] = e as [string, number, number];
@@ -330,6 +386,12 @@ function HostArena({ view, t, player }: HostViewProps) {
           const c = Number(e.text) / 100, ang = (e.v * Math.PI) / 180;
           g.strokeStyle = e.color ?? '#FFFFFF'; g.globalAlpha = 1 - age / 180; g.lineWidth = 5 + 5 * c; glow(g, e.color, 14);
           g.beginPath(); g.arc(e.x, e.y, R + 22 + 10 * c, ang - 0.9, ang + 0.9); g.stroke(); glow(g); g.globalAlpha = 1;
+          return true;
+        }
+        if (e.kind === 'whirl') {
+          if (age > 260) return false;
+          g.strokeStyle = e.color ?? '#FFFFFF'; g.globalAlpha = 1 - age / 260; g.lineWidth = 8; glow(g, e.color, 16);
+          circle(g, e.x, e.y, R + 26 + age / 12); g.stroke(); glow(g); g.globalAlpha = 1;
           return true;
         }
         if (e.kind === 'text') {
@@ -615,8 +677,9 @@ function useCooldown(seconds: number) {
 function PlayController({ view, t, send, me }: ControllerViewProps) {
   const land = useLandscape();
   const now = useServerNow(200);
-  const roll = useCooldown(COOLDOWN.roll);
-  const altCd = useCooldown(view.weapon === 'hammer' ? COOLDOWN.stomp : COOLDOWN.bigShot);
+  const roll = useCooldown(view.rollCd ?? 1.5);
+  const altCd = useCooldown(view.altCd ?? 3);
+  const multiRoll = (view.rolls ?? 1) > 1;
   const lastUp = useRef(0);
   const altPress = useRef(false);
   const sendRef = useRef(send);
@@ -646,7 +709,11 @@ function PlayController({ view, t, send, me }: ControllerViewProps) {
     lastUp.current = performance.now();
     sendRef.current({ type: 'a', down: false });
   };
-  const doRoll = () => { if (!roll.isReady()) return; roll.start(); vibrate(20); sendRef.current({ type: 'roll' }); };
+  const doRoll = () => {
+    if (!multiRoll) { if (!roll.isReady()) return; roll.start(); }
+    vibrate(20);
+    sendRef.current({ type: 'roll' });
+  };
 
   const count = view.startAt && now < view.startAt ? Math.ceil((view.startAt - now) / 1000) : 0;
   const backIn = view.respawnAt ? Math.max(0, Math.ceil((view.respawnAt - now) / 1000)) : 0;
@@ -739,6 +806,95 @@ function WeaponPick({ view, t, send }: ControllerViewProps) {
   );
 }
 
+function PowerupCard({ id, t, selected, owned, price, disabled, onClick, compact }: {
+  compact?: boolean; id: string; t: (k: string, v?: Record<string, string | number>) => string; selected?: boolean; owned?: number; price?: number | string; disabled?: boolean; onClick?: () => void;
+}) {
+  const def = POWERUP[id];
+  if (!def) return null;
+  const c = RARITY_COLOR[def.rarity];
+  return (
+    <button type="button" disabled={disabled} onClick={onClick}
+      style={{ textAlign: 'left', border: `3px solid ${c}`, borderRadius: 20, padding: '11px 13px', background: selected ? '#262048' : '#110D24', color: '#fff', display: 'flex', flexDirection: 'column', gap: 6, boxShadow: selected ? `0 0 22px ${c}88` : `0 0 10px ${c}33`, opacity: disabled && !selected ? 0.45 : 1, transform: selected ? 'scale(1.02)' : undefined, transition: 'transform .15s' }}>
+      <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+        <span style={{ background: c, color: '#110D24', borderRadius: 999, padding: '2px 9px', fontSize: 11, fontWeight: 700 }}>{t(`rar.${def.rarity}`)}</span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 700, color: WEAPON_COLOR[def.weapon] }}>
+          <WeaponIcon weapon={def.weapon} size={20} />{compact ? null : def.weapon === 'alle' ? t('pu.forAll') : t(`w.${def.weapon}`)}
+        </span>
+      </span>
+      <b className="display" style={{ fontSize: compact ? 17 : 20, lineHeight: 1.1 }}>{t(`pu.${id}`)}</b>
+      <span style={{ fontSize: 14, color: '#E4E0F5', lineHeight: 1.3 }}>{t(`pud.${id}`)}</span>
+      {(owned || price !== undefined) && (
+        <span style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
+          <span className="faint">{owned ? t('pu.owned', { n: owned }) : ''}</span>
+          {price !== undefined && <b className="display" style={{ fontSize: 17, color: '#FFD447' }}>{price}</b>}
+        </span>
+      )}
+    </button>
+  );
+}
+
+function Coins({ n }: { n: number }) {
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#262048', borderRadius: 999, padding: '6px 12px', flex: 'none' }}>
+      <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#FFD447" stroke="#C79E1A" strokeWidth="2.5" /><path d="M12 7v10" stroke="#110D24" strokeWidth="2" strokeLinecap="round" /></svg>
+      <b className="display" style={{ fontSize: 19 }}>{n}</b>
+    </span>
+  );
+}
+
+function PickScreen({ view, t, send }: ControllerViewProps) {
+  const offers = view.offers as string[];
+  const picked = view.picked as string | null;
+  return (
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+        <h1 style={{ fontSize: 26 }}>{view.start ? t('pick.startPhone') : t('pick.title')}</h1>
+        <Coins n={view.money ?? 0} />
+      </div>
+      {view.deadline && <PhoneTimer deadline={view.deadline} duration={view.duration} />}
+      {offers.map((id) => (
+        <PowerupCard key={id} id={id} t={t} selected={picked === id} owned={view.owned?.[id]} disabled={!!picked}
+          onClick={() => { if (!picked) { vibrate(30); send({ type: 'pick', id }); } }} />
+      ))}
+      {picked && <p className="muted" style={{ textAlign: 'center' }}>{t('pick.done')}</p>}
+    </div>
+  );
+}
+
+function ShopScreen({ view, t, send }: ControllerViewProps) {
+  const offers = view.offers as string[];
+  const bought = view.bought as string[];
+  const money = view.money as number;
+  return (
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+        <h1 className="display" style={{ fontSize: 32, color: '#FFD447' }}>{t('shop.title')}</h1>
+        <Coins n={money} />
+      </div>
+      <PhoneTimer deadline={view.deadline} duration={view.duration} />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 9 }}>
+        {offers.map((id) => {
+          const def = POWERUP[id];
+          const own = bought.includes(id);
+          const maxed = def?.max !== undefined && (view.owned?.[id] ?? 0) >= def.max;
+          const price = def ? PRICE[def.rarity] : 0;
+          return (
+            <PowerupCard key={id} id={id} t={t} compact selected={own} owned={view.owned?.[id]} price={own ? t('shop.bought') : maxed ? t('shop.max') : price}
+              disabled={view.done || own || maxed || price > money} onClick={() => { vibrate(30); send({ type: 'buy', id }); }} />
+          );
+        })}
+      </div>
+      <div style={{ flex: 1 }} />
+      {view.done ? <p className="muted" style={{ textAlign: 'center' }}>{t('shop.waiting')}</p> : (
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button type="button" className="up-btn ghost" style={{ flex: 1 }} disabled={money < REROLL_PRICE} onClick={() => send({ type: 'reroll' })}>{t('shop.reroll', { n: REROLL_PRICE })}</button>
+          <button type="button" className="up-btn" style={{ flex: 1 }} onClick={() => send({ type: 'shopDone' })}>{t('shop.finish')}</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function Controller(props: ControllerViewProps) {
   const { view, t, me } = props;
   switch (view.screen) {
@@ -748,6 +904,10 @@ function Controller(props: ControllerViewProps) {
       return <WeaponPick {...props} />;
     case 'play':
       return <PlayController {...props} />;
+    case 'pick':
+      return <PickScreen {...props} />;
+    case 'shop':
+      return <ShopScreen {...props} />;
     case 'roundEnd':
       return (
         <div className="anim-fade" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, textAlign: 'center' }}>
@@ -758,6 +918,7 @@ function Controller(props: ControllerViewProps) {
           {view.kos > 0 && <p style={{ fontSize: 18 }}>{t('phone.kos', { n: view.kos })}</p>}
           {view.gain > 0 && <p style={{ fontSize: 20, color: 'var(--yellow)', fontWeight: 700 }}>{t('phone.gain', { n: view.gain })}</p>}
           <p className="muted">{t('me.score', { n: view.score })}</p>
+          {view.money !== undefined && <Coins n={view.money} />}
         </div>
       );
     case 'finalMe':
