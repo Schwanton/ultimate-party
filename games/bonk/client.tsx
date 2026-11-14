@@ -149,7 +149,8 @@ function HostArena({ view, t, player }: HostViewProps) {
   const arena = view.arena as ArenaView;
   const fr = frame && frame.round === view.round && frame.p.length === ids.length ? frame : null;
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const W = 1168, H = 506;
+  // Die Arena füllt den ganzen Bildschirm, unten bleibt Platz für die Spieler-Leiste
+  const W = 1280, H = 720 - (ids.length > 6 ? 84 : 56);
 
   // Bildfolge für flüssige Bewegung (zwischen den letzten zwei Server-Bildern)
   const frames = useRef<{ prev: Frame | null; cur: Frame | null; at: number }>({ prev: null, cur: null, at: 0 });
@@ -175,8 +176,8 @@ function HostArena({ view, t, player }: HostViewProps) {
       if (c === '.') return;
       minX = Math.min(minX, x); minY = Math.min(minY, y); maxX = Math.max(maxX, x); maxY = Math.max(maxY, y);
     }));
-    const bw = (maxX - minX + 2) * cell, bh = (maxY - minY + 2) * cell;
-    const scale = Math.min(1.7, W / bw, H / bh);
+    const bw = (maxX - minX + 1.6) * cell, bh = (maxY - minY + 1.6) * cell;
+    const scale = Math.min(2, W / bw, H / bh);
     layout.current = { scale, ox: (W - (maxX + minX + 1) * cell * scale) / 2, oy: (H - (maxY + minY + 1) * cell * scale) / 2 };
     floorCanvas.current = drawFloor(arena, cell, scale, layout.current.ox, layout.current.oy, W, H);
   }, [arena, view.cell]);
@@ -413,19 +414,11 @@ function HostArena({ view, t, player }: HostViewProps) {
   const count = startAt && now < startAt ? Math.ceil((startAt - now) / 1000) : 0;
   const ended = view.phase === 'roundEnd';
   const winners = ((view.winners ?? []) as string[]).map((id) => player(id)).filter(Boolean) as PlayerInfo[];
-  const gameT = fr?.t ?? 0;
-  const fireIn = Math.ceil((view.fireStart as number) - gameT);
-
   return (
-    <>
-      <HostHeader title={t('title')} color={PINK} info={t('round', { n: view.round, total: view.total })}
-        right={view.phase === 'fight' ? (
-          fireIn > 0
-            ? <span className="up-chip" style={{ fontSize: 17, opacity: fireIn > 15 ? 0.6 : 1 }}>{t('fire.in', { n: fireIn })}</span>
-            : <span className="up-chip" style={{ fontSize: 17, color: '#FF9F43', boxShadow: '0 0 16px #FF6B2C' }}>{t('fire.now')}</span>
-        ) : undefined} />
-      <div style={{ position: 'relative', width: W, height: H, flex: 'none', borderRadius: 24, overflow: 'hidden', background: 'radial-gradient(ellipse at center, #140F3A, #05030F 75%)' }}>
+    <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at center, #140F3A, #05030F 75%)' }}>
+      <div style={{ position: 'absolute', left: 0, top: 0, width: W, height: H }}>
         <canvas ref={canvasRef} style={{ width: W, height: H, display: 'block' }} />
+        <span style={{ position: 'absolute', left: 18, top: 12, fontSize: 15, fontWeight: 700, color: 'rgba(228,224,245,.55)', pointerEvents: 'none' }}>{t('round', { n: view.round, total: view.total })}</span>
         {count > 0 && (
           <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
             <span key={count} className="display anim-pop" style={{ fontSize: 160, fontWeight: 800, textShadow: '0 0 30px #FF4FB8' }}>{count}</span>
@@ -446,7 +439,7 @@ function HostArena({ view, t, player }: HostViewProps) {
           </div>
         )}
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(6, ids.length)}, minmax(0, 1fr))`, gap: 8, flex: 'none', margin: '0 44px 0 40px' }}>
+      <div style={{ position: 'absolute', left: 96, right: 96, bottom: 6, display: 'grid', gridTemplateColumns: `repeat(${Math.min(6, ids.length)}, minmax(0, 1fr))`, gap: 6 }}>
         {ids.map((id, i) => {
           const p = player(id);
           const st = fr?.p[i];
@@ -465,7 +458,7 @@ function HostArena({ view, t, player }: HostViewProps) {
           );
         })}
       </div>
-    </>
+    </div>
   );
 }
 

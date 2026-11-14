@@ -2,6 +2,10 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.22.2
+
+- Bonk!: Die Arena füllt jetzt den ganzen Fernseher und ist dadurch größer. Die Runde steht klein oben links in der Ecke, die Spieler-Leiste liegt unten am Rand
+
 ## 0.22.1
 
 - „Spiel beenden“ für den VIP ist jetzt ein kleiner Knopf oben links über dem Spiel (mit Rückfrage), statt ganz unten auf dem Handy
