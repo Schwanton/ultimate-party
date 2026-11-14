@@ -35,7 +35,6 @@ function Host(props: HostViewProps) {
           <span className="up-tag anim-pop" style={{ background: PINK, color: '#fff', boxShadow: `0 8px 0 ${PINK_D}`, fontSize: 90, padding: '12px 46px', borderRadius: 26, transform: 'rotate(-3deg)' }}>{t('title')}</span>
           <p className="anim-up" style={{ fontSize: 28, maxWidth: 900, lineHeight: 1.35, animationDelay: '.4s' }}>{t('intro.text')}</p>
           <p className="muted anim-up" style={{ fontSize: 22, animationDelay: '.8s' }}>{t('intro.points')}</p>
-          {view.lastMan && <p className="anim-up" style={{ fontSize: 22, fontWeight: 700, color: 'var(--yellow)', animationDelay: '1.2s' }}>{t('intro.last')}</p>}
         </div>
       );
     case 'ready':
@@ -184,7 +183,7 @@ function HostGraph({ view, t, player, room }: HostViewProps) {
     const e = multAt(seed, to);
     return e > best.m ? { t: to, m: e } : best;
   })();
-  const lastIds = (view.last ?? []) as string[];
+
   return (
     <>
       {crashed && view.allOut && <Confetti silent />}
@@ -250,13 +249,8 @@ function HostGraph({ view, t, player, room }: HostViewProps) {
               {boom ? t('crash.at', { m: fmt(view.crashAt, lang) }) : fmt(m, lang)}
               {!crashed && fall > 0.2 && <span style={{ fontSize: 54, animation: 'upBeat .4s ease-in-out infinite' }}>▼</span>}
             </span>
-            {!crashed && <span className="muted" style={{ fontSize: 20, fontWeight: 700 }}>{t('run.points', { n: Math.floor(100 * m * view.mult) })}</span>}
+            {!crashed && <span className="muted" style={{ fontSize: 20, fontWeight: 700 }}>{t('run.points', { n: Math.floor((view.free ?? 100) * m * view.mult) })}</span>}
             {crashed && view.allOut && <span style={{ fontSize: 22, fontWeight: 700 }}>{t('crash.allOut', { m: fmt(view.crashAt, lang) })}</span>}
-            {crashed && lastIds.length > 0 && (
-              <span className="anim-pop" style={{ alignSelf: 'flex-start', marginTop: 6, background: 'var(--yellow)', color: '#110D24', fontWeight: 800, fontSize: 20, padding: '6px 14px', borderRadius: 14, boxShadow: '0 4px 0 #C79E1A', animationDelay: '.5s' }}>
-                {t('crash.last', { name: lastIds.map((id) => player(id)?.name ?? '?').join(' & '), n: view.lastBonus })}
-              </span>
-            )}
           </div>
         </div>
 
@@ -345,7 +339,7 @@ function AnonSide({ view, t, crashed, fall }: { view: any; t: Translate; crashed
 
 /* ---------------- Auszählung am Ende ---------------- */
 
-/** Farbzonen nach Kurs (wie die Farben während der Runde): Grenzen × 100 × Rundenmultiplikator */
+/** Farbzonen nach Kurs (wie die Farben während der Runde): Grenzen × Gratis-Topf × Rundenmultiplikator */
 const ZONES: { to: number; c: string }[] = [
   { to: 1, c: '#7E6FE8' },
   { to: 1.5, c: '#FFFFFF' },
@@ -551,7 +545,7 @@ function RoundColumn({ r, at, ids, dead, player, t, lang, flow }: {
 }) {
   const W = 460, H = 452, bottom = H - 16, topY = 18, colX = 72, colW = 46;
   const px = bottom - topY;
-  const unit = 100 * r.mult;
+  const unit = (r.free ?? 100) * r.mult;
   const minTop = unit * 1.5;
   const b = (id: string) => r.base[id] ?? 0;
   const e = (id: string) => r.extra[id] ?? 0;
@@ -645,8 +639,6 @@ function RoundColumn({ r, at, ids, dead, player, t, lang, flow }: {
         if (b(id) <= 0 && ef === 0) return null;
         const v = valOf(id);
         const ex = e(id);
-        const isLast = r.last?.includes(id);
-        const betExtra = ex - (isLast ? r.lastBonus ?? 0 : 0);
         return (
           <div key={id} style={{
             position: 'absolute', left: mX + col * colStep, top: y(v) - 17, display: 'flex', alignItems: 'flex-start', gap: 6, zIndex: 2,
@@ -660,7 +652,7 @@ function RoundColumn({ r, at, ids, dead, player, t, lang, flow }: {
                   <span style={{ display: 'flex', alignItems: 'center', gap: 4, animation: 'upPop .35s ease-out both', background: '#110D24', borderRadius: 8, paddingRight: 5 }}>
                     <b style={{ fontSize: 13, padding: '1px 6px', borderRadius: 8, background: ex > 0 ? 'var(--green)' : '#FF3B4E', color: ex > 0 ? '#110D24' : '#fff' }}>{ex > 0 ? '+' : '−'}{Math.abs(ex).toLocaleString(LOCALE)}</b>
                     <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', whiteSpace: 'nowrap' }}>
-                      {[betExtra !== 0 ? `${r.pct?.[id] ?? 0} %` : null, isLast ? t('tally.last') : null].filter(Boolean).join(' · ')}
+                      {r.pct?.[id] ?? 0} %
                     </span>
                   </span>
                 )}
@@ -700,10 +692,14 @@ function FallBuzz({ fall }: { fall: number }) {
 /** Einsatz wählen: drei schmale Knöpfe oben, „+0 %“ breit darunter */
 function BetPicker({ view, t, send, now }: { view: any; t: Translate; send: (a: any) => void; now: number }) {
   const s = Math.max(0, Math.ceil((view.startAt - now) / 1000));
-  const opts = view.options as { pct: number; amount: number }[];
-  const btn = (o: { pct: number; amount: number }, wide = false) => {
+  type Opt = { pct: number; amount: number; locked?: boolean };
+  const opts = view.options as Opt[];
+  const free = (view.free ?? 100) as number;
+  const btn = (o: Opt, wide = false) => {
     const sel = view.bet === o.pct;
-    const disabled = o.pct > 0 && o.amount <= 0;
+    const disabled = (o.pct > 0 && o.amount <= 0) || !!o.locked;
+    // +100 % begrenzt: wie oft noch (letzte Runde: immer)
+    const sub = o.pct === 100 && view.allInLeft != null ? (o.locked ? t('bet.allInGone') : t('bet.allInLeft', { n: view.allInLeft })) : null;
     return (
       <button key={o.pct} type="button" disabled={disabled} aria-pressed={sel} onClick={() => send({ type: 'bet', pct: o.pct })}
         style={{
@@ -712,7 +708,8 @@ function BetPicker({ view, t, send, now }: { view: any; t: Translate; send: (a: 
           boxShadow: sel ? `0 0 0 3px #fff, 0 6px 0 ${o.pct ? '#C79E1A' : '#8F88B8'}` : '0 5px 0 #0A0716', transition: 'transform .1s', transform: sel ? 'translateY(-2px)' : undefined,
         }}>
         <span className="display" style={{ fontSize: wide ? 30 : o.pct >= 100 ? 23 : 27, fontWeight: 800, whiteSpace: 'nowrap' }}>+{o.pct}&nbsp;%</span>
-        <span style={{ fontSize: 14, fontWeight: 700, opacity: 0.85 }}>{o.pct ? `${o.amount.toLocaleString(LOCALE)}` : t('bet.free')}</span>
+        <span style={{ fontSize: 14, fontWeight: 700, opacity: 0.85 }}>{o.pct ? (o.locked ? '' : `${o.amount.toLocaleString(LOCALE)}`) : t('bet.free', { n: free.toLocaleString(LOCALE) })}</span>
+        {sub && <span style={{ fontSize: 12, fontWeight: 800, color: sel ? '#110D24' : o.locked ? 'var(--muted)' : 'var(--yellow)' }}>{sub}</span>}
       </button>
     );
   };
@@ -734,13 +731,13 @@ function BetPicker({ view, t, send, now }: { view: any; t: Translate; send: (a: 
       {view.mult > 1 && <span className="up-tag" style={{ alignSelf: 'flex-start', background: 'var(--yellow)', color: '#110D24' }}>{t('double')}</span>}
       <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 6 }}>
         <h2 style={{ fontSize: 24, color: remind ? 'var(--yellow)' : undefined }}>{remind ? t('bet.pickNow') : t('bet.title')}</h2>
-        <p className="muted" style={{ fontSize: 15 }}>{t('bet.text')}</p>
+        <p className="muted" style={{ fontSize: 15 }}>{t('bet.text', { n: free.toLocaleString(LOCALE) })}</p>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 10 }}>
         {opts.filter((o) => o.pct > 0).map((o) => btn(o))}
         {btn(opts[0], true)}
       </div>
-      <p style={{ textAlign: 'center', fontWeight: 700 }}>{t('bet.pot', { pot: (100 + chosen.amount).toLocaleString(LOCALE) })}</p>
+      <p style={{ textAlign: 'center', fontWeight: 700 }}>{t('bet.pot', { pot: (free + chosen.amount).toLocaleString(LOCALE) })}</p>
     </div>
   );
 }
@@ -781,7 +778,6 @@ function Controller({ view, t, send, me, room }: ControllerViewProps) {
           <Avatar player={me} size={100} />
           <h1 style={{ fontSize: 30 }}>{view.m != null ? t('phone.safe', { m: fmt(view.m, lang) }) : t('phone.busted', { m: fmt(view.crashAt, lang) })}</h1>
           <span className="display" style={{ fontSize: 56, fontWeight: 800, color: view.gain >= 0 ? 'var(--yellow)' : '#FF3B4E' }}>{view.gain >= 0 ? '+' : ''}{view.gain.toLocaleString(LOCALE)}</span>
-          {view.bonus > 0 && <span className="up-tag anim-pop" style={{ background: 'var(--yellow)', color: '#110D24', fontSize: 20 }}>{t('phone.lastBonus', { n: view.bonus })}</span>}
           {view.stake > 0 && <p style={{ fontWeight: 700 }}>{view.m != null ? t('phone.potWon', { pot: view.pot }) : t('phone.stakeLost', { stake: view.stake })}</p>}
           <p className="muted">{t('phone.total', { n: view.total.toLocaleString(LOCALE) })}</p>
         </div>

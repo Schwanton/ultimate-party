@@ -11,6 +11,8 @@ export const TALLY = { intro: 2, outro: 4 };
 export interface TallyRound {
   crashAt: number;
   mult: number;
+  /** Gratis-Topf dieser Runde (100 × Rundennummer) */
+  free?: number;
   /** Gewinn aus den gratis 100 (0 = gecrasht) */
   base: Record<string, number>;
   /** Ergebnis des eigenen Einsatzes (kann negativ sein) */
@@ -19,9 +21,6 @@ export interface TallyRound {
   pct?: Record<string, number>;
   /** Kurs beim Aussteigen (fehlt = gecrasht) */
   cm?: Record<string, number>;
-  /** Option „Letzter raus“: wer den Bonus bekommen hat (steckt schon in extra) */
-  last?: string[];
-  lastBonus?: number;
 }
 
 export interface TallyData {

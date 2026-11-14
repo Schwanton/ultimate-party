@@ -2,6 +2,12 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.25.3
+
+- Cash Out: Der Gratis-Topf wächst mit jeder Runde – 100 × Rundennummer (Runde 4: 400)
+- Cash Out: Neue Einstellung „Einsatz +100 %“ – unbegrenzt oder höchstens 3× pro Partie; in der letzten Runde geht +100 % immer
+- Cash Out: Die Einstellung „Bonus für den Letzten“ ist entfallen
+
 ## 0.25.2
 
 - Bonk!: Feuer macht nur noch Schaden und schubst nicht mehr

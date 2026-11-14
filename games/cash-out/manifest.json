@@ -17,7 +17,7 @@
     "quick"
   ],
   "sdkVersion": 1,
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "UP!",
   "options": [
     {
@@ -66,31 +66,31 @@
       }
     },
     {
-      "id": "lastMan",
+      "id": "allIn",
       "label": {
-        "de": "Bonus für den Letzten",
-        "en": "Last one out bonus"
+        "de": "Einsatz +100 %",
+        "en": "+100 % bets"
       },
-      "default": "off",
+      "default": "free",
       "choices": [
         {
-          "value": "off",
+          "value": "free",
           "label": {
-            "de": "Aus",
-            "en": "Off"
+            "de": "Unbegrenzt",
+            "en": "Unlimited"
           }
         },
         {
-          "value": "on",
+          "value": "limit3",
           "label": {
-            "de": "An",
-            "en": "On"
+            "de": "Höchstens 3× pro Partie",
+            "en": "At most 3× per game"
           }
         }
       ],
       "help": {
-        "de": "Wer als Letzter vor dem Absturz aussteigt, bekommt 100 Punkte extra (letzte Runde 200).",
-        "en": "Whoever cashes out last before the crash gets 100 extra points (200 in the last round)."
+        "de": "Begrenzt: Jeder darf höchstens dreimal alles setzen. In der letzten Runde geht +100 % immer und zählt nicht mit.",
+        "en": "Limited: everyone may go all in at most three times. In the last round +100 % is always allowed and doesn't count."
       }
     }
   ]

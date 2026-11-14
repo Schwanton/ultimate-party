@@ -1,11 +1,11 @@
 /**
  * Crash – ein Kurs schwankt wie eine Aktie (meist aufwärts), bis er zufällig abstürzt.
- * Pro Runde liegen 100 gratis im Topf; dazu kann jeder vor dem Start 0/10/25/100 % seines Geldes setzen.
+ * Pro Runde liegen 100 × Rundennummer gratis im Topf; dazu kann jeder vor dem Start 0/10/25/100 % seines Geldes setzen.
+ * Option „+100 %“: unbegrenzt oder höchstens 3× pro Partie (die letzte Runde zählt nicht mit, da geht es immer).
  * Steigt man aus, bekommt man den Topf × Kurs. Kracht es, ist der Topf weg (und damit der eigene Einsatz).
  * Letzte Runde doppelt. Geldstände bleiben bis zur Auszählung am Ende geheim.
  *
  * Modi: open (man sieht, wer aussteigt), half (nur, dass jemand aussteigt), secret (nichts).
- * Option „Letzter raus“: Wer als Letzter vor dem Absturz aussteigt, bekommt einen Bonus (× Rundenmultiplikator).
  */
 
 import { Scores, type GameContext, type GameServerModule } from '@up/sdk';
@@ -15,7 +15,7 @@ import { tallyDuration, type TallyData } from './tally';
 const T = { intro: 8, ready: 5, afterCrash: 6, afterAllBusted: 2, allOutReveal: 1.5 };
 const BASE = 100;
 const BETS = [0, 10, 25, 100];
-const LAST_BONUS = 100;
+const ALL_IN_LIMIT = 3;
 
 export default {
   create(ctx: GameContext) {
@@ -25,7 +25,8 @@ export default {
     const mode = (['open', 'half', 'secret'].includes(String(ctx.options.mode)) ? String(ctx.options.mode) : 'open') as 'open' | 'half' | 'secret';
     // frühester Absturz: einmal pro Partie zwischen 2 und 6 Sekunden
     const minCrash = 2 + Math.random() * 4;
-    const lastMan = String(ctx.options.lastMan) === 'on' && ids.length > 1;
+    const limited = String(ctx.options.allIn) === 'limit3';
+    const allInLeft = new Map<string, number>(ids.map((id) => [id, limited ? ALL_IN_LIMIT : Infinity]));
     let round = 0;
     let phase: 'intro' | 'ready' | 'run' | 'crash' | 'tally' = 'intro';
     let seed = 1;
@@ -41,7 +42,10 @@ export default {
     const extraSum = new Map<string, number>(ids.map((id) => [id, 0]));
 
     const mult = () => (round === total ? 2 : 1);
-    const base = () => ({ round, total, mult: mult(), seed, mode, lastMan });
+    const free = () => BASE * round;
+    const base = () => ({ round, total, mult: mult(), seed, mode, free: free() });
+    // +100 % gesperrt? (letzte Runde immer frei)
+    const allInLocked = (id: string) => round !== total && (allInLeft.get(id) ?? 0) <= 0;
 
     function intro() {
       ctx.setHostView({ screen: 'intro', mode });
@@ -76,14 +80,18 @@ export default {
       const m = money.get(id);
       ctx.setPlayerView(id, {
         screen: 'ready', ...base(), startAt, input: true, money: m, bet: bets.get(id) ?? 0, picked: picked.has(id),
-        options: BETS.map((pct) => ({ pct, amount: Math.floor((m * pct) / 100) })),
+        options: BETS.map((pct) => ({ pct, amount: Math.floor((m * pct) / 100), locked: pct === 100 && allInLocked(id) })),
+        allInLeft: limited && round !== total ? allInLeft.get(id) : null,
       });
     }
 
     function run() {
       phase = 'run';
       startAt = Date.now();
-      for (const id of ids) stakes.set(id, Math.floor((money.get(id) * (bets.get(id) ?? 0)) / 100));
+      for (const id of ids) {
+        stakes.set(id, Math.floor((money.get(id) * (bets.get(id) ?? 0)) / 100));
+        if (limited && round !== total && bets.get(id) === 100 && (stakes.get(id) ?? 0) > 0) allInLeft.set(id, (allInLeft.get(id) ?? 0) - 1);
+      }
       hostRun();
       ids.forEach(phoneRun);
       crashTimer?.cancel();
@@ -96,7 +104,7 @@ export default {
       }
     }
 
-    const pot = (id: string) => BASE + (stakes.get(id) ?? 0);
+    const pot = (id: string) => free() + (stakes.get(id) ?? 0);
 
     function hostRun() {
       const inCount = ids.length - cashed.size;
@@ -119,28 +127,22 @@ export default {
       const m = mult();
       const roundBase: Record<string, number> = {};
       const roundExtra: Record<string, number> = {};
-      const results = new Map<string, { base: number; extra: number; bonus: number }>();
-      // Letzter raus: wer zuletzt ausgestiegen ist (gleichzeitig = alle Gleichzeitigen)
-      const lastT = cashed.size ? Math.max(...cashedT.values()) : -1;
-      const lastIds = lastMan ? [...cashed.keys()].filter((id) => cashedT.get(id) === lastT) : [];
+      const results = new Map<string, { base: number; extra: number }>();
       for (const id of ids) {
         const x = cashed.get(id);
         const stake = stakes.get(id) ?? 0;
-        const b = x != null ? Math.round(BASE * x * m) : 0;
+        const b = x != null ? Math.round(free() * x * m) : 0;
         const e = x != null ? Math.round(stake * x * m) - stake : -stake;
-        const bonus = lastIds.includes(id) ? LAST_BONUS * m : 0;
         roundBase[id] = b;
-        roundExtra[id] = e + bonus;
+        roundExtra[id] = e;
         extraSum.set(id, (extraSum.get(id) ?? 0) + e);
-        money.add(id, b + e + bonus);
-        results.set(id, { base: b, extra: e, bonus });
+        money.add(id, b + e);
+        results.set(id, { base: b, extra: e });
       }
       tally.rounds.push({
-        crashAt, mult: m, base: roundBase, extra: roundExtra,
+        crashAt, mult: m, free: free(), base: roundBase, extra: roundExtra,
         pct: Object.fromEntries(ids.map((id) => [id, bets.get(id) ?? 0])),
         cm: Object.fromEntries([...cashed]),
-        last: lastIds.length ? lastIds : undefined,
-        lastBonus: lastIds.length ? LAST_BONUS * m : undefined,
       });
       const busted = ids.filter((id) => !cashed.has(id));
       ctx.setHostView({
@@ -148,11 +150,10 @@ export default {
         bustedCount: busted.length, outCount: cashed.size,
         cashed: mode === 'open' ? [...cashed].map(([id, x]) => ({ id, m: x, t: cashedT.get(id) ?? 0 })).sort((a, b) => b.m - a.m) : [],
         busted: mode === 'open' ? busted : [],
-        last: mode === 'open' ? lastIds : [], lastBonus: LAST_BONUS * m,
       });
       ctx.setAllPlayerViews((p) => {
         const r = results.get(p.id)!;
-        return { screen: 'crashed', crashAt, m: cashed.get(p.id) ?? null, pot: pot(p.id), stake: stakes.get(p.id) ?? 0, gain: r.base + r.extra + r.bonus, bonus: r.bonus, total: money.get(p.id) };
+        return { screen: 'crashed', crashAt, m: cashed.get(p.id) ?? null, pot: pot(p.id), stake: stakes.get(p.id) ?? 0, gain: r.base + r.extra, total: money.get(p.id) };
       });
       // Alle erwischt: schnell weiter
       ctx.after(cashed.size === 0 ? T.afterAllBusted : T.afterCrash, nextRound);
@@ -190,7 +191,7 @@ export default {
       start: intro,
       onAction(id, action) {
         if (action?.type === 'cash') return cashOut(id);
-        if (action?.type === 'bet' && phase === 'ready' && ids.includes(id) && BETS.includes(Number(action.pct))) {
+        if (action?.type === 'bet' && phase === 'ready' && ids.includes(id) && BETS.includes(Number(action.pct)) && !(Number(action.pct) === 100 && allInLocked(id))) {
           bets.set(id, Number(action.pct));
           const first = !picked.has(id);
           picked.add(id);
@@ -199,7 +200,10 @@ export default {
         }
       },
       bot(_id, view) {
-        if (view.screen === 'ready' && view.bet === 0 && view.money > 0 && Math.random() < 0.6) return { type: 'bet', pct: BETS[1 + Math.floor(Math.random() * 3)] };
+        if (view.screen === 'ready' && view.bet === 0 && view.money > 0 && Math.random() < 0.6) {
+          const ok = (view.options as { pct: number; locked: boolean }[]).filter((o) => o.pct > 0 && !o.locked);
+          return { type: 'bet', pct: ok[Math.floor(Math.random() * ok.length)].pct };
+        }
         return null;
       },
     };
