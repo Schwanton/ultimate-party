@@ -20,7 +20,7 @@ const PHY = {
   kbScale: 1.2, kbMul: 0.72, dmgMul: 0.8, fireDps: 10, firePush: 900, padSpeed: 720, beltPush: 1100,
 };
 const HAMMER = { maxCharge: 1.2, cooldown: 0.35, chargeSlow: 0.45, stompR: 78 };
-const SLING = { every: 0.24, speed: 560, life: 0.6, r: 6, bigSpeed: 460, bigLife: 0.85, bigR: 10 };
+const SLING = { every: 0.4, speed: 560, life: 0.6, r: 6, bigSpeed: 460, bigLife: 0.85, bigR: 10 };
 const POINTS = { knockout: 100, place: [300, 150, 75] };
 const MONEY = { knockout: 10, place: [15, 10, 5], round: 5 };
 const WEAPON_PRICE = 50;
@@ -854,7 +854,7 @@ export default {
       const angles = n(f, 'streuschuss') ? [-0.21, 0, 0.21] : [0];
       for (const a of angles) {
         const dx = f.fx * Math.cos(a) - f.fy * Math.sin(a), dy = f.fx * Math.sin(a) + f.fy * Math.cos(a);
-        shots.push({ x: f.x + dx * (PHY.radius + 6), y: f.y + dy * (PHY.radius + 6), vx: dx * sp, vy: dy * sp, owner: f.id, until: t + life, big, bounces: n(f, 'abpraller'), pierce: n(f, 'durchschlag') > 0, hit: [], dmg: big ? 9 : 3, base: big ? 300 : 45, kind: big ? 1 : 0 });
+        shots.push({ x: f.x + dx * (PHY.radius + 6), y: f.y + dy * (PHY.radius + 6), vx: dx * sp, vy: dy * sp, owner: f.id, until: t + life, big, bounces: n(f, 'abpraller'), pierce: n(f, 'durchschlag') > 0, hit: [], dmg: big ? 7 : 2, base: big ? 280 : 45, kind: big ? 1 : 0 });
       }
       events.push(['shot', ids.indexOf(f.id), big ? 1 : 0]);
     }

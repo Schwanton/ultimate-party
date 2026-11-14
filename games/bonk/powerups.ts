@@ -34,7 +34,7 @@ export const POWERUPS: PowerupDef[] = [
   // Schleuder
   { id: 'schnellfeuer', rarity: 'common', weapon: 'schleuder', max: 3 },
   { id: 'abpraller', rarity: 'common', weapon: 'schleuder', max: 2 },
-  { id: 'streuschuss', rarity: 'rare', weapon: 'schleuder', max: 1 },
+  { id: 'streuschuss', rarity: 'legendary', weapon: 'schleuder', max: 1 },
   { id: 'ladeschussplus', rarity: 'rare', weapon: 'schleuder', max: 2 },
   { id: 'riesenkugel', rarity: 'epic', weapon: 'schleuder', max: 1 },
   { id: 'durchschlag', rarity: 'legendary', weapon: 'schleuder', max: 1 },

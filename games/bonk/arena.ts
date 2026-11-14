@@ -448,4 +448,4 @@ export const ICON: Record<string, string> = {
 };
 
 /** Abklingzeiten in Sekunden (das Handy zeigt sie an) */
-export const COOLDOWN = { roll: 1.5, stomp: 4, bigShot: 3, pushHook: 4, detonate: 2.5 };
+export const COOLDOWN = { roll: 1.5, stomp: 4, bigShot: 4.5, pushHook: 4, detonate: 2.5 };
