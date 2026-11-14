@@ -9,7 +9,7 @@ export const RARITY_COLOR: Record<Rarity, string> = { common: '#4BE3A1', rare: '
 export const PRICE: Record<Rarity, number> = { common: 15, rare: 30, epic: 50, legendary: 80 };
 export const REROLL_PRICE = 10;
 
-export interface PowerupDef { id: string; rarity: Rarity; weapon: 'alle' | 'hammer' | 'schleuder'; max?: number }
+export interface PowerupDef { id: string; rarity: Rarity; weapon: 'alle' | 'hammer' | 'schleuder' | 'haken' | 'bomben' | 'schwert' | 'bumerang'; max?: number }
 
 export const POWERUPS: PowerupDef[] = [
   // für alle Waffen
@@ -36,6 +36,27 @@ export const POWERUPS: PowerupDef[] = [
   { id: 'ladeschussplus', rarity: 'rare', weapon: 'schleuder', max: 2 },
   { id: 'riesenkugel', rarity: 'epic', weapon: 'schleuder', max: 1 },
   { id: 'durchschlag', rarity: 'legendary', weapon: 'schleuder', max: 1 },
+  // Enterhaken
+  { id: 'stahlseil', rarity: 'common', weapon: 'haken', max: 3 },
+  { id: 'widerhaken', rarity: 'common', weapon: 'haken', max: 3 },
+  { id: 'doppelhaken', rarity: 'rare', weapon: 'haken', max: 2 },
+  { id: 'schleuderzug', rarity: 'epic', weapon: 'haken', max: 1 },
+  // Bomben
+  { id: 'kurzelunte', rarity: 'common', weapon: 'bomben', max: 2 },
+  { id: 'grossebombe', rarity: 'common', weapon: 'bomben', max: 3 },
+  { id: 'haftbombe', rarity: 'rare', weapon: 'bomben', max: 1 },
+  { id: 'kettenreaktion', rarity: 'epic', weapon: 'bomben', max: 1 },
+  { id: 'minenleger', rarity: 'legendary', weapon: 'bomben', max: 1 },
+  // Schwert und Schild
+  { id: 'schnelleklinge', rarity: 'common', weapon: 'schwert', max: 3 },
+  { id: 'dickerschild', rarity: 'common', weapon: 'schwert', max: 2 },
+  { id: 'konter', rarity: 'rare', weapon: 'schwert', max: 1 },
+  { id: 'klingenwelle', rarity: 'legendary', weapon: 'schwert', max: 1 },
+  // Bumerang
+  { id: 'weitwurf', rarity: 'common', weapon: 'bumerang', max: 3 },
+  { id: 'scharfkante', rarity: 'common', weapon: 'bumerang', max: 3 },
+  { id: 'rueckholsog', rarity: 'rare', weapon: 'bumerang', max: 1 },
+  { id: 'doppelbumerang', rarity: 'epic', weapon: 'bumerang', max: 1 },
 ];
 
 export const POWERUP = Object.fromEntries(POWERUPS.map((p) => [p.id, p])) as Record<string, PowerupDef>;

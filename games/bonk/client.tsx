@@ -6,11 +6,11 @@ import { POWERUP, PRICE, RARITY_COLOR, REROLL_PRICE } from './powerups';
 
 const PINK = '#FF4FB8';
 const INK = '#07051A';
-const FLAG = { air: 1, roll: 2, invuln: 4, gone: 8, out: 16, charge: 32, stun: 64 };
+const FLAG = { air: 1, roll: 2, invuln: 4, gone: 8, out: 16, charge: 32, stun: 64, block: 128 };
 
 /** [x, y, Winkel°, Flags, Schaden, Leben, Ladung%] */
 type PFrame = [number, number, number, number, number, number, number];
-interface Frame { round: number; t: number; fire: number | null; p: PFrame[]; s: [number, number, number][]; e: (string | number)[][] }
+interface Frame { round: number; t: number; fire: number | null; p: PFrame[]; o: number[][]; e: (string | number)[][] }
 interface ArenaView { cols: number; rows: number; grid: string[]; walls?: [number, number, number, number][]; bumpers: { x: number; y: number }[]; ring: number[]; ringMax: number; center: { x: number; y: number }; seed: number }
 
 const heat = (d: number) => (d >= 100 ? '#FF3B4E' : d >= 60 ? '#FF9F43' : d >= 30 ? '#FFD447' : '#FFFFFF');
@@ -237,6 +237,29 @@ function HostArena({ view, t, player }: HostViewProps) {
       } else if (kind === 'wall') {
         const [, x, y] = e as [string, number, number];
         effects.current.push({ kind: 'spark', x, y, at: n, v: 200 });
+      } else if (kind === 'boom') {
+        const [, x, y, r] = e as [string, number, number, number];
+        effects.current.push({ kind: 'blast', x, y, at: n, v: r, color: '#FF6B2C' });
+        shake.current = { until: n + 300, power: 10 };
+        sfx.custom((s) => { s.noise(0.5, { filter: 500, type: 'lowpass', vol: 0.5 }); s.tone(70, 0.4, { type: 'sine', vol: 0.4, to: 30 }); });
+      } else if (kind === 'slash') {
+        const [, i, step] = e as [string, number, number];
+        const p = fr.p[i];
+        if (p) effects.current.push({ kind: 'swoosh', x: p[0], y: p[1], at: n, v: p[2], text: String(step === 2 ? 90 : 20), color: info.current.colors[i] });
+        sfx.custom((s) => s.noise(0.1, { filter: 2500, sweepTo: 6000, vol: step === 2 ? 0.12 : 0.06 }));
+      } else if (kind === 'block') {
+        const [, x, y] = e as [string, number, number];
+        effects.current.push({ kind: 'ring', x, y, at: n, v: 22, color: '#9B7BFF' });
+        sfx.custom((s) => s.tone(1200, 0.08, { type: 'square', vol: 0.08, to: 900 }));
+      } else if (kind === 'grab') {
+        const [, x, y] = e as [string, number, number];
+        effects.current.push({ kind: 'ring', x, y, at: n, v: 26, color: '#36D6F5' });
+        sfx.custom((s) => s.tone(500, 0.1, { type: 'triangle', vol: 0.12, to: 300 }));
+      } else if (kind === 'hook' || kind === 'throw' || kind === 'toss') {
+        sfx.custom((s) => s.noise(0.14, { filter: 1200, sweepTo: 3500, vol: 0.06 }));
+      } else if (kind === 'fizzle') {
+        const [, x, y] = e as [string, number, number];
+        effects.current.push({ kind: 'ring', x, y, at: n, v: 14, color: '#8F88B8' });
       }
     }
   }, [fr]);
@@ -302,11 +325,36 @@ function HostArena({ view, t, player }: HostViewProps) {
       const a = Math.min(1, (n - at) / 34);
       const lerp = (p: number, q: number) => p + (q - p) * a;
 
-      // Geschosse
-      for (const s of cur.s) {
-        glow(g, '#FF9F43', 10);
-        g.fillStyle = s[2] ? '#FFD447' : '#FFFFFF';
-        circle(g, s[0], s[1], s[2] ? 9 : 5); g.fill();
+      // Geschosse, Haken, Bomben, Bumerangs
+      for (const o of cur.o ?? []) {
+        const [k, ox2, oy2] = o;
+        if (k === 0 || k === 1) {
+          glow(g, '#FF9F43', 10); g.fillStyle = k ? '#FFD447' : '#FFFFFF';
+          circle(g, ox2, oy2, k ? 9 : 5); g.fill();
+        } else if (k === 5) {
+          const an = (o[3] * Math.PI) / 180;
+          glow(g, '#9B7BFF', 14); g.strokeStyle = '#C29BFF'; g.lineWidth = 6;
+          g.beginPath(); g.arc(ox2 - Math.cos(an) * 14, oy2 - Math.sin(an) * 14, 22, an - 1, an + 1); g.stroke();
+        } else if (k === 2) {
+          const owner = cur.p[o[3]], q = prev.p[o[3]] ?? owner;
+          const c = o[4] ? '#FF7EB6' : '#36D6F5';
+          if (owner) {
+            g.strokeStyle = c; g.lineWidth = 2.5; glow(g, c, 8);
+            g.beginPath(); g.moveTo(lerp(q[0], owner[0]), lerp(q[1], owner[1])); g.lineTo(ox2, oy2); g.stroke();
+          }
+          g.fillStyle = c; circle(g, ox2, oy2, 6); g.fill();
+        } else if (k === 3) {
+          const fuse = o[3], blink = fuse < 6 ? Math.floor(n / 70) % 2 : Math.floor(n / 220) % 2;
+          glow(g, '#FF3B4E', blink ? 18 : 8);
+          g.fillStyle = '#110D24'; g.strokeStyle = '#FF3B4E'; g.lineWidth = 3;
+          circle(g, ox2, oy2, o[4] ? 11 : 10); g.fill(); g.stroke();
+          g.fillStyle = blink ? '#FFD447' : '#FF9F43'; circle(g, ox2 + 7, oy2 - 9, 3); g.fill();
+        } else if (k === 4) {
+          g.save(); g.translate(ox2, oy2); g.rotate(n / 50);
+          glow(g, '#4BE3A1', 12); g.strokeStyle = '#4BE3A1'; g.lineWidth = 5; g.lineCap = 'round';
+          g.beginPath(); g.moveTo(-12, 8); g.lineTo(0, -8); g.lineTo(12, 8); g.stroke();
+          g.restore();
+        }
       }
       glow(g);
 
@@ -327,7 +375,7 @@ function HostArena({ view, t, player }: HostViewProps) {
           g.strokeStyle = color + '88'; g.lineWidth = 3;
           for (let k = 1; k <= 3; k++) { g.beginPath(); g.moveTo(x - Math.cos(ang) * (R + k * 8), y - Math.sin(ang) * (R + k * 8) - 6 + k * 3); g.lineTo(x - Math.cos(ang) * (R + k * 8 + 10), y - Math.sin(ang) * (R + k * 8 + 10) - 6 + k * 3); g.stroke(); }
         }
-        drawWeapon(g, weapons[i], x, y, ang, R, color, flags & FLAG.charge ? p[6] : -1);
+        drawWeapon(g, weapons[i], x, y, ang, R, color, flags & FLAG.charge ? p[6] : -1, !!(flags & FLAG.block));
         drawFigure(g, x, y, R * sc, color, ang, !!(flags & FLAG.stun));
         g.globalAlpha = 1;
         if (flags & FLAG.charge) {
@@ -393,6 +441,16 @@ function HostArena({ view, t, player }: HostViewProps) {
           if (age > 260) return false;
           g.strokeStyle = e.color ?? '#FFFFFF'; g.globalAlpha = 1 - age / 260; g.lineWidth = 8; glow(g, e.color, 16);
           circle(g, e.x, e.y, R + 26 + age / 12); g.stroke(); glow(g); g.globalAlpha = 1;
+          return true;
+        }
+        if (e.kind === 'blast') {
+          if (age > 420) return false;
+          const k = age / 420;
+          g.globalAlpha = 1 - k;
+          glow(g, '#FF6B2C', 24);
+          g.fillStyle = 'rgba(255,107,44,0.35)'; circle(g, e.x, e.y, e.v * (0.4 + 0.6 * k)); g.fill();
+          g.strokeStyle = '#FFD447'; g.lineWidth = 5; circle(g, e.x, e.y, e.v * (0.5 + 0.5 * k)); g.stroke();
+          glow(g); g.globalAlpha = 1;
           return true;
         }
         if (e.kind === 'text') {
@@ -497,7 +555,7 @@ function drawFigure(g: CanvasRenderingContext2D, x: number, y: number, r: number
   }
 }
 
-function drawWeapon(g: CanvasRenderingContext2D, weapon: string, x: number, y: number, ang: number, r: number, color: string, charge: number) {
+function drawWeapon(g: CanvasRenderingContext2D, weapon: string, x: number, y: number, ang: number, r: number, color: string, charge: number, blocking = false) {
   g.save();
   g.translate(x, y);
   g.rotate(ang + (charge >= 0 ? -1.1 - charge / 120 : 0));
@@ -505,6 +563,16 @@ function drawWeapon(g: CanvasRenderingContext2D, weapon: string, x: number, y: n
   g.strokeStyle = color; g.fillStyle = '#110D24'; g.lineWidth = 3;
   if (weapon === 'schleuder') {
     g.beginPath(); g.moveTo(r - 2, 0); g.lineTo(r + 10, 0); g.moveTo(r + 10, 0); g.lineTo(r + 18, -7); g.moveTo(r + 10, 0); g.lineTo(r + 18, 7); g.stroke();
+  } else if (weapon === 'haken') {
+    g.beginPath(); g.moveTo(r - 2, 6); g.lineTo(r + 12, 6); g.arc(r + 12, 0, 6, Math.PI / 2, -Math.PI / 2, true); g.stroke();
+  } else if (weapon === 'bomben') {
+    circle(g, r + 6, 6, 6); g.fill(); g.stroke();
+  } else if (weapon === 'bumerang') {
+    g.beginPath(); g.moveTo(r - 2, 10); g.lineTo(r + 8, 2); g.lineTo(r - 2, -6); g.stroke();
+  } else if (weapon === 'schwert') {
+    g.beginPath(); g.moveTo(r - 2, 8); g.lineTo(r + 22, 8); g.moveTo(r + 2, 3); g.lineTo(r + 2, 13); g.stroke();
+    g.lineWidth = blocking ? 6 : 4;
+    g.beginPath(); g.arc(0, 0, r + (blocking ? 9 : 5), blocking ? -1.1 : -1.6, blocking ? 1.1 : -0.6); g.stroke();
   } else {
     g.beginPath(); g.moveTo(r - 4, 0); g.lineTo(r + 16, 0); g.stroke();
     g.beginPath(); g.rect(r + 12, -9, 12, 18); g.fill(); g.stroke();
@@ -561,10 +629,10 @@ function drawFloor(arena: ArenaView, cell: number, scale: number, ox: number, oy
   g.lineCap = 'round';
   for (const [x1, y1, x2, y2] of arena.walls ?? []) {
     glow(g, '#C29BFF', 16);
-    g.strokeStyle = '#C29BFF'; g.lineWidth = 9;
+    g.strokeStyle = '#C29BFF'; g.lineWidth = 14;
     g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke();
     glow(g);
-    g.strokeStyle = '#FFFFFF'; g.lineWidth = 3;
+    g.strokeStyle = '#FFFFFF'; g.lineWidth = 5;
     g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke();
   }
   // Säulen
@@ -690,7 +758,8 @@ function PlayController({ view, t, send, me }: ControllerViewProps) {
   const wColor = WEAPON_COLOR[view.weapon as 'hammer'];
   const gesture = view.controls === 'gesten';
   const altName = t(`alt.${view.weapon}`);
-  const doAlt = () => { if (!altCd.isReady()) return; altCd.start(); vibrate(30); sendRef.current({ type: 'alt' }); };
+  const doAlt = () => { if (!altCd.isReady()) return; if ((view.altCd ?? 0) > 0) altCd.start(); vibrate(30); sendRef.current({ type: 'alt', down: true }); };
+  const altUp = () => sendRef.current({ type: 'alt', down: false });
   const aDown = () => {
     if (gesture && performance.now() - lastUp.current < 280) { altPress.current = true; doAlt(); return; }
     altPress.current = false;
@@ -698,7 +767,7 @@ function PlayController({ view, t, send, me }: ControllerViewProps) {
     sendRef.current({ type: 'a', down: true });
   };
   const aUp = () => {
-    if (altPress.current) { altPress.current = false; return; }
+    if (altPress.current) { altPress.current = false; altUp(); return; }
     lastUp.current = performance.now();
     sendRef.current({ type: 'a', down: false });
   };
@@ -730,7 +799,7 @@ function PlayController({ view, t, send, me }: ControllerViewProps) {
 
   const buttons = (
     <div style={{ position: 'relative', width: S * 2.25, height: gesture ? S * 1.6 : S * 2.2, flex: 'none' }}>
-      <RoundButton size={S} color={wColor} icon={view.weapon} label={view.weapon === 'hammer' ? t('phone.hold') : t('phone.fire')}
+      <RoundButton size={S} color={wColor} icon={view.weapon} label={t(`a.${view.weapon}`)}
         sub={gesture ? t('phone.double', { name: altName }) : undefined}
         ready={gesture ? altCd.ready : 1}
         ariaLabel={`A: ${t(`w.${view.weapon}`)}`} onDown={aDown} onUp={aUp}
@@ -738,7 +807,7 @@ function PlayController({ view, t, send, me }: ControllerViewProps) {
       <RoundButton size={S * 0.74} color="#4BE3A1" label={t('phone.roll')} ready={roll.ready} ariaLabel={`B: ${t('phone.roll')}`} onDown={doRoll}
         style={{ position: 'absolute', right: S * 1.12, bottom: 0 }} />
       {!gesture && (
-        <RoundButton size={S * 0.74} color="#9B7BFF" label={altName} ready={altCd.ready} ariaLabel={`C: ${altName}`} onDown={doAlt}
+        <RoundButton size={S * 0.74} color="#9B7BFF" label={altName} ready={altCd.ready} ariaLabel={`C: ${altName}`} onDown={doAlt} onUp={altUp}
           style={{ position: 'absolute', right: S * 0.13, bottom: S * 1.16 }} />
       )}
     </div>

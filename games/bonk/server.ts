@@ -10,7 +10,7 @@
 
 import { Scores, shuffle, type GameContext, type GameServerModule } from '@up/sdk';
 import { POWERUP, PRICE, REROLL_PRICE, drawPowerups, rarityChances } from './powerups';
-import { CELL, COOLDOWN, T_PILLAR, WEAPONS, distToSegment, edgeDistance, generateArena, onGround, walkable, type Arena, type WeaponId } from './arena';
+import { CELL, COOLDOWN, T_PILLAR, WALL_HALF, WEAPONS, distToSegment, edgeDistance, generateArena, onGround, walkable, type Arena, type WeaponId } from './arena';
 
 const TICK = 1 / 30;
 const T = { intro: 8, weapon: 20, pick: 20, shop: 45, ready: 3, roundEnd: 5, scores: 6, respawn: 2.2, invuln: 1.5, credit: 3 };
@@ -23,7 +23,11 @@ const HAMMER = { maxCharge: 1.2, cooldown: 0.35, chargeSlow: 0.45, stompR: 78 };
 const SLING = { every: 0.24, speed: 560, life: 0.6, r: 6, bigSpeed: 460, bigLife: 0.85, bigR: 10 };
 const POINTS = { knockout: 100, place: [300, 150, 75] };
 const MONEY = { knockout: 10, place: [15, 10, 5], round: 5 };
-const FLAG = { air: 1, roll: 2, invuln: 4, gone: 8, out: 16, charge: 32, stun: 64 };
+const FLAG = { air: 1, roll: 2, invuln: 4, gone: 8, out: 16, charge: 32, stun: 64, block: 128 };
+const HOOK = { speed: 760, range: 300, cooldown: 0.9, pull: 420 };
+const BOMB = { speed: 350, flight: 0.4, fuse: 1.5, radius: 70, cooldown: 0.6, max: 2 };
+const SWORD = { gap: 0.22, finisher: 0.4, comboWindow: 0.8, reach: 20, r: 30 };
+const BOOM = { speed: 560, back: 600, range: 260, life: 3 };
 
 type State = 'alive' | 'gone' | 'out';
 interface Fighter {
@@ -35,8 +39,12 @@ interface Fighter {
   hitBy: string | null; hitAt: number; kos: number; place: number;
   botRelease: number; botRoll: number;
   pu: Record<string, number>; rollStock: number; rollRecharge: number; shots: number;
+  combo: number; comboAt: number; blocking: boolean; blockStart: number;
 }
-interface Shot { x: number; y: number; vx: number; vy: number; owner: string; until: number; big: boolean; bounces: number; pierce: boolean; hit: string[] }
+interface Shot { x: number; y: number; vx: number; vy: number; owner: string; until: number; big: boolean; bounces: number; pierce: boolean; hit: string[]; dmg: number; base: number; kind: number }
+interface Hook { owner: string; x: number; y: number; vx: number; vy: number; dist: number; max: number; mode: 'pull' | 'push' }
+interface Bomb { owner: string; x: number; y: number; vx: number; vy: number; landAt: number; fuseAt: number; stuck: string | null; flying: boolean; gone?: boolean }
+interface Boom { owner: string; x: number; y: number; vx: number; vy: number; back: boolean; traveled: number; range: number; until: number; hitOut: string[]; hitBack: string[] }
 type Ev = (string | number)[];
 
 export default {
@@ -49,6 +57,10 @@ export default {
     const weapons = new Map<string, WeaponId | null>(ids.map((id) => [id, null]));
     const fighters = new Map<string, Fighter>();
     let shots: Shot[] = [];
+    let hooks: Hook[] = [];
+    let bombs: Bomb[] = [];
+    let booms: Boom[] = [];
+    const weaponOpts = new Map<string, WeaponId[]>(ids.map((id) => [id, shuffle(WEAPONS).slice(0, 3)]));
     let events: Ev[] = [];
     let arena: Arena = generateArena(N);
     let grid: string[] = arena.grid;
@@ -65,7 +77,15 @@ export default {
     const n = (f: Fighter, id: string) => f.pu[id] ?? 0;
     const maxCharge = (f: Fighter) => HAMMER.maxCharge * 0.75 ** n(f, 'schnelllader');
     const rollCd = (f: Fighter) => COOLDOWN.roll * 0.75 ** n(f, 'schnellrolle');
-    const altCd = (f: Fighter) => (f.weapon === 'hammer' ? COOLDOWN.stomp * 0.6 ** n(f, 'stampferplus') : COOLDOWN.bigShot * 0.6 ** n(f, 'ladeschussplus'));
+    const altCd = (f: Fighter) => {
+      switch (f.weapon) {
+        case 'hammer': return COOLDOWN.stomp * 0.6 ** n(f, 'stampferplus');
+        case 'schleuder': return COOLDOWN.bigShot * 0.6 ** n(f, 'ladeschussplus');
+        case 'haken': return COOLDOWN.pushHook;
+        case 'bomben': return COOLDOWN.detonate;
+        default: return 0;
+      }
+    };
     let round = 0;
     let t = 0;
     let loop = 0;
@@ -102,11 +122,11 @@ export default {
 
     function chooseWeapons() {
       phase = 'weapon';
-      for (const id of ids) if (isBot(id)) weapons.set(id, shuffle(WEAPONS)[0]);
+      for (const id of ids) if (isBot(id)) weapons.set(id, shuffle(weaponOpts.get(id)!)[0]);
       const timer = ctx.timer(T.weapon, finishWeapons);
       const show = () => {
         ctx.setHostView({ screen: 'weapon', ids, chosen: Object.fromEntries(weapons), deadline: timer.deadline, duration: timer.duration });
-        ctx.setAllPlayerViews((p) => ({ screen: 'weapon', options: WEAPONS, chosen: weapons.get(p.id), deadline: timer.deadline, duration: timer.duration }));
+        ctx.setAllPlayerViews((p) => ({ screen: 'weapon', options: weaponOpts.get(p.id) ?? WEAPONS, chosen: weapons.get(p.id), deadline: timer.deadline, duration: timer.duration }));
       };
       showWeapons = show;
       show();
@@ -117,7 +137,7 @@ export default {
     function finishWeapons() {
       if (phase !== 'weapon') return;
       ctx.clearTimers();
-      for (const id of ids) if (!weapons.get(id)) weapons.set(id, shuffle(WEAPONS)[0]);
+      for (const id of ids) if (!weapons.get(id)) weapons.set(id, shuffle(weaponOpts.get(id)!)[0]);
       pickPhase(true);
     }
 
@@ -127,6 +147,9 @@ export default {
       phase = 'ready';
       t = 0;
       shots = [];
+      hooks = [];
+      bombs = [];
+      booms = [];
       events = [];
       arena = generateArena(N);
       grid = arena.grid;
@@ -141,6 +164,7 @@ export default {
           dmg: 0, lives: 3 + ((owned.get(id) ?? {}).viertesleben ?? 0), state: 'alive', respawnAt: 0, air: false, airMin: 0, rollUntil: 0, rollReady: 0, invulnUntil: 0, stunUntil: 0, bumpUntil: 0,
           charging: null, swingReady: 0, altReady: 0, fireHeld: false, nextShot: 0, hitBy: null, hitAt: -9, kos: 0, place: 0, botRelease: 0, botRoll: 0,
           pu: owned.get(id) ?? {}, rollStock: 1 + ((owned.get(id) ?? {}).doppelrolle ?? 0), rollRecharge: 0, shots: 0,
+          combo: 0, comboAt: -9, blocking: false, blockStart: 0,
         });
       });
       // Blickrichtung zur Mitte
@@ -198,6 +222,7 @@ export default {
         const speed = PHY.accel * (1 + 0.1 * n(f, 'leichtfuss')) * (1 - 0.05 * n(f, 'brocken'));
         let ax = stunned ? 0 : f.ix * speed, ay = stunned ? 0 : f.iy * speed;
         if (f.charging !== null) { ax *= HAMMER.chargeSlow; ay *= HAMMER.chargeSlow; }
+        if (f.blocking) { const k = n(f, 'dickerschild') ? 0.75 : 0.5; ax *= k; ay *= k; }
         const ice = cellAt(f.x, f.y) === 'i';
         if (f.air) { ax *= PHY.airControl; ay *= PHY.airControl; }
         else if (ice) { ax *= 0.45; ay *= 0.45; }
@@ -221,7 +246,7 @@ export default {
           f.x = nx0;
           f.y = ny0;
         }
-        if (Math.hypot(f.ix, f.iy) > 0.3 && f.charging === null && !f.air) {
+        if (Math.hypot(f.ix, f.iy) > 0.3 && f.charging === null && !f.air && !f.blocking) {
           const l = Math.hypot(f.ix, f.iy);
           f.fx = f.ix / l; f.fy = f.iy / l;
         }
@@ -248,7 +273,7 @@ export default {
           const dx = x2 - x1, dy = y2 - y1, l2 = dx * dx + dy * dy || 1;
           const k = Math.max(0, Math.min(1, ((f.x - x1) * dx + (f.y - y1) * dy) / l2));
           const cx = x1 + k * dx, cy = y1 + k * dy;
-          const ox = f.x - cx, oy = f.y - cy, d = Math.hypot(ox, oy), min = PHY.radius + 3;
+          const ox = f.x - cx, oy = f.y - cy, d = Math.hypot(ox, oy), min = PHY.radius + WALL_HALF;
           if (d >= min) continue;
           const nx = d ? ox / d : -dy / Math.sqrt(l2), ny = d ? oy / d : dx / Math.sqrt(l2);
           f.x = cx + nx * min; f.y = cy + ny * min;
@@ -293,6 +318,9 @@ export default {
       }
 
       stepShots();
+      stepHooks();
+      stepBombs();
+      stepBooms();
 
       // Runtergefallen?
       const before = withLives().length;
@@ -377,8 +405,22 @@ export default {
       }
     }
 
-    function hit(v: Fighter, by: Fighter, dmg: number, base: number, dx: number, dy: number) {
+    /** Schild: Treffer von vorn werden abgeblockt */
+    function blocks(v: Fighter, dx: number, dy: number) {
+      if (!v.blocking || v.weapon !== 'schwert' || v.state !== 'alive') return false;
+      const l = Math.hypot(dx, dy) || 1;
+      const arc = ((70 + 30 * n(v, 'dickerschild')) * Math.PI) / 180;
+      return (-dx * v.fx - dy * v.fy) / l > Math.cos(arc);
+    }
+
+    function hit(v: Fighter, by: Fighter, dmg: number, base: number, dx: number, dy: number, counter = false) {
       if (v.state !== 'alive' || t < v.invulnUntil) return;
+      if (by !== v && blocks(v, dx, dy)) {
+        events.push(['block', Math.round(v.x + v.fx * 18), Math.round(v.y + v.fy * 18)]);
+        if (n(v, 'konter') && t - v.blockStart < 0.3 && !counter) hit(by, v, 3, 320, -dx, -dy, true);
+        dmg = 0;
+        base *= 0.2;
+      }
       v.dmg += dmg;
       const kb = base * PHY.kbMul * (1 + (v.dmg / 100) * PHY.kbScale) * (1 + 0.1 * n(by, 'wucht')) * 0.85 ** n(v, 'brocken');
       const l = Math.hypot(dx, dy) || 1;
@@ -435,27 +477,200 @@ export default {
 
     function attackDown(f: Fighter) {
       if (!canAct(f)) return;
-      if (f.weapon === 'hammer') {
-        if (f.charging === null && t >= f.swingReady) f.charging = t;
-      } else {
-        f.fireHeld = true;
-        if (t >= f.nextShot) shoot(f, false);
+      switch (f.weapon) {
+        case 'hammer':
+          if (f.charging === null && t >= f.swingReady) f.charging = t;
+          break;
+        case 'schleuder':
+          f.fireHeld = true;
+          if (t >= f.nextShot) shoot(f, false);
+          break;
+        case 'haken':
+          if (t >= f.swingReady && !hooks.some((h) => h.owner === f.id)) { throwHook(f, 'pull'); f.swingReady = t + HOOK.cooldown * 0.6 ** n(f, 'doppelhaken'); }
+          break;
+        case 'bomben':
+          if (t >= f.swingReady && bombs.filter((b) => b.owner === f.id).length < BOMB.max + 2 * n(f, 'minenleger')) { throwBomb(f); f.swingReady = t + BOMB.cooldown; }
+          break;
+        case 'schwert':
+          slash(f);
+          break;
+        case 'bumerang':
+          if (booms.filter((b) => b.owner === f.id).length < 1 + n(f, 'doppelbumerang')) throwBoom(f);
+          break;
       }
     }
 
     function attackUp(f: Fighter) {
       if (f.weapon === 'hammer') { if (f.state === 'alive') swing(f); }
-      else f.fireHeld = false;
+      else if (f.weapon === 'schleuder') f.fireHeld = false;
     }
 
-    function alt(f: Fighter) {
-      if (!canAct(f) || t < f.altReady) return;
+    function alt(f: Fighter, down = true) {
+      if (f.weapon === 'schwert') { // Schild: halten
+        if (down && canAct(f)) { f.blocking = true; f.blockStart = t; }
+        else if (!down) f.blocking = false;
+        return;
+      }
+      if (!down || !canAct(f) || t < f.altReady) return;
+      if (f.weapon === 'bumerang') { for (const b of booms) if (b.owner === f.id) b.back = true; return; }
       f.altReady = t + altCd(f);
       if (f.weapon === 'hammer') {
         f.charging = null;
         f.stunUntil = t + 0.15;
         shockwave(f, HAMMER.stompR * (1 + 0.2 * n(f, 'stampferplus')), 6, 240);
-      } else shoot(f, true);
+      } else if (f.weapon === 'schleuder') shoot(f, true);
+      else if (f.weapon === 'haken') { hooks = hooks.filter((h) => h.owner !== f.id); throwHook(f, 'push'); }
+      else if (f.weapon === 'bomben') for (const b of bombs) if (b.owner === f.id) b.fuseAt = Math.min(b.fuseAt, t);
+    }
+
+    /* ---------- Enterhaken ---------- */
+
+    function throwHook(f: Fighter, mode: 'pull' | 'push') {
+      aim(f, 320);
+      hooks.push({ owner: f.id, x: f.x + f.fx * PHY.radius, y: f.y + f.fy * PHY.radius, vx: f.fx * HOOK.speed, vy: f.fy * HOOK.speed, dist: 0, max: HOOK.range * (1 + 0.3 * n(f, 'stahlseil')), mode });
+      events.push(['hook', ids.indexOf(f.id)]);
+    }
+
+    function stepHooks() {
+      const keep: Hook[] = [];
+      for (const h of hooks) {
+        const o = fighters.get(h.owner)!;
+        if (o.state !== 'alive') continue;
+        h.x += h.vx * TICK; h.y += h.vy * TICK; h.dist += HOOK.speed * TICK;
+        const solid = cellAt(h.x, h.y) === T_PILLAR || arena.walls.some((w) => distToSegment(h.x, h.y, w) < WALL_HALF + 2);
+        if (solid) {
+          if (h.mode === 'pull') { // sich zur Wand ziehen
+            const dx = h.x - o.x, dy = h.y - o.y, l = Math.hypot(dx, dy) || 1;
+            o.vx = (dx / l) * 680; o.vy = (dy / l) * 680; o.air = true; o.airMin = t + 0.15; o.charging = null;
+            events.push(['grab', Math.round(h.x), Math.round(h.y)]);
+          }
+          continue;
+        }
+        let used = false;
+        for (const v of fighters.values()) {
+          if (v === o || v.state !== 'alive' || t < v.invulnUntil) continue;
+          if (Math.hypot(v.x - h.x, v.y - h.y) > PHY.radius + 6) continue;
+          if (h.mode === 'push') hit(v, o, 6, 330, h.vx, h.vy);
+          else if (blocks(v, h.vx, h.vy)) hit(v, o, 0, 0, h.vx, h.vy);
+          else {
+            hit(v, o, 5 + 3 * n(o, 'widerhaken'), 0, h.vx, h.vy);
+            const dx = o.x - v.x, dy = o.y - v.y, l = Math.hypot(dx, dy) || 1;
+            const sp = (HOOK.pull + l * 0.8) * (n(o, 'schleuderzug') ? 1.6 : 1);
+            v.vx = (dx / l) * sp; v.vy = (dy / l) * sp; v.air = true; v.airMin = t + 0.2;
+          }
+          events.push(['grab', Math.round(h.x), Math.round(h.y)]);
+          used = true;
+          break;
+        }
+        if (!used && h.dist < h.max) keep.push(h);
+      }
+      hooks = keep;
+    }
+
+    /* ---------- Bomben ---------- */
+
+    function throwBomb(f: Fighter) {
+      aim(f, 200);
+      bombs.push({ owner: f.id, x: f.x + f.fx * PHY.radius, y: f.y + f.fy * PHY.radius, vx: f.fx * BOMB.speed, vy: f.fy * BOMB.speed, landAt: t + BOMB.flight, fuseAt: t + BOMB.fuse * 0.75 ** n(f, 'kurzelunte'), stuck: null, flying: true });
+      events.push(['toss', ids.indexOf(f.id)]);
+    }
+
+    function stepBombs() {
+      const keep: Bomb[] = [];
+      for (const b of bombs) {
+        if (b.gone) continue;
+        const o = fighters.get(b.owner)!;
+        if (b.stuck) {
+          const v = fighters.get(b.stuck);
+          if (v && v.state === 'alive') { b.x = v.x; b.y = v.y; } else b.stuck = null;
+        } else if (b.flying) {
+          b.x += b.vx * TICK; b.y += b.vy * TICK;
+          if (n(o, 'haftbombe')) {
+            for (const v of fighters.values()) if (v !== o && v.state === 'alive' && Math.hypot(v.x - b.x, v.y - b.y) < PHY.radius + 8) { b.stuck = v.id; b.flying = false; break; }
+          }
+          if (b.flying && t >= b.landAt) {
+            b.flying = false;
+            if (!onGround(grid, b.x, b.y, 4)) { events.push(['fizzle', Math.round(b.x), Math.round(b.y)]); continue; }
+          }
+        }
+        if (t >= b.fuseAt) { explode(b); continue; }
+        keep.push(b);
+      }
+      bombs = keep.filter((b) => !b.gone);
+    }
+
+    function explode(b: Bomb) {
+      b.gone = true;
+      const o = fighters.get(b.owner)!;
+      const r = BOMB.radius * (1 + 0.2 * n(o, 'grossebombe'));
+      events.push(['boom', Math.round(b.x), Math.round(b.y), Math.round(r)]);
+      for (const v of fighters.values()) {
+        if (v.state !== 'alive') continue;
+        const dx = v.x - b.x, dy = v.y - b.y;
+        if (Math.hypot(dx, dy) > r + PHY.radius) continue;
+        if (v === o) hit(v, o, 6, 170, dx || 1, dy);
+        else hit(v, o, 12, 300, dx || 1, dy);
+      }
+      if (n(o, 'kettenreaktion')) for (const c of bombs) if (c !== b && Math.hypot(c.x - b.x, c.y - b.y) < r) c.fuseAt = Math.min(c.fuseAt, t + 0.08);
+    }
+
+    /* ---------- Schwert und Schild ---------- */
+
+    function slash(f: Fighter) {
+      if (t < f.swingReady || f.blocking) return;
+      const step = t - f.comboAt < SWORD.comboWindow ? (f.combo + 1) % 3 : 0;
+      f.combo = step;
+      f.comboAt = t;
+      f.swingReady = t + (step === 2 ? SWORD.finisher : SWORD.gap) * 0.8 ** n(f, 'schnelleklinge');
+      aim(f, 100);
+      const hx = f.x + f.fx * (PHY.radius + SWORD.reach), hy = f.y + f.fy * (PHY.radius + SWORD.reach);
+      events.push(['slash', ids.indexOf(f.id), step]);
+      for (const o of fighters.values()) {
+        if (o === f || o.state !== 'alive') continue;
+        if (Math.hypot(o.x - hx, o.y - hy) > SWORD.r + PHY.radius) continue;
+        const dx = o.x - f.x, dy = o.y - f.y, l = Math.hypot(dx, dy) || 1;
+        hit(o, f, step === 2 ? 8 : 4, step === 2 ? 330 : 90, dx / l + f.fx * 0.6, dy / l + f.fy * 0.6);
+        thorns(f, o);
+      }
+      if (step === 2 && n(f, 'klingenwelle')) {
+        shots.push({ x: hx, y: hy, vx: f.fx * 500, vy: f.fy * 500, owner: f.id, until: t + 0.5, big: false, bounces: 0, pierce: true, hit: [], dmg: 6, base: 260, kind: 5 });
+      }
+    }
+
+    /* ---------- Bumerang ---------- */
+
+    function throwBoom(f: Fighter) {
+      aim(f, 300);
+      booms.push({ owner: f.id, x: f.x + f.fx * PHY.radius, y: f.y + f.fy * PHY.radius, vx: f.fx * BOOM.speed, vy: f.fy * BOOM.speed, back: false, traveled: 0, range: BOOM.range * (1 + 0.3 * n(f, 'weitwurf')), until: t + BOOM.life, hitOut: [], hitBack: [] });
+      events.push(['throw', ids.indexOf(f.id)]);
+    }
+
+    function stepBooms() {
+      const keep: Boom[] = [];
+      for (const b of booms) {
+        const o = fighters.get(b.owner)!;
+        if (o.state !== 'alive' || t > b.until) continue;
+        if (!b.back) {
+          b.x += b.vx * TICK; b.y += b.vy * TICK; b.traveled += BOOM.speed * TICK;
+          if (b.traveled >= b.range || cellAt(b.x, b.y) === T_PILLAR || arena.walls.some((w) => distToSegment(b.x, b.y, w) < WALL_HALF + 4)) b.back = true;
+        } else {
+          const dx = o.x - b.x, dy = o.y - b.y, l = Math.hypot(dx, dy) || 1;
+          if (l < 22) continue; // gefangen
+          b.vx = (dx / l) * BOOM.back; b.vy = (dy / l) * BOOM.back;
+          b.x += b.vx * TICK; b.y += b.vy * TICK;
+        }
+        const list = b.back ? b.hitBack : b.hitOut;
+        for (const v of fighters.values()) {
+          if (v === o || v.state !== 'alive' || list.includes(v.id)) continue;
+          if (Math.hypot(v.x - b.x, v.y - b.y) > PHY.radius + 12) continue;
+          list.push(v.id);
+          let dx = b.vx, dy = b.vy;
+          if (b.back && n(o, 'rueckholsog')) { dx = o.x - v.x; dy = o.y - v.y; }
+          hit(v, o, 6 + 2 * n(o, 'scharfkante'), 160, dx, dy);
+        }
+        keep.push(b);
+      }
+      booms = keep;
     }
 
     function shoot(f: Fighter, big: boolean) {
@@ -470,7 +685,7 @@ export default {
       const angles = n(f, 'streuschuss') ? [-0.21, 0, 0.21] : [0];
       for (const a of angles) {
         const dx = f.fx * Math.cos(a) - f.fy * Math.sin(a), dy = f.fx * Math.sin(a) + f.fy * Math.cos(a);
-        shots.push({ x: f.x + dx * (PHY.radius + 6), y: f.y + dy * (PHY.radius + 6), vx: dx * sp, vy: dy * sp, owner: f.id, until: t + life, big, bounces: n(f, 'abpraller'), pierce: n(f, 'durchschlag') > 0, hit: [] });
+        shots.push({ x: f.x + dx * (PHY.radius + 6), y: f.y + dy * (PHY.radius + 6), vx: dx * sp, vy: dy * sp, owner: f.id, until: t + life, big, bounces: n(f, 'abpraller'), pierce: n(f, 'durchschlag') > 0, hit: [], dmg: big ? 9 : 3, base: big ? 300 : 45, kind: big ? 1 : 0 });
       }
       events.push(['shot', ids.indexOf(f.id), big ? 1 : 0]);
     }
@@ -491,7 +706,7 @@ export default {
             s.vx -= 2 * vn * nx; s.vy -= 2 * vn * ny; s.x = px + nx * (PHY.pillarR + 6); s.y = py + ny * (PHY.pillarR + 6); s.bounces--;
           } else blocked = true;
         }
-        const wall = arena.walls.find((w) => distToSegment(s.x, s.y, w) < 5);
+        const wall = arena.walls.find((w) => distToSegment(s.x, s.y, w) < WALL_HALF + 2);
         if (wall) {
           if (s.bounces > 0) {
             if (wall[0] === wall[2]) { s.vx = -s.vx; s.x += Math.sign(s.vx) * 6; } else { s.vy = -s.vy; s.y += Math.sign(s.vy) * 6; }
@@ -505,7 +720,12 @@ export default {
           if (o.id === s.owner || o.state !== 'alive' || t < o.invulnUntil || s.hit.includes(o.id)) continue;
           if (Math.hypot(o.x - s.x, o.y - s.y) > r + PHY.radius) continue;
           const by = fighters.get(s.owner)!;
-          hit(o, by, s.big ? 9 : 3, s.big ? 300 : 45, s.vx, s.vy);
+          if (blocks(o, s.vx, s.vy)) { // Schild wirft Geschosse zurück
+            s.vx = -s.vx; s.vy = -s.vy; s.owner = o.id; s.hit = []; s.until = t + 0.6;
+            events.push(['block', Math.round(s.x), Math.round(s.y)]);
+            break;
+          }
+          hit(o, by, s.dmg, s.base, s.vx, s.vy);
           s.hit.push(o.id);
           if (!s.pierce) { used = true; break; }
         }
@@ -584,9 +804,10 @@ export default {
       let dx = 0, dy = 0;
       if (target) {
         dx = target.x - f.x; dy = target.y - f.y;
-        if (f.weapon === 'schleuder') {
-          if (best < 130) { dx = -dx; dy = -dy; }
-          else if (best < 230) [dx, dy] = [-dy, dx];
+        const keepAway = f.weapon === 'schleuder' ? 180 : f.weapon === 'bomben' ? 150 : f.weapon === 'bumerang' ? 170 : f.weapon === 'haken' ? 190 : 0;
+        if (keepAway) {
+          if (best < keepAway - 50) { dx = -dx; dy = -dy; }
+          else if (best < keepAway + 50) [dx, dy] = [-dy, dx];
         }
       }
       const l = Math.hypot(dx, dy) || 1;
@@ -605,11 +826,27 @@ export default {
         let near = 0;
         for (const o of fighters.values()) if (o !== f && o.state === 'alive' && Math.hypot(o.x - f.x, o.y - f.y) < HAMMER.stompR) near++;
         if (near >= 2 && t >= f.altReady && Math.random() < 0.1) alt(f);
-      } else {
+      } else if (f.weapon === 'schleuder') {
         f.fx = (target.x - f.x) / best; f.fy = (target.y - f.y) / best;
         if (best < 300 && !f.fireHeld) attackDown(f);
         else if (best >= 300 && f.fireHeld) attackUp(f);
         if (best < 250 && t >= f.altReady && Math.random() < 0.02) alt(f);
+      } else {
+        f.fx = (target.x - f.x) / best; f.fy = (target.y - f.y) / best;
+        const tg = target;
+        if (f.weapon === 'haken') {
+          if (best < 280 && Math.random() < 0.08) attackDown(f);
+          if (best < 200 && t >= f.altReady && Math.random() < 0.02) alt(f);
+        } else if (f.weapon === 'bomben') {
+          if (best < 230 && Math.random() < 0.06) attackDown(f);
+          if (t >= f.altReady && bombs.some((b) => b.owner === f.id && !b.flying && Math.hypot(b.x - tg.x, b.y - tg.y) < 65)) alt(f);
+        } else if (f.weapon === 'schwert') {
+          if (f.blocking && t >= f.botRelease) alt(f, false);
+          else if (!f.blocking && best < 55 && Math.random() < 0.4) attackDown(f);
+          else if (!f.blocking && best < 140 && Math.random() < 0.03) { alt(f, true); f.botRelease = t + 0.4 + Math.random() * 0.6; }
+        } else if (f.weapon === 'bumerang') {
+          if (best < 300 && Math.random() < 0.06) attackDown(f);
+        }
       }
       if (t >= f.botRoll && Math.random() < 0.004) { roll(f); f.botRoll = t + 3; }
     }
@@ -622,12 +859,17 @@ export default {
         p: ids.map((id) => {
           const f = fighters.get(id)!;
           const flags = (f.air ? FLAG.air : 0) | (t < f.rollUntil ? FLAG.roll : 0) | (t < f.invulnUntil ? FLAG.invuln : 0)
-            | (f.state === 'gone' ? FLAG.gone : 0) | (f.state === 'out' ? FLAG.out : 0) | (f.charging !== null ? FLAG.charge : 0) | (t < f.stunUntil ? FLAG.stun : 0);
+            | (f.state === 'gone' ? FLAG.gone : 0) | (f.state === 'out' ? FLAG.out : 0) | (f.charging !== null ? FLAG.charge : 0) | (t < f.stunUntil ? FLAG.stun : 0) | (f.blocking ? FLAG.block : 0);
           const ang = Math.round((Math.atan2(f.fy, f.fx) * 180) / Math.PI);
           const charge = f.charging !== null ? Math.round(Math.min(1, (t - f.charging) / maxCharge(f)) * 100) : 0;
           return [Math.round(f.x), Math.round(f.y), ang, flags, Math.floor(f.dmg), f.lives, charge];
         }),
-        s: shots.map((s) => [Math.round(s.x), Math.round(s.y), s.big ? 1 : 0]),
+        o: [
+          ...shots.map((s) => [s.kind, Math.round(s.x), Math.round(s.y), Math.round((Math.atan2(s.vy, s.vx) * 180) / Math.PI)]),
+          ...hooks.map((h) => [2, Math.round(h.x), Math.round(h.y), ids.indexOf(h.owner), h.mode === 'push' ? 1 : 0]),
+          ...bombs.map((b) => [3, Math.round(b.x), Math.round(b.y), Math.max(0, Math.round((b.fuseAt - t) * 10)), b.flying ? 1 : 0]),
+          ...booms.map((b) => [4, Math.round(b.x), Math.round(b.y), ids.indexOf(b.owner)]),
+        ],
         e: events,
       });
       events = [];
@@ -816,7 +1058,7 @@ export default {
       onAction(id, action) {
         if (!action || typeof action !== 'object') return;
         if (action.type === 'weapon') {
-          if (phase !== 'weapon' || !WEAPONS.includes(action.weapon)) return;
+          if (phase !== 'weapon' || !(weaponOpts.get(id) ?? []).includes(action.weapon)) return;
           weapons.set(id, action.weapon);
           showWeapons();
           if (ids.every((x) => weapons.get(x))) ctx.after(1.5, finishWeapons);
@@ -860,7 +1102,7 @@ export default {
           }
           case 'a': action.down ? attackDown(f) : attackUp(f); break;
           case 'roll': roll(f); break;
-          case 'alt': alt(f); break;
+          case 'alt': alt(f, action.down !== false); break;
         }
       },
       onPlayerRejoin(id) {

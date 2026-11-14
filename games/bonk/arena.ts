@@ -48,7 +48,7 @@ export function walkable(c: string | undefined) {
 }
 
 export function arenaSize(players: number) {
-  const cols = Math.round(Math.min(36, Math.max(24, 22 + players * 1.2)));
+  const cols = Math.round(Math.min(44, Math.max(31, 29 + players * 1.3)));
   const rows = Math.round(cols * 0.56);
   return { cols, rows };
 }
@@ -69,7 +69,7 @@ function tryGenerate(players: number, seed: number): Arena | null {
   const inside = (x: number, y: number) => x >= 1 && y >= 1 && x < cols - 1 && y < rows - 1;
 
   // 1) Inseln: Mittelpunkte mit Mindestabstand
-  const count = 3 + Math.floor(R() * 2) + (players > 6 ? 1 : 0) + (players > 9 ? 1 : 0);
+  const count = 4 + Math.floor(R() * 2) + (players > 5 ? 1 : 0) + (players > 9 ? 1 : 0);
   const centers: { x: number; y: number; r: number }[] = [];
   for (let i = 0; i < 200 && centers.length < count; i++) {
     const r = (1.9 + R() * 1.9) * (rows / 13);
@@ -198,8 +198,8 @@ function tryGenerate(players: number, seed: number): Arena | null {
     }
   }
   const has = (x: number, y: number, dx: number, dy: number) => faces.some((f) => f[0] === x && f[1] === y && f[2] === dx && f[3] === dy);
-  const runs = 1 + Math.floor(R() * 3);
-  for (let k = 0; k < runs * 5 && walls.length < runs && faces.length; k++) {
+  const runs = 3 + Math.floor(R() * 3);
+  for (let k = 0; k < runs * 6 && walls.length < runs && faces.length; k++) {
     const [x, y, dx, dy] = faces[Math.floor(R() * faces.length)];
     const len = 2 + Math.floor(R() * 3);
     // entlang der Kante weitergehen (senkrecht zur Blickrichtung)
@@ -212,12 +212,13 @@ function tryGenerate(players: number, seed: number): Arena | null {
     if (walls.some((w) => Math.hypot(w[0] - seg[0], w[1] - seg[1]) < CELL * 3)) continue;
     walls.push(seg);
   }
-  if (R() < 0.6) {
+  const innerWalls = 1 + Math.floor(R() * 2);
+  for (let k = 0; k < innerWalls; k++) {
     const inner = walk.filter(([x, y]) => g[y][x] !== T_BRIDGE && edgeDistance(g, x, y) >= 2);
     if (inner.length) {
       const [x, y] = inner[Math.floor(R() * inner.length)];
       const seg: [number, number, number, number] = R() < 0.5 ? [x * CELL, y * CELL, (x + 2) * CELL, y * CELL] : [x * CELL, y * CELL, x * CELL, (y + 2) * CELL];
-      if (!spawns.some((s) => distToSegment(s.x, s.y, seg) < CELL)) walls.push(seg);
+      if (!spawns.some((s) => distToSegment(s.x, s.y, seg) < CELL) && !walls.some((w) => Math.hypot(w[0] - seg[0], w[1] - seg[1]) < CELL * 3)) walls.push(seg);
     }
   }
 
@@ -334,14 +335,21 @@ function fallback(players: number, seed: number): Arena {
 
 /* ---------- Waffen (gemeinsam für Server und Handy/TV) ---------- */
 
-export type WeaponId = 'hammer' | 'schleuder';
-export const WEAPONS: WeaponId[] = ['hammer', 'schleuder'];
+export type WeaponId = 'hammer' | 'schleuder' | 'haken' | 'bomben' | 'schwert' | 'bumerang';
+export const WEAPONS: WeaponId[] = ['hammer', 'schleuder', 'haken', 'bomben', 'schwert', 'bumerang'];
 
 export const WEAPON_COLOR: Record<WeaponId | 'alle', string> = {
   hammer: '#FFD447',
   schleuder: '#FF9F43',
+  haken: '#36D6F5',
+  bomben: '#FF3B4E',
+  schwert: '#9B7BFF',
+  bumerang: '#4BE3A1',
   alle: '#FFFFFF',
 };
+
+/** Wanddicke (Spiel-Einheiten) – so dick wird sie auch gezeichnet */
+export const WALL_HALF = 6;
 
 /** Symbole (Pfade im 24er-Raster, nur Linien) */
 export const ICON: Record<string, string> = {
@@ -350,9 +358,10 @@ export const ICON: Record<string, string> = {
   haken: 'M15 3v10a5 5 0 1 1-9-3 M6 10l-2 2 M6 10l2.5 1 M15 3h5',
   bomben: 'M10 21a6.5 6.5 0 1 0 0-13a6.5 6.5 0 0 0 0 13z M14.5 9.5l3-3 M19 2.5v2 M21.5 5h-2',
   schild: 'M12 3l7 3v5c0 5-3 8-7 10c-4-2-7-5-7-10V6z M12 7v9 M9.5 9.5h5',
+  schwert: 'M12 3l7 3v5c0 5-3 8-7 10c-4-2-7-5-7-10V6z M12 7v9 M9.5 9.5h5',
   bumerang: 'M4 18L11 5.5c.5-.9 1.5-.9 2 0L20 18h-4l-4-7.5L8 18z',
   alle: 'M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6l-5.4 2.9 1.2-6-4.5-4.2 6.1-.7z',
 };
 
 /** Abklingzeiten in Sekunden (das Handy zeigt sie an) */
-export const COOLDOWN = { roll: 1.5, stomp: 4, bigShot: 3 };
+export const COOLDOWN = { roll: 1.5, stomp: 4, bigShot: 3, pushHook: 4, detonate: 2.5 };
