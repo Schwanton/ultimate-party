@@ -277,6 +277,23 @@ export interface RoomSnapshot {
   settings: RoomSettings;
   joinUrl: string;
   dev: boolean;
+  /** laufende oder gerade beendete Abstimmung über das nächste Spiel */
+  vote: GameVote | null;
+  /** zuletzt per Zufall gezogenes Spiel (für die Walzen-Animation auf dem TV) */
+  roll: { reel: string[]; at: number } | null;
+}
+
+/** Wie das nächste Spiel gewählt wird: VIP wählt (Standard), Abstimmung oder Zufall */
+export type PickMode = 'vip' | 'vote' | 'random';
+
+export interface GameVote {
+  candidates: string[];
+  /** Spieler-ID → Spiel-ID */
+  votes: Record<string, string>;
+  deadline: number;
+  duration: number;
+  /** Sieger, sobald ausgewertet */
+  result: string | null;
 }
 
 export interface RoomSettings {
@@ -287,6 +304,8 @@ export interface RoomSettings {
   timeFactor: number;
   /** Spiel-Einstellungen pro Spiel (gameId → Werte) */
   gameOptions: Record<string, GameOptionValues>;
+  /** wie das nächste Spiel gewählt wird */
+  pickMode?: PickMode;
 }
 
 export interface HostViewProps<V = any> {

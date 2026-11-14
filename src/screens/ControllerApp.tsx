@@ -6,6 +6,7 @@ import registry, { clientGame } from '../registry';
 import { Avatar, Crown, FullscreenButton, Logo, isLight, shade, vibrate } from '../ui';
 import { GameOptionsForm, optionsSummary } from './GameOptions';
 import { fitOf, gameDesc, useTagFilter } from './GameLibrary';
+import { PhoneVote, PickModeSwitch, pickModeOf } from './PickMode';
 
 const params = new URLSearchParams(location.search);
 
@@ -169,6 +170,7 @@ function InRoom() {
         </div>
       )}
       {content}
+      {room.phase === 'game' && !room.finished && isVip && <EndGameButton t={t} />}
       {room.phase === 'game' && room.finished && (
         isVip ? (
           <div style={{ display: 'flex', gap: 10 }} className="anim-up">
@@ -179,6 +181,28 @@ function InRoom() {
           <p className="muted" style={{ textAlign: 'center' }}>{t('game.vipDecides', { name: player(room.vipId ?? '')?.name ?? 'VIP' })}</p>
         )
       )}
+    </div>
+  );
+}
+
+/** VIP: laufendes Spiel abbrechen und alle zurück in die Lobby holen (mit Rückfrage) */
+function EndGameButton({ t }: { t: (k: string, v?: Record<string, string | number>) => string }) {
+  const [ask, setAsk] = useState(false);
+  if (!ask) {
+    return (
+      <button type="button" onClick={() => setAsk(true)} style={{ marginTop: 'auto', alignSelf: 'center', minHeight: 44, border: 0, borderRadius: 999, padding: '8px 18px', background: 'transparent', color: 'var(--faint)', font: "700 14px 'DM Sans', sans-serif", display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+        {t('game.end')}
+      </button>
+    );
+  }
+  return (
+    <div role="alertdialog" aria-label={t('game.end')} className="up-card anim-up" style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 12, padding: 16 }}>
+      <p style={{ fontSize: 17, fontWeight: 700 }}>{t('game.endConfirm')}</p>
+      <div style={{ display: 'flex', gap: 10 }}>
+        <button className="up-btn ghost full" onClick={() => setAsk(false)}>{t('common.cancel')}</button>
+        <button className="up-btn full" style={{ background: 'var(--red)', boxShadow: '0 5px 0 #A81B2B', color: '#fff' }} onClick={() => { setAsk(false); net.send('lobby'); }}>{t('game.end')}</button>
+      </div>
     </div>
   );
 }
@@ -195,6 +219,8 @@ function PhoneLobby({ onEditAvatar }: { onEditAvatar: () => void }) {
   const all = useGames();
   const { tag, setTag, present, shown: list } = useTagFilter(all);
   const selected = all.find((g) => g.id === room.selectedGameId);
+  const mode = pickModeOf(room);
+  const voting = mode === 'vote' && !!room.vote && !room.vote.result;
 
   const start = async () => {
     setError(null);
@@ -226,8 +252,27 @@ function PhoneLobby({ onEditAvatar }: { onEditAvatar: () => void }) {
         </button>
       </section>
 
+      {isVip && (
+        <section style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <span className="up-label">{t('pick.label')}</span>
+          <PickModeSwitch mode={mode} t={t} />
+        </section>
+      )}
+      {voting && room.vote && <PhoneVote vote={room.vote} games={all} room={room} me={me} t={t} isVip={isVip} />}
+
       {/* Für den VIP: Start und Einstellungen ganz oben, darunter die Spielsammlung */}
-      {isVip && selected && (
+      {isVip && selected && !voting && (
+        <>
+          {mode === 'random' && <button className="up-btn ghost full" onClick={() => net.send('random')}>{t('pick.reroll')}</button>}
+          {mode === 'vote' && <button className="up-btn ghost full" onClick={() => net.send('vote:start')}>{room.vote ? t('pick.newVote') : t('pick.startVote')}</button>}
+        </>
+      )}
+      {!isVip && !voting && mode !== 'vip' && selected && (
+        <p className="up-card" style={{ padding: '12px 16px', fontSize: 16 }}>
+          <b>{selected.name[room.lang] ?? selected.name.en}</b> · <span className="muted">{mode === 'random' ? t('pick.byRandom') : t('pick.byVote', { n: Object.values(room.vote?.votes ?? {}).filter((g) => g === selected.id).length })}</span>
+        </p>
+      )}
+      {isVip && selected && !voting && (
         <>
           <button className="up-btn big full" disabled={active < selected.minPlayers} onClick={start}>{t('lobby.start')}</button>
           <p className="muted" style={{ textAlign: 'center', fontSize: 14, marginTop: -4 }}>
@@ -253,6 +298,7 @@ function PhoneLobby({ onEditAvatar }: { onEditAvatar: () => void }) {
       ) : null}
       {error && <p className="up-error">{error}</p>}
 
+      {mode === 'vip' && (<>
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
         <h2 style={{ fontSize: 22, fontWeight: 700 }}>{t('lobby.pickGame')}</h2>
         <span className="muted" style={{ fontSize: 14 }}>{t('lobby.playersReady', { n: active })}</span>
@@ -285,8 +331,7 @@ function PhoneLobby({ onEditAvatar }: { onEditAvatar: () => void }) {
           );
         })}
       </div>
-
-
+      </>)}
     </>
   );
 }

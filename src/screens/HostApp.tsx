@@ -9,6 +9,7 @@ import { HostSettings } from './HostSettings';
 import { GameOptionsForm, optionsSummary } from './GameOptions';
 import { UpdateBanner } from './Update';
 import { GameCover, GameLibrary, fitOf, gameDesc, gameName, gameTags, playersLabel } from './GameLibrary';
+import { HostVoteBoard, PickModeSwitch, PickedBadge, pickModeOf, useRoll } from './PickMode';
 
 async function connectHost() {
   const saved = loadSession('host');
@@ -154,7 +155,7 @@ function GameMenu({ finished, vip }: { finished: boolean; vip?: PlayerInfo }) {
       <div className="anim-fade" style={{ position: 'absolute', top: 30, right: 56, zIndex: 45, display: 'flex', gap: 12, alignItems: 'center', background: 'var(--surface)', padding: '10px 12px 10px 20px', borderRadius: 22 }}>
         <span className="muted" style={{ fontSize: 16 }}>{vip ? t('game.vipDecides', { name: vip.name }) : ''}</span>
         <button className="up-btn small" onClick={() => net.request('start')}>{t('game.again')}</button>
-        <button className="up-btn ghost small" onClick={() => net.send('lobby')}>{t('game.otherGame')}</button>
+        <button className="up-btn ghost small" style={{ whiteSpace: 'nowrap' }} onClick={() => net.send('lobby')}>{t('game.otherGame')}</button>
       </div>
     );
   }
@@ -188,6 +189,8 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
   const vip = players.find((p) => p.id === room.vipId);
   const games = host.games.filter((g) => !g.hidden || room.dev);
   const selected = games.find((g) => g.id === room.selectedGameId);
+  // Zufall: kurz rattert eine Walze durch die Spiele
+  const rolling = useRoll(room, games);
   const joinUrl = `${room.joinUrl}/?r=${room.code}`;
   const lastResult = host.results.at(-1);
   const lastWinner = lastResult?.ranking[0] ? players.find((p) => p.id === lastResult.ranking[0].playerId) : undefined;
@@ -211,8 +214,8 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
           <SoundButton label={t('sound.enable')} />
           {room.dev && (
             <>
-              <button className="up-btn ghost small" onClick={() => net.send('bots:add', { count: 1 })}>{t('lobby.addBots')}</button>
-              {players.some((p) => p.isBot) && <button className="up-btn ghost small" onClick={() => net.send('bots:remove')}>{t('lobby.removeBots')}</button>}
+              <button className="up-btn ghost small" style={{ whiteSpace: 'nowrap' }} onClick={() => net.send('bots:add', { count: 1 })}>{t('lobby.addBots')}</button>
+              {players.some((p) => p.isBot) && <button className="up-btn ghost small" style={{ whiteSpace: 'nowrap' }} onClick={() => net.send('bots:remove')}>{t('lobby.removeBots')}</button>}
             </>
           )}
           <div style={{ display: 'flex', background: 'var(--surface)', borderRadius: 999, padding: 4 }}>
@@ -286,9 +289,24 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
           </section>
         </div>
 
-        <SelectedGame game={selected} players={active.length} canStart={canStart} gameCount={games.length} lang={room.lang} t={t} vipName={vip?.name}
-          summary={selected?.options?.length ? optionsSummary(selected, room.settings.gameOptions?.[selected.id], room.lang) : ''}
-          onLibrary={() => setLibraryOpen(true)} onOptions={() => setOptionsOpen(true)} />
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <span className="up-label" style={{ fontSize: 14, whiteSpace: 'nowrap' }}>{t('pick.label')}</span>
+            <PickModeSwitch mode={pickModeOf(room)} t={t} big />
+            <span style={{ flex: 1 }} />
+            {pickModeOf(room) === 'random' && <button className="up-btn ghost small" style={{ whiteSpace: 'nowrap' }} onClick={() => net.send('random')}>{t('pick.reroll')}</button>}
+            {pickModeOf(room) === 'vote' && room.vote?.result && <button className="up-btn ghost small" style={{ whiteSpace: 'nowrap' }} onClick={() => net.send('vote:start')}>{t('pick.newVote')}</button>}
+            {pickModeOf(room) === 'vote' && !room.vote && <button className="up-btn ghost small" style={{ whiteSpace: 'nowrap' }} onClick={() => net.send('vote:start')}>{t('pick.startVote')}</button>}
+          </div>
+          {pickModeOf(room) === 'vote' && room.vote && !room.vote.result ? (
+            <HostVoteBoard vote={room.vote} games={games} room={room} t={t} player={(id) => room.players.find((p) => p.id === id)} />
+          ) : (
+            <SelectedGame game={rolling ?? selected} rolling={!!rolling} players={active.length} canStart={canStart && !rolling} gameCount={games.length} lang={room.lang} t={t}
+              pickedBadge={<PickedBadge room={room} t={t} vipName={vip?.name} />}
+              summary={selected?.options?.length ? optionsSummary(selected, room.settings.gameOptions?.[selected.id], room.lang) : ''}
+              onLibrary={() => setLibraryOpen(true)} onOptions={() => setOptionsOpen(true)} />
+          )}
+        </div>
       </main>
     </>
   );
@@ -307,8 +325,8 @@ const IconSliders = () => (
 const badge = (bg: string, color: string): React.CSSProperties => ({ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 999, background: bg, color, fontSize: 15, fontWeight: 700, whiteSpace: 'nowrap' });
 
 /** Rechts in der Lobby: das gewählte Spiel groß mit Titelbild, Infos, Einstellungen und Start */
-function SelectedGame({ game, players, canStart, gameCount, lang, t, summary, vipName, onLibrary, onOptions }: {
-  game?: GameManifest; players: number; canStart: boolean; gameCount: number; lang: Lang; t: Translate; summary: string; vipName?: string; onLibrary: () => void; onOptions: () => void;
+function SelectedGame({ game, rolling, players, canStart, gameCount, lang, t, summary, pickedBadge, onLibrary, onOptions }: {
+  game?: GameManifest; rolling?: boolean; players: number; canStart: boolean; gameCount: number; lang: Lang; t: Translate; summary: string; pickedBadge: React.ReactNode; onLibrary: () => void; onOptions: () => void;
 }) {
   if (!game) {
     return (
@@ -321,14 +339,11 @@ function SelectedGame({ game, players, canStart, gameCount, lang, t, summary, vi
   const fit = fitOf(game, players);
   const fitText = fit === 'few' ? t('lobby.needPlayers', { n: game.minPlayers - players }) : fit === 'many' ? t('lobby.tooManyShort') : t('lobby.fits');
   return (
-    <section key={game.id} className="anim-up" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', borderRadius: 28, overflow: 'hidden', background: 'var(--surface)', boxShadow: `0 0 0 3px ${game.color}, 0 8px 0 ${shade(game.color)}` }}>
+    <section key={rolling ? 'roll' : game.id} className={rolling ? undefined : 'anim-up'} style={{ flex: 1, minWidth: 0, minHeight: 0, display: 'flex', flexDirection: 'column', borderRadius: 28, overflow: 'hidden', background: 'var(--surface)', boxShadow: `0 0 0 3px ${game.color}, 0 8px 0 ${shade(game.color)}` }}>
       <div style={{ flex: 1, minHeight: 180, position: 'relative' }}>
         <GameCover g={game} lang={lang} zoom letterSize={240} />
-        {vipName && (
-          <span style={{ position: 'absolute', left: 18, top: 18, background: 'var(--bg)', borderRadius: 999, padding: '7px 14px', fontSize: 14, fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-            <Crown size={18} /> {t('lobby.pickedBy', { name: vipName })}
-          </span>
-        )}
+        {!rolling && pickedBadge}
+        {rolling && <span className="display" style={{ position: 'absolute', left: 18, top: 18, background: 'var(--yellow)', color: '#110D24', borderRadius: 999, padding: '7px 16px', fontSize: 18, fontWeight: 800 }}>{t('pick.rolling')}</span>}
       </div>
       <div style={{ flex: 'none', padding: '18px 26px 22px', display: 'flex', flexDirection: 'column', gap: 10 }}>
         <h1 className="display" style={{ fontSize: 44, fontWeight: 800, lineHeight: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{gameName(game, lang)}</h1>

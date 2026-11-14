@@ -4,7 +4,7 @@ import { randomUUID } from 'node:crypto';
 import type { WebSocket } from 'ws';
 import {
   ANIMALS, type Avatar, type GameContext, type GameServer, type Lang, type PlayerInfo,
-  resolveOptions, type RankingEntry, type RoomSettings, type RoomSnapshot, type TimerHandle,
+  resolveOptions, type GameVote, type RankingEntry, type RoomSettings, type RoomSnapshot, type TimerHandle,
 } from '../sdk/types';
 import { shuffle } from '../sdk/util';
 import { allGames, getGame, type LoadedGame } from './registry';
@@ -65,6 +65,11 @@ export class Room {
   game: RunningGame | null = null;
   notice: string | null = null;
   results: { gameId: string; ranking: RankingEntry[] }[] = [];
+  /** Abstimmung über das nächste Spiel (nur in der Lobby) */
+  vote: GameVote | null = null;
+  roll: { reel: string[]; at: number } | null = null;
+  private voteTimer: ReturnType<typeof setTimeout> | null = null;
+  private lastPlayedId: string | null = null;
   usedContent = new Set<string>();
   lastActivity = Date.now();
   /** nach einem Neustart wiederhergestellt (alte Handys dürfen automatisch neu beitreten) */
@@ -284,7 +289,101 @@ export class Room {
 
   selectGame(id: string) {
     if (this.phase !== 'lobby' || !getGame(id)) return;
+    // Wer selbst ein Spiel aussucht, schaltet zurück auf „VIP wählt“
+    if (this.settings.pickMode && this.settings.pickMode !== 'vip') {
+      this.settings.pickMode = 'vip';
+      this.remember();
+    }
+    this.clearVote();
+    this.roll = null;
     this.selectedGameId = id;
+    this.touch();
+  }
+
+  /* ---------------- Nächstes Spiel: VIP, Abstimmung oder Zufall ---------------- */
+
+  /** Spiele, die zur aktuellen Spielerzahl passen (sonst alle), ohne das zuletzt gespielte */
+  private pickPool() {
+    const n = this.eligible().length;
+    const all = allGames().map((g) => g.manifest).filter((m) => !m.hidden || DEV);
+    const fitting = all.filter((m) => n >= m.minPlayers && n <= m.maxPlayers);
+    const pool = (fitting.length ? fitting : all).filter((m) => m.id !== this.lastPlayedId);
+    return (pool.length ? pool : all).map((m) => m.id);
+  }
+
+  setPickMode(mode: string) {
+    if (mode !== 'vip' && mode !== 'vote' && mode !== 'random') return;
+    this.settings.pickMode = mode;
+    this.remember();
+    if (this.phase !== 'lobby') return this.touch();
+    if (mode === 'vote') this.startVote();
+    else if (mode === 'random') this.rollGame();
+    else this.clearVote();
+    this.touch();
+  }
+
+  private clearVote() {
+    if (this.voteTimer) clearTimeout(this.voteTimer);
+    this.voteTimer = null;
+    this.vote = null;
+  }
+
+  startVote() {
+    if (this.phase !== 'lobby') return;
+    this.clearVote();
+    this.roll = null;
+    const candidates = shuffle(this.pickPool()).slice(0, 4);
+    const duration = 45_000;
+    this.vote = { candidates, votes: {}, deadline: Date.now() + duration, duration, result: null };
+    this.voteTimer = setTimeout(() => this.finishVote(), duration);
+    // Bots stimmen zufällig ab (zum Testen)
+    for (const p of this.players.values()) {
+      if (!p.info.isBot) continue;
+      setTimeout(() => this.castVote(p.info.id, candidates[Math.floor(Math.random() * candidates.length)]), 800 + Math.random() * 2500);
+    }
+    this.touch();
+  }
+
+  castVote(playerId: string, gameId: string) {
+    const v = this.vote;
+    if (!v || v.result || this.phase !== 'lobby' || !v.candidates.includes(gameId) || !this.players.has(playerId)) return;
+    v.votes[playerId] = gameId;
+    // Alle (verbundenen) haben abgestimmt → kurz danach auswerten
+    const voters = [...this.players.values()].filter((p) => p.info.connected || p.info.isBot);
+    if (voters.every((p) => v.votes[p.info.id])) {
+      if (this.voteTimer) clearTimeout(this.voteTimer);
+      v.deadline = Date.now() + 2500;
+      this.voteTimer = setTimeout(() => this.finishVote(), 2500);
+    }
+    this.touch();
+  }
+
+  finishVote() {
+    const v = this.vote;
+    if (!v || v.result) return;
+    if (this.voteTimer) clearTimeout(this.voteTimer);
+    this.voteTimer = null;
+    const counts = new Map<string, number>();
+    for (const id of Object.values(v.votes)) counts.set(id, (counts.get(id) ?? 0) + 1);
+    const best = Math.max(0, ...counts.values());
+    const top = v.candidates.filter((id) => (counts.get(id) ?? 0) === best);
+    v.result = top[Math.floor(Math.random() * top.length)];
+    v.deadline = Date.now();
+    this.selectedGameId = v.result;
+    this.touch();
+  }
+
+  rollGame() {
+    if (this.phase !== 'lobby') return;
+    this.clearVote();
+    const pool = this.pickPool().filter((id) => id !== this.selectedGameId);
+    const options = pool.length ? pool : this.pickPool();
+    const picked = options[Math.floor(Math.random() * options.length)];
+    const all = allGames().map((g) => g.manifest).filter((m) => !m.hidden || DEV).map((m) => m.id);
+    const reel = Array.from({ length: 11 }, () => all[Math.floor(Math.random() * all.length)]);
+    reel.push(picked);
+    this.selectedGameId = picked;
+    this.roll = { reel, at: Date.now() };
     this.touch();
   }
 
@@ -317,6 +416,9 @@ export class Room {
     this.game = g;
     this.phase = 'game';
     this.notice = null;
+    this.clearVote();
+    this.roll = null;
+    this.lastPlayedId = m.id;
     const ctx = this.createContext(g, players.map((p) => ({ ...p.info })));
     const ok = this.safe(() => {
       g.server = loaded.module.create(ctx);
@@ -349,6 +451,9 @@ export class Room {
       p.info.role = 'player';
     }
     this.updateVip();
+    // Je nach Einstellung gleich das nächste Spiel bestimmen
+    if (this.settings.pickMode === 'vote') this.startVote();
+    else if (this.settings.pickMode === 'random') this.rollGame();
     this.touch();
   }
 
@@ -613,6 +718,8 @@ export class Room {
       settings: this.settings,
       joinUrl: this.joinUrl,
       dev: DEV,
+      vote: this.vote,
+      roll: this.roll,
     };
   }
 

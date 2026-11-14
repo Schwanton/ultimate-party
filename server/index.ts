@@ -210,6 +210,21 @@ function handle(ws: WebSocket, msg: any) {
     case 'lobby':
       if (room && (isHost || isVip)) room.backToLobby();
       return;
+    case 'pickMode':
+      if (room && (isHost || isVip)) room.setPickMode(String(msg.mode));
+      return;
+    case 'vote:start':
+      if (room && (isHost || isVip)) room.startVote();
+      return;
+    case 'vote:end':
+      if (room && (isHost || isVip)) room.finishVote();
+      return;
+    case 'random':
+      if (room && (isHost || isVip)) room.rollGame();
+      return;
+    case 'gamevote':
+      if (room && s.playerId) room.castVote(s.playerId, String(msg.gameId));
+      return;
 
     /* ---- Nur Host ---- */
     case 'settings':

@@ -2,6 +2,14 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.21.0
+
+- Nächstes Spiel: Am Fernseher und beim VIP lässt sich einstellen, wie das nächste Spiel gewählt wird – „VIP wählt“ (wie bisher), „Abstimmung“ oder „Zufall“
+- Abstimmung: Alle stimmen auf dem Handy zwischen bis zu 4 passenden Spielen ab (45 Sekunden, früher fertig, wenn alle abgestimmt haben). Der VIP kann vorzeitig auswerten oder neu abstimmen lassen
+- Zufall: Auf dem Fernseher rattert eine Walze durch die Spiele und bleibt bei einem passenden stehen. „Nochmal würfeln“ zieht ein anderes
+- Nach jedem Spiel startet je nach Einstellung automatisch eine neue Abstimmung bzw. ein neuer Zufallszug
+- Der VIP kann ein laufendes Spiel auf dem Handy beenden („Spiel beenden“ unten, mit Rückfrage) – dann sind alle wieder in der Lobby
+
 ## 0.20.0
 
 - Bonk!: Powerups! Am Anfang wählt jeder ein Start-Powerup für seine Waffe, nach jeder Runde 1 von 3 – in den Seltenheiten gewöhnlich (grün), selten (blau), episch (lila) und legendär (gold). Wer weit zurückliegt, bekommt ab Runde 3 bessere Chancen
