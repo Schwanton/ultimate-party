@@ -79,6 +79,7 @@ const scenarios: { game: string; players: number; options?: Record<string, numbe
   { game: 'cash-out', players: 3, options: { rounds: 4, mode: 'secret' } },
   { game: 'cash-out', players: 1, options: { rounds: 4 } },
   { game: 'cash-out', players: 5, options: { rounds: 5, allIn: 'limit3' } },
+  { game: 'cash-out', players: 3, options: { rounds: 4, risk: 'off' } },
   { game: 'heisse-kartoffel', players: 5, options: { lives: 2 } },
   { game: 'sumo', players: 4, options: { rounds: 1 } },
   { game: 'bonk', players: 3, options: { rounds: 3, controls: 'gesten' } },

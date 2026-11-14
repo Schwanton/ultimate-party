@@ -55,5 +55,7 @@
  "bet.pickNow": "Tap your bet!",
  "graph.peak": "Peak {m}",
  "bet.allInLeft": "{n}× left",
- "bet.allInGone": "used up"
+ "bet.allInGone": "used up",
+ "risk.label": "Risk",
+ "intro.risk": "Watch the colour: green means crashes are rarer, red means more likely – it's never safe. A steep climb makes it redder, a dip turns it greener after a brief scare."
 }

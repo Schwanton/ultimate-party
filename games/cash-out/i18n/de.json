@@ -55,5 +55,7 @@
  "bet.pickNow": "Tipp deinen Einsatz an!",
  "graph.peak": "Höchststand {m}",
  "bet.allInLeft": "noch {n}×",
- "bet.allInGone": "aufgebraucht"
+ "bet.allInGone": "aufgebraucht",
+ "risk.label": "Risiko",
+ "intro.risk": "Achtet auf die Farbe: Bei Grün kracht es seltener, bei Rot öfter – sicher ist es nie. Ein steiler Anstieg macht es röter, ein Einbruch nach kurzem Schreck grüner."
 }

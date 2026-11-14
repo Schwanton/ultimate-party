@@ -5,11 +5,13 @@
  * Steigt man aus, bekommt man den Topf × Kurs. Kracht es, ist der Topf weg (und damit der eigene Einsatz).
  * Letzte Runde doppelt. Geldstände bleiben bis zur Auszählung am Ende geheim.
  *
+ * Risiko-Farbe (Standard an): Die Absturz-Chance hängt von der „Hitze“ der Kurve ab (rot 3× so hoch wie grün),
+ * die TV und Handys im Hintergrund anzeigen. Aus: Absturz rein zufällig wie früher.
  * Modi: open (man sieht, wer aussteigt), half (nur, dass jemand aussteigt), secret (nichts).
  */
 
 import { Scores, type GameContext, type GameServerModule } from '@up/sdk';
-import { crashTime as rollCrashTime, floor2, multAt, newSeed } from './curve';
+import { crashTime as rollCrashTime, crashTimeRisk, floor2, multAt, newSeed } from './curve';
 import { tallyDuration, type TallyData } from './tally';
 
 const T = { intro: 8, ready: 5, afterCrash: 6, afterAllBusted: 2, allOutReveal: 1.5 };
@@ -26,6 +28,7 @@ export default {
     // frühester Absturz: einmal pro Partie zwischen 2 und 6 Sekunden
     const minCrash = 2 + Math.random() * 4;
     const limited = String(ctx.options.allIn) === 'limit3';
+    const risk = String(ctx.options.risk ?? 'on') !== 'off';
     const allInLeft = new Map<string, number>(ids.map((id) => [id, limited ? ALL_IN_LIMIT : Infinity]));
     let round = 0;
     let phase: 'intro' | 'ready' | 'run' | 'crash' | 'tally' = 'intro';
@@ -43,12 +46,12 @@ export default {
 
     const mult = () => (round === total ? 2 : 1);
     const free = () => BASE * round;
-    const base = () => ({ round, total, mult: mult(), seed, mode, free: free() });
+    const base = () => ({ round, total, mult: mult(), seed, mode, free: free(), risk });
     // +100 % gesperrt? (letzte Runde immer frei)
     const allInLocked = (id: string) => round !== total && (allInLeft.get(id) ?? 0) <= 0;
 
     function intro() {
-      ctx.setHostView({ screen: 'intro', mode });
+      ctx.setHostView({ screen: 'intro', mode, risk });
       ctx.setAllPlayerViews(() => ({ screen: 'intro' }));
       ctx.after(T.intro, nextRound);
     }
@@ -64,7 +67,7 @@ export default {
       picked = new Set(ids.filter((id) => money.get(id) <= 0));
       stakes = new Map();
       seed = newSeed();
-      crashTime = rollCrashTime(Math.random(), minCrash);
+      crashTime = risk ? crashTimeRisk(seed, Math.random(), minCrash) : rollCrashTime(Math.random(), minCrash);
       startAt = Date.now() + T.ready * 1000;
       hostReady();
       ids.forEach(phoneReady);

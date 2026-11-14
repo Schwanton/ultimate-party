@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ControllerViewProps, GameClientModule, HostViewProps, PlayerInfo, Translate } from '@up/sdk';
 import { Avatar, Confetti, HostHeader, PhoneWait, sfx, useServerNow, vibrate } from '@up/ui';
-import { STEP, fallAt, floor2, multAt } from './curve';
+import { STEP, fallAt, floor2, heatAt, multAt } from './curve';
 import { allBusted, arrivalAt, flowFraction, tallyAt, totalAt, type TallyData, type TallyRound } from './tally';
 
 const PINK = '#FF4F7B';
@@ -17,6 +17,28 @@ function mix(a: string, b: string, f: number) {
   const p = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
   const [x, y] = [p(a), p(b)];
   return `rgb(${x.map((v, i) => Math.round(v + (y[i] - v) * f)).join(',')})`;
+}
+
+/** Risiko-Farbe: 0 = grün … 1 = rot */
+const HEAT_STOPS = ['#2E9E5B', '#E3C23A', '#F08A2E', '#E0393E'];
+function heatColor(h: number) {
+  const f = Math.max(0, Math.min(1, h)) * (HEAT_STOPS.length - 1);
+  const i = Math.min(HEAT_STOPS.length - 2, Math.floor(f));
+  const p = (x: string) => [1, 3, 5].map((k) => parseInt(x.slice(k, k + 2), 16));
+  const [a, b] = [p(HEAT_STOPS[i]), p(HEAT_STOPS[i + 1])];
+  return '#' + a.map((v, k) => Math.round(v + (b[k] - v) * (f - i)).toString(16).padStart(2, '0')).join('');
+}
+
+/** Leiste grün → rot mit Zeiger */
+function RiskGauge({ heat, width, label }: { heat: number; width: number; label: string }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+      <span style={{ fontSize: 15, fontWeight: 800, color: '#fff', textShadow: '0 1px 3px rgba(0,0,0,.6)' }}>{label}</span>
+      <div style={{ position: 'relative', width, height: 14, borderRadius: 7, background: `linear-gradient(90deg, ${HEAT_STOPS.join(', ')})`, boxShadow: '0 0 0 2px rgba(0,0,0,.35)' }}>
+        <div style={{ position: 'absolute', top: -7, left: `${(Math.max(0, Math.min(1, heat)) * 100).toFixed(1)}%`, width: 6, height: 28, marginLeft: -3, borderRadius: 3, background: '#fff', boxShadow: `0 0 0 2px #110D24, 0 0 12px ${heatColor(heat)}`, transition: 'left .25s linear' }} />
+      </div>
+    </div>
+  );
 }
 
 function info(view: any, t: Translate) {
@@ -35,6 +57,12 @@ function Host(props: HostViewProps) {
           <span className="up-tag anim-pop" style={{ background: PINK, color: '#fff', boxShadow: `0 8px 0 ${PINK_D}`, fontSize: 90, padding: '12px 46px', borderRadius: 26, transform: 'rotate(-3deg)' }}>{t('title')}</span>
           <p className="anim-up" style={{ fontSize: 28, maxWidth: 900, lineHeight: 1.35, animationDelay: '.4s' }}>{t('intro.text')}</p>
           <p className="muted anim-up" style={{ fontSize: 22, animationDelay: '.8s' }}>{t('intro.points')}</p>
+          {view.risk && (
+            <div className="anim-up" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, animationDelay: '1.2s' }}>
+              <RiskGauge heat={0.5} width={320} label={t('risk.label')} />
+              <p style={{ fontSize: 22, fontWeight: 700, maxWidth: 900 }}>{t('intro.risk')}</p>
+            </div>
+          )}
         </div>
       );
     case 'ready':
@@ -120,6 +148,9 @@ function HostGraph({ view, t, player, room }: HostViewProps) {
   const sorted = [...cashed].sort((a, b) => b.m - a.m);
   const inIds = (view.players as string[]).filter((id) => !cashed.some((c) => c.id === id));
   const many = view.players.length > 12;
+  // Risiko-Farbe im Hintergrund (beim Absturz: wie sie zuletzt war)
+  const heat = view.risk ? heatAt(seed, crashed ? view.crashTime : tNow) : null;
+  const heatC = heat != null ? heatColor(heat) : null;
   const color = boom ? FALL : mix(multColor(m).startsWith('#') ? multColor(m) : '#FFFFFF', FALL, Math.min(1, fall * 1.4));
 
   // Klänge: Spannung, die immer weiter steigt – Herzschlag wird schneller, nach und nach kommen
@@ -169,8 +200,6 @@ function HostGraph({ view, t, player, room }: HostViewProps) {
     });
   }, [crashed, view.allOut]);
 
-  // Zittern beim Fallen (stärker, je heftiger)
-  const jitter = fall > 0.15 ? `translate(${(Math.sin(now / 23) * fall * 7).toFixed(1)}px, ${(Math.cos(now / 31) * fall * 5).toFixed(1)}px)` : undefined;
   const tipX = X(tNow), tipY = Y(m);
   // Höchststand bis jetzt (am Ende: bis zum Absturz, auch auf dem grauen Teil)
   const peak = (() => {
@@ -189,9 +218,15 @@ function HostGraph({ view, t, player, room }: HostViewProps) {
       {crashed && view.allOut && <Confetti silent />}
       <HostHeader title={t('title')} color={PINK} info={info(view, t)} />
       <div style={{ flex: 1, display: 'flex', gap: 20, minHeight: 0, animation: boom ? 'upShake .6s ease-out' : undefined }}>
-        <div style={{ position: 'relative', width: W, height: H, background: '#15102E', borderRadius: 26, overflow: 'hidden', transform: jitter }}>
-          {/* rotes Pulsieren beim Fallen */}
-          <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', boxShadow: `inset 0 0 ${60 + fall * 80}px ${fall * 30}px rgba(255,59,78,${(fall * 0.75).toFixed(2)})`, transition: 'box-shadow .2s' }} />
+        <div style={{ position: 'relative', width: W, height: H, background: '#15102E', borderRadius: 26, overflow: 'hidden' }}>
+          {/* Risiko-Farbe: Tönung und Leuchten am Rand */}
+          {heatC && (
+            <div aria-hidden="true" style={{
+              position: 'absolute', inset: 0, pointerEvents: 'none', transition: 'background .3s linear, box-shadow .3s linear',
+              background: `linear-gradient(180deg, ${heatC}55 0%, ${heatC}22 55%, ${heatC}10 100%)`,
+              boxShadow: `inset 0 0 70px 10px ${heatC}88`, opacity: crashed ? 0.45 : 1,
+            }} />
+          )}
           <svg width={W} height={H} style={{ position: 'absolute', inset: 0 }} aria-hidden="true">
             <defs>
               <linearGradient id="cr-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor={color} stopOpacity=".35" /><stop offset="1" stopColor="#15102E" stopOpacity="0" /></linearGradient>
@@ -252,6 +287,11 @@ function HostGraph({ view, t, player, room }: HostViewProps) {
             {!crashed && <span className="muted" style={{ fontSize: 20, fontWeight: 700 }}>{t('run.points', { n: Math.floor((view.free ?? 100) * m * view.mult) })}</span>}
             {crashed && view.allOut && <span style={{ fontSize: 22, fontWeight: 700 }}>{t('crash.allOut', { m: fmt(view.crashAt, lang) })}</span>}
           </div>
+          {heat != null && !crashed && (
+            <div style={{ position: 'absolute', right: 30, bottom: PAD + 14, background: 'rgba(17,13,36,.7)', borderRadius: 14, padding: '10px 14px' }}>
+              <RiskGauge heat={heat} width={200} label={t('risk.label')} />
+            </div>
+          )}
         </div>
 
         {view.mode !== 'open' ? <AnonSide view={view} t={t} crashed={crashed} fall={fall} /> : (
@@ -758,16 +798,20 @@ function Controller({ view, t, send, me, room }: ControllerViewProps) {
       const sec = (now - view.startAt) / 1000;
       const m = multAt(view.seed, sec);
       const fall = fallAt(view.seed, sec);
+      const heat = view.risk ? heatAt(view.seed, sec) : null;
+      const heatC = heat != null ? heatColor(heat) : null;
       return (
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 24 }}>
           <FallBuzz fall={fall} />
-          <span className="display" style={{ fontSize: 56 + fall * 10, fontWeight: 800, color: fall > 0.2 ? FALL : multColor(m), fontVariantNumeric: 'tabular-nums', transform: fall > 0.2 ? `translateX(${(Math.sin(now / 20) * fall * 5).toFixed(1)}px)` : undefined }}>{fmt(m, lang)}{fall > 0.2 ? ' ▼' : ''}</span>
+          {heatC && <div aria-hidden="true" style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0, transition: 'background .3s linear, box-shadow .3s linear', background: `${heatC}2E`, boxShadow: `inset 0 0 60px 12px ${heatC}99` }} />}
+          <span className="display" style={{ position: 'relative', fontSize: 56 + fall * 10, fontWeight: 800, color: fall > 0.2 ? FALL : multColor(m), fontVariantNumeric: 'tabular-nums' }}>{fmt(m, lang)}{fall > 0.2 ? ' ▼' : ''}</span>
+          {heat != null && <div style={{ position: 'relative' }}><RiskGauge heat={heat} width={180} label={t('risk.label')} /></div>}
           <button type="button" onPointerDown={(e) => { e.preventDefault(); vibrate(30); send({ type: 'cash' }); }}
-            style={{ width: 280, height: 280, borderRadius: '50%', border: 0, background: PINK, color: '#fff', boxShadow: `0 10px 0 ${PINK_D}, 0 0 40px ${PINK}88`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, touchAction: 'manipulation' }}>
+            style={{ position: 'relative', width: 280, height: 280, borderRadius: '50%', border: 0, background: PINK, color: '#fff', boxShadow: `0 10px 0 ${PINK_D}, 0 0 40px ${PINK}88`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, touchAction: 'manipulation' }}>
             <span className="display" style={{ fontSize: 34, fontWeight: 800 }}>{t('phone.cash')}</span>
             <span className="display" style={{ fontSize: 28, fontWeight: 800, color: '#FFD447' }}>+{Math.floor(view.pot * m * view.mult).toLocaleString(LOCALE)}</span>
           </button>
-          <p className="muted" style={{ textAlign: 'center' }}>{view.stake > 0 ? t('phone.pot', { pot: view.pot, stake: view.stake }) : t('phone.hint')}</p>
+          <p className="muted" style={{ position: 'relative', textAlign: 'center' }}>{view.stake > 0 ? t('phone.pot', { pot: view.pot, stake: view.stake }) : t('phone.hint')}</p>
         </div>
       );
     }

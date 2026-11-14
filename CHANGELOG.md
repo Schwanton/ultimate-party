@@ -2,6 +2,13 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.25.4
+
+- Cash Out: Neue Risiko-Farbe – der Hintergrund färbt sich von Grün bis Rot, dazu eine Risiko-Leiste auf TV und Handy. Bei Rot kracht es öfter, bei Grün seltener (sicher ist es nie)
+- Cash Out: Ein steiler Anstieg macht es röter; ein Einbruch erst kurz röter, dann grüner; ein Kurs weit über seinem Schnitt wird heiß, ruhige Phasen kühlen ab
+- Cash Out: Fällt der Kurs, gibt es keinen roten Rand und kein Zittern mehr – Rot drumherum heißt jetzt nur noch „Gefahr“
+- Cash Out: Die Risiko-Farbe lässt sich in den Einstellungen abschalten
+
 ## 0.25.3
 
 - Cash Out: Der Gratis-Topf wächst mit jeder Runde – 100 × Rundennummer (Runde 4: 400)

@@ -17,7 +17,7 @@
     "quick"
   ],
   "sdkVersion": 1,
-  "version": "1.1.0",
+  "version": "1.2.0",
   "author": "UP!",
   "options": [
     {
@@ -91,6 +91,34 @@
       "help": {
         "de": "Begrenzt: Jeder darf höchstens dreimal alles setzen. In der letzten Runde geht +100 % immer und zählt nicht mit.",
         "en": "Limited: everyone may go all in at most three times. In the last round +100 % is always allowed and doesn't count."
+      }
+    },
+    {
+      "id": "risk",
+      "label": {
+        "de": "Risiko-Farbe",
+        "en": "Risk colour"
+      },
+      "default": "on",
+      "choices": [
+        {
+          "value": "on",
+          "label": {
+            "de": "An",
+            "en": "On"
+          }
+        },
+        {
+          "value": "off",
+          "label": {
+            "de": "Aus",
+            "en": "Off"
+          }
+        }
+      ],
+      "help": {
+        "de": "An: Der Hintergrund färbt sich von Grün bis Rot – bei Rot kracht es öfter. Aus: Der Absturz ist reiner Zufall.",
+        "en": "On: the background shifts from green to red – red crashes more often. Off: the crash is pure chance."
       }
     }
   ]
