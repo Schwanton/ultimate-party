@@ -58,7 +58,6 @@ export const POWERUPS: PowerupDef[] = [
   { id: 'weitwurf', rarity: 'common', weapon: 'bumerang', max: 3 },
   { id: 'scharfkante', rarity: 'common', weapon: 'bumerang', max: 3 },
   { id: 'rueckholsog', rarity: 'rare', weapon: 'bumerang', max: 1 },
-  { id: 'doppelbumerang', rarity: 'epic', weapon: 'bumerang', max: 1 },
 ];
 
 export const POWERUP = Object.fromEntries(POWERUPS.map((p) => [p.id, p])) as Record<string, PowerupDef>;

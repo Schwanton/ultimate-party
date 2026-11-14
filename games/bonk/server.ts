@@ -341,9 +341,6 @@ export default {
         if (!f.air && burning(f.x, f.y)) {
           const k = 0.5 ** n(f, 'feuerfest');
           f.dmg += PHY.fireDps * k * TICK;
-          const dx = arena.center.x - f.x, dy = arena.center.y - f.y, l = Math.hypot(dx, dy) || 1;
-          f.vx += (dx / l) * PHY.firePush * k * TICK;
-          f.vy += (dy / l) * PHY.firePush * k * TICK;
         }
         // Meteorsprung landet
         if (f.meteorUntil && t >= f.meteorUntil) {
@@ -484,7 +481,7 @@ export default {
       v.vy = (dy / l) * kb + v.vy * 0.2;
       v.air = true;
       v.airMin = t + 0.12;
-      v.stunUntil = t + 0.12 + kb / 2500;
+      // kein Betäuben bei Treffern (seit 0.25.2)
       v.charging = null;
       v.hitBy = by.id;
       v.hitAt = t;

@@ -2,6 +2,12 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.25.2
+
+- Bonk!: Feuer macht nur noch Schaden und schubst nicht mehr
+- Bonk!: Wer getroffen wird, ist nicht mehr kurz betäubt – man kann sofort weiter angreifen oder ausweichen
+- Bonk!: Das Powerup „Doppelbumerang“ gibt es nicht mehr
+
 ## 0.25.1
 
 - Bonk!: Die Schleuder ist schwächer – Kugeln machen weniger Schaden (2 % statt 3 %), sie schießt deutlich langsamer (alle 0,4 s statt 0,24 s), und der Ladeschuss braucht länger (4,5 s) und trifft etwas schwächer
