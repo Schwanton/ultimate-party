@@ -32,6 +32,7 @@ npm run check-packs
 | Mic Drop | `prompt` – die Frage | `tags` |
 | Flunkerfakt | `question` – Satz mit `___` als Lücke · `answer` – die Wahrheit | `alternatives` (Schreibweisen, die auch als Wahrheit zählen) · `decoys` (2–3 Haus-Lügen, falls zu wenig Spieler) · `source` (Quelle) · `tags` |
 | Vernissage | `word` – was gezeichnet werden soll | `tags` |
+| Figurendle | `thema` – Kennung des Themas (z. B. `one-piece`) | siehe unten |
 
 **Flunkerfakt-Beispiel**
 
@@ -46,6 +47,26 @@ npm run check-packs
 ```
 
 Bei Flunkerfakt müssen die Fakten **wirklich stimmen** – bitte zu jeder Frage eine Quelle angeben und gegenprüfen.
+
+## Figurendle: eigene Themen und Bilder
+
+Ein Figurendle-Pack beschreibt ein Thema: einen Eintrag mit den Spalten und viele Einträge mit Figuren. Vorlage: `games/figurendle/content/de/one-piece.json`.
+
+```json
+{ "thema": "harry-potter", "id": "hp-spalten", "titel": "Harry Potter", "spalten": [
+  { "key": "haus", "label": "Haus", "typ": "gleich" },
+  { "key": "faecher", "label": "Lieblingsfächer", "kurz": "Fächer", "typ": "liste", "leer": "keine" },
+  { "key": "alter", "label": "Alter", "typ": "zahl", "nah": 5, "einheit": "J." },
+  { "key": "buch", "label": "Erstes Buch", "kurz": "Buch", "typ": "reihe", "werte": ["Stein der Weisen", "Kammer des Schreckens"] }
+] }
+{ "thema": "harry-potter", "id": "hp-hermine", "name": "Hermine Granger", "auch": ["Hermine"], "bekanntheit": 1,
+  "werte": { "haus": "Gryffindor", "faecher": ["Arithmantik"], "alter": 18, "buch": "Stein der Weisen" } }
+```
+
+- Spaltenarten: `gleich` (gleicher Text = grün), `liste` (gleiche Liste = grün, Überschneidung = orange), `zahl` (Pfeil nach oben/unten; orange, wenn höchstens `nah` bzw. `nahProzent` Prozent daneben; `format: "gross"` zeigt „3 Mrd.“), `reihe` (Reihenfolge aus `werte`, mit Pfeil).
+- `bekanntheit`: 1 = sehr bekannt, 2 = normal, 3 = nur für Profis (Einstellung „Gesuchte Figuren“). Tippen kann man immer alle Figuren.
+- `auch`: weitere Namen, unter denen man die Figur findet.
+- **Bilder** gehören nicht ins Repository. Lege sie auf dem Rechner, auf dem UP! läuft, in den Ordner `.up-data/bilder/figurendle/` – Dateiname wie die Figur ohne Themen-Kürzel, z. B. `law.webp` für `op-law` (webp, png oder jpg). Fehlt ein Bild, zeigt das Spiel den Anfangsbuchstaben.
 
 ## Mit KI neue Inhalte erzeugen
 

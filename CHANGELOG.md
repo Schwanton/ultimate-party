@@ -2,6 +2,15 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.30.0
+
+- Neues Spiel: Figurendle – wer ist die geheime Figur? Tippe Figuren und lies die Hinweise: grün stimmt, orange teilweise, rot falsch, Pfeile zeigen „höher“ oder „niedriger“. Erstes Pack: One Piece mit 51 Figuren (Geschlecht, Zugehörigkeit, Teufelsfrucht, Haki, Kopfgeld, Größe, Herkunft, erster Arc)
+- Zwei Spielweisen: „Jeder für sich“ – alle raten gleichzeitig auf dem Handy, der Fernseher zeigt nur eure Farben. „Gemeinsames Brett“ – alle Hinweise stehen auf dem Fernseher, jeder darf jederzeit raten (3 Sekunden Pause nach jedem Tipp)
+- Unbegrenzte Versuche, kein Zeitlimit. Nach 10 Fehlversuchen verrät das Spiel den Anfangsbuchstaben. Wer nicht weiterkommt, kann aufgeben, und der VIP kann die Runde jederzeit auflösen
+- Bei der Auflösung hängt die Figur als Steckbrief am Fernseher, und man sieht den Weg jedes Spielers Tipp für Tipp
+- Eigene Bilder: Lege Bilder der Figuren in den Ordner .up-data/bilder/figurendle/ (z. B. law.webp) – sie bleiben nur auf deinem Rechner
+- Erste spielbare Version: Die Werte der Figuren werden noch mit dem One-Piece-Wiki abgeglichen
+
 ## 0.29.0
 
 - Murmel-Mayhem: Neue Murmel-Werkstatt zu Beginn – jeder gestaltet am Handy seine Murmeln mit Hauptfarbe, Zweitfarbe und Muster (Streifen, Ringe, Punkte, Katzenauge, Stern, Karo …). Alle eigenen Murmeln rollen so, und euer Name erscheint in diesem Muster

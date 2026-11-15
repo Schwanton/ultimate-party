@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
 import { WebSocketServer, type WebSocket } from 'ws';
-import { BOOT_ID, BUILD_DIR, DEV, PORT, QUIET } from './config';
+import { BOOT_ID, BUILD_DIR, DATA_DIR, DEV, PORT, QUIET } from './config';
 import { initNetwork, joinBaseUrl, watchJoinBaseUrl } from './network';
 import { getGame, loadGames } from './registry';
 import { setSecret } from './secrets';
@@ -63,6 +63,16 @@ const server = http.createServer((req, res) => {
       'Content-Type': MIME[path.extname(file)] ?? 'application/octet-stream',
       'Cache-Control': DEV ? 'no-cache' : 'public, max-age=86400',
     });
+    return void fs.createReadStream(file).pipe(res);
+  }
+
+  // Eigene Bilder des Hosts (nicht im Git): /eigene-bilder/<spiel>/<datei> aus .up-data/bilder/<spiel>/
+  const ownFile = /^\/eigene-bilder\/([a-z0-9-]+)\/([\w.%-]+\.(?:webp|png|jpg))$/i.exec(url.pathname);
+  if (ownFile) {
+    const dir = path.join(DATA_DIR, 'bilder', ownFile[1]);
+    const file = path.join(dir, path.basename(decodeURIComponent(ownFile[2])));
+    if (!file.startsWith(dir + path.sep) || !fs.existsSync(file)) return void res.writeHead(404).end();
+    res.writeHead(200, { 'Content-Type': MIME[path.extname(file).toLowerCase()] ?? 'application/octet-stream', 'Cache-Control': 'no-cache' });
     return void fs.createReadStream(file).pipe(res);
   }
 

@@ -1,0 +1,36 @@
+{
+  "id": "figurendle",
+  "name": { "de": "Figurendle", "en": "Figurendle" },
+  "description": {
+    "de": "Wer ist die geheime Figur? Tippe Figuren und lies die Hinweise: grün stimmt, orange teilweise, rot falsch. Erstes Pack: One Piece.",
+    "en": "Who is the secret character? Guess characters and read the clues: green is right, orange partly, red wrong. First pack: One Piece."
+  },
+  "minPlayers": 1,
+  "maxPlayers": 12,
+  "audience": true,
+  "minutes": 15,
+  "color": "#C8792E",
+  "tags": ["guess"],
+  "sdkVersion": 1,
+  "contentFields": ["thema"],
+  "version": "1.0.0",
+  "author": "UP!",
+  "options": [
+    {
+      "id": "variante", "label": { "de": "Spielweise", "en": "Mode" }, "default": "solo",
+      "choices": [
+        { "value": "solo", "label": { "de": "Jeder für sich", "en": "Everyone for themselves" } },
+        { "value": "brett", "label": { "de": "Gemeinsames Brett", "en": "Shared board" } }
+      ]
+    },
+    { "id": "rounds", "label": { "de": "Runden", "en": "Rounds" }, "default": 5, "min": 3, "max": 10 },
+    {
+      "id": "schwierigkeit", "label": { "de": "Gesuchte Figuren", "en": "Secret characters" }, "default": "normal",
+      "choices": [
+        { "value": "leicht", "label": { "de": "Leicht (nur sehr bekannte)", "en": "Easy (only very famous)" } },
+        { "value": "normal", "label": { "de": "Normal", "en": "Normal" } },
+        { "value": "profi", "label": { "de": "Profi (alle)", "en": "Expert (all)" } }
+      ]
+    }
+  ]
+}

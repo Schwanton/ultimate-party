@@ -72,6 +72,10 @@ const scenarios: { game: string; players: number; options?: Record<string, numbe
   { game: 'murmel-mayhem', players: 5 },
   { game: 'murmel-mayhem', players: 12 },
   { game: 'murmel-mayhem', players: 14 }, // 2 davon Publikum
+  { game: 'figurendle', players: 1 },
+  { game: 'figurendle', players: 4 },
+  { game: 'figurendle', players: 12 },
+  { game: 'figurendle', players: 14 }, // 2 davon Publikum
   // mit Spiel-Einstellungen
   { game: 'mic-drop', players: 4, options: { rounds: 5, answerTime: 0.75 } },
   { game: 'flunkerfakt', players: 4, options: { questions: 3 } },
@@ -97,6 +101,9 @@ const scenarios: { game: string; players: number; options?: Record<string, numbe
   { game: 'sternenpakt', players: 2, options: { ai: 4, ships: 'rough', years: 20 } },
   { game: 'murmel-mayhem', players: 3, options: { rounds: 3 } },
   { game: 'murmel-mayhem', players: 4, options: { rounds: 8 } },
+  { game: 'figurendle', players: 3, options: { variante: 'brett', rounds: 3 } },
+  { game: 'figurendle', players: 10, options: { variante: 'brett', rounds: 5, schwierigkeit: 'profi' } },
+  { game: 'figurendle', players: 2, options: { rounds: 10, schwierigkeit: 'leicht' } },
 ];
 // Nur bestimmte Spiele testen:  npm test -- mehrheit wer-wars
 const only = process.argv.slice(2);
