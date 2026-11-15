@@ -1,13 +1,14 @@
 {
  "name": "One Piece",
  "author": "UP!",
- "version": "1.0.0",
- "description": "One Piece figures (manga status Nov 2026). Images: put your own files into .up-data/bilder/figurendle/ (e.g. law.webp).",
+ "version": "1.1.0",
+ "description": "120 One Piece characters, values from the One Piece Wiki (onepiece.fandom.com, Nov 2026). Images are downloaded from the wiki onto your computer.",
  "items": [
   {
    "thema": "one-piece",
    "id": "op-spalten",
    "titel": "One Piece",
+   "wiki": "https://onepiece.fandom.com",
    "spalten": [
     {
      "key": "geschlecht",
@@ -72,24 +73,27 @@
       "Whisky Peak",
       "Little Garden",
       "Drum Island",
-      "Alabasta",
+      "Arabasta",
       "Jaya",
       "Skypiea",
       "Long Ring Long Land",
       "Water 7",
       "Enies Lobby",
+      "Post-Enies Lobby",
       "Thriller Bark",
-      "Sabaody",
+      "Sabaody Archipelago",
       "Amazon Lily",
       "Impel Down",
       "Marineford",
+      "Post-War",
+      "Return to Sabaody",
       "Fish-Man Island",
       "Punk Hazard",
       "Dressrosa",
       "Zou",
       "Whole Cake Island",
       "Levely",
-      "Wano",
+      "Wano Country",
       "Egghead",
       "Elbaph"
      ]
@@ -106,11 +110,12 @@
     "Luffy"
    ],
    "bekanntheit": 1,
+   "wiki": "Monkey_D._Luffy",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
      "Straw Hat Pirates",
-     "Emperor"
+     "Four Emperors"
     ],
     "frucht": [
      "Zoan"
@@ -136,6 +141,7 @@
     "Zoro"
    ],
    "bekanntheit": 1,
+   "wiki": "Roronoa_Zoro",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
@@ -159,6 +165,7 @@
    "name": "Nami",
    "auch": [],
    "bekanntheit": 1,
+   "wiki": "Nami",
    "werte": {
     "geschlecht": "female",
     "gruppe": [
@@ -180,6 +187,7 @@
     "Lysop"
    ],
    "bekanntheit": 1,
+   "wiki": "Usopp",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
@@ -203,6 +211,7 @@
     "Vinsmoke Sanji"
    ],
    "bekanntheit": 1,
+   "wiki": "Sanji",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
@@ -211,7 +220,8 @@
     "frucht": [],
     "haki": [
      "Observation",
-     "Armament"
+     "Armament",
+     "Conqueror's"
     ],
     "kopfgeld": 1032000000,
     "groesse": 180,
@@ -227,6 +237,7 @@
     "Chopper"
    ],
    "bekanntheit": 1,
+   "wiki": "Tony_Tony_Chopper",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
@@ -238,7 +249,7 @@
     "haki": [],
     "kopfgeld": 1000,
     "groesse": 90,
-    "herkunft": "Paradise",
+    "herkunft": "Grand Line",
     "arc": "Drum Island"
    }
   },
@@ -250,6 +261,7 @@
     "Robin"
    ],
    "bekanntheit": 1,
+   "wiki": "Nico_Robin",
    "werte": {
     "geschlecht": "female",
     "gruppe": [
@@ -273,6 +285,7 @@
     "Cutty Flam"
    ],
    "bekanntheit": 1,
+   "wiki": "Franky",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
@@ -292,6 +305,7 @@
    "name": "Brook",
    "auch": [],
    "bekanntheit": 1,
+   "wiki": "Brook",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
@@ -312,14 +326,16 @@
    "id": "op-jinbei",
    "name": "Jinbe",
    "auch": [
-    "Jinbei"
+    "Jinbei",
+    "Jimbei"
    ],
    "bekanntheit": 1,
+   "wiki": "Jinbe",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
      "Straw Hat Pirates",
-     "Warlord"
+     "Seven Warlords of the Sea"
     ],
     "frucht": [],
     "haki": [
@@ -328,7 +344,7 @@
     ],
     "kopfgeld": 1100000000,
     "groesse": 301,
-    "herkunft": "Fish-Man Island",
+    "herkunft": "Grand Line",
     "arc": "Impel Down"
    }
   },
@@ -340,11 +356,12 @@
     "Rothaar"
    ],
    "bekanntheit": 1,
+   "wiki": "Shanks",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
      "Red Hair Pirates",
-     "Emperor"
+     "Four Emperors"
     ],
     "frucht": [],
     "haki": [
@@ -364,12 +381,13 @@
    "name": "Buggy",
    "auch": [],
    "bekanntheit": 1,
+   "wiki": "Buggy",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
      "Cross Guild",
-     "Emperor",
-     "Warlord"
+     "Four Emperors",
+     "Seven Warlords of the Sea"
     ],
     "frucht": [
      "Paramecia"
@@ -377,7 +395,7 @@
     "haki": [],
     "kopfgeld": 3189000000,
     "groesse": 192,
-    "herkunft": "Unknown",
+    "herkunft": "Grand Line",
     "arc": "Orange Town"
    }
   },
@@ -391,11 +409,12 @@
     "Falkenauge"
    ],
    "bekanntheit": 1,
+   "wiki": "Dracule_Mihawk",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
      "Cross Guild",
-     "Warlord"
+     "Seven Warlords of the Sea"
     ],
     "frucht": [],
     "haki": [
@@ -411,26 +430,30 @@
   {
    "thema": "one-piece",
    "id": "op-crocodile",
-   "name": "Sir Crocodile",
+   "name": "Crocodile",
    "auch": [
-    "Crocodile",
+    "Sir Crocodile",
     "Mr. 0"
    ],
    "bekanntheit": 1,
+   "wiki": "Crocodile",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
      "Cross Guild",
-     "Warlord"
+     "Seven Warlords of the Sea"
     ],
     "frucht": [
      "Logia"
     ],
-    "haki": [],
+    "haki": [
+     "Observation",
+     "Armament"
+    ],
     "kopfgeld": 1965000000,
     "groesse": 253,
-    "herkunft": "Unknown",
-    "arc": "Alabasta"
+    "herkunft": "Grand Line",
+    "arc": "Little Garden"
    }
   },
   {
@@ -442,11 +465,12 @@
     "Weißbart"
    ],
    "bekanntheit": 1,
+   "wiki": "Edward_Newgate",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
      "Whitebeard Pirates",
-     "Emperor"
+     "Four Emperors"
     ],
     "frucht": [
      "Paramecia"
@@ -458,8 +482,8 @@
     ],
     "kopfgeld": 5046000000,
     "groesse": 666,
-    "herkunft": "New World",
-    "arc": "Jaya"
+    "herkunft": "Grand Line",
+    "arc": "Arabasta"
    }
   },
   {
@@ -469,7 +493,8 @@
    "auch": [
     "Marco der Phönix"
    ],
-   "bekanntheit": 2,
+   "bekanntheit": 1,
+   "wiki": "Marco",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
@@ -484,7 +509,7 @@
     ],
     "kopfgeld": 1374000000,
     "groesse": 203,
-    "herkunft": "New World",
+    "herkunft": "Grand Line",
     "arc": "Jaya"
    }
   },
@@ -497,6 +522,7 @@
     "Puma D. Ace"
    ],
    "bekanntheit": 1,
+   "wiki": "Portgas_D._Ace",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
@@ -513,7 +539,7 @@
     "kopfgeld": 550000000,
     "groesse": 185,
     "herkunft": "South Blue",
-    "arc": "Alabasta"
+    "arc": "Drum Island"
    }
   },
   {
@@ -525,16 +551,16 @@
     "Teach"
    ],
    "bekanntheit": 1,
+   "wiki": "Marshall_D._Teach",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
      "Blackbeard Pirates",
-     "Emperor",
-     "Warlord"
+     "Four Emperors",
+     "Seven Warlords of the Sea"
     ],
     "frucht": [
-     "Logia",
-     "Paramecia"
+     "Logia"
     ],
     "haki": [
      "Observation",
@@ -542,7 +568,7 @@
     ],
     "kopfgeld": 3996000000,
     "groesse": 344,
-    "herkunft": "Unknown",
+    "herkunft": "Grand Line",
     "arc": "Jaya"
    }
   },
@@ -550,13 +576,16 @@
    "thema": "one-piece",
    "id": "op-kaido",
    "name": "Kaido",
-   "auch": [],
+   "auch": [
+    "Kaidou"
+   ],
    "bekanntheit": 1,
+   "wiki": "Kaidou",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
      "Beasts Pirates",
-     "Emperor"
+     "Four Emperors"
     ],
     "frucht": [
      "Zoan"
@@ -568,7 +597,7 @@
     ],
     "kopfgeld": 4611100000,
     "groesse": 710,
-    "herkunft": "New World",
+    "herkunft": "Grand Line",
     "arc": "Dressrosa"
    }
   },
@@ -580,11 +609,12 @@
     "Charlotte Linlin"
    ],
    "bekanntheit": 1,
+   "wiki": "Charlotte_Linlin",
    "werte": {
     "geschlecht": "female",
     "gruppe": [
      "Big Mom Pirates",
-     "Emperor"
+     "Four Emperors"
     ],
     "frucht": [
      "Paramecia"
@@ -596,7 +626,7 @@
     ],
     "kopfgeld": 4388000000,
     "groesse": 880,
-    "herkunft": "New World",
+    "herkunft": "Grand Line",
     "arc": "Fish-Man Island"
    }
   },
@@ -607,7 +637,8 @@
    "auch": [
     "Katakuri"
    ],
-   "bekanntheit": 2,
+   "bekanntheit": 1,
+   "wiki": "Charlotte_Katakuri",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
@@ -623,7 +654,7 @@
     ],
     "kopfgeld": 1057000000,
     "groesse": 509,
-    "herkunft": "New World",
+    "herkunft": "Grand Line",
     "arc": "Whole Cake Island"
    }
   },
@@ -634,7 +665,8 @@
    "auch": [
     "Pudding"
    ],
-   "bekanntheit": 3,
+   "bekanntheit": 2,
+   "wiki": "Charlotte_Pudding",
    "werte": {
     "geschlecht": "female",
     "gruppe": [
@@ -646,8 +678,112 @@
     "haki": [],
     "kopfgeld": 0,
     "groesse": 166,
-    "herkunft": "New World",
+    "herkunft": "Grand Line",
+    "arc": "Fish-Man Island"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-cracker",
+   "name": "Charlotte Cracker",
+   "auch": [
+    "Cracker"
+   ],
+   "bekanntheit": 2,
+   "wiki": "Charlotte_Cracker",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Big Mom Pirates"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [
+     "Observation",
+     "Armament"
+    ],
+    "kopfgeld": 860000000,
+    "groesse": 307,
+    "herkunft": "Grand Line",
     "arc": "Whole Cake Island"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-smoothie",
+   "name": "Charlotte Smoothie",
+   "auch": [
+    "Smoothie"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Charlotte_Smoothie",
+   "werte": {
+    "geschlecht": "female",
+    "gruppe": [
+     "Big Mom Pirates"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [
+     "Observation",
+     "Armament"
+    ],
+    "kopfgeld": 932000000,
+    "groesse": 464,
+    "herkunft": "Grand Line",
+    "arc": "Whole Cake Island"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-brulee",
+   "name": "Charlotte Brûlée",
+   "auch": [
+    "Brûlée",
+    "Brulee"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Charlotte_Brulee",
+   "werte": {
+    "geschlecht": "female",
+    "gruppe": [
+     "Big Mom Pirates"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 350,
+    "herkunft": "Grand Line",
+    "arc": "Whole Cake Island"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-pekoms",
+   "name": "Pekoms",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Pekoms",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Big Mom Pirates"
+    ],
+    "frucht": [
+     "Zoan"
+    ],
+    "haki": [
+     "Observation",
+     "Armament"
+    ],
+    "kopfgeld": 330000000,
+    "groesse": 232,
+    "herkunft": "Unknown",
+    "arc": "Fish-Man Island"
    }
   },
   {
@@ -658,11 +794,12 @@
     "Doflamingo"
    ],
    "bekanntheit": 1,
+   "wiki": "Donquixote_Doflamingo",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
      "Donquixote Pirates",
-     "Warlord"
+     "Seven Warlords of the Sea"
     ],
     "frucht": [
      "Paramecia"
@@ -674,8 +811,125 @@
     ],
     "kopfgeld": 340000000,
     "groesse": 305,
-    "herkunft": "Mary Geoise",
-    "arc": "Alabasta"
+    "herkunft": "Red Line",
+    "arc": "Jaya"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-rosinante",
+   "name": "Donquixote Rosinante",
+   "auch": [
+    "Corazon",
+    "Rosinante"
+   ],
+   "bekanntheit": 2,
+   "wiki": "Donquixote_Rosinante",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Marines"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 293,
+    "herkunft": "Red Line",
+    "arc": "Dressrosa"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-vergo",
+   "name": "Vergo",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Vergo",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Donquixote Pirates"
+    ],
+    "frucht": [],
+    "haki": [
+     "Observation",
+     "Armament"
+    ],
+    "kopfgeld": 0,
+    "groesse": 247,
+    "herkunft": "North Blue",
+    "arc": "Punk Hazard"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-monet",
+   "name": "Monet",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Monet",
+   "werte": {
+    "geschlecht": "female",
+    "gruppe": [
+     "Donquixote Pirates"
+    ],
+    "frucht": [
+     "Logia"
+    ],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 227,
+    "herkunft": "North Blue",
+    "arc": "Punk Hazard"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-sugar",
+   "name": "Sugar",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Sugar",
+   "werte": {
+    "geschlecht": "female",
+    "gruppe": [
+     "Donquixote Pirates"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 110,
+    "herkunft": "North Blue",
+    "arc": "Punk Hazard"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-trebol",
+   "name": "Trebol",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Trebol",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Donquixote Pirates"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [
+     "Observation",
+     "Armament"
+    ],
+    "kopfgeld": 99000000,
+    "groesse": 349,
+    "herkunft": "North Blue",
+    "arc": "Dressrosa"
    }
   },
   {
@@ -683,27 +937,28 @@
    "id": "op-law",
    "name": "Trafalgar Law",
    "auch": [
-    "Law"
+    "Law",
+    "Trafalgar D. Water Law"
    ],
    "bekanntheit": 1,
+   "wiki": "Trafalgar_D._Water_Law",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
      "Heart Pirates",
-     "Warlord"
+     "Seven Warlords of the Sea"
     ],
     "frucht": [
      "Paramecia"
     ],
     "haki": [
      "Observation",
-     "Armament",
-     "Conqueror's"
+     "Armament"
     ],
     "kopfgeld": 3000000000,
     "groesse": 191,
     "herkunft": "North Blue",
-    "arc": "Sabaody"
+    "arc": "Sabaody Archipelago"
    }
   },
   {
@@ -711,7 +966,8 @@
    "id": "op-bepo",
    "name": "Bepo",
    "auch": [],
-   "bekanntheit": 3,
+   "bekanntheit": 2,
+   "wiki": "Bepo",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
@@ -719,10 +975,10 @@
     ],
     "frucht": [],
     "haki": [],
-    "kopfgeld": 500,
+    "kopfgeld": 1500,
     "groesse": 240,
-    "herkunft": "New World",
-    "arc": "Sabaody"
+    "herkunft": "Grand Line",
+    "arc": "Sabaody Archipelago"
    }
   },
   {
@@ -733,6 +989,7 @@
     "Kid"
    ],
    "bekanntheit": 1,
+   "wiki": "Eustass_Kid",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
@@ -749,7 +1006,30 @@
     "kopfgeld": 3000000000,
     "groesse": 205,
     "herkunft": "South Blue",
-    "arc": "Sabaody"
+    "arc": "Sabaody Archipelago"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-killer",
+   "name": "Killer",
+   "auch": [],
+   "bekanntheit": 2,
+   "wiki": "Killer",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Kid Pirates"
+    ],
+    "frucht": [],
+    "haki": [
+     "Observation",
+     "Armament"
+    ],
+    "kopfgeld": 200000000,
+    "groesse": 195,
+    "herkunft": "South Blue",
+    "arc": "Sabaody Archipelago"
    }
   },
   {
@@ -759,7 +1039,8 @@
    "auch": [
     "Bonney"
    ],
-   "bekanntheit": 3,
+   "bekanntheit": 2,
+   "wiki": "Jewelry_Bonney",
    "werte": {
     "geschlecht": "female",
     "gruppe": [
@@ -768,11 +1049,139 @@
     "frucht": [
      "Paramecia"
     ],
-    "haki": [],
+    "haki": [
+     "Armament"
+    ],
     "kopfgeld": 320000000,
     "groesse": 174,
-    "herkunft": "South Blue",
-    "arc": "Sabaody"
+    "herkunft": "Red Line",
+    "arc": "Sabaody Archipelago"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-hawkins",
+   "name": "Basil Hawkins",
+   "auch": [
+    "Hawkins"
+   ],
+   "bekanntheit": 2,
+   "wiki": "Basil_Hawkins",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Hawkins Pirates",
+     "Beasts Pirates"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [
+     "Observation",
+     "Armament"
+    ],
+    "kopfgeld": 320000000,
+    "groesse": 210,
+    "herkunft": "North Blue",
+    "arc": "Sabaody Archipelago"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-drake",
+   "name": "X Drake",
+   "auch": [
+    "Drake"
+   ],
+   "bekanntheit": 2,
+   "wiki": "X_Drake",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Marines"
+    ],
+    "frucht": [
+     "Zoan"
+    ],
+    "haki": [
+     "Observation",
+     "Armament"
+    ],
+    "kopfgeld": 222000000,
+    "groesse": 233,
+    "herkunft": "North Blue",
+    "arc": "Sabaody Archipelago"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-apoo",
+   "name": "Scratchmen Apoo",
+   "auch": [
+    "Apoo"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Scratchmen_Apoo",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "On Air Pirates"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [
+     "Observation",
+     "Armament"
+    ],
+    "kopfgeld": 350000000,
+    "groesse": 256,
+    "herkunft": "Grand Line",
+    "arc": "Sabaody Archipelago"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-urouge",
+   "name": "Urouge",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Urouge",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Fallen Monk Pirates"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 108000000,
+    "groesse": 388,
+    "herkunft": "Sky Islands",
+    "arc": "Sabaody Archipelago"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-bege",
+   "name": "Capone Bege",
+   "auch": [
+    "Bege"
+   ],
+   "bekanntheit": 2,
+   "wiki": "Capone_Bege",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Fire Tank Pirates"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [],
+    "kopfgeld": 350000000,
+    "groesse": 166,
+    "herkunft": "West Blue",
+    "arc": "Sabaody Archipelago"
    }
   },
   {
@@ -783,11 +1192,12 @@
     "Hancock"
    ],
    "bekanntheit": 1,
+   "wiki": "Boa_Hancock",
    "werte": {
     "geschlecht": "female",
     "gruppe": [
      "Kuja Pirates",
-     "Warlord"
+     "Seven Warlords of the Sea"
     ],
     "frucht": [
      "Paramecia"
@@ -805,17 +1215,40 @@
   },
   {
    "thema": "one-piece",
+   "id": "op-marguerite",
+   "name": "Marguerite",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Marguerite",
+   "werte": {
+    "geschlecht": "female",
+    "gruppe": [
+     "Kuja Pirates"
+    ],
+    "frucht": [],
+    "haki": [
+     "Armament"
+    ],
+    "kopfgeld": 0,
+    "groesse": 178,
+    "herkunft": "Calm Belt",
+    "arc": "Amazon Lily"
+   }
+  },
+  {
+   "thema": "one-piece",
    "id": "op-moria",
    "name": "Gecko Moria",
    "auch": [
     "Moria"
    ],
-   "bekanntheit": 3,
+   "bekanntheit": 2,
+   "wiki": "Gecko_Moria",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
      "Thriller Bark Pirates",
-     "Warlord"
+     "Seven Warlords of the Sea"
     ],
     "frucht": [
      "Paramecia"
@@ -829,26 +1262,74 @@
   },
   {
    "thema": "one-piece",
-   "id": "op-kuma",
-   "name": "Bartholomew Kuma",
-   "auch": [
-    "Kuma"
-   ],
-   "bekanntheit": 3,
+   "id": "op-perona",
+   "name": "Perona",
+   "auch": [],
+   "bekanntheit": 2,
+   "wiki": "Perona",
    "werte": {
-    "geschlecht": "male",
+    "geschlecht": "female",
     "gruppe": [
-     "Revolutionary Army",
-     "Warlord"
+     "Thriller Bark Pirates"
     ],
     "frucht": [
      "Paramecia"
     ],
     "haki": [],
+    "kopfgeld": 0,
+    "groesse": 160,
+    "herkunft": "West Blue",
+    "arc": "Thriller Bark"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-absalom",
+   "name": "Absalom",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Absalom",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Thriller Bark Pirates"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 195,
+    "herkunft": "West Blue",
+    "arc": "Thriller Bark"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-kuma",
+   "name": "Bartholomew Kuma",
+   "auch": [
+    "Kuma"
+   ],
+   "bekanntheit": 2,
+   "wiki": "Bartholomew_Kuma",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Revolutionary Army",
+     "Seven Warlords of the Sea"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [
+     "Observation",
+     "Armament"
+    ],
     "kopfgeld": 296000000,
     "groesse": 689,
     "herkunft": "South Blue",
-    "arc": "Thriller Bark"
+    "arc": "Jaya"
    }
   },
   {
@@ -859,10 +1340,11 @@
     "Garp"
    ],
    "bekanntheit": 1,
+   "wiki": "Monkey_D._Garp",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
-     "Navy"
+     "Marines"
     ],
     "frucht": [],
     "haki": [
@@ -873,7 +1355,7 @@
     "kopfgeld": 0,
     "groesse": 287,
     "herkunft": "East Blue",
-    "arc": "Enies Lobby"
+    "arc": "Arlong Park"
    }
   },
   {
@@ -881,23 +1363,25 @@
    "id": "op-sengoku",
    "name": "Sengoku",
    "auch": [],
-   "bekanntheit": 3,
+   "bekanntheit": 2,
+   "wiki": "Sengoku",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
-     "Navy"
+     "Marines"
     ],
     "frucht": [
      "Zoan"
     ],
     "haki": [
      "Observation",
-     "Armament"
+     "Armament",
+     "Conqueror's"
     ],
     "kopfgeld": 0,
     "groesse": 278,
-    "herkunft": "Unknown",
-    "arc": "Alabasta"
+    "herkunft": "South Blue",
+    "arc": "Jaya"
    }
   },
   {
@@ -908,11 +1392,11 @@
     "Sakazuki"
    ],
    "bekanntheit": 1,
+   "wiki": "Sakazuki",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
-     "Navy",
-     "Admiral"
+     "Marines"
     ],
     "frucht": [
      "Logia"
@@ -935,11 +1419,11 @@
     "Kuzan"
    ],
    "bekanntheit": 1,
+   "wiki": "Kuzan",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
-     "Blackbeard Pirates",
-     "Admiral"
+     "Blackbeard Pirates"
     ],
     "frucht": [
      "Logia"
@@ -962,11 +1446,11 @@
     "Borsalino"
    ],
    "bekanntheit": 1,
+   "wiki": "Borsalino",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
-     "Navy",
-     "Admiral"
+     "Marines"
     ],
     "frucht": [
      "Logia"
@@ -978,7 +1462,7 @@
     "kopfgeld": 0,
     "groesse": 302,
     "herkunft": "North Blue",
-    "arc": "Sabaody"
+    "arc": "Sabaody Archipelago"
    }
   },
   {
@@ -988,12 +1472,12 @@
    "auch": [
     "Issho"
    ],
-   "bekanntheit": 3,
+   "bekanntheit": 2,
+   "wiki": "Issho",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
-     "Navy",
-     "Admiral"
+     "Marines"
     ],
     "frucht": [
      "Paramecia"
@@ -1004,8 +1488,35 @@
     ],
     "kopfgeld": 0,
     "groesse": 270,
-    "herkunft": "Unknown",
-    "arc": "Punk Hazard"
+    "herkunft": "Grand Line",
+    "arc": "Dressrosa"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-ryokugyu",
+   "name": "Ryokugyu",
+   "auch": [
+    "Aramaki"
+   ],
+   "bekanntheit": 2,
+   "wiki": "Aramaki",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Marines"
+    ],
+    "frucht": [
+     "Logia"
+    ],
+    "haki": [
+     "Observation",
+     "Armament"
+    ],
+    "kopfgeld": 0,
+    "groesse": 308,
+    "herkunft": "South Blue",
+    "arc": "Levely"
    }
   },
   {
@@ -1015,11 +1526,12 @@
    "auch": [
     "Coby"
    ],
-   "bekanntheit": 2,
+   "bekanntheit": 1,
+   "wiki": "Koby",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
-     "Navy"
+     "Marines"
     ],
     "frucht": [],
     "haki": [
@@ -1034,14 +1546,37 @@
   },
   {
    "thema": "one-piece",
-   "id": "op-smoker",
-   "name": "Smoker",
+   "id": "op-helmeppo",
+   "name": "Helmeppo",
    "auch": [],
    "bekanntheit": 2,
+   "wiki": "Helmeppo",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
-     "Navy"
+     "Marines"
+    ],
+    "frucht": [],
+    "haki": [
+     "Armament"
+    ],
+    "kopfgeld": 0,
+    "groesse": 179,
+    "herkunft": "Unknown",
+    "arc": "Romance Dawn"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-smoker",
+   "name": "Smoker",
+   "auch": [],
+   "bekanntheit": 1,
+   "wiki": "Smoker",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Marines"
     ],
     "frucht": [
      "Logia"
@@ -1052,7 +1587,7 @@
     ],
     "kopfgeld": 0,
     "groesse": 209,
-    "herkunft": "Unknown",
+    "herkunft": "Grand Line",
     "arc": "Loguetown"
    }
   },
@@ -1061,18 +1596,44 @@
    "id": "op-tashigi",
    "name": "Tashigi",
    "auch": [],
-   "bekanntheit": 3,
+   "bekanntheit": 2,
+   "wiki": "Tashigi",
    "werte": {
     "geschlecht": "female",
     "gruppe": [
-     "Navy"
+     "Marines"
     ],
     "frucht": [],
-    "haki": [],
+    "haki": [
+     "Observation",
+     "Armament"
+    ],
     "kopfgeld": 0,
     "groesse": 170,
     "herkunft": "East Blue",
     "arc": "Loguetown"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-morgan",
+   "name": "Morgan",
+   "auch": [
+    "Axe-Hand Morgan"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Morgan",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Marines"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 285,
+    "herkunft": "Unknown",
+    "arc": "Romance Dawn"
    }
   },
   {
@@ -1082,7 +1643,8 @@
    "auch": [
     "Dragon"
    ],
-   "bekanntheit": 3,
+   "bekanntheit": 1,
+   "wiki": "Monkey_D._Dragon",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
@@ -1091,7 +1653,7 @@
     "frucht": [],
     "haki": [],
     "kopfgeld": 0,
-    "groesse": 255,
+    "groesse": 256,
     "herkunft": "East Blue",
     "arc": "Loguetown"
    }
@@ -1102,6 +1664,7 @@
    "name": "Sabo",
    "auch": [],
    "bekanntheit": 1,
+   "wiki": "Sabo",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
@@ -1114,10 +1677,10 @@
      "Observation",
      "Armament"
     ],
-    "kopfgeld": 602000000,
+    "kopfgeld": 0,
     "groesse": 187,
     "herkunft": "East Blue",
-    "arc": "Marineford"
+    "arc": "Post-War"
    }
   },
   {
@@ -1127,7 +1690,8 @@
    "auch": [
     "Rayleigh"
    ],
-   "bekanntheit": 2,
+   "bekanntheit": 1,
+   "wiki": "Silvers_Rayleigh",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
@@ -1142,7 +1706,7 @@
     "kopfgeld": 0,
     "groesse": 188,
     "herkunft": "Unknown",
-    "arc": "Sabaody"
+    "arc": "Orange Town"
    }
   },
   {
@@ -1154,6 +1718,7 @@
     "Gold Roger"
    ],
    "bekanntheit": 1,
+   "wiki": "Gol_D._Roger",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
@@ -1173,12 +1738,35 @@
   },
   {
    "thema": "one-piece",
+   "id": "op-crocus",
+   "name": "Crocus",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Crocus",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Roger Pirates"
+    ],
+    "frucht": [],
+    "haki": [
+     "Observation"
+    ],
+    "kopfgeld": 0,
+    "groesse": 203,
+    "herkunft": "Grand Line",
+    "arc": "Reverse Mountain"
+   }
+  },
+  {
+   "thema": "one-piece",
    "id": "op-vivi",
    "name": "Nefertari Vivi",
    "auch": [
     "Vivi"
    ],
-   "bekanntheit": 2,
+   "bekanntheit": 1,
+   "wiki": "Nefertari_Vivi",
    "werte": {
     "geschlecht": "female",
     "gruppe": [
@@ -1188,8 +1776,30 @@
     "haki": [],
     "kopfgeld": 0,
     "groesse": 169,
-    "herkunft": "Paradise",
-    "arc": "Whisky Peak"
+    "herkunft": "Grand Line",
+    "arc": "Reverse Mountain"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-cobra",
+   "name": "Nefertari Cobra",
+   "auch": [
+    "Cobra"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Nefertari_Cobra",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Arabasta Kingdom"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 182,
+    "herkunft": "Grand Line",
+    "arc": "Drum Island"
    }
   },
   {
@@ -1199,11 +1809,12 @@
    "auch": [
     "Eneru"
    ],
-   "bekanntheit": 2,
+   "bekanntheit": 1,
+   "wiki": "Enel",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
-     "Skypiea"
+     "God's Army"
     ],
     "frucht": [
      "Logia"
@@ -1219,10 +1830,33 @@
   },
   {
    "thema": "one-piece",
+   "id": "op-wiper",
+   "name": "Wyper",
+   "auch": [
+    "Wiper"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Wiper",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Shandia"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 183,
+    "herkunft": "Sky Islands",
+    "arc": "Skypiea"
+   }
+  },
+  {
+   "thema": "one-piece",
    "id": "op-arlong",
    "name": "Arlong",
    "auch": [],
-   "bekanntheit": 2,
+   "bekanntheit": 1,
+   "wiki": "Arlong",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
@@ -1232,7 +1866,30 @@
     "haki": [],
     "kopfgeld": 20000000,
     "groesse": 263,
-    "herkunft": "Fish-Man Island",
+    "herkunft": "Grand Line",
+    "arc": "Arlong Park"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-hatchan",
+   "name": "Hatchan",
+   "auch": [
+    "Hachi",
+    "Octy"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Hachi",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Takoyaki 8"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 8000000,
+    "groesse": 220,
+    "herkunft": "Unknown",
     "arc": "Arlong Park"
    }
   },
@@ -1244,7 +1901,8 @@
     "Käpt'n Kuro",
     "Klahadore"
    ],
-   "bekanntheit": 3,
+   "bekanntheit": 2,
+   "wiki": "Kuro",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
@@ -1253,7 +1911,7 @@
     "frucht": [],
     "haki": [],
     "kopfgeld": 16000000,
-    "groesse": 200,
+    "groesse": 207,
     "herkunft": "East Blue",
     "arc": "Syrup Village"
    }
@@ -1265,7 +1923,8 @@
    "auch": [
     "Krieg"
    ],
-   "bekanntheit": 3,
+   "bekanntheit": 2,
+   "wiki": "Don_Krieg",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
@@ -1274,9 +1933,127 @@
     "frucht": [],
     "haki": [],
     "kopfgeld": 17000000,
-    "groesse": 249,
+    "groesse": 243,
     "herkunft": "East Blue",
     "arc": "Baratie"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-gin",
+   "name": "Gin",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Gin",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Krieg Pirates"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 12000000,
+    "groesse": 186,
+    "herkunft": "East Blue",
+    "arc": "Baratie"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-alvida",
+   "name": "Alvida",
+   "auch": [],
+   "bekanntheit": 2,
+   "wiki": "Alvida",
+   "werte": {
+    "geschlecht": "female",
+    "gruppe": [
+     "Cross Guild",
+     "Buggy Pirates"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [],
+    "kopfgeld": 5000000,
+    "groesse": 198,
+    "herkunft": "East Blue",
+    "arc": "Romance Dawn"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-mr3",
+   "name": "Mr. 3",
+   "auch": [
+    "Galdino"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Galdino",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Cross Guild",
+     "Buggy Pirates"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [],
+    "kopfgeld": 24000000,
+    "groesse": 179,
+    "herkunft": "South Blue",
+    "arc": "Little Garden"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-mr1",
+   "name": "Mr. 1",
+   "auch": [
+    "Daz Bonez"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Daz_Bonez",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Cross Guild"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [],
+    "kopfgeld": 75000000,
+    "groesse": 212,
+    "herkunft": "West Blue",
+    "arc": "Arabasta"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-bonclay",
+   "name": "Bon Clay",
+   "auch": [
+    "Mr. 2",
+    "Bentham",
+    "Bon Kurei"
+   ],
+   "bekanntheit": 2,
+   "wiki": "Bentham",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Newkama Land"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [],
+    "kopfgeld": 32000000,
+    "groesse": 238,
+    "herkunft": "East Blue",
+    "arc": "Little Garden"
    }
   },
   {
@@ -1286,7 +2063,8 @@
    "auch": [
     "Lucci"
    ],
-   "bekanntheit": 2,
+   "bekanntheit": 1,
+   "wiki": "Rob_Lucci",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
@@ -1301,7 +2079,99 @@
     ],
     "kopfgeld": 0,
     "groesse": 212,
-    "herkunft": "Unknown",
+    "herkunft": "Grand Line",
+    "arc": "Water 7"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-kaku",
+   "name": "Kaku",
+   "auch": [],
+   "bekanntheit": 2,
+   "wiki": "Kaku",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "CP0"
+    ],
+    "frucht": [
+     "Zoan"
+    ],
+    "haki": [
+     "Observation",
+     "Armament"
+    ],
+    "kopfgeld": 0,
+    "groesse": 193,
+    "herkunft": "East Blue",
+    "arc": "Water 7"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-kalifa",
+   "name": "Kalifa",
+   "auch": [],
+   "bekanntheit": 2,
+   "wiki": "Kalifa",
+   "werte": {
+    "geschlecht": "female",
+    "gruppe": [
+     "CP0"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [
+     "Observation",
+     "Armament"
+    ],
+    "kopfgeld": 0,
+    "groesse": 185,
+    "herkunft": "Grand Line",
+    "arc": "Water 7"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-spandam",
+   "name": "Spandam",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Spandam",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "CP0"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 192,
+    "herkunft": "Grand Line",
+    "arc": "Water 7"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-iceburg",
+   "name": "Iceburg",
+   "auch": [
+    "Eisberg"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Iceburg",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Galley-La Company"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 199,
+    "herkunft": "Grand Line",
     "arc": "Water 7"
    }
   },
@@ -1312,11 +2182,12 @@
    "auch": [
     "Oden"
    ],
-   "bekanntheit": 3,
+   "bekanntheit": 2,
+   "wiki": "Kozuki_Oden",
    "werte": {
     "geschlecht": "male",
     "gruppe": [
-     "Kozuki Family"
+     "Kouzuki Family"
     ],
     "frucht": [],
     "haki": [
@@ -1326,8 +2197,308 @@
     ],
     "kopfgeld": 0,
     "groesse": 382,
-    "herkunft": "New World",
-    "arc": "Wano"
+    "herkunft": "Grand Line",
+    "arc": "Wano Country"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-momonosuke",
+   "name": "Kozuki Momonosuke",
+   "auch": [
+    "Momonosuke",
+    "Momo"
+   ],
+   "bekanntheit": 2,
+   "wiki": "Kozuki_Momonosuke",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Kouzuki Family"
+    ],
+    "frucht": [
+     "Zoan"
+    ],
+    "haki": [
+     "Observation"
+    ],
+    "kopfgeld": 0,
+    "groesse": 322,
+    "herkunft": "Grand Line",
+    "arc": "Punk Hazard"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-kinemon",
+   "name": "Kin'emon",
+   "auch": [
+    "Kinemon"
+   ],
+   "bekanntheit": 2,
+   "wiki": "Kin'emon",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Kouzuki Family",
+     "Nine Red Scabbards"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [
+     "Observation",
+     "Armament"
+    ],
+    "kopfgeld": 0,
+    "groesse": 295,
+    "herkunft": "Grand Line",
+    "arc": "Punk Hazard"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-kikunojo",
+   "name": "Kikunojo",
+   "auch": [
+    "Kiku"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Kikunojo",
+   "werte": {
+    "geschlecht": "female",
+    "gruppe": [
+     "Kouzuki Family",
+     "Nine Red Scabbards"
+    ],
+    "frucht": [],
+    "haki": [
+     "Observation",
+     "Armament"
+    ],
+    "kopfgeld": 0,
+    "groesse": 287,
+    "herkunft": "Grand Line",
+    "arc": "Wano Country"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-denjiro",
+   "name": "Denjiro",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Denjiro",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Kouzuki Family",
+     "Nine Red Scabbards"
+    ],
+    "frucht": [],
+    "haki": [
+     "Observation",
+     "Armament"
+    ],
+    "kopfgeld": 0,
+    "groesse": 306,
+    "herkunft": "Grand Line",
+    "arc": "Wano Country"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-kawamatsu",
+   "name": "Kawamatsu",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Kawamatsu",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Kouzuki Family",
+     "Nine Red Scabbards"
+    ],
+    "frucht": [],
+    "haki": [
+     "Observation",
+     "Armament"
+    ],
+    "kopfgeld": 0,
+    "groesse": 271,
+    "herkunft": "Grand Line",
+    "arc": "Wano Country"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-nekomamushi",
+   "name": "Nekomamushi",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Nekomamushi",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Mokomo Dukedom",
+     "Nine Red Scabbards"
+    ],
+    "frucht": [],
+    "haki": [
+     "Observation",
+     "Armament"
+    ],
+    "kopfgeld": 0,
+    "groesse": 522,
+    "herkunft": "Grand Line",
+    "arc": "Zou"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-inuarashi",
+   "name": "Inuarashi",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Inuarashi",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Mokomo Dukedom",
+     "Nine Red Scabbards"
+    ],
+    "frucht": [],
+    "haki": [
+     "Observation",
+     "Armament"
+    ],
+    "kopfgeld": 0,
+    "groesse": 511,
+    "herkunft": "Grand Line",
+    "arc": "Zou"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-carrot",
+   "name": "Carrot",
+   "auch": [],
+   "bekanntheit": 2,
+   "wiki": "Carrot",
+   "werte": {
+    "geschlecht": "female",
+    "gruppe": [
+     "Mokomo Dukedom"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 161,
+    "herkunft": "Grand Line",
+    "arc": "Zou"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-yamato",
+   "name": "Yamato",
+   "auch": [],
+   "bekanntheit": 1,
+   "wiki": "Yamato",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Beasts Pirates"
+    ],
+    "frucht": [
+     "Zoan"
+    ],
+    "haki": [
+     "Observation",
+     "Armament",
+     "Conqueror's"
+    ],
+    "kopfgeld": 0,
+    "groesse": 263,
+    "herkunft": "Unknown",
+    "arc": "Wano Country"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-king",
+   "name": "King",
+   "auch": [
+    "Alber"
+   ],
+   "bekanntheit": 2,
+   "wiki": "King",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Beasts Pirates"
+    ],
+    "frucht": [
+     "Zoan"
+    ],
+    "haki": [
+     "Observation",
+     "Armament"
+    ],
+    "kopfgeld": 1390000000,
+    "groesse": 613,
+    "herkunft": "Grand Line",
+    "arc": "Wano Country"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-queen",
+   "name": "Queen",
+   "auch": [],
+   "bekanntheit": 2,
+   "wiki": "Queen",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Beasts Pirates"
+    ],
+    "frucht": [
+     "Zoan"
+    ],
+    "haki": [
+     "Observation",
+     "Armament"
+    ],
+    "kopfgeld": 1320000000,
+    "groesse": 612,
+    "herkunft": "Grand Line",
+    "arc": "Wano Country"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-jack",
+   "name": "Jack",
+   "auch": [],
+   "bekanntheit": 2,
+   "wiki": "Jack",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Beasts Pirates"
+    ],
+    "frucht": [
+     "Zoan"
+    ],
+    "haki": [
+     "Observation",
+     "Armament"
+    ],
+    "kopfgeld": 1000000000,
+    "groesse": 830,
+    "herkunft": "Grand Line",
+    "arc": "Dressrosa"
    }
   },
   {
@@ -1335,18 +2506,540 @@
    "id": "op-shirahoshi",
    "name": "Shirahoshi",
    "auch": [],
-   "bekanntheit": 3,
+   "bekanntheit": 2,
+   "wiki": "Shirahoshi",
    "werte": {
     "geschlecht": "female",
     "gruppe": [
      "Ryugu Kingdom"
     ],
     "frucht": [],
+    "haki": [
+     "Observation"
+    ],
+    "kopfgeld": 0,
+    "groesse": 1187,
+    "herkunft": "Grand Line",
+    "arc": "Fish-Man Island"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-hody",
+   "name": "Hody Jones",
+   "auch": [
+    "Hody"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Hody_Jones",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "New Fish-Man Pirates"
+    ],
+    "frucht": [],
     "haki": [],
     "kopfgeld": 0,
-    "groesse": 1111,
-    "herkunft": "Fish-Man Island",
+    "groesse": 331,
+    "herkunft": "Grand Line",
     "arc": "Fish-Man Island"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-caesar",
+   "name": "Caesar Clown",
+   "auch": [
+    "Caesar"
+   ],
+   "bekanntheit": 2,
+   "wiki": "Caesar_Clown",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "NEO MADS"
+    ],
+    "frucht": [
+     "Logia"
+    ],
+    "haki": [],
+    "kopfgeld": 300000000,
+    "groesse": 309,
+    "herkunft": "Grand Line",
+    "arc": "Punk Hazard"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-vegapunk",
+   "name": "Vegapunk",
+   "auch": [
+    "Dr. Vegapunk"
+   ],
+   "bekanntheit": 2,
+   "wiki": "Vegapunk",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Marines"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 314,
+    "herkunft": "Grand Line",
+    "arc": "Punk Hazard"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-bartolomeo",
+   "name": "Bartolomeo",
+   "auch": [],
+   "bekanntheit": 2,
+   "wiki": "Bartolomeo",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Barto Club"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [],
+    "kopfgeld": 200000000,
+    "groesse": 220,
+    "herkunft": "East Blue",
+    "arc": "Dressrosa"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-cavendish",
+   "name": "Cavendish",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Cavendish",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Beautiful Pirates"
+    ],
+    "frucht": [],
+    "haki": [
+     "Observation",
+     "Armament"
+    ],
+    "kopfgeld": 330000000,
+    "groesse": 208,
+    "herkunft": "Grand Line",
+    "arc": "Dressrosa"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-rebecca",
+   "name": "Rebecca",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Rebecca",
+   "werte": {
+    "geschlecht": "female",
+    "gruppe": [
+     "Dressrosa"
+    ],
+    "frucht": [],
+    "haki": [
+     "Observation"
+    ],
+    "kopfgeld": 0,
+    "groesse": 171,
+    "herkunft": "Grand Line",
+    "arc": "Dressrosa"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-kyros",
+   "name": "Kyros",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Kyros",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Riku Family"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 298,
+    "herkunft": "Grand Line",
+    "arc": "Dressrosa"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-shiryu",
+   "name": "Shiryu",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Shiryu",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Blackbeard Pirates"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [
+     "Armament"
+    ],
+    "kopfgeld": 0,
+    "groesse": 340,
+    "herkunft": "Grand Line",
+    "arc": "Impel Down"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-burgess",
+   "name": "Jesus Burgess",
+   "auch": [
+    "Burgess"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Jesus_Burgess",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Blackbeard Pirates"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [
+     "Observation",
+     "Armament"
+    ],
+    "kopfgeld": 20000000,
+    "groesse": 355,
+    "herkunft": "Grand Line",
+    "arc": "Jaya"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-augur",
+   "name": "Van Augur",
+   "auch": [
+    "Augur"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Van_Augur",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Blackbeard Pirates"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [],
+    "kopfgeld": 64000000,
+    "groesse": 340,
+    "herkunft": "East Blue",
+    "arc": "Jaya"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-laffitte",
+   "name": "Laffitte",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Laffitte",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Blackbeard Pirates"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 42200000,
+    "groesse": 340,
+    "herkunft": "West Blue",
+    "arc": "Jaya"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-beckman",
+   "name": "Benn Beckman",
+   "auch": [
+    "Beckman"
+   ],
+   "bekanntheit": 2,
+   "wiki": "Benn_Beckman",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Red Hair Pirates"
+    ],
+    "frucht": [],
+    "haki": [
+     "Armament"
+    ],
+    "kopfgeld": 0,
+    "groesse": 206,
+    "herkunft": "North Blue",
+    "arc": "Romance Dawn"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-yasopp",
+   "name": "Yasopp",
+   "auch": [],
+   "bekanntheit": 2,
+   "wiki": "Yasopp",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Red Hair Pirates"
+    ],
+    "frucht": [],
+    "haki": [
+     "Observation"
+    ],
+    "kopfgeld": 0,
+    "groesse": 183,
+    "herkunft": "East Blue",
+    "arc": "Romance Dawn"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-roux",
+   "name": "Lucky Roux",
+   "auch": [
+    "Lucky Lou"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Lucky_Roux",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Red Hair Pirates"
+    ],
+    "frucht": [],
+    "haki": [
+     "Armament"
+    ],
+    "kopfgeld": 0,
+    "groesse": 241,
+    "herkunft": "South Blue",
+    "arc": "Romance Dawn"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-zeff",
+   "name": "Zeff",
+   "auch": [
+    "Jeff",
+    "Rotfuß Jeff"
+   ],
+   "bekanntheit": 2,
+   "wiki": "Zeff",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Baratie"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 189,
+    "herkunft": "East Blue",
+    "arc": "Baratie"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-dalton",
+   "name": "Dalton",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Dalton",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Sakura Kingdom"
+    ],
+    "frucht": [
+     "Zoan"
+    ],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 218,
+    "herkunft": "Grand Line",
+    "arc": "Drum Island"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-kureha",
+   "name": "Dr. Kureha",
+   "auch": [
+    "Kureha"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Kureha",
+   "werte": {
+    "geschlecht": "female",
+    "gruppe": [
+     "Sakura Kingdom"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 188,
+    "herkunft": "Grand Line",
+    "arc": "Drum Island"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-wapol",
+   "name": "Wapol",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Wapol",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Evil Black Drum Kingdom"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 207,
+    "herkunft": "Grand Line",
+    "arc": "Drum Island"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-magellan",
+   "name": "Magellan",
+   "auch": [],
+   "bekanntheit": 2,
+   "wiki": "Magellan",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Impel Down"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 491,
+    "herkunft": "Grand Line",
+    "arc": "Impel Down"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-hannyabal",
+   "name": "Hannyabal",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Hannyabal",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Impel Down"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 309,
+    "herkunft": "South Blue",
+    "arc": "Impel Down"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-foxy",
+   "name": "Foxy",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Foxy",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Foxy Pirates"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [],
+    "kopfgeld": 24000000,
+    "groesse": 180,
+    "herkunft": "South Blue",
+    "arc": "Long Ring Long Land"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-reiju",
+   "name": "Vinsmoke Reiju",
+   "auch": [
+    "Reiju"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Vinsmoke_Reiju",
+   "werte": {
+    "geschlecht": "female",
+    "gruppe": [
+     "Germa 66"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 173,
+    "herkunft": "North Blue",
+    "arc": "Whole Cake Island"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-judge",
+   "name": "Vinsmoke Judge",
+   "auch": [
+    "Judge"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Vinsmoke_Judge",
+   "werte": {
+    "geschlecht": "male",
+    "gruppe": [
+     "Germa 66"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 272,
+    "herkunft": "North Blue",
+    "arc": "Whole Cake Island"
    }
   }
  ]

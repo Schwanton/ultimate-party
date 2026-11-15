@@ -34,6 +34,67 @@ function imageIndex(): Map<string, string> {
   return out;
 }
 
+/**
+ * Bilder aus dem Wiki des Themas laden (Content-Pack: „wiki“ beim Thema und bei jeder Figur).
+ * Läuft im Hintergrund, nur für fehlende Bilder; gespeichert wird nur auf diesem Rechner (.up-data).
+ */
+let downloading: Promise<void> | null = null;
+const failed = new Set<string>();
+
+function shortId(id: string) {
+  return id.replace(/^[^-]+-/, '').toLowerCase();
+}
+
+export async function downloadImages(base: string, figs: Fig[], have: Map<string, string>): Promise<void> {
+  const want = figs.filter((f) => typeof f.wiki === 'string' && f.wiki && !have.has(f.id.toLowerCase()) && !have.has(shortId(f.id)) && !failed.has(f.id));
+  if (!want.length) return;
+  fs.mkdirSync(IMG_DIR, { recursive: true });
+  const headers = { 'User-Agent': 'UP-Ultimate-Party/1.0 (Partyspiel Figurendle; github.com/Schwanton/ultimate-party)' };
+  const sources = new Map<string, string>();
+  for (let i = 0; i < want.length; i += 40) {
+    const part = want.slice(i, i + 40);
+    const titles = part.map((f) => String(f.wiki).replace(/_/g, ' '));
+    try {
+      const url = `${base.replace(/\/$/, '')}/api.php?action=query&prop=pageimages&piprop=thumbnail&pithumbsize=480&format=json&formatversion=2&redirects=1&titles=${encodeURIComponent(titles.join('|'))}`;
+      const res = await fetch(url, { headers, signal: AbortSignal.timeout(20000) });
+      const data = (await res.json()) as { query?: { pages?: { title: string; thumbnail?: { source: string } }[]; normalized?: { from: string; to: string }[]; redirects?: { from: string; to: string }[] } };
+      const q = data.query ?? {};
+      const follow = (t: string) => {
+        for (const list of [q.normalized ?? [], q.redirects ?? []]) for (const m of list) if (m.from === t) t = m.to;
+        return t;
+      };
+      const byTitle = new Map((q.pages ?? []).map((p) => [p.title, p.thumbnail?.source]));
+      part.forEach((f, k) => {
+        const src = byTitle.get(follow(titles[k]));
+        if (src) sources.set(f.id, src);
+        else failed.add(f.id);
+      });
+    } catch {
+      return; // kein Internet o. Ä.: beim nächsten Spiel noch einmal versuchen
+    }
+  }
+  const queue = [...sources];
+  const worker = async () => {
+    for (let job = queue.shift(); job; job = queue.shift()) {
+      const [id, src] = job;
+      try {
+        const res = await fetch(src, { headers, signal: AbortSignal.timeout(30000) });
+        const type = res.headers.get('content-type') ?? '';
+        const ext = type.includes('png') ? 'png' : type.includes('webp') ? 'webp' : type.includes('jpeg') || type.includes('jpg') ? 'jpg' : null;
+        if (!res.ok || !ext) { failed.add(id); continue; }
+        const buf = Buffer.from(await res.arrayBuffer());
+        if (buf.length < 500 || buf.length > 8_000_000) { failed.add(id); continue; }
+        const tmp = path.join(IMG_DIR, `.${shortId(id)}.tmp`);
+        fs.writeFileSync(tmp, buf);
+        fs.renameSync(tmp, path.join(IMG_DIR, `${shortId(id)}.${ext}`));
+      } catch {
+        /* nächstes Mal */
+      }
+    }
+  };
+  await Promise.all([worker(), worker(), worker(), worker()]);
+}
+
 export default {
   create(ctx: GameContext) {
     const ids = ctx.players.map((p) => p.id);
@@ -52,13 +113,20 @@ export default {
     const cols: Col[] = (def?.spalten ?? []).filter((c) => c && typeof c.key === 'string' && typeof c.label === 'string');
     const figs = figsAll.filter((f) => def && f.thema === def.thema);
     const byId = new Map(figs.map((f) => [f.id, f]));
-    const imgs = imageIndex();
-    const img = (f: Fig) => imgs.get(f.id.toLowerCase()) ?? imgs.get(f.id.replace(/^[^-]+-/, '').toLowerCase()) ?? null;
+    let imgs = imageIndex();
+    const img = (f: Fig) => imgs.get(f.id.toLowerCase()) ?? imgs.get(shortId(f.id)) ?? null;
     const sub = (f: Fig) => {
       const g = f.werte[cols[1]?.key ?? ''];
       return Array.isArray(g) ? String(g[0] ?? '') : g ? String(g) : '';
     };
-    const figList = figs.map((f) => ({ id: f.id, n: f.name, a: f.auch ?? [], s: sub(f), img: img(f) })).sort((a, b) => a.n.localeCompare(b.n));
+    const makeList = () => figs.map((f) => ({ id: f.id, n: f.name, a: f.auch ?? [], s: sub(f), img: img(f) })).sort((a, b) => a.n.localeCompare(b.n));
+    let figList = makeList();
+    // Fehlende Bilder im Hintergrund aus dem Wiki laden (Einstellung „Figurenbilder“), nicht in automatischen Tests
+    const wikiBase = (def as { wiki?: unknown } | null)?.wiki;
+    if (ctx.options.bilder !== 'aus' && typeof wikiBase === 'string' && /^https:\/\//.test(wikiBase) && process.env.UP_NO_UPDATE !== '1') {
+      downloading ??= downloadImages(wikiBase, figs, imgs).finally(() => { downloading = null; });
+      void downloading.then(() => { imgs = imageIndex(); figList = makeList(); });
+    }
 
     const total = Number(ctx.options.rounds) || 5;
     const pool = (f: Fig) => !!def && f.thema === def.thema && typeof f.name === 'string' && (Number(f.bekanntheit) || 2) <= maxBek;
@@ -106,6 +174,8 @@ export default {
     }
 
     function startRound() {
+      imgs = imageIndex();
+      figList = makeList();
       secret = secrets[round];
       phase = 'guess';
       solo = new Map(ids.map((id) => [id, { guesses: [], cells: [], place: 0, points: 0, gaveUp: false }]));

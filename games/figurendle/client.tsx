@@ -19,6 +19,10 @@ const DISPLAY = "'Pirata One', Georgia, serif";
 const PAPER = `radial-gradient(ellipse at 50% 40%, rgba(255,248,225,.7), rgba(150,110,60,.25) 100%), repeating-linear-gradient(0deg, rgba(90,60,25,.09) 0 1px, transparent 1px 80px), repeating-linear-gradient(90deg, rgba(90,60,25,.09) 0 1px, transparent 1px 80px), #ecdcb6`;
 const PAPER_PHONE = `repeating-linear-gradient(0deg, rgba(90,60,25,.08) 0 1px, transparent 1px 48px), repeating-linear-gradient(90deg, rgba(90,60,25,.08) 0 1px, transparent 1px 48px), #ecdcb6`;
 const ARROW = { u: '↑', d: '↓' } as const;
+/** Hinweisfelder einer neuen Zeile ploppen nacheinander von links nach rechts auf */
+const STEP = 0.28;
+const KEYFRAMES = '@keyframes fdPop { 0% { transform: scale(.2) rotateX(85deg); opacity: 0 } 65% { transform: scale(1.12); opacity: 1 } 100% { transform: none; opacity: 1 } }';
+const pop = (k: number, on: boolean): CSSProperties => (on ? { animation: `fdPop .38s ease-out ${(k * STEP).toFixed(2)}s both` } : {});
 
 type Color = 'g' | 'o' | 'r';
 interface Cell { t: string; c: Color; a?: 'u' | 'd' }
@@ -51,6 +55,7 @@ function Frame({ children, pad = '28px 40px 24px', gap = 18 }: { children: React
   return (
     <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', background: PAPER, color: INK, fontFamily: FONT, display: 'flex', flexDirection: 'column', padding: pad, gap }}>
       <Compass />
+      <style>{KEYFRAMES}</style>
       {children}
     </div>
   );
@@ -161,8 +166,8 @@ function HostSolo({ view, t, player }: HostViewProps) {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 {hidden > 0 && <span style={{ fontSize: 13, color: MUTED, fontWeight: 700, textAlign: 'center' }}>{t('solo.more', { n: hidden })}</span>}
                 {shown.map((row, i) => (
-                  <div key={hidden + i} className={i === shown.length - 1 ? 'anim-pop' : undefined} style={{ display: 'grid', gridTemplateColumns: `repeat(${row.length}, minmax(0, 1fr))`, gap: 3 }}>
-                    {row.split('').map((c, k) => <span key={k} style={{ height: twoRows ? 13 : 18, borderRadius: 3, background: C[c as Color], boxShadow: 'inset 0 -2px 0 rgba(0,0,0,.18)' }} />)}
+                  <div key={hidden + i} style={{ display: 'grid', gridTemplateColumns: `repeat(${row.length}, minmax(0, 1fr))`, gap: 3 }}>
+                    {row.split('').map((c, k) => <span key={k} style={{ height: twoRows ? 13 : 18, borderRadius: 3, background: C[c as Color], boxShadow: 'inset 0 -2px 0 rgba(0,0,0,.18)', ...pop(k, i === shown.length - 1) }} />)}
                   </div>
                 ))}
               </div>
@@ -180,9 +185,9 @@ function HostSolo({ view, t, player }: HostViewProps) {
   );
 }
 
-function CellBox({ cell, h = 50, size = 14 }: { cell: Cell; h?: number; size?: number }) {
+function CellBox({ cell, h = 50, size = 14, anim }: { cell: Cell; h?: number; size?: number; anim?: CSSProperties }) {
   return (
-    <div style={{ background: C[cell.c], color: FG[cell.c], borderRadius: 4, minHeight: h, padding: 4, boxSizing: 'border-box', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', fontSize: size, fontWeight: 700, lineHeight: 1.1, boxShadow: 'inset 0 -3px 0 rgba(0,0,0,.18)', overflow: 'hidden', overflowWrap: 'break-word', hyphens: 'auto' }}>
+    <div style={{ ...anim, background: C[cell.c], color: FG[cell.c], borderRadius: 4, minHeight: h, padding: 4, boxSizing: 'border-box', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', fontSize: size, fontWeight: 700, lineHeight: 1.1, boxShadow: 'inset 0 -3px 0 rgba(0,0,0,.18)', overflow: 'hidden', overflowWrap: 'break-word', hyphens: 'auto' }}>
       <span style={{ fontSize: cell.t.length > 18 ? size - 2 : size }}>{cell.t}</span>
       {cell.a && <span style={{ fontSize: size + 3 }}>{ARROW[cell.a]}</span>}
     </div>
@@ -196,8 +201,11 @@ function HostBrett({ view, t, player }: HostViewProps) {
   const len = view.misses as number;
   const prev = useRef(len);
   useEffect(() => {
-    if (len > prev.current) sfx.play(board[0]?.gain ? 'ding' : 'pop');
+    if (len <= prev.current) { prev.current = len; return; }
     prev.current = len;
+    const timers = cols.map((_, k) => setTimeout(() => sfx.play('pop'), k * STEP * 1000));
+    if (board[0]?.gain) timers.push(setTimeout(() => sfx.play('ding'), cols.length * STEP * 1000));
+    return () => timers.forEach(clearTimeout);
   }, [len]);
   const grid = `150px repeat(${cols.length}, minmax(0, 1fr))`;
   const left = Math.max(0, view.letterAfter - len);
@@ -214,7 +222,7 @@ function HostBrett({ view, t, player }: HostViewProps) {
           {board.slice(0, 8).map((b, i) => {
             const p = player(b.by);
             return (
-              <div key={board.length - i} className={i === 0 ? 'anim-up' : undefined} style={{ display: 'grid', gridTemplateColumns: grid, gap: 5 }}>
+              <div key={len - i} className={i === 0 ? 'anim-up' : undefined} style={{ display: 'grid', gridTemplateColumns: grid, gap: 5 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
                   {p && <Avatar player={p} size={30} flat />}
                   <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, lineHeight: 1.1 }}>
@@ -222,7 +230,7 @@ function HostBrett({ view, t, player }: HostViewProps) {
                     <span style={{ fontSize: 13, color: MUTED }}>{t('by', { name: p?.name ?? '?' })}{b.gain ? ` · +${b.gain}` : ''}</span>
                   </div>
                 </div>
-                {b.cells.map((c, k) => <CellBox key={k} cell={c} />)}
+                {b.cells.map((c, k) => <CellBox key={k} cell={c} anim={pop(k + 1, i === 0)} />)}
               </div>
             );
           })}
@@ -263,7 +271,7 @@ function Poster({ secret, t }: { secret: { name: string; img: string | null; fac
       <span style={{ fontFamily: DISPLAY, fontSize: 72, lineHeight: 0.9, letterSpacing: 2 }}>{t('reveal.wanted')}</span>
       <div style={{ width: 320, height: 290, border: `3px solid ${INK}`, background: '#d8bf86', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
         {secret.img
-          ? <img src={secret.img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'sepia(.25)' }} />
+          ? <img src={secret.img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', filter: 'sepia(.25)' }} />
           : <span style={{ fontFamily: DISPLAY, fontSize: 120, color: '#a88a52' }}>{secret.name.charAt(0)}</span>}
       </div>
       <span style={{ fontFamily: DISPLAY, fontSize: 20, letterSpacing: 3 }}>{t('reveal.deadOrAlive')}</span>
@@ -390,6 +398,7 @@ function Phone({ children, gap = 12 }: { children: ReactNode; gap?: number }) {
   useFonts();
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap, fontFamily: FONT, color: INK, background: PAPER_PHONE, margin: '-18px -18px -22px', padding: '18px 16px 22px', minHeight: '100dvh', boxSizing: 'border-box' }}>
+      <style>{KEYFRAMES}</style>
       {children}
     </div>
   );
@@ -446,7 +455,7 @@ function Search({ figs, tried, disabled, onPick, t, label }: { figs: FigEntry[];
               <button key={f.id} type="button" disabled={off} onClick={() => { onPick(f.id); setQ(''); }}
                 style={{ width: '100%', minHeight: 52, display: 'flex', alignItems: 'center', gap: 10, padding: '6px 12px', border: 0, borderBottom: '1px solid #e3d3ad', background: 'transparent', fontFamily: FONT, textAlign: 'left', cursor: off ? 'default' : 'pointer', opacity: done.has(f.id) ? 0.45 : 1 }}>
                 <span style={{ width: 38, height: 38, borderRadius: 6, background: '#d8bf86', color: MUTED, fontWeight: 800, fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none', overflow: 'hidden' }}>
-                  {f.img ? <img src={f.img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : f.n.charAt(0)}
+                  {f.img ? <img src={f.img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} /> : f.n.charAt(0)}
                 </span>
                 <span style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.15, minWidth: 0 }}>
                   <span style={{ fontSize: 18, fontWeight: 800, color: INK }}>{f.n}</span>
@@ -506,7 +515,7 @@ function PhoneSolo({ view, t, send, room }: ControllerViewProps) {
             <span style={{ fontSize: 18, fontWeight: 800 }}>{g.name}</span>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 4 }}>
               {g.cells.map((c, k) => (
-                <div key={k} lang={room.lang} style={{ background: C[c.c], color: FG[c.c], borderRadius: 4, padding: 4, minHeight: 46, boxSizing: 'border-box', display: 'flex', flexDirection: 'column', justifyContent: 'center', textAlign: 'center', lineHeight: 1.1, overflow: 'hidden', overflowWrap: 'break-word' }}>
+                <div key={k} lang={room.lang} style={{ ...pop(k, i === 0), background: C[c.c], color: FG[c.c], borderRadius: 4, padding: 4, minHeight: 46, boxSizing: 'border-box', display: 'flex', flexDirection: 'column', justifyContent: 'center', textAlign: 'center', lineHeight: 1.1, overflow: 'hidden', overflowWrap: 'break-word' }}>
                   <span style={{ fontSize: 11, fontWeight: 700, opacity: 0.9 }}>{cols[k]}</span>
                   <span style={{ fontSize: c.t.length > 16 ? 11 : c.t.length > 9 ? 12.5 : 14, fontWeight: 800, hyphens: 'auto' }}>{c.t}{c.a ? ` ${ARROW[c.a]}` : ''}</span>
                 </div>
@@ -562,7 +571,7 @@ function PhoneBrett({ view, t, send }: ControllerViewProps) {
           {mine.map((m, i) => (
             <div key={mine.length - i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
               <span style={{ fontSize: 17, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.name}</span>
-              <span style={{ display: 'flex', gap: 2, flex: 'none' }}>{m.colors.split('').map((c, k) => <span key={k} style={{ width: 12, height: 18, borderRadius: 2, background: C[c as Color] }} />)}</span>
+              <span style={{ display: 'flex', gap: 2, flex: 'none' }}>{m.colors.split('').map((c, k) => <span key={k} style={{ width: 12, height: 18, borderRadius: 2, background: C[c as Color], ...pop(k, i === 0) }} />)}</span>
             </div>
           ))}
         </div>
@@ -597,7 +606,7 @@ function PhoneSolved({ view, t, send, player }: ControllerViewProps) {
       <span style={{ fontSize: 22, fontWeight: 800, textAlign: 'center', marginTop: 10 }}>{t('phone.placeTries', { place: view.place, n: view.tries })}</span>
       <div style={{ background: POSTER, border: '3px solid #6b4a1e', borderRadius: 6, padding: 16, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
         <span style={{ fontSize: 14, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, color: MUTED }}>{t('phone.figure')}</span>
-        {view.img && <img src={view.img} alt="" style={{ width: 120, height: 120, objectFit: 'cover', border: `3px solid ${INK}` }} />}
+        {view.img && <img src={view.img} alt="" style={{ width: 120, height: 120, objectFit: 'cover', objectPosition: 'top', border: `3px solid ${INK}` }} />}
         <span style={{ fontFamily: DISPLAY, fontSize: 38, lineHeight: 1.05, color: RUST, textAlign: 'center' }}>{view.name}</span>
         <span style={{ fontSize: 15, fontWeight: 700, color: C.r }}>{t('phone.secret')}</span>
       </div>
@@ -629,7 +638,7 @@ function PhoneReveal({ view, t }: ControllerViewProps) {
     <Phone>
       <PhoneTop />
       <PhoneMsg title={view.place ? t('phone.found') : t('phone.notFound')} text={t('phone.solution')}>
-        {view.img && <img src={view.img} alt="" style={{ width: 140, height: 140, objectFit: 'cover', border: `3px solid ${INK}` }} />}
+        {view.img && <img src={view.img} alt="" style={{ width: 140, height: 140, objectFit: 'cover', objectPosition: 'top', border: `3px solid ${INK}` }} />}
         <span style={{ fontFamily: DISPLAY, fontSize: 40, color: RUST, lineHeight: 1.05 }}>{view.name}</span>
         <span style={{ fontSize: 30, fontWeight: 800, color: view.points ? C.g : MUTED }}>+{view.points}</span>
       </PhoneMsg>

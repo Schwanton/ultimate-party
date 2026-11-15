@@ -2,6 +2,13 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.31.0
+
+- Figurendle: 120 One-Piece-Figuren statt 51 – alle Werte (Kopfgeld, Größe, Herkunft, Zugehörigkeit, Teufelsfrucht, Haki, erster Auftritt) stammen jetzt aus dem One-Piece-Wiki
+- Figurenbilder kommen automatisch: Beim Spielstart lädt UP! fehlende Bilder im Hintergrund aus dem Wiki auf deinen Rechner (Ordner .up-data/bilder/figurendle). Abschaltbar in den Spiel-Einstellungen unter „Figurenbilder“
+- Die Hinweise eines neuen Tipps ploppen jetzt nacheinander von links nach rechts auf – auf dem Fernseher (mit Klick-Geräusch) und auf dem Handy
+- Neue Arcs bei „Erster Arc“, z. B. „Nach Enies Lobby“ und „Rückkehr nach Sabaody“, genau wie im Wiki
+
 ## 0.30.0
 
 - Neues Spiel: Figurendle – wer ist die geheime Figur? Tippe Figuren und lies die Hinweise: grün stimmt, orange teilweise, rot falsch, Pfeile zeigen „höher“ oder „niedriger“. Erstes Pack: One Piece mit 51 Figuren (Geschlecht, Zugehörigkeit, Teufelsfrucht, Haki, Kopfgeld, Größe, Herkunft, erster Arc)

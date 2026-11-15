@@ -30,6 +30,8 @@ export interface Fig {
   name: string;
   auch?: string[];
   bekanntheit?: number;
+  /** Seite im Wiki des Themas (für Bilder) */
+  wiki?: string;
   werte: Record<string, unknown>;
   [field: string]: unknown;
 }

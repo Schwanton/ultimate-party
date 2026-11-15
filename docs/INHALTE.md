@@ -66,6 +66,7 @@ Ein Figurendle-Pack beschreibt ein Thema: einen Eintrag mit den Spalten und viel
 - Spaltenarten: `gleich` (gleicher Text = grün), `liste` (gleiche Liste = grün, Überschneidung = orange), `zahl` (Pfeil nach oben/unten; orange, wenn höchstens `nah` bzw. `nahProzent` Prozent daneben; `format: "gross"` zeigt „3 Mrd.“), `reihe` (Reihenfolge aus `werte`, mit Pfeil).
 - `bekanntheit`: 1 = sehr bekannt, 2 = normal, 3 = nur für Profis (Einstellung „Gesuchte Figuren“). Tippen kann man immer alle Figuren.
 - `auch`: weitere Namen, unter denen man die Figur findet.
+- **Bilder aus dem Wiki:** Steht beim Thema `"wiki": "https://…fandom.com"` und bei jeder Figur `"wiki": "Seitenname"`, lädt UP! fehlende Bilder beim Spielstart im Hintergrund aus dem Wiki (Einstellung „Figurenbilder“, abschaltbar). Sie landen nur auf deinem Rechner in `.up-data/bilder/figurendle/`.
 - **Bilder** gehören nicht ins Repository. Lege sie auf dem Rechner, auf dem UP! läuft, in den Ordner `.up-data/bilder/figurendle/` – Dateiname wie die Figur ohne Themen-Kürzel, z. B. `law.webp` für `op-law` (webp, png oder jpg). Fehlt ein Bild, zeigt das Spiel den Anfangsbuchstaben.
 
 ## Mit KI neue Inhalte erzeugen
