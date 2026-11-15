@@ -2,6 +2,16 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.29.0
+
+- Murmel-Mayhem: Neue Murmel-Werkstatt zu Beginn – jeder gestaltet am Handy seine Murmeln mit Hauptfarbe, Zweitfarbe und Muster (Streifen, Ringe, Punkte, Katzenauge, Stern, Karo …). Alle eigenen Murmeln rollen so, und euer Name erscheint in diesem Muster
+- Viel größere Bahn, doppelt so breit, mit neuen Bausteinen: Treppe, Sprungschanze mit Lücke, Mühlrad, Förderband nach ganz oben, lange Abfahrt, Gabelung mit kippender Weiche, Looping (nur schnelle Murmeln schaffen ihn) und eine Glasspirale. Jede Partie wird die Bahn neu zusammengesetzt
+- Die Kamera fährt jetzt auch nach links und rechts, und die erste Murmel ist immer im Bild – mit kleiner Krone
+- Vor jedem Rennen fliegt die Kamera einmal über die ganze Bahn, neue Teile leuchten in der Farbe ihrer Erbauer
+- Gebaute Teile bleiben bis zum Spielende (höchstens 4 pro Spieler). Vor dem Bauen wählt ihr am Handy, welche alten Teile ersetzt werden sollen
+- Punkte zum Mitfiebern: Im Ziel springen die Punkte jeder Murmel auf, danach zeigt eine Punktetafel, wer wofür wie viele Punkte bekommt
+- Das Förderband nimmt die Murmeln streng der Reihe nach mit – ein Vorsprung bleibt erhalten
+
 ## 0.28.0
 
 - Murmel-Mayhem mit echter Physik: Die Murmeln rollen, springen, stoßen sich gegenseitig an und drehen sich sichtbar. Statt auf unsichtbaren Schienen zu fahren, rollen sie über Messingkanten

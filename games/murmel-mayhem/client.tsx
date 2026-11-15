@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import type { ControllerViewProps, GameClientModule, HostViewProps, PlayerInfo } from '@up/sdk';
-import { Avatar, Confetti, HostTimer, PhoneTimer, PhoneWait, Podium, Scoreboard, sfx, useServerNow, useStream, vibrate } from '@up/ui';
+import { Confetti, HostTimer, PhoneTimer, PhoneWait, Podium, Scoreboard, sfx, useServerNow, useStream, vibrate } from '@up/ui';
+import { PALETTE, PATTERNS, drawDesignMarble, mainColor, marbleUrl, tileUrl, type Design } from './muster';
 
 /* ================= Stil: Glas und Messing ================= */
 
@@ -18,7 +19,7 @@ const SORT: Record<string, string> = {
   farbweiche: 'weiche', umleitung: 'weiche', wurmloch: 'weiche', kanone: 'weiche',
   beben: 'ereignis', oel: 'ereignis', riese: 'ereignis', tausch: 'ereignis',
 };
-const NOT_LAST = ['farbweiche', 'umleitung'];
+const HOLE = ['farbweiche', 'umleitung'];
 const ICON: Record<string, string> = {
   turbo: 'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6L5.6 18.4',
   feder: 'M6 21h12M8 18l8-2-8-2 8-2-8-2 8-2M12 8V3M9 5l3-3 3 3',
@@ -40,10 +41,10 @@ const ICON: Record<string, string> = {
   tausch: 'M4 8h14l-3-3M20 16H6l3 3',
 };
 
-const FLAG = { done: 1, tube: 2, basket: 4, shield: 8, boost: 16 };
+const FLAG = { done: 1, tube: 2, basket: 4, shield: 8, boost: 16, behind: 32, glass: 64 };
 const IT = { on: 1, closed: 2, gust: 4, kick: 8 };
 const R = 9;
-const WW = 1200;
+const FALLBACK: Design = { c: 12, c2: 13, p: 'uni' };
 
 function useFonts() {
   useEffect(() => {
@@ -60,14 +61,19 @@ const FONT = "'Barlow Semi Condensed', system-ui, sans-serif";
 const DISPLAY = 'Cinzel, Georgia, serif';
 const BG = 'radial-gradient(circle at 50% 30%, #3a2716 0, #140d08 75%)';
 
-function darken(hex: string, f = 0.45): string {
-  const n = parseInt(hex.replace('#', '').slice(0, 6), 16);
-  if (Number.isNaN(n)) return '#222';
-  return `rgb(${Math.round(((n >> 16) & 255) * f)},${Math.round(((n >> 8) & 255) * f)},${Math.round((n & 255) * f)})`;
+/** Murmel mit Muster als Bild */
+function Marble({ d, size, style }: { d: Design | undefined; size: number; style?: CSSProperties }) {
+  return <img src={marbleUrl(d ?? FALLBACK)} alt="" width={size} height={size} style={{ width: size, height: size, flex: 'none', display: 'inline-block', ...style }} />;
 }
 
-function marbleCss(color: string, size: number): CSSProperties {
-  return { width: size, height: size, borderRadius: '50%', flex: 'none', display: 'inline-block', background: `radial-gradient(circle at 35% 30%, #ffffff 0, ${color} 28%, ${darken(color)} 100%)` };
+/** Schrift im Muster der Murmel */
+function PatternText({ d, children, size, style }: { d: Design | undefined; children: ReactNode; size: number; style?: CSSProperties }) {
+  const dd = d ?? FALLBACK;
+  return (
+    <span style={{ filter: 'drop-shadow(0 2px 0 rgba(0,0,0,.8)) drop-shadow(0 0 1px rgba(0,0,0,.9))', display: 'inline-block', minWidth: 0, ...style }}>
+      <span style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: size, lineHeight: 1.15, backgroundImage: `url(${tileUrl(dd)})`, backgroundSize: `${Math.round(size * 0.9)}px`, WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent', WebkitTextStroke: `1px ${dd.c === 13 ? '#888' : 'rgba(0,0,0,.35)'}`, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>{children}</span>
+    </span>
+  );
 }
 
 /** Messing-Plakette mit Emaille-Rand (Karten und Listen) */
@@ -84,25 +90,40 @@ function Badge({ kind, size = 48, dim = false, owner }: { kind: string; size?: n
 
 /* ================= Bahn ================= */
 
-interface Row { i: number; y0: number; dir: number; xa: number; xb: number; step: number | null; end: string; wear: number }
+type Pt = [number, number];
+interface Row { i: number; key: string; dir: number; pts: Pt[]; end: string; mid: string | null; wear: number }
 interface Geo {
+  W: number;
   H: number;
   rows: Row[];
   segs: { ax: number; ay: number; bx: number; by: number; kind: string }[];
   pins: [number, number][];
   wippes: { px: number; py: number; half: number; rest: number }[];
-  sockets: { id: number; x: number; y: number; row: number }[];
+  wheels: { cx: number; cy: number; r: number; hub: number; n: number }[];
+  conv: { x: number; y0: number; y1: number; sp: number; v: number };
+  rocker: { px: number; py: number; half: number };
+  loop: { cx: number; cy: number; r: number };
+  spiral: Pt[];
+  sockets: { id: number; x: number; y: number; row: number; hole: boolean }[];
   finish: { x0: number; x1: number; y: number };
   labels: { t: string; x: number; y: number }[];
   marks: { row: number; kind: string }[];
+  route: Pt[];
 }
-interface PubItem { id: number; kind: string; owner: string; x: number; y: number; row: number; dir: number; age: number; on: boolean; toggle: boolean; tube: [number, number][] | null; forward: boolean }
+interface PubItem { id: number; kind: string; owner: string; x: number; y: number; row: number; dir: number; born: number; on: boolean; toggle: boolean; tube: Pt[] | null; forward: boolean }
+type Designs = Record<string, Design>;
 
-const DROP = 70, STEP_DY = 50;
 function railY(r: Row, x: number) {
-  const base = r.y0 + ((x - r.xa) / (r.xb - r.xa)) * DROP;
-  if (r.step !== null && (r.dir > 0 ? x > r.step : x < r.step)) return base + STEP_DY;
-  return base;
+  const p = r.pts, d = r.dir;
+  if (d * (x - p[0][0]) <= 0) return p[0][1];
+  for (let k = 1; k < p.length; k++) {
+    if (d * (x - p[k][0]) <= 0) {
+      const dx = p[k][0] - p[k - 1][0];
+      if (dx === 0) return p[k][1];
+      return p[k - 1][1] + ((x - p[k - 1][0]) / dx) * (p[k][1] - p[k - 1][1]);
+    }
+  }
+  return p[p.length - 1][1];
 }
 
 type G2 = CanvasRenderingContext2D;
@@ -123,27 +144,35 @@ function disc(g: G2, x: number, y: number, r: number) {
 }
 const RAIL: [string, number, number][] = [['#3d270b', 11, 0], ['#c8963c', 7, 0], ['#fbe7b0', 2, -2]];
 
-/** Feste Bahn einmal vorzeichnen */
-function renderTrack(geo: Geo, t: (k: string) => string): HTMLCanvasElement {
-  const c = document.createElement('canvas');
-  c.width = WW;
-  c.height = geo.H;
-  const g = c.getContext('2d')!;
-  const bg = g.createRadialGradient(WW / 2, geo.H * 0.35, 40, WW / 2, geo.H * 0.4, geo.H * 0.8);
+/** Feste Bahn einmal vorzeichnen: hinten (Hintergrund und Förderband) und vorn (Schienen) */
+function renderTrack(geo: Geo, t: (k: string) => string): { back: HTMLCanvasElement; front: HTMLCanvasElement } {
+  const back = document.createElement('canvas');
+  back.width = geo.W;
+  back.height = geo.H;
+  let g = back.getContext('2d')!;
+  const bg = g.createRadialGradient(geo.W / 2, geo.H * 0.4, 60, geo.W / 2, geo.H * 0.45, geo.W * 0.6);
   bg.addColorStop(0, '#3a2716'); bg.addColorStop(1, '#140d08');
-  g.fillStyle = bg; g.fillRect(0, 0, WW, geo.H);
+  g.fillStyle = bg; g.fillRect(0, 0, geo.W, geo.H);
   g.strokeStyle = '#e7c27a'; g.globalAlpha = 0.05;
-  for (const [cx, cy, r] of [[1060, 120, 80], [300, 420, 60], [900, 760, 70], [200, 1100, 90], [1000, 1400, 60], [500, 1800, 80], [900, 2200, 70]]) {
+  for (const [cx, cy, r] of [[1060, 120, 80], [300, 420, 60], [900, 760, 70], [200, 1300, 90], [1800, 900, 110], [2100, 1450, 70], [1500, 350, 60], [700, 1600, 80]]) {
     g.lineWidth = r * 0.22; g.setLineDash([r * 0.25, r * 0.2]); g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2); g.stroke();
   }
   g.setLineDash([]); g.globalAlpha = 1;
-  g.fillStyle = 'rgba(122,84,24,.16)';
-  for (const r of geo.rows) if (r.i % 2 === 0) g.fillRect(0, r.y0 - 44, WW, 5);
+  const c = geo.conv;
+  for (const dx of [-12, 12]) line(g, c.x + dx, c.y0 + 10, c.x + dx, c.y1 - 10, [['#2a1a0c', 8, 0], ['#8a6424', 4, 0]]);
+  g.strokeStyle = '#5a3a12'; g.lineWidth = 3; g.setLineDash([6, 5]);
+  g.beginPath(); g.moveTo(c.x, c.y0 + 10); g.lineTo(c.x, c.y1 - 10); g.stroke(); g.setLineDash([]);
+  for (const cy of [c.y0 + 10, c.y1 - 10]) { g.fillStyle = disc(g, c.x, cy, 16); g.beginPath(); g.arc(c.x, cy, 16, 0, Math.PI * 2); g.fill(); }
+
+  const front = document.createElement('canvas');
+  front.width = geo.W;
+  front.height = geo.H;
+  g = front.getContext('2d')!;
   // Abnutzung: Delle dunkler, poliert glänzend
   for (const mk of geo.marks) {
     const r = geo.rows[mk.row];
     if (!r) continue;
-    const x = (r.xa + r.xb) / 2, y = railY(r, x);
+    const x = (r.pts[0][0] + r.pts[r.pts.length - 1][0]) / 2, y = railY(r, x);
     g.fillStyle = mk.kind === 'delle' ? 'rgba(20,10,4,.6)' : 'rgba(255,246,220,.5)';
     g.beginPath(); g.ellipse(x, y + 18, 70, 6, 0, 0, Math.PI * 2); g.fill();
     g.font = `700 12px ${DISPLAY}`; g.textAlign = 'center';
@@ -161,26 +190,20 @@ function renderTrack(geo: Geo, t: (k: string) => string): HTMLCanvasElement {
     g.fillStyle = brassGrad(g, w.py, w.py + 30);
     g.beginPath(); g.moveTo(w.px - 12, w.py + 30); g.lineTo(w.px, w.py); g.lineTo(w.px + 12, w.py + 30); g.closePath(); g.fill();
   }
+  const lp = geo.loop;
+  g.strokeStyle = '#3d270b'; g.lineWidth = 11; g.beginPath(); g.arc(lp.cx, lp.cy, lp.r, 0, Math.PI * 2); g.stroke();
+  g.strokeStyle = '#c8963c'; g.lineWidth = 7; g.beginPath(); g.arc(lp.cx, lp.cy, lp.r, 0, Math.PI * 2); g.stroke();
+  g.strokeStyle = '#fbe7b0'; g.lineWidth = 2; g.beginPath(); g.arc(lp.cx, lp.cy, lp.r - 2, Math.PI * 1.1, Math.PI * 1.6); g.stroke();
+  const rk = geo.rocker;
+  g.fillStyle = brassGrad(g, rk.py, rk.py + 30);
+  g.beginPath(); g.moveTo(rk.px - 12, rk.py + 30); g.lineTo(rk.px, rk.py); g.lineTo(rk.px + 12, rk.py + 30); g.closePath(); g.fill();
   for (const l of geo.labels) {
     g.globalAlpha = 0.85; g.fillStyle = '#e7c27a'; g.textAlign = 'center';
-    g.font = `700 ${l.t === 'ziel' ? 18 : 12}px ${DISPLAY}`;
+    g.font = `700 ${l.t === 'ziel' ? 22 : 13}px ${DISPLAY}`;
     g.fillText(t(`track.${l.t}`), l.x, l.y);
   }
   g.globalAlpha = 1;
-  return c;
-}
-
-function drawMarble(g: G2, x: number, y: number, a: number, color: string, r = R, alpha = 1) {
-  g.globalAlpha = alpha;
-  const gr = g.createRadialGradient(x - r * 0.35, y - r * 0.4, 0, x, y, r);
-  gr.addColorStop(0, '#ffffff'); gr.addColorStop(0.28, color); gr.addColorStop(1, darken(color));
-  g.fillStyle = gr; g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill();
-  g.strokeStyle = 'rgba(255,255,255,.55)'; g.lineWidth = 1.8;
-  g.beginPath(); g.arc(x, y, r * 0.58, a, a + 1.3); g.stroke();
-  g.strokeStyle = 'rgba(0,0,0,.25)';
-  g.beginPath(); g.arc(x, y, r * 0.58, a + Math.PI, a + Math.PI + 1.3); g.stroke();
-  g.fillStyle = 'rgba(255,255,255,.85)'; g.beginPath(); g.arc(x - r * 0.35, y - r * 0.42, r * 0.2, 0, Math.PI * 2); g.fill();
-  g.globalAlpha = 1;
+  return { back, front };
 }
 
 interface PartState { flags: number; left: number; flash: number; flashC: string; ang: number; arm: number; h: number }
@@ -211,8 +234,6 @@ function drawPart(g: G2, it: PubItem, geo: Geo, st: PartState, now: number, owne
   const { x, dir } = it;
   const y = railY(r, x);
   const kick = st.flags & IT.kick;
-  const alpha = it.age ? 0.65 : 1;
-  g.globalAlpha = alpha;
   switch (it.kind) {
     case 'turbo': {
       const cy = y - 13 - 24, rr = 16;
@@ -238,7 +259,7 @@ function drawPart(g: G2, it: PubItem, geo: Geo, st: PartState, now: number, owne
       break;
     }
     case 'magnet': {
-      const mx = x - dir * 85, my = y - 50;
+      const mx = x - dir * 85, my = railY(r, x - dir * 85) - 50;
       g.strokeStyle = '#3d270b'; g.lineWidth = 12; g.lineCap = 'butt';
       g.beginPath(); g.arc(mx, my, 16, Math.PI, 0); g.stroke();
       g.strokeStyle = '#d3452f'; g.lineWidth = 8; g.beginPath(); g.arc(mx, my, 16, Math.PI, Math.PI * 1.5); g.stroke();
@@ -262,17 +283,18 @@ function drawPart(g: G2, it: PubItem, geo: Geo, st: PartState, now: number, owne
       break;
     }
     case 'kleber': {
-      const left = Math.max(0, st.left) / (it.age ? 3 : 5);
+      const left = Math.max(0, st.left) / 5;
       const xa = x - dir * 150;
-      g.globalAlpha = alpha * (0.25 + 0.7 * left);
+      g.globalAlpha = 0.25 + 0.7 * left;
       g.strokeStyle = 'rgba(214,150,30,.9)'; g.lineWidth = 3 + 6 * left;
       g.beginPath(); g.moveTo(xa, railY(r, xa) - 5); g.lineTo(x, y - 5); g.stroke();
       g.fillStyle = 'rgba(214,150,30,.9)';
       for (let k = 0; k < 6; k++) { const dx = xa + ((x - xa) * (k + 0.5)) / 6; g.beginPath(); g.ellipse(dx, railY(r, dx) + 6, 3, (4 + (k % 3) * 2) * (0.3 + left), 0, 0, Math.PI * 2); g.fill(); }
+      g.globalAlpha = 1;
       break;
     }
     case 'bremse': {
-      const left = Math.max(0, st.left) / (it.age ? 3 : 6);
+      const left = Math.max(0, st.left) / 6;
       const xa = x - dir * 140;
       g.strokeStyle = `rgba(150,110,70,${0.3 + 0.6 * left})`; g.lineWidth = 2;
       for (let k = 0; k <= 14; k++) { const bx = xa + ((x - xa) * k) / 14, by = railY(r, bx) - 4; g.beginPath(); g.moveTo(bx, by); g.lineTo(bx + dir * 3, by - 8 - 4 * left); g.stroke(); }
@@ -312,7 +334,6 @@ function drawPart(g: G2, it: PubItem, geo: Geo, st: PartState, now: number, owne
       break;
     }
     case 'falltuer': {
-      // Klappe in der Schiene, Korb darunter, Aufzugschiene daneben
       const open = kick;
       st.h = open ? 1 : st.h * 0.9;
       g.save(); g.translate(x - 10, y); g.rotate(st.h * 1.2 * dir);
@@ -326,7 +347,6 @@ function drawPart(g: G2, it: PubItem, geo: Geo, st: PartState, now: number, owne
     }
     case 'farbweiche':
     case 'umleitung': {
-      // Klappe in der Schiene: offen = Murmel fällt auf die Reihe darunter
       const rimC = it.kind === 'farbweiche' ? owner : ENAMEL.weiche;
       const allOpen = it.kind === 'umleitung' && it.on;
       g.fillStyle = INK; g.fillRect(x - 22, y - 3, 44, 7);
@@ -358,7 +378,47 @@ function drawPart(g: G2, it: PubItem, geo: Geo, st: PartState, now: number, owne
       break;
     }
   }
-  g.globalAlpha = 1;
+}
+
+/** Bewegliche Bausteine: Mühlräder, Förderband-Körbe, Kippweiche */
+interface Blocks { wh: number[]; cv: number; rk: number }
+function drawWheels(g: G2, geo: Geo, b: Blocks | null, now: number) {
+  geo.wheels.forEach((w, k) => {
+    const ang = b ? (b.wh[k] ?? 0) / 100 : -now / 900;
+    g.fillStyle = disc(g, w.cx, w.cy, w.hub); g.beginPath(); g.arc(w.cx, w.cy, w.hub, 0, Math.PI * 2); g.fill();
+    g.strokeStyle = '#3d270b'; g.lineWidth = 3;
+    for (let s = 0; s < w.n; s++) {
+      const a = ang + (s + 0.5) * (2 * Math.PI / w.n);
+      g.beginPath(); g.moveTo(w.cx + Math.cos(a) * 18, w.cy + Math.sin(a) * 18); g.lineTo(w.cx + Math.cos(a) * (w.r + 12), w.cy + Math.sin(a) * (w.r + 12)); g.stroke();
+    }
+    g.strokeStyle = '#a87a30'; g.lineWidth = 4; g.beginPath(); g.arc(w.cx, w.cy, w.r + 12, 0, Math.PI * 2); g.stroke();
+  });
+}
+function drawBuckets(g: G2, geo: Geo, b: Blocks | null, now: number) {
+  const c = geo.conv;
+  const len = c.y0 - c.y1;
+  const off = b ? b.cv : ((now / 1000) * c.v) % c.sp;
+  g.strokeStyle = '#e7c27a'; g.lineWidth = 2.5;
+  for (let s = off; s < len; s += c.sp) {
+    const y = c.y0 - s;
+    g.beginPath(); g.moveTo(c.x - 11, y - 14); g.lineTo(c.x - 11, y); g.lineTo(c.x + 11, y); g.lineTo(c.x + 11, y - 14); g.stroke();
+  }
+}
+function drawRocker(g: G2, geo: Geo, a: number) {
+  const rk = geo.rocker;
+  const c = Math.cos(a), s = Math.sin(a);
+  line(g, rk.px - c * rk.half, rk.py - s * rk.half, rk.px + c * rk.half, rk.py + s * rk.half, RAIL);
+  g.fillStyle = '#3d270b'; g.beginPath(); g.arc(rk.px, rk.py, 4, 0, Math.PI * 2); g.fill();
+}
+function drawSpiral(g: G2, geo: Geo, inner?: () => void) {
+  const sp = geo.spiral;
+  g.lineCap = 'round'; g.lineJoin = 'round';
+  g.strokeStyle = 'rgba(191,227,255,.14)'; g.lineWidth = 26;
+  g.beginPath(); sp.forEach(([x, y], k) => (k ? g.lineTo(x, y) : g.moveTo(x, y))); g.stroke();
+  inner?.();
+  g.strokeStyle = 'rgba(217,238,252,.5)'; g.lineWidth = 2;
+  for (const off of [-12, 12]) { g.beginPath(); sp.forEach(([x, y], k) => (k ? g.lineTo(x + off, y) : g.moveTo(x + off, y))); g.stroke(); }
+  g.fillStyle = brassGrad(g, sp[0][1] - 20, sp[0][1] + 20); g.beginPath(); g.ellipse(sp[0][0], sp[0][1] - 2, 22, 10, 0, 0, Math.PI * 2); g.fill();
 }
 
 /* ================= TV ================= */
@@ -368,10 +428,12 @@ function Host(props: HostViewProps) {
   const { view } = props;
   const inner = (() => {
     switch (view.screen) {
+      case 'werkstatt': return <HostWerkstatt {...props} />;
       case 'intro': return <HostIntro {...props} />;
       case 'build':
       case 'reveal':
       case 'umbau': return <HostOverview {...props} />;
+      case 'flight': return <HostRace {...props} />;
       case 'race': return <HostRace {...props} />;
       case 'result': return <HostResult {...props} />;
       case 'final': return <HostFinal {...props} />;
@@ -382,47 +444,52 @@ function Host(props: HostViewProps) {
 }
 
 function useTrackLayer(geo: Geo | undefined, version: number, t: (k: string) => string) {
-  return useMemo(() => (geo ? renderTrack(geo, t) : null), [version, !!geo]); // eslint-disable-line react-hooks/exhaustive-deps
+  return useMemo(() => (geo ? renderTrack(geo, t) : null), [version, !!geo, geo?.H]); // eslint-disable-line react-hooks/exhaustive-deps
 }
 
 const blankState = (): PartState => ({ flags: 1, left: 9, flash: -1e9, flashC: '#fff', ang: 0, arm: 0, h: 0 });
 
-function Overview({ geo, version, items, height, t, player, highlight, fresh }: {
-  geo: Geo; version: number; items: PubItem[]; height: number; t: (k: string) => string; player: (id: string) => PlayerInfo | undefined;
+function Overview({ geo, version, items, width, height, t, colorOf, highlight, fresh }: {
+  geo: Geo; version: number; items: PubItem[]; width: number; height: number; t: (k: string) => string; colorOf: (id: string) => string;
   highlight?: { x: number; y: number } | null; fresh?: { id: number; kind: string; owner: string; x: number; y: number }[];
 }) {
   const layer = useTrackLayer(geo, version, t);
   const ref = useRef<HTMLCanvasElement>(null);
-  const scale = height / geo.H;
-  const w = Math.round(WW * scale);
+  const scale = Math.min(width / geo.W, height / geo.H);
+  const w = Math.round(geo.W * scale), h = Math.round(geo.H * scale);
   useEffect(() => {
     const c = ref.current;
     if (!c || !layer) return;
     const dpr = Math.min(2, window.devicePixelRatio || 1);
     c.width = w * dpr;
-    c.height = height * dpr;
+    c.height = h * dpr;
     const g = c.getContext('2d')!;
     g.setTransform(dpr * scale, 0, 0, dpr * scale, 0, 0);
-    g.drawImage(layer, 0, 0);
+    g.drawImage(layer.back, 0, 0);
+    drawBuckets(g, geo, null, 0);
+    g.drawImage(layer.front, 0, 0);
     for (const wd of geo.wippes) line(g, wd.px - Math.cos(wd.rest) * wd.half, wd.py - Math.sin(wd.rest) * wd.half, wd.px + Math.cos(wd.rest) * wd.half, wd.py + Math.sin(wd.rest) * wd.half, RAIL);
+    drawWheels(g, geo, null, 0);
+    drawRocker(g, geo, 0.42);
+    drawSpiral(g, geo);
     const freshIds = new Set((fresh ?? []).map((f) => f.id));
     for (const it of items) {
       if (freshIds.has(it.id)) continue;
-      const own = player(it.owner)?.color ?? '#fff';
+      const own = colorOf(it.owner);
       drawPart(g, it, geo, blankState(), 0, own);
       drawSensor(g, it, geo, blankState(), 0, own);
     }
-  }, [layer, items, height, w, scale, fresh, player, geo]);
+  }, [layer, items, w, h, scale, fresh, colorOf, geo]);
   return (
-    <div style={{ position: 'relative', width: w, height, flex: 'none', borderRadius: 14, overflow: 'hidden', boxShadow: `0 0 0 2px ${LINE}` }}>
-      <canvas ref={ref} style={{ width: w, height, display: 'block' }} />
+    <div style={{ position: 'relative', width: w, height: h, flex: 'none', borderRadius: 14, overflow: 'hidden', boxShadow: `0 0 0 2px ${LINE}` }}>
+      <canvas ref={ref} style={{ width: w, height: h, display: 'block' }} />
       {(fresh ?? []).filter((f) => f.id > 0).map((f, k) => (
-        <span key={f.id} className="anim-pop" style={{ position: 'absolute', left: f.x * scale - 16, top: f.y * scale - 34, animationDelay: `${0.45 * k}s`, animationFillMode: 'both' }}>
-          <Badge kind={f.kind} size={32} owner={player(f.owner)?.color} />
+        <span key={f.id} className="anim-pop" style={{ position: 'absolute', left: f.x * scale - 14, top: f.y * scale - 30, animationDelay: `${0.45 * k}s`, animationFillMode: 'both' }}>
+          <Badge kind={f.kind} size={28} owner={colorOf(f.owner)} />
         </span>
       ))}
       {highlight && (
-        <span style={{ position: 'absolute', left: highlight.x * scale - 34, top: highlight.y * scale - 34, width: 68, height: 68, borderRadius: '50%', border: `4px solid ${BRASS_L}`, boxShadow: `0 0 24px ${BRASS}`, animation: 'mmPulse 1.2s ease-in-out infinite' }} />
+        <span style={{ position: 'absolute', left: highlight.x * scale - 30, top: highlight.y * scale - 30, width: 60, height: 60, borderRadius: '50%', border: `4px solid ${BRASS_L}`, boxShadow: `0 0 24px ${BRASS}`, animation: 'mmPulse 1.2s ease-in-out infinite' }} />
       )}
       <style>{'@keyframes mmPulse { 0%,100% { transform: scale(.85); opacity: .7 } 50% { transform: scale(1.15); opacity: 1 } }'}</style>
     </div>
@@ -433,23 +500,88 @@ function Title({ size = 30 }: { size?: number }) {
   return <span style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: size, color: BRASS, lineHeight: 1.1 }}>Murmel-Mayhem</span>;
 }
 
-function HostIntro({ view, t }: HostViewProps) {
-  const rules = ['intro.r1', 'intro.r2', 'intro.r3', 'intro.r4'];
+/** Sich drehende große Murmel (Werkstatt) */
+function SpinMarble({ d, size }: { d: Design; size: number }) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    let raf = 0;
+    const draw = (n: number) => {
+      raf = requestAnimationFrame(draw);
+      const c = ref.current;
+      if (!c) return;
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      if (c.width !== size * dpr) { c.width = size * dpr; c.height = size * dpr; }
+      const g = c.getContext('2d')!;
+      g.setTransform(dpr, 0, 0, dpr, 0, 0);
+      g.clearRect(0, 0, size, size);
+      drawDesignMarble(g, size / 2, size / 2, n / 700, d, size / 2 - 2);
+    };
+    raf = requestAnimationFrame(draw);
+    return () => cancelAnimationFrame(raf);
+  }, [d, size]);
+  return <canvas ref={ref} style={{ width: size, height: size, display: 'block', flex: 'none' }} aria-hidden="true" />;
+}
+
+function HostWerkstatt({ view, t, player }: HostViewProps) {
+  const ids = view.players as string[];
+  const designs = view.designs as Designs;
+  const ready = new Set(view.ready as string[]);
+  const size = ids.length <= 4 ? 150 : ids.length <= 8 ? 112 : 88;
   return (
-    <div style={{ position: 'absolute', inset: 0, display: 'flex', gap: 40, padding: '34px 56px', background: BG }}>
-      <Overview geo={view.geo} version={view.trackV} items={[]} height={652} t={t} player={() => undefined} />
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 22, justifyContent: 'center' }}>
-        <span className="anim-pop" style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: 64, color: BRASS, textShadow: '0 4px 0 #6e4a14' }}>{t('title')}</span>
-        <p className="anim-up" style={{ fontSize: 24, lineHeight: 1.4, color: TEXT }}>{t('intro.text', { n: view.perPlayer })}</p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+    <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', gap: 18, padding: '34px 56px', background: BG }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <Title size={26} />
+          <span style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: 48, color: TEXT }}>{t('werk.title')}</span>
+          <span style={{ fontSize: 22, color: MUTED }}>{t('werk.text')}</span>
+        </div>
+        <HostTimer deadline={view.deadline} duration={view.duration} />
+      </div>
+      <div style={{ flex: 1, display: 'flex', flexWrap: 'wrap', gap: 22, alignContent: 'center', justifyContent: 'center' }}>
+        {ids.map((id) => {
+          const p = player(id);
+          const d = designs[id] ?? FALLBACK;
+          const done = ready.has(id);
+          return (
+            <div key={id} style={{ width: size + 70, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '14px 8px', borderRadius: 18, background: done ? 'rgba(233,196,106,.14)' : 'rgba(255,255,255,.04)', border: `1.5px solid ${done ? BRASS : LINE}` }}>
+              <SpinMarble d={d} size={size} />
+              <PatternText d={d} size={Math.round(size / 4.2)} style={{ maxWidth: size + 56 }}>{p?.name ?? '?'}</PatternText>
+              <span style={{ fontSize: 16, fontWeight: 600, color: done ? BRASS_L : DIM }}>{done ? t('werk.done') : t('werk.busy')}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function HostIntro({ view, t, player }: HostViewProps) {
+  const rules = ['intro.r1', 'intro.r2', 'intro.r3', 'intro.r4'];
+  const designs = view.designs as Designs;
+  const colorOf = (id: string) => mainColor(designs[id]);
+  return (
+    <div style={{ position: 'absolute', inset: 0, display: 'flex', gap: 36, padding: '34px 48px', background: BG }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14, justifyContent: 'center' }}>
+        <Overview geo={view.geo} version={view.trackV} items={[]} width={640} height={540} t={t} colorOf={colorOf} />
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, maxWidth: 640 }}>
+          {(view.players as string[]).map((id) => (
+            <span key={id} style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Marble d={designs[id]} size={26} /><PatternText d={designs[id]} size={17}>{player(id)?.name}</PatternText></span>
+          ))}
+        </div>
+      </div>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 18, justifyContent: 'center' }}>
+        <span className="anim-pop" style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: 58, color: BRASS, textShadow: '0 4px 0 #6e4a14' }}>{t('title')}</span>
+        <p className="anim-up" style={{ fontSize: 22, lineHeight: 1.4, color: TEXT, margin: 0 }}>{t('intro.text', { n: view.perPlayer })}</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {rules.map((k, i) => (
             <div key={k} className="anim-up" style={{ display: 'flex', gap: 14, alignItems: 'center', animationDelay: `${0.3 + i * 0.25}s` }}>
-              <Badge kind={['turbo', 'kleber', 'farbweiche', 'tausch'][i]} size={44} />
-              <span style={{ fontSize: 20, color: MUTED, lineHeight: 1.35 }}>{t(k)}</span>
+              <Badge kind={['turbo', 'kleber', 'farbweiche', 'tausch'][i]} size={40} />
+              <span style={{ fontSize: 19, color: MUTED, lineHeight: 1.35 }}>{t(k)}</span>
             </div>
           ))}
         </div>
-        <p className="anim-up" style={{ fontSize: 18, color: DIM, animationDelay: '1.4s' }}>{t('intro.points', { total: view.total })}</p>
+        <p className="anim-up" style={{ fontSize: 18, color: DIM, animationDelay: '1.2s', margin: 0 }}>{t('intro.keep', { cap: view.cap })}</p>
+        <p className="anim-up" style={{ fontSize: 17, color: DIM, animationDelay: '1.4s', margin: 0 }}>{t('intro.points', { total: view.total })}</p>
       </div>
     </div>
   );
@@ -468,64 +600,66 @@ function HostOverview({ view, t, player }: HostViewProps) {
   const fresh = view.screen === 'reveal' ? (view.fresh as { id: number; kind: string; owner: string; x: number; y: number; moved: boolean }[]) : undefined;
   const umbau = view.umbau;
   const ids = (view.players ?? []) as string[];
+  const designs = (view.designs ?? {}) as Designs;
+  const colorOf = useMemo(() => (id: string) => mainColor(designs[id]), [designs]);
   return (
-    <div style={{ position: 'absolute', inset: 0, display: 'flex', gap: 34, padding: '34px 56px', background: BG }}>
-      <Overview geo={view.geo} version={view.trackV} items={items} height={652} t={t} player={player} fresh={fresh} highlight={view.screen === 'umbau' ? umbau : null} />
-      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 18 }}>
+    <div style={{ position: 'absolute', inset: 0, display: 'flex', gap: 28, padding: '30px 40px', background: BG, alignItems: 'center' }}>
+      <Overview geo={view.geo} version={view.trackV} items={items} width={800} height={660} t={t} colorOf={colorOf} fresh={fresh} highlight={view.screen === 'umbau' ? umbau : null} />
+      <div style={{ flex: 1, minWidth: 0, alignSelf: 'stretch', display: 'flex', flexDirection: 'column', gap: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Title />
-            <span style={{ fontSize: 18, color: MUTED }}>{t('round', { n: view.round, total: view.total })}{view.last ? ` · ${t('lastRound')}` : ''}</span>
+            <Title size={24} />
+            <span style={{ fontSize: 17, color: MUTED }}>{t('round', { n: view.round, total: view.total })}{view.last ? ` · ${t('lastRound')}` : ''}</span>
           </div>
           {view.screen === 'build' && <HostTimer deadline={view.deadline} duration={view.duration} />}
         </div>
         {view.screen === 'build' && (
           <>
-            <h1 style={{ fontFamily: DISPLAY, fontSize: 38, color: TEXT, margin: 0 }}>{t('build.title')}</h1>
-            <p style={{ fontSize: 21, color: MUTED, lineHeight: 1.4, margin: 0 }}>{t(view.last ? 'build.textLast' : 'build.text')}</p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 6 }}>
+            <h1 style={{ fontFamily: DISPLAY, fontSize: 34, color: TEXT, margin: 0 }}>{t('build.title')}</h1>
+            <p style={{ fontSize: 19, color: MUTED, lineHeight: 1.4, margin: 0 }}>{t(view.last ? 'build.textLast' : 'build.text', { cap: view.cap })}</p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginTop: 4 }}>
               {ids.map(player).filter(Boolean).map((p) => {
                 const done = (view.ready as string[]).includes(p!.id);
                 return (
-                  <span key={p!.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 12px 6px 6px', borderRadius: 30, background: done ? 'rgba(233,196,106,.18)' : 'rgba(255,255,255,.04)', border: `1px solid ${done ? BRASS : LINE}` }}>
-                    <span style={{ borderRadius: '50%', boxShadow: `0 0 0 3px ${p!.color}` }}><Avatar player={p!} size={34} /></span>
-                    <b style={{ fontSize: 17 }}>{p!.name}</b>
-                    <span style={{ fontSize: 15, color: done ? BRASS_L : DIM }}>{done ? t('build.done') : t('build.building')}</span>
+                  <span key={p!.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 12px 5px 5px', borderRadius: 30, background: done ? 'rgba(233,196,106,.18)' : 'rgba(255,255,255,.04)', border: `1px solid ${done ? BRASS : LINE}` }}>
+                    <Marble d={designs[p!.id]} size={30} />
+                    <b style={{ fontSize: 16 }}>{p!.name}</b>
+                    <span style={{ fontSize: 14, color: done ? BRASS_L : DIM }}>{done ? t('build.done') : t('build.building')}</span>
                   </span>
                 );
               })}
             </div>
             {umbau && umbau.key && (
-              <p style={{ marginTop: 'auto', fontSize: 18, color: DIM, lineHeight: 1.4 }}>{t('build.changed')} {t(umbau.key, umbauVars(umbau.vars, t))}{umbau.vars?.worn ? ` ${t('umbau.wear', umbauVars(umbau.vars, t))}` : ''}</p>
+              <p style={{ marginTop: 'auto', fontSize: 17, color: DIM, lineHeight: 1.4 }}>{t('build.changed')} {t(umbau.key, umbauVars(umbau.vars, t))}{umbau.vars?.worn ? ` ${t('umbau.wear', umbauVars(umbau.vars, t))}` : ''}</p>
             )}
           </>
         )}
         {view.screen === 'reveal' && (
           <>
-            <h1 style={{ fontFamily: DISPLAY, fontSize: 38, color: TEXT, margin: 0 }}>{t('reveal.title')}</h1>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, overflow: 'hidden' }}>
+            <h1 style={{ fontFamily: DISPLAY, fontSize: 34, color: TEXT, margin: 0 }}>{t('reveal.title')}</h1>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 7, overflow: 'hidden' }}>
               {fresh!.map((f, k) => {
                 const p = player(f.owner);
                 return (
-                  <div key={k} className="anim-up" style={{ display: 'flex', alignItems: 'center', gap: 12, animationDelay: `${k * 0.45}s`, animationFillMode: 'both' }}>
-                    <Badge kind={f.kind} size={38} owner={p?.color} />
-                    <b style={{ fontSize: 19, color: p?.color ?? TEXT }}>{p?.name}</b>
-                    <span style={{ fontSize: 19 }}>{t(`k.${f.kind}`)}</span>
-                    {f.moved && <span style={{ fontSize: 15, color: DIM }}>{t('reveal.moved')}</span>}
-                    {f.id < 0 && <span style={{ fontSize: 15, color: DIM }}>{t('reveal.event')}</span>}
+                  <div key={k} className="anim-up" style={{ display: 'flex', alignItems: 'center', gap: 10, animationDelay: `${k * 0.45}s`, animationFillMode: 'both' }}>
+                    <Badge kind={f.kind} size={34} owner={colorOf(f.owner)} />
+                    <PatternText d={designs[f.owner]} size={17}>{p?.name}</PatternText>
+                    <span style={{ fontSize: 18 }}>{t(`k.${f.kind}`)}</span>
+                    {f.moved && <span style={{ fontSize: 14, color: DIM }}>{t('reveal.moved')}</span>}
+                    {f.id < 0 && <span style={{ fontSize: 14, color: DIM }}>{t('reveal.event')}</span>}
                   </div>
                 );
               })}
-              {fresh!.length === 0 && <p style={{ fontSize: 20, color: MUTED }}>{t('reveal.none')}</p>}
+              {fresh!.length === 0 && <p style={{ fontSize: 19, color: MUTED }}>{t('reveal.none')}</p>}
             </div>
           </>
         )}
         {view.screen === 'umbau' && (
           <>
-            <h1 style={{ fontFamily: DISPLAY, fontSize: 38, color: TEXT, margin: 0 }}>{t('umbau.title')}</h1>
-            <p className="anim-up" style={{ fontSize: 26, lineHeight: 1.35 }}>{t(umbau.key, umbauVars(umbau.vars, t))}</p>
-            {view.wear && <p className="anim-up" style={{ fontSize: 20, color: MUTED, lineHeight: 1.4, animationDelay: '.5s' }}>{t('umbau.wear', { worn: view.wear.worn, polished: view.wear.polished })}</p>}
-            <p style={{ fontSize: 18, color: DIM }}>{t('umbau.items')}</p>
+            <h1 style={{ fontFamily: DISPLAY, fontSize: 34, color: TEXT, margin: 0 }}>{t('umbau.title')}</h1>
+            <p className="anim-up" style={{ fontSize: 24, lineHeight: 1.35 }}>{t(umbau.key, umbauVars(umbau.vars, t))}</p>
+            {view.wear && <p className="anim-up" style={{ fontSize: 19, color: MUTED, lineHeight: 1.4, animationDelay: '.5s' }}>{t('umbau.wear', { worn: view.wear.worn, polished: view.wear.polished })}</p>}
+            <p style={{ fontSize: 17, color: DIM }}>{t('umbau.items')}</p>
           </>
         )}
       </div>
@@ -533,32 +667,53 @@ function HostOverview({ view, t, player }: HostViewProps) {
   );
 }
 
-interface Frame { round: number; t: number; m: number[][]; o: number[]; p: number[]; ow: number[]; it: [number, number, number][]; w: number[]; fx: (string | number)[][]; g: [number, number, number] | null; q: number; oil: number }
-interface Effect { kind: 'ring' | 'text'; x: number; y: number; at: number; color: string; text?: string; r?: number }
+interface Frame { round: number; t: number; m: number[][]; o: number[]; p: number[]; ow: number[]; it: [number, number, number][]; w: number[]; b: Blocks; fx: (string | number)[][]; g: [number, number, number] | null; q: number; oil: number }
+interface Effect { kind: 'ring' | 'text' | 'pop'; x: number; y: number; at: number; color: string; text?: string; sub?: string; r?: number; big?: boolean }
 
+const TW = 1054, TH = 720;
+
+/** Rennen und Kamerafahrt: Kamera folgt dem Feld (links/rechts und oben/unten), die erste Murmel bleibt immer im Bild */
 function HostRace({ view, t, player }: HostViewProps) {
   const geo = view.geo as Geo;
+  const flight = view.screen === 'flight';
   const layer = useTrackLayer(geo, view.trackV, t);
   const frame = useStream<Frame>();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const frames = useRef<{ prev: Frame | null; cur: Frame | null; at: number }>({ prev: null, cur: null, at: 0 });
-  const cam = useRef({ y: 300, h: 900, init: false });
+  const cam = useRef({ x: 300, y: 200, s: 0.8, init: false });
   const effects = useRef<Effect[]>([]);
   const banner = useRef<{ text: string; at: number } | null>(null);
   const [bannerText, setBannerText] = useState<{ text: string; key: number } | null>(null);
-  const [edge, setEdge] = useState<[number, number]>([0, 0]);
   const items = view.items as PubItem[];
   const pids = view.players as string[];
-  const ownerColors = useMemo(() => pids.map((id) => player(id)?.color ?? '#ffffff'), [pids, player]);
+  const designs = (view.designs ?? {}) as Designs;
+  const ownerDesigns = useMemo(() => pids.map((id) => designs[id] ?? FALLBACK), [pids, designs]);
+  const ownerColors = useMemo(() => ownerDesigns.map((d) => mainColor(d)), [ownerDesigns]);
   const itemById = useMemo(() => new Map(items.map((it) => [it.id, it])), [items]);
+  const freshIds = useMemo(() => new Set((flight ? view.fresh : []) as number[]), [flight, view.fresh]);
+  const flightStart = useRef(performance.now());
   const partState = useRef(new Map<number, PartState>());
-  const W = 1054, H = 720;
-  const fr = frame && frame.round === view.round && frame.m.length === view.n ? frame : null;
+  const fr = !flight && frame && frame.round === view.round && frame.m.length === view.n ? frame : null;
   const stOf = (id: number) => {
     let s = partState.current.get(id);
     if (!s) { s = blankState(); partState.current.set(id, s); }
     return s;
   };
+  const route = geo.route;
+  const routeCum = useMemo(() => {
+    const out = [0];
+    for (let k = 1; k < route.length; k++) out.push(out[k - 1] + Math.hypot(route[k][0] - route[k - 1][0], route[k][1] - route[k - 1][1]));
+    return out;
+  }, [route]);
+
+  useEffect(() => {
+    if (flight) {
+      flightStart.current = performance.now();
+      banner.current = { text: t('flight.banner', { n: view.round }), at: performance.now() };
+      setBannerText({ text: banner.current.text, key: banner.current.at });
+      sfx.custom((s) => { s.tone(392, 0.25, { type: 'triangle', vol: 0.06 }); s.tone(523, 0.3, { type: 'triangle', vol: 0.06, at: 0.2 }); s.tone(659, 0.45, { type: 'triangle', vol: 0.06, at: 0.4 }); });
+    }
+  }, [flight]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!fr) return;
@@ -566,6 +721,7 @@ function HostRace({ view, t, player }: HostViewProps) {
     if (f.cur !== fr) { f.prev = f.cur ?? fr; f.cur = fr; f.at = performance.now(); }
     for (const [id, flags, left] of fr.it) { const s = stOf(id); s.flags = flags; s.left = left; }
     const n = performance.now();
+    const M = fr.m.length, mult = view.mult ?? 1;
     for (const e of fr.fx) {
       const kind = e[0];
       const it = typeof e[1] === 'number' ? itemById.get(e[1]) : undefined;
@@ -584,10 +740,17 @@ function HostRace({ view, t, player }: HostViewProps) {
       } else if (kind === 'shield') {
         const m = fr.m[Number(e[1])];
         if (m) effects.current.push({ kind: 'ring', x: m[0], y: m[1], at: n, color: '#9fd7ff', r: 20 });
+      } else if (kind === 'loop') {
+        const m = fr.m[Number(e[1])];
+        if (m && Number(e[2]) === 1) { effects.current.push({ kind: 'text', x: geo.loop.cx, y: geo.loop.cy - 70, at: n, color: '#f6dd9c', text: t('race.loop') }); sfx.custom((s) => s.tone(700, 0.25, { type: 'sine', vol: 0.05, to: 1400 })); }
       } else if (kind === 'finish') {
         const i = Number(e[1]);
-        if (Number(e[2]) === 1) {
-          banner.current = { text: t('race.first', { name: player(pids[fr.ow[i]])?.name ?? '' }), at: n };
+        const place = Number(e[2]);
+        const pts = ((M - place + 1) * 10 + (place === 1 ? 100 : 0)) * mult;
+        const m = fr.m[i];
+        effects.current.push({ kind: 'pop', x: m ? m[0] : geo.finish.x0 + 100, y: geo.finish.y - 50, at: n, color: ownerColors[fr.ow[i]] ?? '#fff', text: `+${pts}`, sub: t('race.placeN', { n: place }), big: place === 1 });
+        if (place === 1) {
+          banner.current = { text: t('race.first', { name: player(pids[fr.ow[i]])?.name ?? '', pts: 100 * mult }), at: n };
           sfx.play('cheer');
         } else sfx.custom((s) => s.tone(1200 + Math.random() * 300, 0.06, { type: 'sine', vol: 0.05 }));
       } else if (kind === 'event') {
@@ -599,6 +762,8 @@ function HostRace({ view, t, player }: HostViewProps) {
         sfx.custom((s) => s.tone(300, 0.35, { type: 'sine', vol: 0.06, to: 900 }));
       } else if (kind === 'gust') {
         sfx.custom((s) => s.noise(0.8, { filter: 900, sweepTo: 400, vol: 0.08 }));
+      } else if (kind === 'giant') {
+        effects.current.push({ kind: 'ring', x: Number(e[1]), y: Number(e[2]), at: n, color: '#bbbbbb', r: 50 });
       }
     }
     if (banner.current && n - banner.current.at < 50) setBannerText({ text: banner.current.text, key: banner.current.at });
@@ -612,7 +777,14 @@ function HostRace({ view, t, player }: HostViewProps) {
 
   useEffect(() => {
     let raf = 0;
-    let lastEdge = '';
+    const routeLen = routeCum[routeCum.length - 1] || 1;
+    const routeAt = (s: number): Pt => {
+      for (let k = 1; k < route.length; k++) if (s <= routeCum[k] || k === route.length - 1) {
+        const f = Math.min(1, Math.max(0, (s - routeCum[k - 1]) / (routeCum[k] - routeCum[k - 1] || 1)));
+        return [route[k - 1][0] + (route[k][0] - route[k - 1][0]) * f, route[k - 1][1] + (route[k][1] - route[k - 1][1]) * f];
+      }
+      return route[0];
+    };
     const draw = () => {
       raf = requestAnimationFrame(draw);
       const c = canvasRef.current;
@@ -620,7 +792,7 @@ function HostRace({ view, t, player }: HostViewProps) {
       const g = c.getContext('2d');
       if (!g) return;
       const dpr = Math.min(2, window.devicePixelRatio || 1);
-      if (c.width !== W * dpr) { c.width = W * dpr; c.height = H * dpr; }
+      if (c.width !== TW * dpr) { c.width = TW * dpr; c.height = TH * dpr; }
       const { prev, cur, at } = frames.current;
       const n = performance.now();
       const a = Math.min(1, (n - at) / 34);
@@ -629,84 +801,131 @@ function HostRace({ view, t, player }: HostViewProps) {
         const jump = Math.abs(q[0] - p[0]) + Math.abs(q[1] - p[1]) > 120;
         return jump ? [q[0], q[1], q[2] / 100, q[3]] : [p[0] + (q[0] - p[0]) * a, p[1] + (q[1] - p[1]) * a, q[2] / 100, q[3]];
       };
-      // Kamera folgt der Mitte des Feldes
-      let targetY = 300, targetH = 900;
-      if (cur) {
-        const live = cur.m.map((m, i) => [m[1], m[3], i]).filter(([y, f]) => !(f & FLAG.done) && y > -20).sort((p, q) => p[0] - q[0]);
+      // Kamera
+      const base = TW / 1250;
+      const minS = Math.max(TW / geo.W, TH / geo.H) * 1.05;
+      let tx = cam.current.x, ty = cam.current.y, ts = base;
+      let leader: [number, number] | null = null;
+      if (flight) {
+        const p = Math.min(1, (n - flightStart.current) / ((view.dur ?? 8) * 1000 - 400));
+        const e = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+        [tx, ty] = routeAt(e * routeLen);
+        ts = TW / 1100;
+      } else if (cur) {
+        const live: number[] = [];
+        for (const i of cur.o) { const m = cur.m[i]; if (!(m[3] & FLAG.done) && m[1] > -20) live.push(i); }
         if (live.length) {
-          const lo = live[Math.floor(live.length * 0.15)][0], hi = live[Math.max(0, Math.ceil(live.length * 0.85) - 1)][0];
-          targetY = (lo + hi) / 2;
-          targetH = Math.max(900, Math.min(1500, hi - lo + 380));
-        } else targetY = geo.H - 300;
-      }
+          const band = live.slice(Math.floor(live.length * 0.15), Math.max(1, Math.ceil(live.length * 0.85)));
+          tx = 0; ty = 0;
+          for (const i of band) { const [x, y] = pos(i); tx += x; ty += y; }
+          tx /= band.length; ty /= band.length;
+          const [lx, ly] = pos(live[0]);
+          leader = [lx, ly];
+          const needW = Math.abs(lx - tx) * 2 + 300, needH = Math.abs(ly - ty) * 2 + 240;
+          ts = Math.max(minS, Math.min(base, TW / needW, TH / needH));
+        } else if (cur.m.length) { tx = (geo.finish.x0 + geo.finish.x1) / 2; ty = geo.finish.y - 120; }
+        else { tx = 500; ty = 250; }
+      } else { tx = 500; ty = 250; }
       const cm = cam.current;
-      if (!cm.init && cur) { cm.y = targetY; cm.h = targetH; cm.init = true; }
-      cm.y += (targetY - cm.y) * 0.04;
-      cm.h += (targetH - cm.h) * 0.02;
-      const scale = Math.min(W / WW, H / cm.h);
-      const viewH = H / scale;
-      const top = Math.max(-60, Math.min(geo.H - viewH + 40, cm.y - viewH / 2));
-      const ox = (W - WW * scale) / 2;
+      if (!cm.init) { cm.x = tx; cm.y = ty; cm.s = ts; cm.init = true; }
+      const k = flight ? 0.12 : 0.06;
+      cm.x += (tx - cm.x) * k; cm.y += (ty - cm.y) * k; cm.s += (ts - cm.s) * 0.06;
+      const vw = TW / cm.s, vh = TH / cm.s;
+      let left = Math.max(-20, Math.min(geo.W - vw + 20, cm.x - vw / 2));
+      let top = Math.max(-80, Math.min(geo.H - vh + 40, cm.y - vh / 2));
+      if (leader) {
+        const mx = Math.min(90, vw / 4), my = Math.min(80, vh / 4);
+        const nl = Math.min(Math.max(left, leader[0] + mx - vw), leader[0] - mx);
+        const nt = Math.min(Math.max(top, leader[1] + my - vh), leader[1] - my);
+        cm.x += nl - left; cm.y += nt - top; left = nl; top = nt;
+      }
       g.setTransform(dpr, 0, 0, dpr, 0, 0);
-      g.fillStyle = INK; g.fillRect(0, 0, W, H);
+      g.fillStyle = INK; g.fillRect(0, 0, TW, TH);
       if (cur?.q) g.translate((Math.random() - 0.5) * 8, (Math.random() - 0.5) * 8);
-      g.translate(ox, -top * scale);
-      g.scale(scale, scale);
-      const sy = Math.max(0, top), sh = Math.min(geo.H - sy, viewH + 2);
-      g.drawImage(layer, 0, sy, WW, sh, 0, sy, WW, sh);
+      g.scale(cm.s, cm.s);
+      g.translate(-left, -top);
+      const sx = Math.max(0, Math.floor(left)), sy = Math.max(0, Math.floor(top));
+      const sw = Math.min(geo.W - sx, Math.ceil(vw) + 2), sh = Math.min(geo.H - sy, Math.ceil(vh) + 2);
+      const blit = (img: HTMLCanvasElement) => { if (sw > 0 && sh > 0) g.drawImage(img, sx, sy, sw, sh, sx, sy, sw, sh); };
+      blit(layer.back);
+      const blocks = cur ? cur.b : null;
+      drawBuckets(g, geo, blocks, n);
+      const M = cur ? cur.m.length : 0;
+      if (cur) for (let i = 0; i < M; i++) {
+        const [x, y, ang, f] = pos(i);
+        if (f & FLAG.behind) drawDesignMarble(g, x, y, ang, ownerDesigns[cur.ow[i]] ?? FALLBACK, R, 0.9);
+      }
+      blit(layer.front);
       // Ölpest
       if (cur && cur.oil >= 0) {
         const r = geo.rows[cur.oil];
-        if (r) { g.strokeStyle = 'rgba(40,60,90,.55)'; g.lineWidth = 22; g.lineCap = 'round'; g.beginPath(); g.moveTo(r.xa, railY(r, r.xa) - 8); g.lineTo(r.xb, railY(r, r.xb) - 8); g.stroke(); }
+        if (r) { g.strokeStyle = 'rgba(40,60,90,.55)'; g.lineWidth = 22; g.lineCap = 'round'; g.beginPath(); r.pts.forEach(([x, y], k2) => (k2 ? g.lineTo(x, y - 8) : g.moveTo(x, y - 8))); g.stroke(); }
       }
-      // Wippen
-      geo.wippes.forEach((wd, k) => {
-        const ang = cur ? (cur.w[k] ?? wd.rest * 100) / 100 : wd.rest;
+      geo.wippes.forEach((wd, k2) => {
+        const ang = cur ? (cur.w[k2] ?? wd.rest * 100) / 100 : wd.rest;
         line(g, wd.px - Math.cos(ang) * wd.half, wd.py - Math.sin(ang) * wd.half, wd.px + Math.cos(ang) * wd.half, wd.py + Math.sin(ang) * wd.half, RAIL);
         g.fillStyle = '#3d270b'; g.beginPath(); g.arc(wd.px, wd.py, 4, 0, Math.PI * 2); g.fill();
       });
-      // Röhren und Teile hinter den Murmeln
+      drawWheels(g, geo, blocks, n);
+      drawRocker(g, geo, blocks ? blocks.rk / 100 : 0.42);
       for (const it of items) if (it.kind === 'wurmloch') drawPart(g, it, geo, stOf(it.id), n, ownerColors[pids.indexOf(it.owner)] ?? '#fff');
-      if (!cur) return;
-      const M = cur.m.length;
-      // Farbsensoren: leuchten auf, wenn eine Murmel darunter durchrollt
+      // Farbsensoren
       for (const it of items) {
         const r = geo.rows[it.row];
-        const sx = it.x - it.dir * 90, sy2 = railY(r, sx) - R - 4;
         const st = stOf(it.id);
-        for (let i = 0; i < M; i++) {
-          const m = cur.m[i];
-          if (Math.abs(m[0] - sx) < 12 && Math.abs(m[1] - sy2) < 20) { st.flash = n; st.flashC = ownerColors[cur.ow[i]] ?? '#fff'; }
+        if (cur) {
+          const sx2 = it.x - it.dir * 90, sy2 = railY(r, sx2) - R - 4;
+          for (let i = 0; i < M; i++) {
+            const m = cur.m[i];
+            if (Math.abs(m[0] - sx2) < 12 && Math.abs(m[1] - sy2) < 20) { st.flash = n; st.flashC = ownerColors[cur.ow[i]] ?? '#fff'; }
+          }
         }
         drawSensor(g, it, geo, st, n, ownerColors[pids.indexOf(it.owner)] ?? '#fff');
       }
-      for (let i = 0; i < M; i++) {
+      if (cur) for (let i = 0; i < M; i++) {
         const [x, y, ang, f] = pos(i);
-        if (y < -30) continue;
-        const col = ownerColors[cur.ow[i]] ?? '#fff';
-        if (f & FLAG.boost) { g.globalAlpha = 0.3; g.fillStyle = col; g.beginPath(); g.arc(x, y, 15, 0, Math.PI * 2); g.fill(); g.globalAlpha = 1; }
-        drawMarble(g, x, y, ang, col, R, f & FLAG.tube ? 0.85 : 1);
+        if (y < -30 || f & (FLAG.behind | FLAG.glass)) continue;
+        const d = ownerDesigns[cur.ow[i]] ?? FALLBACK;
+        if (f & FLAG.boost) { g.globalAlpha = 0.3; g.fillStyle = mainColor(d); g.beginPath(); g.arc(x, y, 15, 0, Math.PI * 2); g.fill(); g.globalAlpha = 1; }
+        drawDesignMarble(g, x, y, ang, d, R, f & FLAG.tube ? 0.85 : 1);
         if (f & FLAG.shield) { g.strokeStyle = 'rgba(159,215,255,.8)'; g.lineWidth = 2; g.beginPath(); g.arc(x, y, 13, 0, Math.PI * 2); g.stroke(); }
       }
-      // führende Murmel jeder Farbe: heller Ring
-      const seen = new Set<number>();
-      for (const i of cur.o) {
-        const ow = cur.ow[i];
-        if (seen.has(ow)) continue;
-        seen.add(ow);
-        const [x, y, , f] = pos(i);
-        if (f & FLAG.done) continue;
-        g.strokeStyle = '#fff6dc'; g.lineWidth = 1.5; g.globalAlpha = 0.9;
-        g.beginPath(); g.arc(x, y, 12.5, 0, Math.PI * 2); g.stroke(); g.globalAlpha = 1;
-      }
       for (const it of items) if (it.kind !== 'wurmloch') drawPart(g, it, geo, stOf(it.id), n, ownerColors[pids.indexOf(it.owner)] ?? '#fff');
-      if (cur.g) {
+      drawSpiral(g, geo, () => {
+        if (cur) for (let i = 0; i < M; i++) {
+          const [x, y, ang, f] = pos(i);
+          if (f & FLAG.glass) drawDesignMarble(g, x, y, ang, ownerDesigns[cur.ow[i]] ?? FALLBACK, R);
+        }
+      });
+      // neue Teile leuchten bei der Kamerafahrt
+      if (flight) {
+        for (const it of items) {
+          if (!freshIds.has(it.id)) continue;
+          const col = ownerColors[pids.indexOf(it.owner)] ?? '#fff';
+          const pulse = 0.5 + 0.5 * Math.sin(n / 160);
+          g.globalAlpha = 0.35 + 0.5 * pulse; g.strokeStyle = col; g.lineWidth = 5;
+          g.beginPath(); g.arc(it.x, it.y - 18, 34 + pulse * 8, 0, Math.PI * 2); g.stroke();
+          g.globalAlpha = 1;
+          g.font = `700 15px ${FONT}`; g.textAlign = 'center'; g.lineWidth = 5; g.strokeStyle = INK;
+          const label = `${player(it.owner)?.name ?? ''}: ${t(`k.${it.kind}`)}`;
+          g.strokeText(label, it.x, it.y - 66); g.fillStyle = col; g.fillText(label, it.x, it.y - 66);
+        }
+      }
+      // Krone über der führenden Murmel
+      if (leader) {
+        const [lx, ly] = leader;
+        const bob = Math.sin(n / 180) * 2, cy = ly - 24 + bob;
+        g.fillStyle = '#f6dd9c'; g.strokeStyle = '#6e4a14'; g.lineWidth = 1.6;
+        g.beginPath(); g.moveTo(lx - 9, cy + 6); g.lineTo(lx - 9, cy - 3); g.lineTo(lx - 4.5, cy + 2); g.lineTo(lx, cy - 6); g.lineTo(lx + 4.5, cy + 2); g.lineTo(lx + 9, cy - 3); g.lineTo(lx + 9, cy + 6); g.closePath(); g.fill(); g.stroke();
+      }
+      if (cur?.g) {
         const [gx, gy, ga] = cur.g;
         const gr = g.createRadialGradient(gx - 8, gy - 10, 2, gx, gy, 26);
         gr.addColorStop(0, '#f2f2f2'); gr.addColorStop(0.4, '#9a9a9a'); gr.addColorStop(1, '#3a3a3a');
         g.fillStyle = gr; g.beginPath(); g.arc(gx, gy, 26, 0, Math.PI * 2); g.fill();
         g.strokeStyle = 'rgba(0,0,0,.3)'; g.lineWidth = 3; g.beginPath(); g.arc(gx, gy, 15, ga / 100, ga / 100 + 1.4); g.stroke();
       }
+      const fs = 1 / Math.max(0.55, cm.s);
       effects.current = effects.current.filter((e) => {
         const age = n - e.at;
         if (e.kind === 'ring') {
@@ -716,29 +935,36 @@ function HostRace({ view, t, player }: HostViewProps) {
           g.globalAlpha = 1;
           return true;
         }
+        if (e.kind === 'pop') {
+          // Punkte springen über dem Ziel auf
+          if (age > 2300) return false;
+          const s = age < 180 ? 0.4 + (age / 180) * 0.9 : age < 300 ? 1.3 - ((age - 180) / 120) * 0.3 : 1;
+          g.save();
+          g.globalAlpha = age > 1700 ? Math.max(0, (2300 - age) / 600) : 1;
+          g.translate(e.x, e.y - age * 0.035);
+          g.scale(s * fs, s * fs);
+          g.font = `700 ${e.big ? 34 : 24}px ${DISPLAY}`; g.textAlign = 'center';
+          g.lineWidth = 6; g.strokeStyle = INK; g.strokeText(e.text ?? '', 0, 0);
+          g.fillStyle = e.color; g.fillText(e.text ?? '', 0, 0);
+          g.font = `700 13px ${FONT}`; g.lineWidth = 4;
+          g.strokeText(e.sub ?? '', 0, 17); g.fillStyle = TEXT; g.fillText(e.sub ?? '', 0, 17);
+          g.restore();
+          return true;
+        }
         if (age > 1500) return false;
         g.globalAlpha = 1 - age / 1500;
-        g.font = `700 ${Math.round(16 / Math.max(0.6, scale))}px ${FONT}`; g.textAlign = 'center';
+        g.font = `700 ${Math.round(16 * fs)}px ${FONT}`; g.textAlign = 'center';
         g.lineWidth = 5; g.strokeStyle = INK; g.strokeText(e.text ?? '', e.x, e.y - age / 40);
         g.fillStyle = e.color; g.fillText(e.text ?? '', e.x, e.y - age / 40);
         g.globalAlpha = 1;
         return true;
       });
-      let above = 0, below = 0;
-      for (let i = 0; i < M; i++) {
-        const m = cur.m[i];
-        if (m[3] & FLAG.done || m[1] < -20) continue;
-        if (m[1] < top + 20) above++;
-        else if (m[1] > top + viewH - 20) below++;
-      }
-      const key = `${above},${below}`;
-      if (key !== lastEdge) { lastEdge = key; setEdge([above, below]); }
     };
     raf = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(raf);
-  }, [layer, items, ownerColors, geo]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [layer, items, ownerColors, ownerDesigns, geo, flight, freshIds, routeCum]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const ranking: { pid: string; color: string; done: number }[] = [];
+  const ranking: { pid: string; done: number; owner: number }[] = [];
   if (fr) {
     const seen = new Set<number>();
     for (const i of fr.o) {
@@ -746,83 +972,147 @@ function HostRace({ view, t, player }: HostViewProps) {
       if (seen.has(ow)) continue;
       seen.add(ow);
       const p = player(pids[ow]);
-      if (p) ranking.push({ pid: p.id, color: p.color, done: fr.m.filter((m, k) => fr.ow[k] === ow && m[3] & FLAG.done).length });
+      if (p) ranking.push({ pid: p.id, owner: ow, done: fr.m.filter((m, k) => fr.ow[k] === ow && m[3] & FLAG.done).length });
     }
   }
   const barH = 560;
-  const cm = cam.current;
-  const vis = fr ? { top: Math.max(0, (cm.y - cm.h / 2) / geo.H), h: cm.h / geo.H } : null;
   return (
     <div style={{ position: 'absolute', inset: 0, display: 'flex' }}>
-      <div style={{ position: 'relative', width: W, height: H }}>
-        <canvas ref={canvasRef} style={{ width: W, height: H, display: 'block' }} />
-        {edge[0] > 0 && <EdgePill top>{t('race.above', { n: edge[0] })}</EdgePill>}
-        {edge[1] > 0 && <EdgePill>{t('race.below', { n: edge[1] })}</EdgePill>}
+      <div style={{ position: 'relative', width: TW, height: TH }}>
+        <canvas ref={canvasRef} style={{ width: TW, height: TH, display: 'block' }} />
         {bannerText && (
-          <div key={bannerText.key} className="anim-pop" style={{ position: 'absolute', left: '50%', top: 90, transform: 'translateX(-50%)', padding: '12px 28px', borderRadius: 16, background: 'rgba(20,13,8,.88)', border: `2px solid ${BRASS}`, fontFamily: DISPLAY, fontWeight: 700, fontSize: 30, color: BRASS_L, whiteSpace: 'nowrap', boxShadow: `0 0 30px ${BRASS}55` }}>{bannerText.text}</div>
+          <div key={bannerText.key} className="anim-pop" style={{ position: 'absolute', left: '50%', top: 70, transform: 'translateX(-50%)', padding: '12px 28px', borderRadius: 16, background: 'rgba(20,13,8,.88)', border: `2px solid ${BRASS}`, fontFamily: DISPLAY, fontWeight: 700, fontSize: 30, color: BRASS_L, whiteSpace: 'nowrap', boxShadow: `0 0 30px ${BRASS}55` }}>{bannerText.text}</div>
         )}
       </div>
-      <div style={{ width: 1280 - W, boxSizing: 'border-box', padding: '18px 14px', display: 'flex', flexDirection: 'column', gap: 12, background: 'linear-gradient(180deg, #2b1d12, #1a110a)', borderLeft: `1px solid ${LINE}` }}>
+      <div style={{ width: 1280 - TW, boxSizing: 'border-box', padding: '18px 14px', display: 'flex', flexDirection: 'column', gap: 12, background: 'linear-gradient(180deg, #2b1d12, #1a110a)', borderLeft: `1px solid ${LINE}` }}>
         <Title size={20} />
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
           <span style={{ fontSize: 15, color: MUTED }}>{t('round', { n: view.round, total: view.total })}</span>
           <span style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: 28 }}>{fr ? fmtTime(fr.t) : '0:00'}</span>
         </div>
-        <div style={{ display: 'flex', gap: 10, flex: 1, minHeight: 0 }}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-            <span style={{ fontSize: 11, color: DIM }}>{t('race.start')}</span>
-            <div style={{ position: 'relative', width: 40, height: barH, flex: 'none', borderRadius: 8, background: 'rgba(255,255,255,.04)', border: `1px solid ${LINE}` }}>
-              {vis && <span style={{ position: 'absolute', left: -3, width: 44, top: Math.min(barH - 20, vis.top * barH), height: Math.max(20, Math.min(barH, vis.h * barH)), border: `2px solid ${BRASS}`, borderRadius: 6, boxSizing: 'border-box' }} />}
-              {fr && fr.p.map((p, i) => (
-                <span key={i} style={{ position: 'absolute', left: 6 + (i % 3) * 10, top: Math.min(barH - 10, (p / 1000) * barH - 5), ...marbleCss(ownerColors[fr.ow[i]] ?? '#fff', 10), transition: 'top .3s linear' }} />
-              ))}
+        {flight ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <span style={{ fontSize: 17, color: TEXT, lineHeight: 1.35 }}>{t('flight.text')}</span>
+            {pids.map((id) => (
+              <span key={id} style={{ display: 'flex', alignItems: 'center', gap: 7 }}><Marble d={designs[id]} size={22} /><PatternText d={designs[id]} size={16} style={{ maxWidth: 160 }}>{player(id)?.name}</PatternText></span>
+            ))}
+          </div>
+        ) : (
+          <div style={{ display: 'flex', gap: 10, flex: 1, minHeight: 0 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+              <span style={{ fontSize: 11, color: DIM }}>{t('race.start')}</span>
+              <div style={{ position: 'relative', width: 40, height: barH, flex: 'none', borderRadius: 8, background: 'rgba(255,255,255,.04)', border: `1px solid ${LINE}` }}>
+                {fr && fr.p.map((p, i) => (
+                  <img key={i} src={marbleUrl(ownerDesigns[fr.ow[i]] ?? FALLBACK)} alt="" style={{ position: 'absolute', left: 4 + (i % 3) * 10, top: Math.min(barH - 12, (p / 1000) * barH - 6), width: 12, height: 12, transition: 'top .3s linear' }} />
+                ))}
+              </div>
+              <span style={{ fontSize: 11, color: DIM }}>{t('race.finish')}</span>
             </div>
-            <span style={{ fontSize: 11, color: DIM }}>{t('race.finish')}</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1, minWidth: 0 }}>
+              <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: 1.5, color: DIM }}>{t('race.best')}</span>
+              {ranking.slice(0, 12).map((r, k) => {
+                const p = player(r.pid)!;
+                return (
+                  <div key={r.pid} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '5px 7px', borderRadius: 8, background: 'rgba(255,255,255,.03)' }}>
+                    <span style={{ width: 16, fontFamily: DISPLAY, fontWeight: 700, fontSize: 14, color: BRASS }}>{k + 1}</span>
+                    <Marble d={ownerDesigns[r.owner]} size={18} />
+                    <span style={{ flex: 1, minWidth: 0, fontSize: 15, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</span>
+                    {r.done > 0 && <span style={{ fontSize: 12, color: BRASS_L }}>{r.done}✓</span>}
+                  </div>
+                );
+              })}
+            </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1, minWidth: 0 }}>
-            <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: 1.5, color: DIM }}>{t('race.best')}</span>
-            {ranking.slice(0, 12).map((r, k) => {
-              const p = player(r.pid)!;
-              return (
-                <div key={r.pid} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '5px 7px', borderRadius: 8, background: 'rgba(255,255,255,.03)' }}>
-                  <span style={{ width: 16, fontFamily: DISPLAY, fontWeight: 700, fontSize: 14, color: BRASS }}>{k + 1}</span>
-                  <span style={marbleCss(r.color, 17)} />
-                  <span style={{ flex: 1, minWidth: 0, fontSize: 15, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</span>
-                  {r.done > 0 && <span style={{ fontSize: 12, color: BRASS_L }}>{r.done}✓</span>}
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
-}
-
-function EdgePill({ top, children }: { top?: boolean; children: ReactNode }) {
-  return <span style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', [top ? 'top' : 'bottom']: 12, padding: '5px 16px', borderRadius: 16, background: 'rgba(20,13,8,.85)', border: `1.5px solid ${BRASS}`, fontSize: 16, fontWeight: 700, whiteSpace: 'nowrap' }}>{children}</span>;
 }
 
 function fmtTime(s: number) {
   return `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 }
 
+/** Zahl zählt hoch, sobald die Zeile erscheint */
+function CountUp({ value, delay }: { value: number; delay: number }) {
+  const [v, setV] = useState(0);
+  useEffect(() => {
+    let raf = 0;
+    const id = setTimeout(() => {
+      const t0 = performance.now();
+      const tick = (n: number) => {
+        const f = Math.min(1, (n - t0) / 900);
+        setV(Math.round(value * (1 - Math.pow(1 - f, 3))));
+        if (f < 1) raf = requestAnimationFrame(tick);
+      };
+      raf = requestAnimationFrame(tick);
+    }, delay);
+    return () => { clearTimeout(id); cancelAnimationFrame(raf); };
+  }, [value, delay]);
+  return <>{v}</>;
+}
+
+/** Punktetafel: wer wie viele Punkte für seine Murmeln bekommt – danach der Gesamtstand */
 function HostResult({ view, t, player }: HostViewProps) {
-  const rows = Object.keys(view.after).map((id) => ({ player: player(id)!, before: view.before[id] ?? 0, after: view.after[id] })).filter((r) => r.player);
-  const first = view.firstPid ? player(view.firstPid) : null;
-  const trapKing = Object.entries(view.traps as Record<string, number>).sort((a, b) => b[1] - a[1])[0];
-  const tk = trapKing && trapKing[1] > 0 ? player(trapKing[0]) : null;
+  const [phase2, setPhase2] = useState(false);
+  const ids = view.players as string[];
+  const designs = view.designs as Designs;
+  const marbles = view.marbles as [number, number, number][];
+  useEffect(() => {
+    setPhase2(false);
+    const id = setTimeout(() => setPhase2(true), 10500);
+    return () => clearTimeout(id);
+  }, [view.round]);
+  const rows = ids.map((id, k) => ({ id, list: marbles.filter((m) => m[0] === k), sum: view.points[id] ?? 0, trap: view.trapPts[id] ?? 0 })).sort((a, b) => b.sum - a.sum);
+  const max = Math.max(1, ...rows.map((r) => r.sum));
+  const step = Math.min(0.55, 4.2 / Math.max(1, rows.length));
+  if (phase2) {
+    const score = Object.keys(view.after).map((id) => ({ player: player(id)!, before: view.before[id] ?? 0, after: view.after[id] })).filter((r) => r.player);
+    return (
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', gap: 16, padding: '30px 56px', background: BG }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+          <Title />
+          <span style={{ fontSize: 18, color: MUTED }}>{t('round', { n: view.round, total: view.total })} · {t('result.total')}</span>
+        </div>
+        <Scoreboard rows={score} />
+      </div>
+    );
+  }
+  const big = rows.length <= 6;
   return (
-    <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', gap: 16, padding: '30px 56px', background: BG }}>
+    <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', gap: 10, padding: '24px 44px', background: BG }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <Title />
+        <span style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: 36, color: BRASS }}>{t('result.title')}</span>
         <span style={{ fontSize: 18, color: MUTED }}>{t('round', { n: view.round, total: view.total })}{view.mult > 1 ? ` · ${t('double')}` : ''}</span>
       </div>
-      <div style={{ display: 'flex', gap: 30, fontSize: 20 }}>
-        {first && <span>{t('result.first', { name: first.name })} <b style={{ color: BRASS_L }}>+{100 * view.mult}</b></span>}
-        {tk && <span style={{ color: '#ff9b88' }}>{t('result.traps', { name: tk.name, n: trapKing[1] })}</span>}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: big ? 10 : 5 }}>
+        {rows.map((r, k) => {
+          const d = designs[r.id];
+          const delay = (rows.length - 1 - k) * step;
+          return (
+            <div key={r.id} className="anim-pop" style={{ display: 'grid', gridTemplateColumns: `34px ${big ? 48 : 34}px 210px 1fr 150px 90px`, alignItems: 'center', gap: 12, padding: big ? '8px 12px' : '4px 12px', borderRadius: 14, background: k === 0 ? 'rgba(233,196,106,.12)' : 'rgba(255,255,255,.035)', border: `1px solid ${k === 0 ? BRASS : 'transparent'}`, animationDelay: `${delay}s`, animationFillMode: 'both' }}>
+              <span style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: big ? 24 : 18, color: BRASS_L }}>{k + 1}.</span>
+              <Marble d={d} size={big ? 46 : 32} />
+              <PatternText d={d} size={big ? 30 : 22} style={{ maxWidth: 210 }}>{player(r.id)?.name ?? '?'}</PatternText>
+              <span style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                {r.list.map(([, place, pts]) => (
+                  <span key={place} style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4, padding: '2px 7px', borderRadius: 8, border: `2px solid ${mainColor(d)}`, fontSize: big ? 15 : 13, color: MUTED, background: place === 1 ? 'rgba(233,196,106,.25)' : 'transparent' }}>
+                    {place}.<b style={{ color: TEXT }}>+{pts}</b>
+                  </span>
+                ))}
+                {r.trap > 0 && <span style={{ display: 'inline-flex', gap: 4, padding: '2px 7px', borderRadius: 8, border: '2px solid #d3452f', fontSize: big ? 15 : 13, color: '#ff9b88' }}>{t('result.trapChip')}<b>+{r.trap}</b></span>}
+                {r.list.length === 0 && r.trap === 0 && <span style={{ fontSize: 14, color: DIM }}>{t('result.nothing')}</span>}
+              </span>
+              <span style={{ height: 12, borderRadius: 6, background: 'rgba(255,255,255,.08)', overflow: 'hidden' }}>
+                <span style={{ display: 'block', height: '100%', width: `${(r.sum / max) * 100}%`, borderRadius: 6, backgroundImage: `url(${tileUrl(d ?? FALLBACK)})`, backgroundSize: '14px', transformOrigin: 'left', animation: `mmGrow 1s ease-out ${delay}s both` }} />
+              </span>
+              <span style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: big ? 30 : 22, textAlign: 'right', color: BRASS_L }}>+<CountUp value={r.sum} delay={delay * 1000} /></span>
+            </div>
+          );
+        })}
       </div>
-      <Scoreboard rows={rows} />
+      <span style={{ fontSize: 15, color: DIM, textAlign: 'center' }}>{t('result.rule', { mult: view.mult > 1 ? ` ${t('double')}` : '' })}</span>
+      <style>{'@keyframes mmGrow { from { transform: scaleX(0) } }'}</style>
     </div>
   );
 }
@@ -847,12 +1137,12 @@ function Phone({ children, color }: { children: ReactNode; color?: string }) {
   );
 }
 
-function TopBar({ me, color, title, right }: { me: PlayerInfo; color: string; title: string; right?: ReactNode }) {
+function TopBar({ me, design, title, right }: { me: PlayerInfo; design: Design | undefined; title: string; right?: ReactNode }) {
   return (
     <>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, paddingLeft: 40 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-          <span style={marbleCss(color, 30)} />
+          <Marble d={design} size={30} />
           <b style={{ fontSize: 17, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{me.name}</b>
         </div>
         {right}
@@ -865,12 +1155,16 @@ function TopBar({ me, color, title, right }: { me: PlayerInfo; color: string; ti
 /** Bahn als SVG (Handy) */
 function PlanSvg({ geo, scale, children }: { geo: Geo; scale: number; children?: ReactNode }) {
   return (
-    <svg width={WW * scale} height={geo.H * scale} viewBox={`0 0 ${WW} ${geo.H}`} style={{ display: 'block' }}>
-      <rect width={WW} height={geo.H} fill="#1f150d" />
+    <svg width={geo.W * scale} height={geo.H * scale} viewBox={`0 0 ${geo.W} ${geo.H}`} style={{ display: 'block' }}>
+      <rect width={geo.W} height={geo.H} fill="#1f150d" />
+      <line x1={geo.conv.x} y1={geo.conv.y0} x2={geo.conv.x} y2={geo.conv.y1} stroke="#6e4a14" strokeWidth={22} strokeDasharray="14 10" />
       {geo.segs.map((s, i) => (
         <line key={i} x1={s.ax} y1={s.ay} x2={s.bx} y2={s.by} stroke={s.kind === 'glass' ? '#9fc2d8' : '#c8963c'} strokeWidth={s.kind === 'glass' ? 5 : 11} strokeLinecap="round" opacity={s.kind === 'glass' ? 0.6 : 1} />
       ))}
-      <rect x={geo.finish.x0} y={geo.finish.y - 40} width={geo.finish.x1 - geo.finish.x0} height={40} fill="rgba(233,196,106,.15)" />
+      {geo.wheels.map((w, i) => <circle key={`w${i}`} cx={w.cx} cy={w.cy} r={w.r + 10} fill="none" stroke="#a87a30" strokeWidth={10} />)}
+      <circle cx={geo.loop.cx} cy={geo.loop.cy} r={geo.loop.r} fill="none" stroke="#c8963c" strokeWidth={10} />
+      <polyline points={geo.spiral.map((p) => p.join(',')).join(' ')} fill="none" stroke="#9fc2d8" strokeWidth={20} opacity={0.4} />
+      <rect x={geo.finish.x0} y={geo.finish.y - 40} width={geo.finish.x1 - geo.finish.x0} height={40} fill="rgba(233,196,106,.25)" />
       {children}
     </svg>
   );
@@ -878,18 +1172,21 @@ function PlanSvg({ geo, scale, children }: { geo: Geo; scale: number; children?:
 
 function Controller(props: ControllerViewProps) {
   const { view, t, me } = props;
+  const design = view.design as Design | undefined;
   const color = view.color ?? me.color;
   switch (view.screen) {
+    case 'werkstatt':
+      return <PhoneWerkstatt {...props} />;
     case 'intro':
-      return <Phone color={color}><PhoneWait title={t('title')} text={t('phone.intro', { n: view.perPlayer })} emoji={<span style={marbleCss(color, 90)} />} /></Phone>;
+      return <Phone color={color}><PhoneWait title={t('title')} text={t('phone.intro', { n: view.perPlayer })} emoji={<Marble d={design} size={96} />} /></Phone>;
     case 'build':
-      return <PhoneBuild {...props} />;
+      return view.step === 'remove' ? <PhoneRemove {...props} /> : <PhoneBuild {...props} />;
     case 'race':
       return <PhoneRace {...props} />;
     case 'watch':
       return (
         <Phone color={color}>
-          <PhoneWait title={t(view.key)} text={view.mine?.length ? t('phone.yours', { list: view.mine.map((f: { kind: string }) => t(`k.${f.kind}`)).join(', ') }) : t('lookAtTv')} emoji={<span style={marbleCss(color, 90)} />} />
+          <PhoneWait title={t(view.key)} text={view.mine?.length ? t('phone.yours', { list: view.mine.map((f: { kind: string }) => t(`k.${f.kind}`)).join(', ') }) : t('lookAtTv')} emoji={<Marble d={design} size={96} />} />
         </Phone>
       );
     case 'result':
@@ -897,8 +1194,8 @@ function Controller(props: ControllerViewProps) {
         <Phone color={color}>
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, textAlign: 'center' }}>
             {view.place === 1 && <Confetti pieces={14} silent />}
-            <span style={marbleCss(color, 80)} />
-            <h1 style={{ fontFamily: DISPLAY, fontSize: 30, margin: 0, color: BRASS }}>+{view.points}</h1>
+            <Marble d={design} size={86} />
+            <PatternText d={design} size={44}>+{view.points}</PatternText>
             <p style={{ fontSize: 18, color: MUTED, margin: 0 }}>{t('phone.finished', { n: view.finished, of: view.of })}</p>
             {view.traps > 0 && <p style={{ fontSize: 17, color: '#ff9b88', margin: 0 }}>{t('phone.traps', { n: view.traps })}</p>}
             <p style={{ fontSize: 17, margin: 0 }}>{t('me.place', { place: view.place, of: view.players })} · {t('me.score', { n: view.score })}</p>
@@ -906,9 +1203,103 @@ function Controller(props: ControllerViewProps) {
         </Phone>
       );
     case 'final':
-      return <Phone color={color}><PhoneWait title={t('me.place', { place: view.place, of: view.of })} text={t('me.score', { n: view.score })} emoji={<span style={marbleCss(color, 100)} />} /></Phone>;
+      return <Phone color={color}><PhoneWait title={t('me.place', { place: view.place, of: view.of })} text={t('me.score', { n: view.score })} emoji={<Marble d={design} size={100} />} /></Phone>;
   }
-  return <Phone color={color}><PhoneWait title={t('lookAtTv')} emoji={<span style={marbleCss(color, 90)} />} /></Phone>;
+  return <Phone color={color}><PhoneWait title={t('lookAtTv')} emoji={<Marble d={design} size={96} />} /></Phone>;
+}
+
+/** Murmel-Werkstatt: Hauptfarbe, Zweitfarbe und Muster wählen */
+function PhoneWerkstatt({ view, t, send, me }: ControllerViewProps) {
+  const server = view.design as Design;
+  const [d, setD] = useState<Design>(server);
+  useEffect(() => setD(server), [server.c, server.c2, server.p]); // eslint-disable-line react-hooks/exhaustive-deps
+  const taken = new Set(view.taken as number[]);
+  const set = (patch: Partial<Design>) => {
+    if (view.ready) return;
+    const next = { ...d, ...patch };
+    setD(next);
+    vibrate(12);
+    send({ type: 'design', design: next });
+  };
+  const swatch = (k: number, active: boolean, disabled: boolean, onClick: () => void, label: string) => (
+    <button key={k} type="button" aria-label={label} aria-pressed={active} disabled={disabled} onClick={onClick}
+      style={{ width: 40, height: 40, borderRadius: '50%', padding: 0, border: active ? `3px solid ${BRASS_L}` : `2px solid ${INK}`, background: PALETTE[k], boxShadow: active ? `0 0 0 2px ${INK}, 0 0 12px ${BRASS}` : 'none', opacity: disabled ? 0.18 : 1, position: 'relative' }}>
+      {disabled && <span style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: TEXT, fontWeight: 700 }}>✕</span>}
+    </button>
+  );
+  return (
+    <Phone color={PALETTE[d.c]}>
+      <TopBar me={me} design={d} title={t('werk.phoneTitle')} right={<PhoneTimer deadline={view.deadline} duration={view.duration} />} />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+        <SpinMarble d={d} size={112} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
+          <PatternText d={d} size={30} style={{ maxWidth: '100%' }}>{me.name}</PatternText>
+          <span style={{ fontSize: 14, color: MUTED, lineHeight: 1.3 }}>{t('werk.hint')}</span>
+        </div>
+      </div>
+      <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: 1.2, color: DIM }}>{t('werk.main')}</span>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        {PALETTE.map((_, k) => swatch(k, d.c === k, taken.has(k) || view.ready, () => set({ c: k, c2: d.c2 === k ? d.c : d.c2 }), t('werk.colorN', { n: k + 1 })))}
+      </div>
+      <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: 1.2, color: DIM }}>{t('werk.pattern')}</span>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+        {PATTERNS.map((p) => (
+          <button key={p} type="button" aria-pressed={d.p === p} disabled={view.ready} onClick={() => set({ p })}
+            style={{ minHeight: 70, borderRadius: 12, border: d.p === p ? `3px solid ${BRASS_L}` : `1px solid ${LINE}`, background: d.p === p ? 'rgba(233,196,106,.16)' : 'rgba(255,255,255,.04)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, color: TEXT, fontFamily: FONT, fontSize: 13, fontWeight: 600 }}>
+            <Marble d={{ ...d, p }} size={36} />
+            {t(`pat.${p}`)}
+          </button>
+        ))}
+      </div>
+      {d.p !== 'uni' && (
+        <>
+          <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: 1.2, color: DIM }}>{t('werk.second')}</span>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            {PALETTE.map((_, k) => swatch(k, d.c2 === k, k === d.c || view.ready, () => set({ c2: k }), t('werk.colorN', { n: k + 1 })))}
+          </div>
+        </>
+      )}
+      <button type="button" onClick={() => send({ type: 'ready', on: !view.ready })}
+        style={{ marginTop: 'auto', minHeight: 54, borderRadius: 12, border: 0, background: view.ready ? 'transparent' : 'linear-gradient(180deg, #f3d38a, #c8963c)', boxShadow: view.ready ? `inset 0 0 0 1px ${DIM}` : '0 3px 0 #6e4a14', color: view.ready ? TEXT : INK, fontFamily: FONT, fontWeight: 700, fontSize: 18 }}>
+        {view.ready ? t('werk.change') : t('werk.ready')}
+      </button>
+    </Phone>
+  );
+}
+
+/** Vor dem Bauen: welche eigenen Teile sollen weg? */
+function PhoneRemove({ view, t, send, me }: ControllerViewProps) {
+  const design = view.design as Design;
+  const mine = view.mine as { id: number; kind: string; row: number }[];
+  const sel = new Set(view.removing as number[]);
+  const full = view.room === 0;
+  return (
+    <Phone color={mainColor(design)}>
+      <TopBar me={me} design={design} title={t('phone.build', { n: view.round })} right={<PhoneTimer deadline={view.deadline} duration={view.duration} />} />
+      <p style={{ margin: 0, fontSize: 17, lineHeight: 1.4 }}>{t(full ? 'rm.full' : 'rm.text', { cap: view.cap, max: view.maxRemove })}</p>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {mine.map((it) => {
+          const on = sel.has(it.id);
+          const blocked = !on && sel.size >= view.maxRemove;
+          return (
+            <button key={it.id} type="button" aria-pressed={on} disabled={blocked} onClick={() => { vibrate(15); send({ type: 'rmToggle', item: it.id }); }}
+              style={{ minHeight: 62, display: 'flex', alignItems: 'center', gap: 12, padding: '6px 12px', borderRadius: 12, border: on ? '3px solid #ff8a73' : `1px solid ${LINE}`, background: on ? 'rgba(211,69,47,.18)' : 'rgba(255,255,255,.04)', color: TEXT, fontFamily: FONT, textAlign: 'left', opacity: blocked ? 0.45 : 1 }}>
+              <Badge kind={it.kind} size={42} dim={on} />
+              <span style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                <b style={{ fontSize: 17, textDecoration: on ? 'line-through' : 'none' }}>{t(`k.${it.kind}`)}</b>
+                <span style={{ fontSize: 13, color: MUTED }}>{t('phone.row', { n: it.row })}</span>
+              </span>
+              <span style={{ fontSize: 14, fontWeight: 700, color: on ? '#ff9b88' : DIM }}>{on ? t('rm.goes') : t('rm.stays')}</span>
+            </button>
+          );
+        })}
+      </div>
+      <button type="button" onClick={() => send({ type: 'rmDone' })}
+        style={{ marginTop: 'auto', minHeight: 54, borderRadius: 12, border: 0, background: 'linear-gradient(180deg, #f3d38a, #c8963c)', boxShadow: '0 3px 0 #6e4a14', color: INK, fontFamily: FONT, fontWeight: 700, fontSize: 18 }}>
+        {sel.size ? t('rm.confirm', { n: sel.size }) : t('rm.keep')}
+      </button>
+    </Phone>
+  );
 }
 
 function PhoneBuild({ view, t, send, me }: ControllerViewProps) {
@@ -917,21 +1308,25 @@ function PhoneBuild({ view, t, send, me }: ControllerViewProps) {
   const placed = view.placed as { card: number; socket: number }[];
   const taken = new Set<number>(view.taken as number[]);
   const [sel, setSel] = useState<number | null>(null);
-  const color = view.color ?? me.color;
-  const scale = 0.5;
+  const design = view.design as Design;
+  const scale = 0.32;
+  const scroller = useRef<HTMLDivElement>(null);
   const placedCard = (c: number) => placed.find((p) => p.card === c);
+  const placedItems = placed.filter((p) => SORT[offers[p.card]] !== 'ereignis').length;
   const canMore = placed.length < view.max;
+  const roomLeft = view.room - placedItems;
   const selKind = sel !== null ? offers[sel] : null;
   const fitsSocket = (s: Geo['sockets'][number]) => {
     if (!selKind || SORT[selKind] === 'ereignis') return false;
     if (taken.has(s.id) || placed.some((p) => p.socket === s.id)) return false;
-    if (NOT_LAST.includes(selKind) && s.row >= view.lastRow) return false;
+    if (HOLE.includes(selKind) && !s.hole) return false;
     return true;
   };
+  const cardOk = (c: number) => SORT[offers[c]] === 'ereignis' || roomLeft > 0;
   const pickCard = (c: number) => {
     if (view.ready) return;
     if (placedCard(c)) { send({ type: 'unplace', card: c }); setSel(null); return; }
-    if (!canMore) return;
+    if (!canMore || !cardOk(c)) return;
     if (SORT[offers[c]] === 'ereignis') { send({ type: 'place', card: c, socket: -1 }); vibrate(20); setSel(null); return; }
     setSel(sel === c ? null : c);
   };
@@ -942,15 +1337,16 @@ function PhoneBuild({ view, t, send, me }: ControllerViewProps) {
     setSel(null);
   };
   return (
-    <Phone color={color}>
-      <TopBar me={me} color={color} title={t('phone.build', { n: view.round })} right={<PhoneTimer deadline={view.deadline} duration={view.duration} />} />
+    <Phone color={mainColor(design)}>
+      <TopBar me={me} design={design} title={t('phone.build', { n: view.round })} right={<PhoneTimer deadline={view.deadline} duration={view.duration} />} />
       <div style={{ display: 'flex', gap: 8 }}>
         {offers.map((k, c) => {
           const pl = placedCard(c);
           const active = sel === c;
+          const off = !pl && (!canMore || !cardOk(c));
           return (
             <button key={c} type="button" aria-pressed={active} onClick={() => pickCard(c)} disabled={view.ready}
-              style={{ flex: 1, minWidth: 0, minHeight: 124, boxSizing: 'border-box', padding: '8px 4px', borderRadius: 12, border: active ? `3px solid ${BRASS_L}` : `1px solid ${pl ? BRASS : LINE}`, background: active ? 'rgba(233,196,106,.16)' : pl ? 'rgba(233,196,106,.08)' : 'rgba(255,255,255,.04)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, fontFamily: FONT, color: TEXT, opacity: !pl && !canMore ? 0.45 : 1 }}>
+              style={{ flex: 1, minWidth: 0, minHeight: 124, boxSizing: 'border-box', padding: '8px 4px', borderRadius: 12, border: active ? `3px solid ${BRASS_L}` : `1px solid ${pl ? BRASS : LINE}`, background: active ? 'rgba(233,196,106,.16)' : pl ? 'rgba(233,196,106,.08)' : 'rgba(255,255,255,.04)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, fontFamily: FONT, color: TEXT, opacity: off ? 0.45 : 1 }}>
               <Badge kind={k} size={44} />
               <span style={{ fontSize: 15, fontWeight: 700, textAlign: 'center', lineHeight: 1.1 }}>{t(`k.${k}`)}</span>
               <span style={{ fontSize: 12, color: MUTED, lineHeight: 1.2, textAlign: 'center' }}>{t(`d.${k}`)}</span>
@@ -960,13 +1356,13 @@ function PhoneBuild({ view, t, send, me }: ControllerViewProps) {
         })}
       </div>
       <span style={{ fontSize: 15, color: MUTED }}>
-        {view.ready ? t('phone.readyWait') : sel !== null ? t('phone.pickSocket') : canMore ? t('phone.pickCard', { n: view.max - placed.length }) : t('phone.allPlaced')}
+        {view.ready ? t('phone.readyWait') : sel !== null ? t('phone.pickSocket') : canMore ? (roomLeft > 0 ? t('phone.pickCard', { n: Math.min(view.max - placed.length, roomLeft) }) : t('phone.capFull', { cap: view.cap })) : t('phone.allPlaced')}
       </span>
-      <div style={{ flex: 1, minHeight: 280, maxHeight: 440, overflow: 'auto', borderRadius: 14, border: `2px solid ${LINE}`, WebkitOverflowScrolling: 'touch' }}>
+      <div ref={scroller} style={{ flex: 1, minHeight: 280, maxHeight: 440, overflow: 'auto', borderRadius: 14, border: `2px solid ${LINE}`, WebkitOverflowScrolling: 'touch' }}>
         <PlanSvg geo={geo} scale={scale}>
-          {(view.items as { id: number; kind: string; x: number; y: number; mine: boolean; age: number }[]).map((it) => (
-            <g key={`i${it.id}`} opacity={it.age ? 0.5 : 0.9}>
-              <circle cx={it.x} cy={it.y - 20} r={28} fill={ENAMEL[SORT[it.kind]]} stroke={it.mine ? '#fff6dc' : INK} strokeWidth={5} />
+          {(view.items as { id: number; kind: string; x: number; y: number; mine: boolean }[]).map((it) => (
+            <g key={`i${it.id}`} opacity={0.9}>
+              <circle cx={it.x} cy={it.y - 20} r={30} fill={ENAMEL[SORT[it.kind]]} stroke={it.mine ? '#fff6dc' : INK} strokeWidth={it.mine ? 8 : 5} />
               <path d={ICON[it.kind]} transform={`translate(${it.x - 18},${it.y - 38}) scale(1.5)`} fill="none" stroke={INK} strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" />
             </g>
           ))}
@@ -977,15 +1373,15 @@ function PhoneBuild({ view, t, send, me }: ControllerViewProps) {
               const k = offers[mine.card];
               return (
                 <g key={s.id} onClick={() => pickCard(mine.card)} style={{ cursor: 'pointer' }}>
-                  <circle cx={s.x} cy={s.y - 20} r={34} fill={ENAMEL[SORT[k]]} stroke="#fff6dc" strokeWidth={6} />
+                  <circle cx={s.x} cy={s.y - 20} r={36} fill={ENAMEL[SORT[k]]} stroke="#fff6dc" strokeWidth={7} />
                   <path d={ICON[k]} transform={`translate(${s.x - 21},${s.y - 41}) scale(1.75)`} fill="none" stroke={INK} strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" />
                 </g>
               );
             }
             return (
               <g key={s.id} onClick={() => ok && pickSocket(s.id)} style={{ cursor: ok ? 'pointer' : 'default' }}>
-                <circle cx={s.x} cy={s.y - 20} r={44} fill={ok ? 'rgba(233,196,106,.22)' : 'transparent'} />
-                <circle cx={s.x} cy={s.y - 20} r={26} fill="none" stroke={ok ? BRASS_L : '#7a6a50'} strokeWidth={ok ? 7 : 4} strokeDasharray="10 8" opacity={sel === null || ok ? 1 : 0.35} />
+                <circle cx={s.x} cy={s.y - 20} r={50} fill={ok ? 'rgba(233,196,106,.25)' : 'transparent'} />
+                <circle cx={s.x} cy={s.y - 20} r={28} fill="none" stroke={ok ? BRASS_L : '#7a6a50'} strokeWidth={ok ? 8 : 5} strokeDasharray="10 8" opacity={sel === null || ok ? 1 : 0.35} />
               </g>
             );
           })}
@@ -1009,37 +1405,36 @@ function toggleText(t: (k: string, v?: Record<string, string | number>) => strin
 
 function PhoneRace({ view, t, send, me }: ControllerViewProps) {
   const now = useServerNow(200);
-  const color = view.color ?? me.color;
+  const design = view.design as Design;
+  const color = mainColor(design);
   if (view.geo) PHONE_GEO.geo = view.geo;
   const geo = (view.geo ?? PHONE_GEO.geo) as Geo | null;
   const toggles = view.toggles as { id: number; kind: string; on: boolean; row: number; readyAt: number; x: number; y: number; forward: boolean }[];
-  const scale = geo ? 360 / geo.H : 0;
+  const scale = geo ? 340 / geo.W : 0;
   return (
     <Phone color={color}>
-      <TopBar me={me} color={color} title={t('phone.race')} />
-      <div style={{ display: 'flex', gap: 12 }}>
-        {geo && (
-          <div style={{ borderRadius: 12, overflow: 'hidden', border: `2px solid ${LINE}`, flex: 'none' }}>
-            <PlanSvg geo={geo} scale={scale}>
-              {(view.others as [number, number][]).map(([x, y], i) => <circle key={`o${i}`} cx={x} cy={y} r={16} fill="#8a7a66" />)}
-              {toggles.map((tg, i) => (
-                <g key={`t${tg.id}`}><circle cx={tg.x} cy={tg.y - 20} r={44} fill="#e8b923" stroke={INK} strokeWidth={5} /><text x={tg.x} y={tg.y - 2} fontSize={52} fontWeight={700} textAnchor="middle" fill={INK} fontFamily={FONT}>{String.fromCharCode(65 + i)}</text></g>
-              ))}
-              {(view.mine as [number, number, number][]).map(([x, y, d], i) => (
-                <g key={`m${i}`}>
-                  <circle cx={x} cy={y} r={46} fill={color} opacity={0.35} />
-                  <circle cx={x} cy={y} r={26} fill={color} stroke="#fff6dc" strokeWidth={6} opacity={d ? 0.6 : 1} />
-                </g>
-              ))}
-            </PlanSvg>
-          </div>
-        )}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, flex: 1, minWidth: 0 }}>
-          <div style={{ display: 'flex', flexDirection: 'column' }}><span style={{ fontSize: 13, color: DIM }}>{t('phone.best')}</span><span style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: 32 }}>{view.place > 0 ? t('phone.placeN', { n: view.place }) : '–'}</span></div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}><span style={{ fontSize: 13, color: DIM }}>{t('phone.inGoal')}</span><span style={{ fontSize: 22, fontWeight: 700 }}>{t('phone.ofN', { n: view.done, of: view.of })}</span></div>
-          <span style={{ fontSize: 13, color: MUTED, lineHeight: 1.3 }}>{toggles.length ? t('phone.mapHint') : t('phone.noToggles')}</span>
+      <TopBar me={me} design={design} title={t('phone.race')} />
+      {geo && (
+        <div style={{ borderRadius: 12, overflow: 'hidden', border: `2px solid ${LINE}`, alignSelf: 'center' }}>
+          <PlanSvg geo={geo} scale={scale}>
+            {(view.others as [number, number][]).map(([x, y], i) => <circle key={`o${i}`} cx={x} cy={y} r={18} fill="#8a7a66" />)}
+            {toggles.map((tg, i) => (
+              <g key={`t${tg.id}`}><circle cx={tg.x} cy={tg.y - 20} r={50} fill="#e8b923" stroke={INK} strokeWidth={6} /><text x={tg.x} y={tg.y + 1} fontSize={60} fontWeight={700} textAnchor="middle" fill={INK} fontFamily={FONT}>{String.fromCharCode(65 + i)}</text></g>
+            ))}
+            {(view.mine as [number, number, number][]).map(([x, y, d], i) => (
+              <g key={`m${i}`}>
+                <circle cx={x} cy={y} r={56} fill={color} opacity={0.35} />
+                <circle cx={x} cy={y} r={30} fill={color} stroke="#fff6dc" strokeWidth={7} opacity={d ? 0.6 : 1} />
+              </g>
+            ))}
+          </PlanSvg>
         </div>
+      )}
+      <div style={{ display: 'flex', gap: 16 }}>
+        <div style={{ display: 'flex', flexDirection: 'column' }}><span style={{ fontSize: 13, color: DIM }}>{t('phone.best')}</span><span style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: 30 }}>{view.place > 0 ? t('phone.placeN', { n: view.place }) : '–'}</span></div>
+        <div style={{ display: 'flex', flexDirection: 'column' }}><span style={{ fontSize: 13, color: DIM }}>{t('phone.inGoal')}</span><span style={{ fontSize: 22, fontWeight: 700 }}>{t('phone.ofN', { n: view.done, of: view.of })}</span></div>
       </div>
+      <span style={{ fontSize: 13, color: MUTED, lineHeight: 1.3 }}>{toggles.length ? t('phone.mapHint') : t('phone.noToggles')}</span>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         {toggles.map((tg, i) => {
           const cooling = tg.readyAt > now;
