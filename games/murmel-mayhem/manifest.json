@@ -1,0 +1,29 @@
+{
+  "id": "murmel-mayhem",
+  "name": { "de": "Murmel-Mayhem", "en": "Marble Mayhem" },
+  "description": {
+    "de": "Eine riesige Murmelbahn aus Messing und Glas: Jede Farbe schickt mehrere Murmeln ins Rennen. Vorher baut ihr heimlich Turbos, Fallen und Weichen ein – und legt im Rennen eure Weichen live um. Die Bahn verändert sich jede Runde.",
+    "en": "A giant brass-and-glass marble run: every colour sends several marbles into the race. Secretly build in boosters, traps and switches beforehand – then flip your switches live during the race. The track changes every round."
+  },
+  "minPlayers": 2,
+  "maxPlayers": 12,
+  "audience": false,
+  "minutes": 13,
+  "color": "#E9C46A",
+  "tags": ["quick"],
+  "sdkVersion": 1,
+  "version": "0.1.0",
+  "author": "UP!",
+  "options": [
+    {
+      "id": "rounds",
+      "label": { "de": "Runden", "en": "Rounds" },
+      "default": 5,
+      "choices": [
+        { "value": 3, "label": { "de": "3", "en": "3" } },
+        { "value": 5, "label": { "de": "5", "en": "5" } },
+        { "value": 8, "label": { "de": "8", "en": "8" } }
+      ]
+    }
+  ]
+}

@@ -2,6 +2,15 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.27.0
+
+- Neues Spiel: Murmel-Mayhem – ein riesiges Murmelrennen aus Messing und Glas für 2–12 Spieler (ca. 13 Minuten). Jede Farbe schickt mehrere Murmeln ins Rennen, die Bahn ist dreimal so hoch wie der Fernseher und die Kamera fährt mit
+- Vor jedem Rennen baut ihr heimlich auf dem Handy: grüne Hilfen für die eigene Farbe, rote Fallen gegen alle anderen, gelbe Weichen – und blaue Ereignisse wie Erdbeben oder Farbtausch. Wollen zwei denselben Platz, bekommt ihn, wer weiter hinten liegt
+- Im Rennen legt ihr eure Weichen live auf dem Handy um: Abkürzungen öffnen, Kanonen scharf schalten, andere auf den verstaubten Nebenweg schicken
+- Überholen ist eingebaut: zwei Spuren in jeder Rinne, an jeder Wende ein Trichter, Nagelfeld, Wippe, eine Fliehkurve oder Sprungschanze. Jede neue Bahn wird vorher von Testmurmeln geprüft, damit das Ziel nicht einfach die Startreihenfolge ist
+- Die Bahn verändert sich jede Runde ein Stück: neue Bauplätze, getauschte Mischstellen, Dellen und polierte Reihen
+- Erste spielbare Version – die Zahlen werden nach euren Testrunden angepasst
+
 ## 0.26.0
 
 - Neues Spiel: Sternenpakt – Weltraum-Strategie im Zeitraffer für 1–12 Spieler (ca. 17 Minuten). Erobert Sterne, baut Wirtschaft, Industrie und Wissenschaft aus, forscht und schließt Pakte – das Spiel kennt keine Bündnisse, Verrat ist erlaubt
