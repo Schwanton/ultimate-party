@@ -1,43 +1,41 @@
 /**
- * Murmel-Mayhem – Murmelbahn mit Fallen, Hilfen und Weichen.
+ * Murmel-Mayhem – Murmelbahn mit echter 2D-Physik, Fallen, Hilfen und Klappen.
  *
- * Ablauf pro Runde: Bauen (geheim, 40 s) → Enthüllen → Rennen (Server-Physik 30×/s, Positionen per ctx.stream)
- * → Auswertung → Umbau der Bahn. Regeln und Zahlen: Konzept-Dokument „Murmel-Mayhem – Konzept“.
+ * Ablauf pro Runde: Bauen (geheim, 40 s) → Enthüllen → Rennen (Server-Physik, 30 Bilder/s per ctx.stream)
+ * → Auswertung → Umbau der Bahn. Regeln und Zahlen: Konzept-Dokument „Murmel-Mayhem – Konzept“
+ * und Projektstand, Reiter „Bau-Entscheidungen“.
  */
 
 import { INPUT_GRACE, Scores, shuffle, type GameContext, type GameServerModule } from '@up/sdk';
 import {
-  Race, SORT, SWITCH_ONLY, TICK, TOGGLE, TOGGLE_START, addSocket, generateGoodTrack, itemExit, posOn,
+  NOT_LAST, Race, SORT, TICK, TOGGLE, addSocket, generateGoodTrack, makeTube, newItem, railY, swapEnd, tubeForward,
   type CardKind, type Item, type ItemKind, type RaceEvent, type Socket, type Track,
 } from './engine';
 
-const T = { intro: 16, build: 40, reveal: 2.2, revealPer: 0.45, result: 9, umbau: 5, finalWait: 1, raceMin: 80, afterFirst: 30, raceMax: 110 };
+const T = { intro: 16, build: 40, reveal: 2.2, revealPer: 0.45, result: 9, umbau: 5, raceMin: 70, afterFirst: 25, raceMax: 110 };
 const POINTS = { perPlace: 10, first: 100, trap: 20, trapMax: 100 };
-const ITEMS: ItemKind[] = ['turbo', 'feder', 'magnet', 'schild', 'kleber', 'schranke', 'gegenfeder', 'falltuer', 'wind', 'bremse', 'farbweiche', 'bruecke', 'umleitung', 'wurmloch', 'kanone'];
+const ITEMS: ItemKind[] = ['turbo', 'feder', 'magnet', 'schild', 'kleber', 'schranke', 'gegenfeder', 'falltuer', 'wind', 'bremse', 'farbweiche', 'umleitung', 'wurmloch', 'kanone'];
 const EVENTS: CardKind[] = ['beben', 'oel', 'riese', 'tausch'];
 const STRONG: CardKind[] = ['turbo', 'kanone', 'schranke', 'farbweiche', 'magnet', 'falltuer'];
+const r1 = (n: number) => Math.round(n);
 
 /** Bahn für Ansichten (TV vollständig, Handy vereinfacht) */
 function geo(track: Track, phone = false) {
-  const thin = (pts: [number, number][]) => (phone && pts.length > 6 ? pts.filter((_, i) => i % 3 === 0 || i === pts.length - 1) : pts);
   return {
     H: track.H,
-    segs: track.segs.map((s) => ({ id: s.id, role: s.role, layer: s.layer, row: s.row, pts: thin(s.pts).map(([x, y]) => [Math.round(x), Math.round(y)]) })),
-    mixers: track.mixers.map((m) => ({ kind: m.kind, x: Math.round(m.x), y: Math.round(m.y), side: m.side, turn: m.turn })),
-    turns: track.turns,
-    sockets: track.sockets.map((s) => ({ id: s.id, x: s.x, y: s.y, kind: s.kind, row: s.row, dust: s.kind === 'switch' && !!track.branches[s.branch!]?.dust })),
-    panels: phone ? [] : track.panels,
-    branches: track.branches.map((b) => ({ id: b.id, base: b.base, dust: b.dust })),
-    marks: track.marks.map((m) => {
-      const s = track.segs[m.seg];
-      const p = posOn(s, s.len * 0.5);
-      return { kind: m.kind, x: Math.round(p.x), y: Math.round(p.y) };
-    }),
-    conveyor: track.conveyor,
+    rows: track.rows.map((r) => ({ i: r.i, y0: r.y0, dir: r.dir, xa: r.xa, xb: r.xb, step: r.step, end: r.end, wear: r.wear })),
+    segs: track.segs.filter((s) => !phone || s.kind === 'rail' || s.kind === 'glass').map((s) => ({ ax: r1(s.ax), ay: r1(s.ay), bx: r1(s.bx), by: r1(s.by), kind: s.kind })),
+    pins: phone ? [] : track.pins.map((p) => [r1(p.x), r1(p.y)]),
+    wippes: track.wippes,
+    sockets: track.sockets.map((s) => ({ id: s.id, x: s.x, y: s.y, row: s.row })),
+    finish: track.finish,
+    labels: phone ? [] : track.labels,
+    marks: track.marks,
   };
 }
 
 interface Placement { card: number; socket: number }
+type Fresh = { id: number; kind: CardKind; owner: string; x: number; y: number; moved: boolean };
 
 export default {
   create(ctx: GameContext) {
@@ -48,8 +46,8 @@ export default {
     const total = Number(ctx.options.rounds) || 5;
     const perPlayer = N <= 4 ? 6 : N <= 8 ? 4 : 3;
     const colors = ids.map((id) => ctx.player(id)?.color ?? '#FFFFFF');
-    const { track, check } = generateGoodTrack(8, 10);
-    ctx.log('Murmel-Mayhem Bahn', track.turns.join(','), 'Ähnlichkeit', check.rho.toFixed(2), 'Überholungen', Math.round(check.overtakes), 'Zeit', check.time.toFixed(0));
+    const { track, check } = generateGoodTrack(4, 5);
+    ctx.log('Murmel-Mayhem Bahn', track.rows.map((r) => r.end).join(','), 'Ähnlichkeit', check.rho.toFixed(2), 'Überholungen', Math.round(check.overtakes), 'Zeit', check.time.toFixed(0));
     let trackV = 1;
     let round = 0;
     let phase: 'intro' | 'build' | 'reveal' | 'race' | 'result' | 'umbau' | 'final' = 'intro';
@@ -62,24 +60,19 @@ export default {
     let race: Race | null = null;
     let loop = 0;
     let raceEvents: RaceEvent[] = [];
-    let marbleOwner: number[] = [];
     let raceStart = scores.snapshot();
     let lastUmbau: { key: string; x: number; y: number; vars?: Record<string, string | number> } | null = null;
-    let lastRace: { points: Record<string, number>; finished: Record<string, number>; firstPid: string | null; traps: Record<string, number> } | null = null;
 
     const lastRound = () => round === total;
     const maxPlace = () => (lastRound() ? 3 : 2);
     const occupied = () => new Set(items.map((it) => it.socket));
     const publicItems = () => items.map((it) => {
       const so = track.sockets[it.socket];
-      return { id: it.id, kind: it.kind, owner: ids[it.owner], x: so.x, y: so.y, age: it.age, on: it.on, toggle: TOGGLE.includes(it.kind), exit: it.exit ? (() => { const p = posOn(track.segs[it.exit!.seg], it.exit!.s); return [Math.round(p.x), Math.round(p.y)]; })() : null };
+      return { id: it.id, kind: it.kind, owner: ids[it.owner], x: so.x, y: so.y, row: so.row, dir: track.rows[so.row].dir, age: it.age, on: it.on, toggle: TOGGLE.includes(it.kind), tube: it.tube ?? null, forward: it.tube ? tubeForward(track, it) : true };
     });
-    const isDust = (so: Socket) => so.kind === 'switch' && !!track.branches[so.branch!]?.dust;
     const fits = (kind: CardKind, so: Socket) => {
       if (SORT[kind] === 'ereignis') return false;
-      if (SWITCH_ONLY.includes(kind)) return so.kind === 'switch' && !(kind === 'bruecke' && isDust(so));
-      if (so.kind !== 'rail') return false;
-      if (kind === 'kanone' && so.row >= 11) return false;
+      if (NOT_LAST.includes(kind) && so.row >= track.rows.length - 1) return false;
       return true;
     };
 
@@ -88,9 +81,7 @@ export default {
       offers = new Map();
       const rank = scores.ranking();
       const behind = new Set(rank.slice(Math.ceil(rank.length / 2)).map((r) => r.playerId));
-      const freeSwitch = track.sockets.filter((s) => s.kind === 'switch' && !occupied().has(s.id)).length;
       for (const id of ids) {
-        const pool: CardKind[] = ITEMS.filter((k) => !SWITCH_ONLY.includes(k) || freeSwitch > 0);
         const weight = (k: CardKind) => (behind.has(id) && round > 1 && STRONG.includes(k) ? 1.7 : 1);
         const draw = (from: CardKind[]) => {
           const sum = from.reduce((a, k) => a + weight(k), 0);
@@ -100,11 +91,11 @@ export default {
         };
         const hand: CardKind[] = [];
         while (hand.length < 3) {
-          const k = Math.random() < 1 / 6 ? EVENTS[Math.floor(Math.random() * EVENTS.length)] : draw(pool);
-          if (hand.filter((h) => h === k).length >= 1 && Math.random() < 0.7) continue;
+          const k = Math.random() < 1 / 6 ? EVENTS[Math.floor(Math.random() * EVENTS.length)] : draw(ITEMS);
+          if (hand.includes(k) && Math.random() < 0.7) continue;
           hand.push(k);
         }
-        if (!hand.some((k) => SORT[k] === 'weiche')) hand[Math.floor(Math.random() * 3)] = draw(pool.filter((k) => SORT[k] === 'weiche'));
+        if (!hand.some((k) => SORT[k] === 'weiche')) hand[Math.floor(Math.random() * 3)] = draw(ITEMS.filter((k) => SORT[k] === 'weiche'));
         offers.set(id, hand);
       }
     }
@@ -133,14 +124,12 @@ export default {
     }
 
     function playerBuild(id: string) {
-      const occ = occupied();
-      const mine = placed.get(id) ?? [];
       ctx.setPlayerView(id, {
         screen: 'build', round, total, max: maxPlace(), color: colors[idx.get(id)!],
         deadline: buildTimer!.deadline, duration: buildTimer!.duration,
-        offers: offers.get(id) ?? [], placed: mine, ready: ready.has(id),
-        geo: geo(track, true), trackV,
-        taken: [...occ],
+        offers: offers.get(id) ?? [], placed: placed.get(id) ?? [], ready: ready.has(id),
+        geo: geo(track, true), trackV, lastRow: track.rows.length - 1,
+        taken: [...occupied()],
         items: publicItems().map((it) => ({ id: it.id, kind: it.kind, x: it.x, y: it.y, mine: it.owner === id, age: it.age })),
       });
     }
@@ -186,7 +175,6 @@ export default {
       if (phase !== 'build') return;
       phase = 'reveal';
       buildTimer?.cancel();
-      // Wer nichts gesetzt hat: Teile kommen auf zufällige freie Plätze
       for (const id of ids) {
         const mine = placed.get(id)!;
         const hand = offers.get(id)!;
@@ -200,11 +188,10 @@ export default {
       }
       const order = shuffle(ids).sort((a, b) => scores.get(a) - scores.get(b));
       const claimed = occupied();
-      const fresh: { id: number; kind: CardKind; owner: string; x: number; y: number; moved: boolean }[] = [];
+      const fresh: Fresh[] = [];
       raceEvents = [];
       const wants: { pid: string; kind: CardKind; socket: number }[] = [];
       for (const pid of order) for (const p of placed.get(pid)!) wants.push({ pid, kind: offers.get(pid)![p.card], socket: p.socket });
-      // erst alle Wunschplätze nach Reihenfolge, dann ausweichen
       const later: typeof wants = [];
       for (const w of wants) {
         if (SORT[w.kind] === 'ereignis') {
@@ -218,10 +205,9 @@ export default {
       }
       for (const w of later) {
         const want = track.sockets[w.socket];
-        const wantR = track.segs[want.seg].r0 + want.s;
         const alt = track.sockets
           .filter((s) => !claimed.has(s.id) && fits(w.kind, s))
-          .sort((a, b) => Math.abs(track.segs[a.seg].r0 + a.s - wantR) - Math.abs(track.segs[b.seg].r0 + b.s - wantR))[0];
+          .sort((a, b) => Math.abs(a.row - want.row) * 2000 + Math.abs(a.x - want.x) - (Math.abs(b.row - want.row) * 2000 + Math.abs(b.x - want.x)))[0];
         if (!alt) continue;
         claimed.add(alt.id);
         addItem(w.pid, w.kind as ItemKind, alt.id, true, fresh);
@@ -232,11 +218,10 @@ export default {
       ctx.after(dur, startRace);
     }
 
-    function addItem(pid: string, kind: ItemKind, socket: number, moved: boolean, fresh: { id: number; kind: CardKind; owner: string; x: number; y: number; moved: boolean }[]) {
+    function addItem(pid: string, kind: ItemKind, socket: number, moved: boolean, fresh: Fresh[]) {
       const so = track.sockets[socket];
-      // Auf dem verstaubten Nebenweg starten Weichen auf „Hauptweg“ – umlegen ist dann eine bewusste Gemeinheit
-      const on = isDust(so) && (kind === 'umleitung' || kind === 'farbweiche') ? false : TOGGLE_START[kind] ?? true;
-      const it: Item = { id: nextItemId++, kind, owner: idx.get(pid)!, socket, age: 0, on, cool: 0, cnt: 0, exit: itemExit(track, kind, so), closedUntil: 0, openFrom: 0, trig: 0 };
+      const it = newItem(nextItemId++, kind, idx.get(pid)!, socket);
+      if (kind === 'wurmloch') it.tube = makeTube(track, so);
       items.push(it);
       fresh.push({ id: it.id, kind, owner: pid, x: so.x, y: so.y, moved });
     }
@@ -244,17 +229,15 @@ export default {
     /* ---------- Rennen ---------- */
     function startRace() {
       phase = 'race';
-      // Wer in der Wertung hinten liegt, startet eher früh
       const rank = new Map(scores.ranking().map((r, k) => [r.playerId, k]));
       const list: { owner: number; key: number }[] = [];
       for (const id of ids) for (let k = 0; k < perPlayer; k++) list.push({ owner: idx.get(id)!, key: Math.random() - (round > 1 ? ((rank.get(id) ?? 0) / Math.max(1, N - 1)) * 0.35 : 0) });
       list.sort((a, b) => a.key - b.key);
-      marbleOwner = list.map((l) => l.owner);
-      for (const it of items) { it.trig = 0; it.cnt = 0; it.cool = 0; it.closedUntil = 0; it.openFrom = 0; }
-      race = new Race(track, marbleOwner, items, raceEvents);
+      const owners = list.map((l) => l.owner);
+      for (const it of items) Object.assign(it, { trig: 0, used: 0, cool: 0, closedUntil: 0, readyAt: 0, gustUntil: 0, kickAt: -9, hit: new Set<number>() });
+      race = new Race(track, owners, items, raceEvents);
       raceStart = scores.snapshot();
-      const startedAt = Date.now();
-      ctx.setHostView({ screen: 'race', players: ids, round, total, geo: geo(track), trackV, items: publicItems(), owners: marbleOwner.map((o) => ids[o]), colors: marbleOwner.map((o) => colors[o]), startedAt, events: raceEvents.map((e) => ({ kind: e.kind, owner: ids[e.owner] })) });
+      ctx.setHostView({ screen: 'race', players: ids, round, total, geo: geo(track), trackV, items: publicItems(), n: owners.length, startedAt: Date.now() });
       phoneRace();
       const my = ++loop;
       let k = 0;
@@ -269,7 +252,7 @@ export default {
         if (k % 10 === 0) phoneRace();
         const t = race.t;
         const end = race.done || t >= T.raceMax || (t >= T.raceMin && firstAt >= 0 && t >= firstAt + T.afterFirst);
-        if (end) return ctx.after(race.done ? 1.2 : 0.4, endRace);
+        if (end) return ctx.after(race.done ? 1.5 : 0.4, endRace);
         ctx.after(TICK, tick);
       };
       ctx.after(TICK, tick);
@@ -277,18 +260,18 @@ export default {
 
     function streamFrame() {
       const r = race!;
-      const order = r.order();
       ctx.stream({
         round, t: Math.round(r.t * 10) / 10,
         m: r.frame(),
-        o: order,
-        p: r.marbles.map((m) => Math.round(r.progress(m.i) * 1000)),
+        o: r.order(),
+        p: r.marbles.map((m) => Math.round(r.share(m.i) * 1000)),
         ow: r.marbles.map((m) => m.owner),
-        it: items.map((it) => [it.id, (it.on ? 1 : 0) | (r.t < it.closedUntil ? 2 : 0) | (r.spent(it) ? 4 : 0)]),
+        it: items.map((it) => [it.id, (it.on ? 1 : 0) | (r.t < it.closedUntil ? 2 : 0) | (r.t < it.gustUntil ? 4 : 0) | (r.t - it.kickAt < 0.3 ? 8 : 0), r.left(it)]),
+        w: r.wippe.map((w) => Math.round(w.a * 100)),
         fx: r.fx,
         g: r.giantPos(),
         q: r.t < r.quakeUntil ? 1 : 0,
-        oil: r.oil && r.t < r.oil.until ? r.oil.seg : -1,
+        oil: r.oil && r.t < r.oil.until ? r.oil.row : -1,
       });
       r.fx = [];
     }
@@ -301,42 +284,40 @@ export default {
         const o = idx.get(id)!;
         const mine = r.marbles.filter((m) => m.owner === o);
         const best = order.findIndex((i) => r.marbles[i].owner === o);
-        const bestColor = best < 0 ? -1 : order.slice(0, best + 1).reduce((acc, i) => acc.add(r.marbles[i].owner), new Set<number>()).size;
+        const place = best < 0 ? -1 : order.slice(0, best + 1).reduce((acc, i) => acc.add(r.marbles[i].owner), new Set<number>()).size;
         ctx.setPlayerView(id, {
           screen: 'race', round, total, color: colors[o], geo: geo(track, true), trackV,
-          mine: mine.map((m) => [Math.round(m.x), Math.round(m.y), m.state === 'done' ? 1 : 0]),
-          others: r.marbles.filter((m) => m.owner !== o && m.state !== 'wait').map((m) => [Math.round(m.x), Math.round(m.y)]),
-          done: mine.filter((m) => m.state === 'done').length, of: mine.length,
-          place: bestColor,
+          mine: mine.map((m) => [Math.round(m.x), Math.round(m.on ? m.y : -60), m.place ? 1 : 0]),
+          others: r.marbles.filter((m) => m.owner !== o && m.on).map((m) => [Math.round(m.x), Math.round(m.y)]),
+          done: mine.filter((m) => m.place).length, of: mine.length,
+          place,
           toggles: items.filter((it) => it.owner === o && TOGGLE.includes(it.kind)).map((it) => {
             const so = track.sockets[it.socket];
-            return { id: it.id, kind: it.kind, on: it.on, row: so.row + 1, readyAt: it.cool > r.t ? now + (it.cool - r.t) * 1000 : 0, x: so.x, y: so.y, dust: so.kind === 'switch' && track.branches[so.branch!]?.dust };
+            return { id: it.id, kind: it.kind, on: it.on, row: so.row + 1, readyAt: it.cool > r.t ? now + (it.cool - r.t) * 1000 : 0, x: so.x, y: so.y, forward: it.tube ? tubeForward(track, it) : true };
           }),
         });
       }
     }
 
-    /** Testspieler legen ihre Weichen so, dass es eigenen Murmeln hilft */
+    /** Testspieler legen ihre Klappen so, dass es eigenen Murmeln hilft */
     function botToggles() {
       const r = race!;
       for (const it of items) {
         if (!TOGGLE.includes(it.kind) || !ctx.player(ids[it.owner])?.isBot || r.t < it.cool) continue;
         const so = track.sockets[it.socket];
+        const dir = track.rows[so.row].dir;
         let near: { own: boolean; d: number } | null = null;
         for (const m of r.marbles) {
-          if (m.state !== 'rail' || m.seg !== so.seg || m.s > so.s || so.s - m.s > 320) continue;
-          const d = so.s - m.s;
+          if (!m.on || m.place || Math.abs(m.y - (railY(track.rows[so.row], m.x) - 13)) > 30) continue;
+          const d = (so.x - m.x) * dir;
+          if (d < 0 || d > 320) continue;
           if (!near || d < near.d) near = { own: m.owner === it.owner, d };
         }
         if (!near) continue;
-        const dust = so.kind === 'switch' && track.branches[so.branch!]?.dust;
-        const back = it.kind === 'wurmloch' && it.exit && track.segs[it.exit.seg].row < so.row;
         let want = it.on;
-        if (it.kind === 'umleitung') want = dust ? !near.own : near.own;
-        else if (it.kind === 'kanone') want = near.own;
-        else if (it.kind === 'wurmloch') want = back ? !near.own : near.own;
-        else if (it.kind === 'farbweiche') want = !dust;
-        else if (it.kind === 'bruecke') want = true;
+        if (it.kind === 'umleitung' || it.kind === 'kanone') want = near.own;
+        else if (it.kind === 'wurmloch') want = tubeForward(track, it) ? near.own : !near.own;
+        else if (it.kind === 'farbweiche') want = true;
         if (want !== it.on) r.toggle(it.id, it.owner);
       }
     }
@@ -362,64 +343,45 @@ export default {
       for (const it of items) traps[ids[it.owner]] += it.trig;
       for (const id of ids) points[id] += Math.min(POINTS.trapMax, traps[id] * POINTS.trap) * mult;
       for (const id of ids) scores.add(id, points[id]);
-      lastRace = { points, finished, firstPid, traps };
-      // Abnutzung zählen, Teile altern
       for (const it of items) it.age++;
       items = items.filter((it) => it.age <= 1);
-      const usage = r.segUse;
+      const rowTime = r.rowTime;
       ctx.setHostView({ screen: 'result', round, total, last: lastRound(), points, finished, traps, firstPid, before: raceStart, after: scores.snapshot(), perPlayer, mult });
       const rank = scores.ranking();
       ctx.setAllPlayerViews((p) => ({ screen: 'result', color: p.color, points: points[p.id] ?? 0, finished: finished[p.id] ?? 0, of: perPlayer, traps: traps[p.id] ?? 0, score: scores.get(p.id), place: rank.findIndex((x) => x.playerId === p.id) + 1, players: N }));
       race = null;
       if (lastRound()) return ctx.after(T.result, final);
-      ctx.after(T.result, () => umbau(usage));
+      ctx.after(T.result, () => umbau(rowTime));
     }
 
     /** Die Bahn ändert sich ein kleines Stück */
-    function umbau(usage: number[]) {
+    function umbau(rowTime: number[]) {
       phase = 'umbau';
-      const rows = track.segs.filter((s) => s.role === 'row');
       lastUmbau = null;
-      // Abnutzung jede 2. Runde: meistbenutzter Weg wird langsamer, am wenigsten benutzter schneller
+      // Abnutzung jede 2. Runde: Reihe mit der meisten Rollzeit bekommt eine Delle, die mit der wenigsten wird poliert
       let wear: { worn: number; polished: number } | null = null;
       if (round % 2 === 0) {
-        const sorted = rows.slice(1).sort((a, b) => usage[b.id] - usage[a.id]);
-        const worn = sorted.find((s) => !track.marks.some((m) => m.seg === s.id));
-        const polished = sorted.reverse().find((s) => !track.marks.some((m) => m.seg === s.id) && s !== worn);
-        if (worn && polished) {
-          worn.wear = 1.22;
-          polished.wear = 0.82;
-          track.marks.push({ seg: worn.id, kind: 'delle' }, { seg: polished.id, kind: 'poliert' });
-          wear = { worn: worn.row + 1, polished: polished.row + 1 };
+        const free = track.rows.filter((row) => row.i > 0 && !track.marks.some((m) => m.row === row.i));
+        const sorted = free.sort((a, b) => rowTime[b.i] - rowTime[a.i]);
+        const worn = sorted[0], polished = sorted[sorted.length - 1];
+        if (worn && polished && worn !== polished) {
+          worn.wear = 4;
+          polished.wear = 0;
+          track.marks.push({ row: worn.i, kind: 'delle' }, { row: polished.i, kind: 'poliert' });
+          wear = { worn: worn.i + 1, polished: polished.i + 1 };
         }
       }
-      const options: (() => void)[] = [];
-      const dust = track.branches.find((b) => b.dust);
-      if (dust && dust.base === 0) options.push(() => {
-        dust.base = 0.25;
-        const so = track.sockets.find((s) => s.branch === dust.id)!;
-        lastUmbau = { key: 'umbau.dust', x: so.x, y: so.y };
-      });
-      const holdTurns = track.mixers.filter((m) => m.kind === 'trichter' || m.kind === 'nagel' || m.kind === 'wippe');
-      if (holdTurns.length) options.push(() => {
-        const m = holdTurns[Math.floor(Math.random() * holdTurns.length)];
-        const kinds = (['trichter', 'nagel', 'wippe'] as const).filter((k) => k !== m.kind);
-        const from = m.kind;
-        m.kind = kinds[Math.floor(Math.random() * kinds.length)];
-        track.turns[m.turn] = m.kind;
-        lastUmbau = { key: 'umbau.swap', x: Math.round(m.x), y: Math.round(m.y), vars: { from, to: m.kind } };
-      });
-      options.push(() => {
-        const so = addSocket(track);
-        if (so) lastUmbau = { key: 'umbau.socket', x: so.x, y: so.y };
-      });
-      const shortB = track.branches.filter((b) => !b.dust && b.base < 0.3);
-      if (shortB.length) options.push(() => {
-        const b = shortB[Math.floor(Math.random() * shortB.length)];
-        b.base = 0.3;
-        const so = track.sockets.find((s) => s.branch === b.id)!;
-        lastUmbau = { key: 'umbau.branch', x: so.x, y: so.y };
-      });
+      const options: (() => void)[] = [
+        () => {
+          const ch = swapEnd(track);
+          const r = track.rows[ch.row];
+          lastUmbau = { key: ch.from === 'offen' ? 'umbau.added' : ch.to === 'offen' ? 'umbau.removed' : 'umbau.swap', x: r.dir > 0 ? 1090 : 110, y: Math.round(railY(r, r.xb)) + 40, vars: { from: ch.from, to: ch.to, row: ch.row + 1 } };
+        },
+        () => {
+          const so = addSocket(track);
+          if (so) lastUmbau = { key: 'umbau.socket', x: so.x, y: so.y };
+        },
+      ];
       options[Math.floor(Math.random() * options.length)]();
       if (!lastUmbau) lastUmbau = { key: 'umbau.none', x: 600, y: 400 };
       if (wear) lastUmbau.vars = { ...(lastUmbau.vars ?? {}), worn: wear.worn, polished: wear.polished };

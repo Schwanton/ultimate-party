@@ -2,6 +2,14 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.28.0
+
+- Murmel-Mayhem mit echter Physik: Die Murmeln rollen, springen, stoßen sich gegenseitig an und drehen sich sichtbar. Statt auf unsichtbaren Schienen zu fahren, rollen sie über Messingkanten
+- Reihenenden sind meist offen – die Murmeln prallen an den Rahmen und fallen auf die nächste Reihe. Dazu Trichter, Nagelfelder, kippende Wippen und Stufen mit Nägeln mitten in der Bahn
+- Alle Teile sind jetzt echte Mechanik mit Farbsensor davor: Schwungrad, Federklappe, Magnet, Glaskuppel, Honigfeld, Schlagbaum, Prallpilz, Falltür mit Korb und Aufzug, Ventilator, Bürstenteppich
+- Neu zum Umlegen im Rennen: Farbklappe und Abkürzungsklappe (Murmeln fallen eine Reihe runter), Rohrpost (Glasröhre in eine andere Reihe) und Katapult
+- Fallen wirken nur ein paar Mal pro Rennen, damit nichts dauerhaft verstopft. Die Riesenmurmel schiebt jetzt wirklich alles vor sich her
+
 ## 0.27.0
 
 - Neues Spiel: Murmel-Mayhem – ein riesiges Murmelrennen aus Messing und Glas für 2–12 Spieler (ca. 13 Minuten). Jede Farbe schickt mehrere Murmeln ins Rennen, die Bahn ist dreimal so hoch wie der Fernseher und die Kamera fährt mit
