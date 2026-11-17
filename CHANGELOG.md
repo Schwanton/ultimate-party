@@ -2,6 +2,16 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.32.0
+
+- Murmel-Mayhem: Die beiden Bahnhälften sind jetzt strikt getrennt – keine Murmel fliegt mehr von links nach rechts hinüber
+- Ruhigere Kamera im Rennen: kein ständiges Rein- und Rauszoomen mehr, sie folgt weich der Spitzengruppe
+- Die Kamerafahrt vor dem Rennen ist langsamer und gleitet sanft über die Bahn. Bei jedem Teil hält sie kurz an: Ein Schild zeigt Name, Erbauer und was es tut, und das Teil führt sich vor (Falltür klappt auf, Schlagbaum geht zu, Ventilator bläst …)
+- Punktetafel und Gesamtstand stehen jetzt zusammen auf einem Bildschirm im Murmel-Mayhem-Stil
+- Das Mühlrad ist raus
+- Wippen und Nagelfelder haben eine Glaswand dahinter, und die Schiene vor dem Nagelfeld ist kürzer – die Murmeln landen jetzt wirklich darauf statt drüberzufliegen
+- Glasspirale und Rohrpost mit echter Physik: Die Murmeln werden je nach Gefälle schneller oder langsamer und stoßen sich in der Röhre gegenseitig an
+
 ## 0.31.0
 
 - Figurendle: 120 One-Piece-Figuren statt 51 – alle Werte (Kopfgeld, Größe, Herkunft, Zugehörigkeit, Teufelsfrucht, Haki, erster Auftritt) stammen jetzt aus dem One-Piece-Wiki

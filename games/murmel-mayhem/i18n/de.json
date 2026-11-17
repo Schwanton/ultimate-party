@@ -4,7 +4,7 @@
   "lastRound": "letzte Runde, Punkte doppelt",
   "double": "Punkte doppelt",
   "lookAtTv": "Schau auf den Fernseher.",
-  "intro.text": "Jede Farbe schickt {n} Murmeln über eine riesige Bahn: Treppen, Schanzen, Mühlrad, Förderband, Looping und Glasspirale. Vor jedem Rennen baut ihr heimlich Teile ein.",
+  "intro.text": "Jede Farbe schickt {n} Murmeln über eine riesige Bahn: Treppen, Schanzen, Nagelfelder, Förderband, Looping und Glasspirale. Vor jedem Rennen baut ihr heimlich Teile ein.",
   "intro.r1": "Grüne Hilfen wirken nur für deine Farbe: Schwungrad, Federklappe, Magnet, Glaskuppel.",
   "intro.r2": "Rote Fallen treffen alle anderen Farben: Honig, Schlagbaum, Prallpilz, Falltür, Ventilator, Bürsten.",
   "intro.r3": "Gelbe Klappen, Rohrpost und Katapult legst du im Rennen live auf dem Handy um.",
@@ -150,7 +150,7 @@
   "pat.stern": "Stern",
   "pat.karo": "Karo",
   "flight.banner": "Runde {n} – einmal über die Bahn",
-  "flight.text": "Die Kamera fährt einmal über die ganze Bahn. Neue Teile leuchten in der Farbe ihrer Erbauer.",
+  "flight.text": "Die Kamera fährt einmal über die ganze Bahn. Jedes Teil zeigt, was es tut – neue leuchten in der Farbe ihrer Erbauer.",
   "phone.flight": "Kamerafahrt über die Bahn …",
   "race.loop": "LOOPING!",
   "race.placeN": "{n}. Platz",
@@ -174,5 +174,6 @@
   "track.gabel": "GABELUNG",
   "track.looping": "LOOPING",
   "track.spirale": "GLASSPIRALE",
-  "end.rad": "Mühlrad"
+  "end.rad": "Mühlrad",
+  "flight.new": "NEU"
 }

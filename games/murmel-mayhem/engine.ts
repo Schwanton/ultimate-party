@@ -4,7 +4,7 @@
  * Die Welt ist 2400 breit und hat zwei Hälften. Links geht es in Reihen hinunter, ein Förderband trägt
  * die Murmeln (der Reihe nach) ganz nach oben, rechts folgen lange Abfahrt, Gabelung mit Looping,
  * Glasspirale und die letzten Reihen bis ins Ziel. Bausteine mitten in Reihen: Treppe, Sprungschanze,
- * Nägel-Stufe. Bausteine an Reihenenden: offen, Trichter, Nagelfeld, Wippe, Mühlrad.
+ * Nägel-Stufe. Bausteine an Reihenenden: offen, Trichter, Nagelfeld, Wippe. Die beiden Hälften sind strikt getrennt.
  * Jede Partie würfelt, welche Reihe welchen Baustein bekommt. Weltkoordinaten: y nach unten.
  */
 
@@ -42,7 +42,7 @@ const CHARGES: Partial<Record<ItemKind, number>> = { kleber: 5, schranke: 3, geg
 
 /** Endbausteine (änderbar beim Umbau) und feste Enden */
 export type EndKind = 'offen' | 'trichter' | 'nagel' | 'wippe' | 'rad' | 'band' | 'gabel' | 'fall' | 'spirale' | 'ziel';
-export const SWAP_ENDS: EndKind[] = ['offen', 'trichter', 'nagel', 'wippe', 'rad'];
+export const SWAP_ENDS: EndKind[] = ['offen', 'trichter', 'nagel', 'wippe'];
 export type MidKind = 'treppe' | 'schanze' | 'stufe';
 const MID: Record<MidKind, { len: number; drop: number }> = { treppe: { len: 336, drop: 176 }, schanze: { len: 145, drop: 102 }, stufe: { len: 0, drop: 50 } };
 
@@ -147,15 +147,14 @@ export function generateTrack(rnd: () => number = Math.random): Track {
   mids.set(pick[1], 'schanze');
   mids.set(pick[2], 'stufe');
   if (rnd() < 0.5) mids.set(pick[3], rnd() < 0.5 ? 'stufe' : 'schanze');
-  // Enden: genau ein Mühlrad (links an L1/L3 oder rechts an R4), ein Trichter, ein Nagelfeld oder eine Wippe
-  const endRows = ['L0', 'L1', 'L2', 'L3', 'R4'];
-  const radRow = ['L1', 'L3', 'R4'][Math.floor(rnd() * 3)];
-  const ends = new Map<string, EndKind>([[radRow, 'rad']]);
-  const restRows = shuffle(endRows.filter((k) => k !== radRow), rnd);
+  // Enden: ein Trichter, ein Nagelfeld, eine Wippe, ein offenes Ende und eins zufällig
+  const restRows = shuffle(['L0', 'L1', 'L2', 'L3', 'R4'], rnd);
+  const ends = new Map<string, EndKind>();
   ends.set(restRows[0], 'trichter');
-  ends.set(restRows[1], rnd() < 0.5 ? 'nagel' : 'wippe');
-  ends.set(restRows[2], rnd() < 0.5 ? 'offen' : rnd() < 0.5 ? 'nagel' : 'wippe');
+  ends.set(restRows[1], 'nagel');
+  ends.set(restRows[2], 'wippe');
   ends.set(restRows[3], 'offen');
+  ends.set(restRows[4], SWAP_ENDS[Math.floor(rnd() * SWAP_ENDS.length)]);
 
   const rows: Row[] = [];
   const f = () => 0.38 + rnd() * 0.2;
@@ -285,12 +284,15 @@ export function buildStatics(track: Track) {
         seg(a[0], a[1], mx + d * 65, my + 24, 4, 0.25, 'rail', r.i);
         seg(mx + d * 65, my + 24, mx + d * 86, my + 17, 4, 0.25, 'rail', r.i);
         seg(mx + d * 40, my + 74, mx + d * 142, my + 90, 4, 0.25, 'rail', r.i);
+        seg(mx + d * 40, my + 74, mx + d * 40, my + 58, 3, 0.2, 'wall');
         seg(nx, ny, p[3][0], p[3][1], 4, 0.25, 'rail', r.i);
         label('schanze', mx + d * 90, my - 30);
       } else {
         // Nägel-Stufe: oben endet die Schiene, unten geht es versetzt weiter, dazwischen Nägel
         const x2 = mx - d * 26;
         seg(x2, my + 50 - 26 * SLOPE, p[3][0], p[3][1], 4, 0.25, 'rail', r.i);
+        // Anschlag am Anfang der unteren Schiene: niemand rollt rückwärts hinunter
+        seg(x2, my + 50 - 26 * SLOPE, x2, my + 12, 3, 0.2, 'wall');
         for (let x = mx + d * 4, k = 0; d > 0 ? x < mx + 140 : x > mx - 140; x += d * 32, k++) pins.push({ x, y: my + Math.abs(x - mx) * SLOPE + 16 + (k % 2 ? 4 : 0), r: 3.6 });
         label('stufe', mx + d * 70, my - 30);
       }
@@ -300,17 +302,26 @@ export function buildStatics(track: Track) {
     }
     // Endbaustein
     const [ex, ey] = p[p.length - 1];
+    // Glaswände oben rechts dürfen den Ausgang des Förderbands nicht versperren
+    const glassTop = r.col === 0 && d > 0 ? Math.max(ey - 60, 180) : ey - 60;
     if (r.end === 'trichter') {
       const cx = ex + d * 24;
       seg(cx - 70, ey + 8, cx - 15, ey + 66, 3, 0.2, 'glass');
       seg(cx + 70, ey + 8, cx + 15, ey + 66, 3, 0.2, 'glass');
       label('trichter', cx, ey - 30);
     } else if (r.end === 'nagel') {
-      const x0 = d > 0 ? ex - 66 : ex - 72;
-      for (let k = 0; k < 3; k++) for (let x = x0 + (k % 2 ? 0 : 15); x < x0 + 140; x += 30) pins.push({ x, y: ey + 20 + k * 25, r: 3.6 });
-      label('nagel', x0 + 70, ey - 30);
+      // Schiene endet früher, die Murmeln fallen mitten ins Nagelfeld; Glaswand dahinter fängt zu schnelle ab
+      const last = segs[segs.length - 1];
+      last.bx = ex - d * 110;
+      last.by = railY(r, last.bx);
+      const lo = Math.min(ex - d * 112, ex + d * 52), hi = Math.max(ex - d * 112, ex + d * 52);
+      for (let k = 0; k < 4; k++) for (let x = lo + (k % 2 ? 15 : 0); x <= hi; x += 30) pins.push({ x, y: ey + 12 + k * 24, r: 3.6 });
+      seg(ex + d * 86, glassTop, ex + d * 86, ey + 100, 3, 0.2, 'glass');
+      label('nagel', (lo + hi) / 2, ey - 40);
     } else if (r.end === 'wippe') {
+      // Glaswand hinter der Wippe: schnelle Murmeln prallen ab und fallen auf die Wippe
       wippes.push({ px: ex, py: ey + 64, half: 56, rest: d > 0 ? -0.3 : 0.3 });
+      seg(ex + d * 104, glassTop, ex + d * 104, ey + 20, 3, 0.2, 'glass');
       label('wippe', ex, ey - 30);
     } else if (r.end === 'rad') {
       // Mühlrad: Rinne zur Aufnahme, Fächer nehmen die Murmeln einzeln mit und setzen sie unten ab
@@ -337,7 +348,9 @@ export function buildStatics(track: Track) {
   const fin = track.finish;
   // Wände und Rahmen
   seg(1134, foot - 100, 1134, foot + 18, 4, 0.2, 'wall');
-  seg(WALL_X, 300, WALL_X, Math.max(foot + 40, 1290), 5, 0.3, 'wall');
+  // Trennwand zwischen den Hälften (bis knapp unter die lange Abfahrt) und Glasdach über dem Ende der ersten Reihe
+  seg(WALL_X, 180, WALL_X, track.H, 5, 0.3, 'wall');
+  seg(860, 100, 1186, 100, 3, 0.2, 'glass');
   seg(22, -300, 22, track.H, 6, 0.3, 'frame');
   seg(2378, -300, 2378, track.H, 6, 0.3, 'frame');
   // Start-Trichter
@@ -423,7 +436,7 @@ export interface Item {
   kickAt: number;
   /** Rohrpost: Weg der Glasröhre */
   tube?: Pt[];
-  tubeLen?: number;
+  tubeCum?: number[];
 }
 
 export interface RaceEvent { kind: EventKind; owner: number; at: number; done?: boolean; data?: number[] }
@@ -445,7 +458,7 @@ export function makeTube(track: Track, so: Socket, rnd: () => number = Math.rand
   for (let n = 0; n < 8 && r.busy.some(([a, b]) => tx > a - 40 && tx < b + 40); n++) tx = lo + rnd() * Math.max(10, hi - lo);
   const ty = railY(r, tx) - 30;
   const a: Pt = [so.x, so.y - 14];
-  const c1: Pt = [so.x, so.y - 140], c2: Pt = [tx, ty - 130];
+  const c1: Pt = [so.x, so.y - 90], c2: Pt = [tx, ty - 130];
   const out: Pt[] = [];
   for (let n = 0; n <= 28; n++) {
     const t = n / 28, u = 1 - t;
@@ -481,6 +494,23 @@ function routeS(route: Pt[], x: number, y: number): number {
 
 /* ---------- Rennen ---------- */
 
+/** Länge entlang eines Pfads */
+function cumOf(pts: Pt[]): number[] {
+  const out = [0];
+  for (let k = 1; k < pts.length; k++) out.push(out[k - 1] + Math.hypot(pts[k][0] - pts[k - 1][0], pts[k][1] - pts[k - 1][1]));
+  return out;
+}
+
+/** Ort und Richtung auf einem Pfad an Stelle s */
+function pathAt(pts: Pt[], cum: number[], s: number): [number, number, number, number] {
+  let k = 1;
+  while (k < cum.length - 1 && cum[k] < s) k++;
+  const l = cum[k] - cum[k - 1] || 1;
+  const f = Math.max(0, Math.min(1, (s - cum[k - 1]) / l));
+  const dx = pts[k][0] - pts[k - 1][0], dy = pts[k][1] - pts[k - 1][1];
+  return [pts[k - 1][0] + dx * f, pts[k - 1][1] + dy * f, dx / l, dy / l];
+}
+
 export const F = { done: 1, tube: 2, basket: 4, shield: 8, boost: 16, behind: 32, glass: 64 };
 
 type Kin = '' | 'wheelWait' | 'wheel' | 'convWait' | 'conv' | 'loop' | 'swing' | 'spiral';
@@ -508,6 +538,7 @@ interface Marble {
   v0: number; phi: number; ok: boolean | null; swingT: number; swingAmp: number;
   tv: number;
   loopDone: boolean; forked: boolean;
+  crossUntil: number;
 }
 
 interface Giant { x: number; y: number; vx: number; vy: number; a: number; done: boolean; still?: number; t: number }
@@ -556,7 +587,7 @@ export class Race {
     this.marbles = owners.map((owner, i) => ({
       i, owner, on: false, x: 140, y: -60, vx: 0, vy: 0, a: rnd() * 6.28, w: 0, contact: false, still: 0, place: 0, finishedAt: 0,
       shield: false, boostUntil: 0, tube: -1, ts: 0, basketUntil: 0, basketX: 0, basketRow: 0,
-      row: 0, ri: 1, pu: 0, kin: '', slot: -1, wheel: -1, convN: 0, lastS: 0, v0: 0, phi: 0, ok: null, swingT: 0, swingAmp: 0, tv: 0, loopDone: false, forked: false,
+      row: 0, ri: 1, pu: 0, kin: '', slot: -1, wheel: -1, convN: 0, lastS: 0, v0: 0, phi: 0, ok: null, swingT: 0, swingAmp: 0, tv: 0, loopDone: false, forked: false, crossUntil: 0,
     }));
     this.queue = this.marbles.slice();
     this.wippe = track.wippes.map((w) => ({ a: w.rest, w: 0 }));
@@ -568,8 +599,7 @@ export class Race {
     this.routeCum = [0];
     for (let k = 1; k < track.route.length; k++) this.routeCum.push(this.routeCum[k - 1] + Math.hypot(track.route[k][0] - track.route[k - 1][0], track.route[k][1] - track.route[k - 1][1]));
     this.routeLen = this.routeCum[this.routeCum.length - 1];
-    this.spiralCum = [0];
-    for (let k = 1; k < track.spiral.length; k++) this.spiralCum.push(this.spiralCum[k - 1] + Math.hypot(track.spiral[k][0] - track.spiral[k - 1][0], track.spiral[k][1] - track.spiral[k - 1][1]));
+    this.spiralCum = cumOf(track.spiral);
     this.spiralLen = this.spiralCum[this.spiralCum.length - 1];
     for (const s of track.segs) {
       const y0 = Math.floor((Math.min(s.ay, s.by) - 30) / 100), y1 = Math.floor((Math.max(s.ay, s.by) + 30) / 100);
@@ -585,7 +615,7 @@ export class Race {
         this.pinBands.get(bb)!.push(p);
       }
     }
-    for (const it of items) it.tubeLen = it.tube ? it.tube.reduce((acc, p, k) => (k ? acc + Math.hypot(p[0] - it.tube![k - 1][0], p[1] - it.tube![k - 1][1]) : 0), 0) : 0;
+    for (const it of items) if (it.tube) it.tubeCum = cumOf(it.tube);
   }
 
   get done() {
@@ -777,7 +807,9 @@ export class Race {
         m.vx *= Math.exp(-k * dt);
       }
       this.enterBlocks(m);
+      this.keepHalf(m);
     }
+    this.tubeContacts(live);
     this.stepWippes(dt);
     this.stepRocker(dt);
     this.pickups();
@@ -850,6 +882,14 @@ export class Race {
     }
   }
 
+  /** Die beiden Hälften sind strikt getrennt (außer über Förderband, Spirale und Rohrpost) */
+  private keepHalf(m: Marble) {
+    if (this.t < m.crossUntil || m.y < 185) return;
+    const col = this.track.rows[m.row].col;
+    if (col === 0 && m.x > WALL_X - 5 - R) { m.x = WALL_X - 5 - R; if (m.vx > 0) m.vx *= -0.3; }
+    else if (col === 1 && m.x < WALL_X + 5 + R && this.track.rows[m.row].key !== 'R0') { m.x = WALL_X + 5 + R; if (m.vx < 0) m.vx *= -0.3; }
+  }
+
   /** Freie Murmel betritt einen Baustein mit eigener Bewegung */
   private enterBlocks(m: Marble) {
     const tr = this.track;
@@ -874,7 +914,7 @@ export class Race {
     }
     const sp = tr.spiral[0];
     if (m.x < sp[0] + 22 && m.x > sp[0] - 15 && m.y > sp[1] - 47 && m.y < sp[1] + 8) {
-      m.kin = 'spiral'; m.ts = 0; m.tv = 420 * (0.8 + this.rnd() * 0.4);
+      m.kin = 'spiral'; m.ts = 0; m.tv = Math.max(120, Math.hypot(m.vx, m.vy));
       return;
     }
     if (!m.forked && m.y > tr.rocker.py + 30 && m.y < tr.rocker.py + 120 && m.x > 2200) {
@@ -924,19 +964,20 @@ export class Race {
       return;
     }
     if (m.kin === 'spiral') {
-      m.ts += m.tv * dt;
+      // Glasspirale: rollt wie auf einer Schiene – Schwerkraft entlang der Röhre, Reibung bremst
       const sp = tr.spiral;
+      const [, , , ty] = pathAt(sp, this.spiralCum, m.ts);
+      m.tv += (G * ty - 1.3 * m.tv - 40) * dt;
+      m.tv = Math.max(60, m.tv);
+      m.ts += m.tv * dt;
       if (m.ts >= this.spiralLen) {
-        const e = sp[sp.length - 1];
-        m.kin = ''; m.x = e[0]; m.y = e[1] + 2; m.vx = 200; m.vy = 60;
+        const [ex, ey, tx, ty2] = pathAt(sp, this.spiralCum, this.spiralLen);
+        m.kin = ''; m.x = ex; m.y = ey + 2; m.vx = tx * m.tv; m.vy = ty2 * m.tv;
         return;
       }
-      let k = 1;
-      while (k < this.spiralCum.length - 1 && this.spiralCum[k] < m.ts) k++;
-      const f = (m.ts - this.spiralCum[k - 1]) / (this.spiralCum[k] - this.spiralCum[k - 1] || 1);
-      m.x = sp[k - 1][0] + (sp[k][0] - sp[k - 1][0]) * f;
-      m.y = sp[k - 1][1] + (sp[k][1] - sp[k - 1][1]) * f;
-      m.a += 25 * dt;
+      const [x, y] = pathAt(sp, this.spiralCum, m.ts);
+      m.x = x; m.y = y;
+      m.a += (m.tv / R) * dt;
       return;
     }
     const lp = tr.loop;
@@ -1031,10 +1072,9 @@ export class Race {
     const vn = (m.vx - svx) * nx + (m.vy - svy) * ny;
     m.x += nx * (R + 4 - d); m.y += ny * (R + 4 - d);
     if (vn < 0) {
-      const cr = rx * ny - ry * nx, I = 3000;
-      const J = -(1.2 * vn) / (1 + (cr * cr) / I);
+      // die Weiche wird angetrieben, Murmeln können sie nicht umdrücken
+      const J = -1.2 * vn;
       m.vx += J * nx; m.vy += J * ny;
-      st.w -= (J * cr) / I;
     }
     m.w = (m.vx * -ny + m.vy * nx) / R;
     m.contact = true;
@@ -1043,11 +1083,8 @@ export class Race {
   /** Kippweiche: jede durchlaufende Murmel stellt sie um */
   private stepRocker(dt: number) {
     const st = this.rocker;
-    st.w += st.side * 30 * dt;
-    st.w *= Math.exp(-2 * dt);
+    st.w = Math.max(-6, Math.min(6, (st.side * 0.42 - st.a) * 14));
     st.a += st.w * dt;
-    if (st.a > 0.42) { st.a = 0.42; st.w = Math.min(0, st.w); }
-    if (st.a < -0.42) { st.a = -0.42; st.w = Math.max(0, st.w); }
   }
 
   private wippeHit(m: Marble) {
@@ -1167,7 +1204,7 @@ export class Race {
         case 'wurmloch':
           if (it.on && it.tube && !it.hit.has(m.i) && Math.abs(m.x - so.x) < 8 && onRail()) {
             it.hit.add(m.i);
-            m.tube = it.id; m.ts = 0;
+            m.tube = it.id; m.ts = 0; m.tv = Math.max(100, Math.abs(m.vx));
             this.fx.push(['tube', it.id, m.i]);
           }
           break;
@@ -1224,17 +1261,21 @@ export class Race {
     }
   }
 
+  /** Rohrpost: Druckluft schiebt, Schwerkraft wirkt entlang der Röhre, Reibung bremst */
   private stepTube(m: Marble, dt: number) {
     const it = this.items.find((x) => x.id === m.tube)!;
-    m.ts += 650 * dt;
-    const pts = it.tube!;
-    const len = it.tubeLen || 1;
+    const pts = it.tube!, cum = it.tubeCum!;
+    const len = cum[cum.length - 1];
+    const [, , , ty] = pathAt(pts, cum, m.ts);
+    m.tv += (G * ty + 650 - 1.1 * m.tv) * dt;
+    m.tv = Math.max(80, m.tv);
+    m.ts += m.tv * dt;
     if (m.ts >= len) {
-      const end = pts[pts.length - 1];
-      const prev = pts[pts.length - 2];
+      const [ex, ey, tx, ty2] = pathAt(pts, cum, len);
       m.tube = -1;
-      m.x = end[0]; m.y = end[1];
-      m.vx = Math.sign(end[0] - prev[0] || 1) * 120; m.vy = 80;
+      m.x = ex; m.y = ey;
+      m.vx = tx * Math.min(m.tv, 420); m.vy = Math.max(40, ty2 * Math.min(m.tv, 420));
+      m.crossUntil = this.t + 1.5;
       // Fortschritt neu suchen (die Röhre springt über mehrere Abschnitte)
       let bd = Infinity;
       for (let k = 1; k < this.track.route.length; k++) {
@@ -1245,18 +1286,41 @@ export class Race {
       }
       return;
     }
-    let acc = 0;
-    for (let k = 1; k < pts.length; k++) {
-      const l = Math.hypot(pts[k][0] - pts[k - 1][0], pts[k][1] - pts[k - 1][1]);
-      if (acc + l >= m.ts) {
-        const f = (m.ts - acc) / (l || 1);
-        m.x = pts[k - 1][0] + (pts[k][0] - pts[k - 1][0]) * f;
-        m.y = pts[k - 1][1] + (pts[k][1] - pts[k - 1][1]) * f;
-        break;
-      }
-      acc += l;
+    const [x, y] = pathAt(pts, cum, m.ts);
+    m.x = x; m.y = y;
+    m.a += (m.tv / R) * dt;
+  }
+
+  /** Murmeln in derselben Röhre stoßen sich an (kein Überholen in der Röhre) */
+  private tubeContacts(live: Marble[]) {
+    const groups = new Map<number, Marble[]>();
+    for (const m of live) {
+      const key = m.kin === 'spiral' ? -2 : m.tube >= 0 ? m.tube : null;
+      if (key === null) continue;
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key)!.push(m);
     }
-    m.a += 20 * dt;
+    for (const [key, list] of groups) {
+      if (list.length < 2) continue;
+      list.sort((a, b) => b.ts - a.ts);
+      let pts = this.track.spiral, cum = this.spiralCum;
+      if (key >= 0) {
+        const it = this.items.find((x) => x.id === key)!;
+        pts = it.tube!; cum = it.tubeCum!;
+      }
+      for (let k = 1; k < list.length; k++) {
+        const ahead = list[k - 1], back = list[k];
+        if (ahead.ts - back.ts >= 2 * R) continue;
+        back.ts = ahead.ts - 2 * R;
+        if (back.tv > ahead.tv) {
+          const vc = (back.tv + ahead.tv) / 2, dv = (back.tv - ahead.tv) / 2;
+          back.tv = vc - 0.5 * dv;
+          ahead.tv = vc + 0.5 * dv;
+        }
+        const [x, y] = pathAt(pts, cum, Math.max(0, back.ts));
+        back.x = x; back.y = y;
+      }
+    }
   }
 
   private runEvent(ev: RaceEvent) {

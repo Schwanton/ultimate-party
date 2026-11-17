@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import type { ControllerViewProps, GameClientModule, HostViewProps, PlayerInfo } from '@up/sdk';
-import { Confetti, HostTimer, PhoneTimer, PhoneWait, Podium, Scoreboard, sfx, useServerNow, useStream, vibrate } from '@up/ui';
+import { Confetti, HostTimer, PhoneTimer, PhoneWait, Podium, sfx, useServerNow, useStream, vibrate } from '@up/ui';
 import { PALETTE, PATTERNS, drawDesignMarble, mainColor, marbleUrl, tileUrl, type Design } from './muster';
 
 /* ================= Stil: Glas und Messing ================= */
@@ -700,11 +700,47 @@ function HostRace({ view, t, player }: HostViewProps) {
     return s;
   };
   const route = geo.route;
-  const routeCum = useMemo(() => {
-    const out = [0];
-    for (let k = 1; k < route.length; k++) out.push(out[k - 1] + Math.hypot(route[k][0] - route[k - 1][0], route[k][1] - route[k - 1][1]));
-    return out;
-  }, [route]);
+  /** Kamerafahrt: geglätteter Weg entlang der Strecke, langsamer bei Teilen (vor allem neuen) und an Anfang und Ende */
+  const flightPath = useMemo(() => {
+    const cum0 = [0];
+    for (let k = 1; k < route.length; k++) cum0.push(cum0[k - 1] + Math.hypot(route[k][0] - route[k - 1][0], route[k][1] - route[k - 1][1]));
+    const L0 = cum0[cum0.length - 1] || 1;
+    const STEP = 20;
+    let pts: Pt[] = [];
+    for (let s = 0, k = 1; s <= L0; s += STEP) {
+      while (k < route.length - 1 && cum0[k] < s) k++;
+      const f = Math.max(0, Math.min(1, (s - cum0[k - 1]) / (cum0[k] - cum0[k - 1] || 1)));
+      pts.push([route[k - 1][0] + (route[k][0] - route[k - 1][0]) * f, route[k - 1][1] + (route[k][1] - route[k - 1][1]) * f]);
+    }
+    // zweimal gleitender Mittelwert über ±300 px: keine Ecken mehr
+    for (let pass = 0; pass < 2; pass++) {
+      const W2 = 15;
+      pts = pts.map((_, i) => {
+        let x = 0, y = 0, n = 0;
+        for (let j = Math.max(0, i - W2); j <= Math.min(pts.length - 1, i + W2); j++) { x += pts[j][0]; y += pts[j][1]; n++; }
+        return [x / n, y / n] as Pt;
+      });
+    }
+    const near = (x: number, y: number) => {
+      let best = 0, bd = Infinity;
+      pts.forEach(([px, py], i) => { const d = (px - x) ** 2 + (py - y) ** 2; if (d < bd) { bd = d; best = i; } });
+      return best * STEP;
+    };
+    const stops = items.map((it) => ({ s: near(it.x, it.y - 20), w: freshIds.has(it.id) ? 0.75 : 0.45 }));
+    const L = (pts.length - 1) * STEP;
+    // Zeit je Wegstück aus der Geschwindigkeit, dann umgekehrt: Weg zu jeder Zeit
+    const tAt = [0];
+    for (let i = 1; i < pts.length; i++) {
+      const s = i * STEP;
+      let slow = 0;
+      for (const st of stops) slow = Math.max(slow, st.w * Math.exp(-(((s - st.s) / 260) ** 2)));
+      const ramp = Math.min(1, (s + 150) / 700, (L - s + 150) / 700);
+      const v = Math.max(0.12, (1 - slow) * ramp);
+      tAt.push(tAt[i - 1] + STEP / v);
+    }
+    const T = tAt[tAt.length - 1] || 1;
+    return { pts, tAt: tAt.map((x) => x / T) };
+  }, [route, items, freshIds]);
 
   useEffect(() => {
     if (flight) {
@@ -777,13 +813,12 @@ function HostRace({ view, t, player }: HostViewProps) {
 
   useEffect(() => {
     let raf = 0;
-    const routeLen = routeCum[routeCum.length - 1] || 1;
-    const routeAt = (s: number): Pt => {
-      for (let k = 1; k < route.length; k++) if (s <= routeCum[k] || k === route.length - 1) {
-        const f = Math.min(1, Math.max(0, (s - routeCum[k - 1]) / (routeCum[k] - routeCum[k - 1] || 1)));
-        return [route[k - 1][0] + (route[k][0] - route[k - 1][0]) * f, route[k - 1][1] + (route[k][1] - route[k - 1][1]) * f];
-      }
-      return route[0];
+    const flightAt = (p: number): Pt => {
+      const { pts, tAt } = flightPath;
+      let lo = 0, hi = tAt.length - 1;
+      while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (tAt[mid] < p) lo = mid; else hi = mid; }
+      const f = Math.max(0, Math.min(1, (p - tAt[lo]) / (tAt[hi] - tAt[lo] || 1)));
+      return [pts[lo][0] + (pts[hi][0] - pts[lo][0]) * f, pts[lo][1] + (pts[hi][1] - pts[lo][1]) * f];
     };
     const draw = () => {
       raf = requestAnimationFrame(draw);
@@ -802,34 +837,34 @@ function HostRace({ view, t, player }: HostViewProps) {
         return jump ? [q[0], q[1], q[2] / 100, q[3]] : [p[0] + (q[0] - p[0]) * a, p[1] + (q[1] - p[1]) * a, q[2] / 100, q[3]];
       };
       // Kamera
-      const base = TW / 1250;
-      const minS = Math.max(TW / geo.W, TH / geo.H) * 1.05;
-      let tx = cam.current.x, ty = cam.current.y, ts = base;
+      // feste Zoomstufe (kein Rein- und Rauszoomen), Kamera folgt der Spitzengruppe
+      const ts = TW / 1250;
+      let tx = cam.current.x, ty = cam.current.y;
       let leader: [number, number] | null = null;
       if (flight) {
-        const p = Math.min(1, (n - flightStart.current) / ((view.dur ?? 8) * 1000 - 400));
-        const e = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
-        [tx, ty] = routeAt(e * routeLen);
-        ts = TW / 1100;
+        const p = Math.min(1, (n - flightStart.current) / ((view.dur ?? 8) * 1000 - 600));
+        [tx, ty] = flightAt(p);
       } else if (cur) {
         const live: number[] = [];
         for (const i of cur.o) { const m = cur.m[i]; if (!(m[3] & FLAG.done) && m[1] > -20) live.push(i); }
         if (live.length) {
-          const band = live.slice(Math.floor(live.length * 0.15), Math.max(1, Math.ceil(live.length * 0.85)));
+          const band = live.slice(0, Math.max(1, Math.ceil(live.length * 0.35)));
           tx = 0; ty = 0;
           for (const i of band) { const [x, y] = pos(i); tx += x; ty += y; }
           tx /= band.length; ty /= band.length;
           const [lx, ly] = pos(live[0]);
           leader = [lx, ly];
-          const needW = Math.abs(lx - tx) * 2 + 300, needH = Math.abs(ly - ty) * 2 + 240;
-          ts = Math.max(minS, Math.min(base, TW / needW, TH / needH));
         } else if (cur.m.length) { tx = (geo.finish.x0 + geo.finish.x1) / 2; ty = geo.finish.y - 120; }
         else { tx = 500; ty = 250; }
       } else { tx = 500; ty = 250; }
       const cm = cam.current;
       if (!cm.init) { cm.x = tx; cm.y = ty; cm.s = ts; cm.init = true; }
-      const k = flight ? 0.12 : 0.06;
-      cm.x += (tx - cm.x) * k; cm.y += (ty - cm.y) * k; cm.s += (ts - cm.s) * 0.06;
+      // weich hinterher, aber nie schneller als ein Stück pro Bild
+      const k = flight ? 0.1 : 0.035;
+      const maxStep = flight ? 40 : 22;
+      cm.x += Math.max(-maxStep, Math.min(maxStep, (tx - cm.x) * k));
+      cm.y += Math.max(-maxStep, Math.min(maxStep, (ty - cm.y) * k));
+      cm.s = ts;
       const vw = TW / cm.s, vh = TH / cm.s;
       let left = Math.max(-20, Math.min(geo.W - vw + 20, cm.x - vw / 2));
       let top = Math.max(-80, Math.min(geo.H - vh + 40, cm.y - vh / 2));
@@ -868,7 +903,16 @@ function HostRace({ view, t, player }: HostViewProps) {
       });
       drawWheels(g, geo, blocks, n);
       drawRocker(g, geo, blocks ? blocks.rk / 100 : 0.42);
-      for (const it of items) if (it.kind === 'wurmloch') drawPart(g, it, geo, stOf(it.id), n, ownerColors[pids.indexOf(it.owner)] ?? '#fff');
+      /** Bei der Kamerafahrt führen die Teile vor, was sie tun (Falltür klappt auf, Schlagbaum geht zu …) */
+      const demo = (it: PubItem): [PubItem, PartState] => {
+        const st = stOf(it.id);
+        if (!flight) return [it, st];
+        const ph = (n / 2600 + it.id * 0.37) % 1;
+        st.flags = (ph < 0.14 ? IT.kick : 0) | (ph > 0.2 && ph < 0.7 ? IT.closed : 0) | (ph > 0.3 && ph < 0.75 ? IT.gust : 0);
+        st.left = 6 - Math.floor(ph * 6);
+        return [it.toggle ? { ...it, on: ph < 0.5 } : it, st];
+      };
+      for (const it of items) if (it.kind === 'wurmloch') { const [d, st] = demo(it); drawPart(g, d, geo, st, n, ownerColors[pids.indexOf(it.owner)] ?? '#fff'); }
       // Farbsensoren
       for (const it of items) {
         const r = geo.rows[it.row];
@@ -890,25 +934,43 @@ function HostRace({ view, t, player }: HostViewProps) {
         drawDesignMarble(g, x, y, ang, d, R, f & FLAG.tube ? 0.85 : 1);
         if (f & FLAG.shield) { g.strokeStyle = 'rgba(159,215,255,.8)'; g.lineWidth = 2; g.beginPath(); g.arc(x, y, 13, 0, Math.PI * 2); g.stroke(); }
       }
-      for (const it of items) if (it.kind !== 'wurmloch') drawPart(g, it, geo, stOf(it.id), n, ownerColors[pids.indexOf(it.owner)] ?? '#fff');
+      for (const it of items) if (it.kind !== 'wurmloch') { const [d, st] = demo(it); drawPart(g, d, geo, st, n, ownerColors[pids.indexOf(it.owner)] ?? '#fff'); }
       drawSpiral(g, geo, () => {
         if (cur) for (let i = 0; i < M; i++) {
           const [x, y, ang, f] = pos(i);
           if (f & FLAG.glass) drawDesignMarble(g, x, y, ang, ownerDesigns[cur.ow[i]] ?? FALLBACK, R);
         }
       });
-      // neue Teile leuchten bei der Kamerafahrt
+      // Kamerafahrt: jedes Teil mit Schild (Name, Erbauer, was es tut); neue leuchten
       if (flight) {
+        const boxes: [number, number, number, number][] = [];
         for (const it of items) {
-          if (!freshIds.has(it.id)) continue;
+          const fresh = freshIds.has(it.id);
           const col = ownerColors[pids.indexOf(it.owner)] ?? '#fff';
-          const pulse = 0.5 + 0.5 * Math.sin(n / 160);
-          g.globalAlpha = 0.35 + 0.5 * pulse; g.strokeStyle = col; g.lineWidth = 5;
-          g.beginPath(); g.arc(it.x, it.y - 18, 34 + pulse * 8, 0, Math.PI * 2); g.stroke();
-          g.globalAlpha = 1;
-          g.font = `700 15px ${FONT}`; g.textAlign = 'center'; g.lineWidth = 5; g.strokeStyle = INK;
-          const label = `${player(it.owner)?.name ?? ''}: ${t(`k.${it.kind}`)}`;
-          g.strokeText(label, it.x, it.y - 66); g.fillStyle = col; g.fillText(label, it.x, it.y - 66);
+          if (fresh) {
+            const pulse = 0.5 + 0.5 * Math.sin(n / 160);
+            g.globalAlpha = 0.35 + 0.5 * pulse; g.strokeStyle = col; g.lineWidth = 5;
+            g.beginPath(); g.arc(it.x, it.y - 18, 38 + pulse * 8, 0, Math.PI * 2); g.stroke();
+            g.globalAlpha = 1;
+          }
+          const l1 = `${fresh ? `${t('flight.new')} · ` : ''}${t(`k.${it.kind}`)} · ${player(it.owner)?.name ?? ''}`;
+          const l2 = t(`d.${it.kind}`);
+          g.font = `700 17px ${FONT}`;
+          const w1 = g.measureText(l1).width;
+          g.font = `500 14px ${FONT}`;
+          const w2 = g.measureText(l2).width;
+          const bw = Math.max(w1, w2) + 22, bx = it.x - bw / 2;
+          // Schilder nicht übereinander: bei Überschneidung eine Etage höher
+          let by = it.y - 128;
+          for (let tries = 0; tries < 4 && boxes.some(([x, y, w, h]) => bx < x + w && bx + bw > x && by < y + h && by + 46 > y); tries++) by -= 54;
+          boxes.push([bx, by, bw, 46]);
+          if (by < it.y - 128) { g.strokeStyle = 'rgba(233,196,106,.45)'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(it.x, by + 54); g.lineTo(it.x, it.y - 74); g.stroke(); }
+          g.fillStyle = 'rgba(20,13,8,.88)'; g.strokeStyle = fresh ? col : 'rgba(233,196,106,.55)'; g.lineWidth = fresh ? 3 : 1.5;
+          g.beginPath(); g.roundRect(bx, by, bw, 46, 9); g.fill(); g.stroke();
+          g.beginPath(); g.moveTo(it.x - 7, by + 46); g.lineTo(it.x, by + 54); g.lineTo(it.x + 7, by + 46); g.closePath(); g.fillStyle = fresh ? col : 'rgba(233,196,106,.55)'; g.fill();
+          g.textAlign = 'center';
+          g.font = `700 17px ${FONT}`; g.fillStyle = fresh ? col : TEXT; g.fillText(l1, it.x, by + 20);
+          g.font = `500 14px ${FONT}`; g.fillStyle = MUTED; g.fillText(l2, it.x, by + 38);
         }
       }
       // Krone über der führenden Murmel
@@ -962,7 +1024,7 @@ function HostRace({ view, t, player }: HostViewProps) {
     };
     raf = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(raf);
-  }, [layer, items, ownerColors, ownerDesigns, geo, flight, freshIds, routeCum]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [layer, items, ownerColors, ownerDesigns, geo, flight, freshIds, flightPath]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const ranking: { pid: string; done: number; owner: number }[] = [];
   if (fr) {
@@ -1034,84 +1096,80 @@ function fmtTime(s: number) {
 }
 
 /** Zahl zählt hoch, sobald die Zeile erscheint */
-function CountUp({ value, delay }: { value: number; delay: number }) {
-  const [v, setV] = useState(0);
+function CountUp({ value, delay, from = 0 }: { value: number; delay: number; from?: number }) {
+  const [v, setV] = useState(from);
   useEffect(() => {
     let raf = 0;
     const id = setTimeout(() => {
       const t0 = performance.now();
       const tick = (n: number) => {
         const f = Math.min(1, (n - t0) / 900);
-        setV(Math.round(value * (1 - Math.pow(1 - f, 3))));
+        setV(Math.round(from + (value - from) * (1 - Math.pow(1 - f, 3))));
         if (f < 1) raf = requestAnimationFrame(tick);
       };
       raf = requestAnimationFrame(tick);
     }, delay);
     return () => { clearTimeout(id); cancelAnimationFrame(raf); };
-  }, [value, delay]);
+  }, [value, delay, from]);
   return <>{v}</>;
 }
 
-/** Punktetafel: wer wie viele Punkte für seine Murmeln bekommt – danach der Gesamtstand */
+/** Punktetafel: wer wie viele Punkte für seine Murmeln bekommt – rechts daneben der Gesamtstand */
 function HostResult({ view, t, player }: HostViewProps) {
-  const [phase2, setPhase2] = useState(false);
   const ids = view.players as string[];
   const designs = view.designs as Designs;
   const marbles = view.marbles as [number, number, number][];
-  useEffect(() => {
-    setPhase2(false);
-    const id = setTimeout(() => setPhase2(true), 10500);
-    return () => clearTimeout(id);
-  }, [view.round]);
   const rows = ids.map((id, k) => ({ id, list: marbles.filter((m) => m[0] === k), sum: view.points[id] ?? 0, trap: view.trapPts[id] ?? 0 })).sort((a, b) => b.sum - a.sum);
-  const max = Math.max(1, ...rows.map((r) => r.sum));
-  const step = Math.min(0.55, 4.2 / Math.max(1, rows.length));
-  if (phase2) {
-    const score = Object.keys(view.after).map((id) => ({ player: player(id)!, before: view.before[id] ?? 0, after: view.after[id] })).filter((r) => r.player);
-    return (
-      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', gap: 16, padding: '30px 56px', background: BG }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-          <Title />
-          <span style={{ fontSize: 18, color: MUTED }}>{t('round', { n: view.round, total: view.total })} · {t('result.total')}</span>
-        </div>
-        <Scoreboard rows={score} />
-      </div>
-    );
-  }
+  const step = Math.min(0.5, 4 / Math.max(1, rows.length));
+  const totalAt = (rows.length - 1) * step + 1.4;
+  const total = ids.map((id) => ({ id, before: view.before[id] ?? 0, after: view.after[id] ?? 0 })).sort((a, b) => b.after - a.after);
   const big = rows.length <= 6;
+  const rowH = big ? 56 : rows.length <= 9 ? 44 : 36;
   return (
-    <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', gap: 10, padding: '24px 44px', background: BG }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <span style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: 36, color: BRASS }}>{t('result.title')}</span>
-        <span style={{ fontSize: 18, color: MUTED }}>{t('round', { n: view.round, total: view.total })}{view.mult > 1 ? ` · ${t('double')}` : ''}</span>
+    <div style={{ position: 'absolute', inset: 0, display: 'flex', gap: 22, padding: '24px 32px', background: BG }}>
+      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+          <span style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: 32, color: BRASS }}>{t('result.title')}</span>
+          <span style={{ fontSize: 17, color: MUTED }}>{t('round', { n: view.round, total: view.total })}{view.mult > 1 ? ` · ${t('double')}` : ''}</span>
+        </div>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: big ? 8 : 4 }}>
+          {rows.map((r, k) => {
+            const d = designs[r.id];
+            const delay = (rows.length - 1 - k) * step;
+            return (
+              <div key={r.id} className="anim-pop" style={{ height: rowH, boxSizing: 'border-box', display: 'grid', gridTemplateColumns: `28px ${big ? 40 : 30}px 170px 1fr 76px`, alignItems: 'center', gap: 10, padding: '0 10px', borderRadius: 12, background: k === 0 ? 'rgba(233,196,106,.12)' : 'rgba(255,255,255,.035)', border: `1px solid ${k === 0 ? BRASS : 'transparent'}`, animationDelay: `${delay}s`, animationFillMode: 'both' }}>
+                <span style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: big ? 22 : 17, color: BRASS_L }}>{k + 1}.</span>
+                <Marble d={d} size={big ? 38 : 28} />
+                <PatternText d={d} size={big ? 26 : 20} style={{ maxWidth: 170 }}>{player(r.id)?.name ?? '?'}</PatternText>
+                <span style={{ display: 'flex', flexWrap: 'wrap', gap: 4, overflow: 'hidden', maxHeight: rowH - 6 }}>
+                  {r.list.map(([, place, pts]) => (
+                    <span key={place} style={{ display: 'inline-flex', alignItems: 'baseline', gap: 3, padding: '1px 6px', borderRadius: 7, border: `2px solid ${mainColor(d)}`, fontSize: big ? 14 : 12, color: MUTED, background: place === 1 ? 'rgba(233,196,106,.25)' : 'transparent' }}>
+                      {place}.<b style={{ color: TEXT }}>+{pts}</b>
+                    </span>
+                  ))}
+                  {r.trap > 0 && <span style={{ display: 'inline-flex', gap: 3, padding: '1px 6px', borderRadius: 7, border: '2px solid #d3452f', fontSize: big ? 14 : 12, color: '#ff9b88' }}>{t('result.trapChip')}<b>+{r.trap}</b></span>}
+                  {r.list.length === 0 && r.trap === 0 && <span style={{ fontSize: 13, color: DIM }}>{t('result.nothing')}</span>}
+                </span>
+                <span style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: big ? 26 : 20, textAlign: 'right', color: BRASS_L }}>+<CountUp value={r.sum} delay={delay * 1000} /></span>
+              </div>
+            );
+          })}
+        </div>
+        <span style={{ fontSize: 13.5, color: DIM, textAlign: 'center' }}>{t('result.rule', { mult: view.mult > 1 ? ` ${t('double')}` : '' })}</span>
       </div>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: big ? 10 : 5 }}>
-        {rows.map((r, k) => {
-          const d = designs[r.id];
-          const delay = (rows.length - 1 - k) * step;
-          return (
-            <div key={r.id} className="anim-pop" style={{ display: 'grid', gridTemplateColumns: `34px ${big ? 48 : 34}px 210px 1fr 150px 90px`, alignItems: 'center', gap: 12, padding: big ? '8px 12px' : '4px 12px', borderRadius: 14, background: k === 0 ? 'rgba(233,196,106,.12)' : 'rgba(255,255,255,.035)', border: `1px solid ${k === 0 ? BRASS : 'transparent'}`, animationDelay: `${delay}s`, animationFillMode: 'both' }}>
-              <span style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: big ? 24 : 18, color: BRASS_L }}>{k + 1}.</span>
-              <Marble d={d} size={big ? 46 : 32} />
-              <PatternText d={d} size={big ? 30 : 22} style={{ maxWidth: 210 }}>{player(r.id)?.name ?? '?'}</PatternText>
-              <span style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
-                {r.list.map(([, place, pts]) => (
-                  <span key={place} style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4, padding: '2px 7px', borderRadius: 8, border: `2px solid ${mainColor(d)}`, fontSize: big ? 15 : 13, color: MUTED, background: place === 1 ? 'rgba(233,196,106,.25)' : 'transparent' }}>
-                    {place}.<b style={{ color: TEXT }}>+{pts}</b>
-                  </span>
-                ))}
-                {r.trap > 0 && <span style={{ display: 'inline-flex', gap: 4, padding: '2px 7px', borderRadius: 8, border: '2px solid #d3452f', fontSize: big ? 15 : 13, color: '#ff9b88' }}>{t('result.trapChip')}<b>+{r.trap}</b></span>}
-                {r.list.length === 0 && r.trap === 0 && <span style={{ fontSize: 14, color: DIM }}>{t('result.nothing')}</span>}
-              </span>
-              <span style={{ height: 12, borderRadius: 6, background: 'rgba(255,255,255,.08)', overflow: 'hidden' }}>
-                <span style={{ display: 'block', height: '100%', width: `${(r.sum / max) * 100}%`, borderRadius: 6, backgroundImage: `url(${tileUrl(d ?? FALLBACK)})`, backgroundSize: '14px', transformOrigin: 'left', animation: `mmGrow 1s ease-out ${delay}s both` }} />
-              </span>
-              <span style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: big ? 30 : 22, textAlign: 'right', color: BRASS_L }}>+<CountUp value={r.sum} delay={delay * 1000} /></span>
+      <div className="anim-up" style={{ width: 330, flex: 'none', display: 'flex', flexDirection: 'column', gap: 6, padding: '16px 14px', borderRadius: 18, background: 'linear-gradient(180deg, #2b1d12, #1a110a)', border: `1.5px solid ${BRASS}`, boxShadow: `0 0 30px ${BRASS}22`, animationDelay: `${totalAt}s`, animationFillMode: 'both' }}>
+        <span style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: 24, color: BRASS, textAlign: 'center' }}>{t('result.total')}</span>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: big ? 8 : 4 }}>
+          {total.map((r, k) => (
+            <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: big ? '6px 8px' : '3px 8px', borderRadius: 10, background: k === 0 ? 'rgba(233,196,106,.16)' : 'rgba(255,255,255,.03)' }}>
+              <span style={{ width: 24, fontFamily: DISPLAY, fontWeight: 700, fontSize: big ? 20 : 16, color: BRASS_L }}>{k + 1}.</span>
+              <Marble d={designs[r.id]} size={big ? 30 : 22} />
+              <PatternText d={designs[r.id]} size={big ? 20 : 16} style={{ flex: 1, minWidth: 0 }}>{player(r.id)?.name ?? '?'}</PatternText>
+              <span style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: big ? 22 : 17, color: TEXT }}><CountUp from={r.before} value={r.after} delay={totalAt * 1000 + 400} /></span>
             </div>
-          );
-        })}
+          ))}
+        </div>
       </div>
-      <span style={{ fontSize: 15, color: DIM, textAlign: 'center' }}>{t('result.rule', { mult: view.mult > 1 ? ` ${t('double')}` : '' })}</span>
       <style>{'@keyframes mmGrow { from { transform: scaleX(0) } }'}</style>
     </div>
   );
