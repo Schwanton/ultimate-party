@@ -2,6 +2,12 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.33.0
+
+- Murmel-Mayhem: Die Weiche an der Gabelung ist jetzt eine echte Wippe – das Gewicht der Murmeln kippt sie, danach federt sie zurück. Wie viele über den Looping rollen, ist jedes Rennen anders (meist etwa die Hälfte)
+- Wippen am Reihenende kippen weicher unter dem Gewicht und haben eine schräge Glashaube dahinter: Zu schnelle Murmeln werden zurück auf die Wippe gelenkt statt vorbeizufliegen
+- Die kleinen Anschläge an Nägel-Stufe und Sprungschanze sind wieder weg
+
 ## 0.32.0
 
 - Murmel-Mayhem: Die beiden Bahnhälften sind jetzt strikt getrennt – keine Murmel fliegt mehr von links nach rechts hinüber

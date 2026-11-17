@@ -284,15 +284,12 @@ export function buildStatics(track: Track) {
         seg(a[0], a[1], mx + d * 65, my + 24, 4, 0.25, 'rail', r.i);
         seg(mx + d * 65, my + 24, mx + d * 86, my + 17, 4, 0.25, 'rail', r.i);
         seg(mx + d * 40, my + 74, mx + d * 142, my + 90, 4, 0.25, 'rail', r.i);
-        seg(mx + d * 40, my + 74, mx + d * 40, my + 58, 3, 0.2, 'wall');
         seg(nx, ny, p[3][0], p[3][1], 4, 0.25, 'rail', r.i);
         label('schanze', mx + d * 90, my - 30);
       } else {
         // Nägel-Stufe: oben endet die Schiene, unten geht es versetzt weiter, dazwischen Nägel
         const x2 = mx - d * 26;
         seg(x2, my + 50 - 26 * SLOPE, p[3][0], p[3][1], 4, 0.25, 'rail', r.i);
-        // Anschlag am Anfang der unteren Schiene: niemand rollt rückwärts hinunter
-        seg(x2, my + 50 - 26 * SLOPE, x2, my + 12, 3, 0.2, 'wall');
         for (let x = mx + d * 4, k = 0; d > 0 ? x < mx + 140 : x > mx - 140; x += d * 32, k++) pins.push({ x, y: my + Math.abs(x - mx) * SLOPE + 16 + (k % 2 ? 4 : 0), r: 3.6 });
         label('stufe', mx + d * 70, my - 30);
       }
@@ -320,8 +317,10 @@ export function buildStatics(track: Track) {
       label('nagel', (lo + hi) / 2, ey - 40);
     } else if (r.end === 'wippe') {
       // Glaswand hinter der Wippe: schnelle Murmeln prallen ab und fallen auf die Wippe
-      wippes.push({ px: ex, py: ey + 64, half: 56, rest: d > 0 ? -0.3 : 0.3 });
-      seg(ex + d * 104, glassTop, ex + d * 104, ey + 20, 3, 0.2, 'glass');
+      // schräge Glashaube hinter der Wippe: lenkt zu schnelle Murmeln nach unten zurück auf die Wippe
+      wippes.push({ px: ex, py: ey + 64, half: 60, rest: d > 0 ? -0.25 : 0.25 });
+      seg(ex + d * 112, glassTop, ex + d * 112, ey - 10, 3, 0.2, 'glass');
+      seg(ex + d * 112, ey - 10, ex + d * 74, ey + 40, 3, 0.2, 'glass');
       label('wippe', ex, ey - 30);
     } else if (r.end === 'rad') {
       // Mühlrad: Rinne zur Aufnahme, Fächer nehmen die Murmeln einzeln mit und setzen sie unten ab
@@ -362,8 +361,10 @@ export function buildStatics(track: Track) {
   label('band', CONV_X - 70, foot + 50);
   label('abfahrt', 1700, 160);
   // Gabelung: Glastrichter über der Kippweiche
-  seg(2250, 235, 2276, 298, 3, 0.2, 'glass');
-  seg(2335, 170, 2302, 298, 3, 0.2, 'glass');
+  // Öffnung leicht rechts der Achse: die Murmeln kommen mit Schwung von links, so verteilt die Wippe etwa halbe-halbe
+  const fo = 18;
+  seg(2250, 235, 2276 + fo, 298, 3, 0.2, 'glass');
+  seg(2335, 170, 2302 + fo, 298, 3, 0.2, 'glass');
   label('gabel', 2190, 300);
   label('looping', 2020, 405);
   label('spirale', 1420, 700);
@@ -565,7 +566,7 @@ export class Race {
   wippe: { a: number; w: number }[];
   wheel: { ang: number; slots: number[]; queue: number[] }[];
   conv = { t: 0, slots: new Map<number, number>(), arrived: 0, n: 0, len: 0 };
-  rocker = { a: 0.42, w: 0, side: 1 };
+  rocker = { a: 0, w: 0, side: 1 };
   loopsTried = 0;
   loopsMade = 0;
   /** Aufenthaltszeit je Reihe (für die Abnutzung) */
@@ -1072,19 +1073,24 @@ export class Race {
     const vn = (m.vx - svx) * nx + (m.vy - svy) * ny;
     m.x += nx * (R + 4 - d); m.y += ny * (R + 4 - d);
     if (vn < 0) {
-      // die Weiche wird angetrieben, Murmeln können sie nicht umdrücken
-      const J = -1.2 * vn;
+      // echte Wippe: das Gewicht der Murmel kippt sie
+      const cr = rx * ny - ry * nx, I = 2600;
+      const J = -(1.15 * vn) / (1 + (cr * cr) / I);
       m.vx += J * nx; m.vy += J * ny;
+      st.w -= (J * cr) / I;
     }
     m.w = (m.vx * -ny + m.vy * nx) / R;
     m.contact = true;
   }
 
-  /** Kippweiche: jede durchlaufende Murmel stellt sie um */
+  /** Kippweiche als echte Wippe: das Gewicht der Murmel kippt sie, eine Feder holt sie zur Mitte zurück */
   private stepRocker(dt: number) {
     const st = this.rocker;
-    st.w = Math.max(-6, Math.min(6, (st.side * 0.42 - st.a) * 14));
+    st.w += -st.a * 60 * dt;
+    st.w *= Math.exp(-8 * dt);
     st.a += st.w * dt;
+    if (st.a > 0.42) { st.a = 0.42; st.w = Math.min(0, st.w) * -0.25; }
+    if (st.a < -0.42) { st.a = -0.42; st.w = Math.max(0, st.w) * -0.25; }
   }
 
   private wippeHit(m: Marble) {
@@ -1117,7 +1123,7 @@ export class Race {
   private stepWippes(dt: number) {
     this.track.wippes.forEach((wd, k) => {
       const st = this.wippe[k];
-      st.w += -(st.a - wd.rest) * 4 * dt;
+      st.w += -(st.a - wd.rest) * 2 * dt;
       st.w *= Math.exp(-1.5 * dt);
       st.a += st.w * dt;
       if (st.a > 0.42) { st.a = 0.42; st.w = Math.min(0, st.w); }
