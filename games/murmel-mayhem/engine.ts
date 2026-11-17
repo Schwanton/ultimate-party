@@ -41,10 +41,10 @@ export const TOGGLE_START: Partial<Record<CardKind, boolean>> = { farbweiche: tr
 const CHARGES: Partial<Record<ItemKind, number>> = { kleber: 5, schranke: 3, gegenfeder: 4, falltuer: 4, wind: 3, bremse: 6 };
 
 /** Endbausteine (änderbar beim Umbau) und feste Enden */
-export type EndKind = 'offen' | 'trichter' | 'nagel' | 'wippe' | 'rad' | 'band' | 'gabel' | 'fall' | 'spirale' | 'ziel';
-export const SWAP_ENDS: EndKind[] = ['offen', 'trichter', 'nagel', 'wippe'];
-export type MidKind = 'treppe' | 'schanze' | 'stufe';
-const MID: Record<MidKind, { len: number; drop: number }> = { treppe: { len: 336, drop: 176 }, schanze: { len: 145, drop: 102 }, stufe: { len: 0, drop: 50 } };
+export type EndKind = 'offen' | 'trichter' | 'nagel' | 'wippe' | 'lotterie' | 'rad' | 'band' | 'gabel' | 'fall' | 'spirale' | 'ziel';
+export const SWAP_ENDS: EndKind[] = ['offen', 'trichter', 'nagel', 'wippe', 'lotterie'];
+export type MidKind = 'treppe' | 'schanze' | 'stufe' | 'trampolin' | 'drehkreuz';
+const MID: Record<MidKind, { len: number; drop: number }> = { treppe: { len: 336, drop: 176 }, schanze: { len: 145, drop: 102 }, stufe: { len: 0, drop: 50 }, trampolin: { len: 150, drop: 30 }, drehkreuz: { len: 0, drop: 0 } };
 
 export interface Row {
   i: number;
@@ -63,10 +63,14 @@ export interface Row {
   radOk: boolean;
   wear: number;
 }
-export interface Seg { ax: number; ay: number; bx: number; by: number; th: number; e: number; kind: 'rail' | 'wall' | 'glass' | 'frame'; row: number }
+export interface Seg { ax: number; ay: number; bx: number; by: number; th: number; e: number; kind: 'rail' | 'wall' | 'glass' | 'frame' | 'tramp'; row: number }
 export interface Pin { x: number; y: number; r: number }
 export interface WippeDef { px: number; py: number; half: number; rest: number }
 export interface WheelDef { cx: number; cy: number; r: number; hub: number; n: number; w: number; pick: Pt; rel: number; out: number; row: number }
+/** Drehkreuz: vier Arme drehen sich über der Schiene */
+export interface TurnDef { cx: number; cy: number; r: number; w: number }
+/** Lotterie-Trommel: drehende Trommel mit Rippen, oben Einwurf, vorn ein Ausgang */
+export interface DrumDef { cx: number; cy: number; r: number; w: number; inA: number; outA: number; gap: number }
 export interface Socket { id: number; row: number; x: number; y: number; hole: boolean }
 export interface Mark { row: number; kind: 'delle' | 'poliert' }
 
@@ -78,6 +82,10 @@ export interface Track {
   pins: Pin[];
   wippes: WippeDef[];
   wheels: WheelDef[];
+  turns: TurnDef[];
+  drums: DrumDef[];
+  /** Glasröhre vom Förderband über die Trennwand */
+  over: Pt[];
   conv: { x: number; y0: number; y1: number; sp: number; v: number };
   rocker: { px: number; py: number; half: number };
   loop: { cx: number; cy: number; r: number };
@@ -130,7 +138,7 @@ function makeRow(i: number, key: string, col: 0 | 1, dir: 1 | -1, x0: number, y0
     const m = MID[mid];
     pts.push([midX, ym]);
     pts.push([midX + dir * m.len, ym + m.drop + m.len * SLOPE * 0.3]);
-    const a = midX - dir * 40, b = midX + dir * (m.len + (mid === 'stufe' ? 170 : 60));
+    const a = midX - dir * (mid === 'drehkreuz' ? 80 : 40), b = midX + dir * (m.len + (mid === 'stufe' ? 170 : mid === 'drehkreuz' ? 80 : 60));
     busy.push([Math.min(a, b), Math.max(a, b)]);
   }
   const last = pts[pts.length - 1];
@@ -143,18 +151,17 @@ export function generateTrack(rnd: () => number = Math.random): Track {
   const midRows = ['L0', 'L1', 'L2', 'L3', 'L4', 'R4', 'R5'];
   const mids = new Map<string, MidKind>();
   const pick = shuffle(midRows, rnd);
-  mids.set(pick[0], 'treppe');
-  mids.set(pick[1], 'schanze');
-  mids.set(pick[2], 'stufe');
-  if (rnd() < 0.5) mids.set(pick[3], rnd() < 0.5 ? 'stufe' : 'schanze');
+  const kinds = shuffle<MidKind>(['treppe', 'schanze', 'stufe', 'trampolin', 'drehkreuz'], rnd);
+  const nMid = 4 + (rnd() < 0.5 ? 1 : 0);
+  for (let k = 0; k < nMid; k++) mids.set(pick[k], kinds[k]);
   // Enden: ein Trichter, ein Nagelfeld, eine Wippe, ein offenes Ende und eins zufällig
   const restRows = shuffle(['L0', 'L1', 'L2', 'L3', 'R4'], rnd);
   const ends = new Map<string, EndKind>();
   ends.set(restRows[0], 'trichter');
   ends.set(restRows[1], 'nagel');
   ends.set(restRows[2], 'wippe');
-  ends.set(restRows[3], 'offen');
-  ends.set(restRows[4], SWAP_ENDS[Math.floor(rnd() * SWAP_ENDS.length)]);
+  ends.set(restRows[3], 'lotterie');
+  ends.set(restRows[4], rnd() < 0.5 ? 'offen' : SWAP_ENDS[Math.floor(rnd() * SWAP_ENDS.length)]);
 
   const rows: Row[] = [];
   const f = () => 0.38 + rnd() * 0.2;
@@ -180,7 +187,7 @@ export function generateTrack(rnd: () => number = Math.random): Track {
   }
   const foot = endY(rows[4]);
   // rechte Hälfte: feste Abfahrt, Gabelung, Looping und Spirale, danach zwei Reihen bis ins Ziel
-  const r0: Row = { i: rows.length, key: 'R0', dir: 1, col: 1, pts: [[1150, 160], [2250, 235]], mid: null, midX: 0, busy: [], end: 'gabel', endable: false, radOk: false, wear: 1 };
+  const r0: Row = { i: rows.length, key: 'R0', dir: 1, col: 1, pts: [[1205, 163], [2250, 235]], mid: null, midX: 0, busy: [], end: 'gabel', endable: false, radOk: false, wear: 1 };
   rows.push(r0);
   rows.push({ i: rows.length, key: 'A', dir: -1, col: 1, pts: [[2245, 400], [1700, 450]], mid: null, midX: 0, busy: [], end: 'fall', endable: false, radOk: false, wear: 1 });
   rows.push({ i: rows.length, key: 'B', dir: -1, col: 1, pts: [[2372, 430], [2020, 520], [1760, 540]], mid: null, midX: 0, busy: [[1950, 2090]], end: 'fall', endable: false, radOk: false, wear: 1 });
@@ -201,7 +208,8 @@ export function generateTrack(rnd: () => number = Math.random): Track {
     spiral.push([Math.round(1240 + 60 * u + 105 * Math.sin(u * 4 * Math.PI)), Math.round(662 + 448 * u)]);
   }
   const track: Track = {
-    W, H, rows, segs: [], pins: [], wippes: [], wheels: [], spiral,
+    W, H, rows, segs: [], pins: [], wippes: [], wheels: [], turns: [], drums: [], spiral,
+    over: [[CONV_X, CONV_TOP - 6], [1116, 104], [1134, 88], [1162, 80], [1192, 82], [1216, 94], [1230, 114], [1238, 140]],
     conv: { x: CONV_X, y0: foot, y1: CONV_TOP, sp: 32, v: 260 },
     rocker: { px: 2290, py: 330, half: 55 },
     loop: { cx: 2020, cy: 476, r: 44 },
@@ -258,6 +266,8 @@ export function buildStatics(track: Track) {
   const labels: Track['labels'] = [];
   const wippes: WippeDef[] = [];
   const wheels: WheelDef[] = [];
+  const turns: TurnDef[] = [];
+  const drums: DrumDef[] = [];
   const route: Pt[] = [[140, 40]];
   const seg = (ax: number, ay: number, bx: number, by: number, th = 4, e = 0.25, kind: Seg['kind'] = 'rail', row = -1) => segs.push({ ax, ay, bx, by, th, e, kind, row });
   const label = (t: string, x: number, y: number) => labels.push({ t, x: Math.round(x), y: Math.round(y) });
@@ -286,6 +296,18 @@ export function buildStatics(track: Track) {
         seg(mx + d * 40, my + 74, mx + d * 142, my + 90, 4, 0.25, 'rail', r.i);
         seg(nx, ny, p[3][0], p[3][1], 4, 0.25, 'rail', r.i);
         label('schanze', mx + d * 90, my - 30);
+      } else if (r.mid === 'trampolin') {
+        // Schiene endet, darunter ein federndes Tuch (vorn tiefer), dahinter geht es höher weiter
+        seg(mx + d * 2, my + 6, mx + d * 2, my + 64, 3, 0.2, 'wall');
+        seg(mx + d * 8, my + 64, mx + d * 116, my + 72, 4, 0.9, 'tramp', r.i);
+        seg(mx + d * 124, my + 74, mx + d * 124, my + 46, 3, 0.2, 'wall');
+        seg(nx, ny, p[3][0], p[3][1], 4, 0.25, 'rail', r.i);
+        label('trampolin', mx + d * 75, my - 30);
+      } else if (r.mid === 'drehkreuz') {
+        // gerade Schiene, darüber dreht sich ein Kreuz in Fahrtrichtung
+        seg(mx, my, p[3][0], p[3][1], 4, 0.25, 'rail', r.i);
+        turns.push({ cx: mx, cy: my - 40, r: 31, w: -2.4 * d });
+        label('drehkreuz', mx, my - 84);
       } else {
         // Nägel-Stufe: oben endet die Schiene, unten geht es versetzt weiter, dazwischen Nägel
         const x2 = mx - d * 26;
@@ -300,7 +322,7 @@ export function buildStatics(track: Track) {
     // Endbaustein
     const [ex, ey] = p[p.length - 1];
     // Glaswände oben rechts dürfen den Ausgang des Förderbands nicht versperren
-    const glassTop = r.col === 0 && d > 0 ? Math.max(ey - 60, 180) : ey - 60;
+    const glassTop = ey - 60;
     if (r.end === 'trichter') {
       const cx = ex + d * 24;
       seg(cx - 70, ey + 8, cx - 15, ey + 66, 3, 0.2, 'glass');
@@ -322,6 +344,14 @@ export function buildStatics(track: Track) {
       seg(ex + d * 112, glassTop, ex + d * 112, ey - 10, 3, 0.2, 'glass');
       seg(ex + d * 112, ey - 10, ex + d * 74, ey + 40, 3, 0.2, 'glass');
       label('wippe', ex, ey - 30);
+    } else if (r.end === 'lotterie') {
+      // Lotterie-Trommel unter dem Reihenende: oben Einwurf, die Trommel dreht sich, vorn geht es raus
+      const cx = ex + d * 20, cy = ey + 86;
+      seg(ex - d * 2, ey, ex + d * 16, ey + 30, 4, 0.2, 'rail', r.i);
+      seg(ex + d * 76, glassTop, ex + d * 76, ey - 20, 3, 0.2, 'glass');
+      seg(ex + d * 76, ey - 20, ex + d * 46, ey + 30, 3, 0.2, 'glass');
+      drums.push({ cx, cy, r: 48, w: -2.6 * d, inA: -Math.PI / 2, outA: d > 0 ? 0.44 : Math.PI - 0.44, gap: 0.32 });
+      label('lotterie', cx, ey - 30);
     } else if (r.end === 'rad') {
       // Mühlrad: Rinne zur Aufnahme, Fächer nehmen die Murmeln einzeln mit und setzen sie unten ab
       const m = d < 0 ? 1 : -1;
@@ -336,7 +366,8 @@ export function buildStatics(track: Track) {
     if (r.mid) route.push(p[1], p[2]);
     route.push(p[p.length - 1]);
     if (r.end === 'rad') route.push([ex - 81 * (d < 0 ? 1 : -1), ey + 82]);
-    if (r.key === 'L4') route.push([CONV_X, ey + 10], [CONV_X, CONV_TOP]);
+    if (r.end === 'lotterie') route.push([ex + d * 20, ey + 86]);
+    if (r.key === 'L4') route.push([CONV_X, ey + 10], ...track.over);
     if (r.key === 'R0') route.push([2289, 300], [2290, 330]);
     if (r.key === 'R2') route.push([1240, 662], [1300, 1110]);
   }
@@ -347,9 +378,8 @@ export function buildStatics(track: Track) {
   const fin = track.finish;
   // Wände und Rahmen
   seg(1134, foot - 100, 1134, foot + 18, 4, 0.2, 'wall');
-  // Trennwand zwischen den Hälften (bis knapp unter die lange Abfahrt) und Glasdach über dem Ende der ersten Reihe
-  seg(WALL_X, 180, WALL_X, track.H, 5, 0.3, 'wall');
-  seg(860, 100, 1186, 100, 3, 0.2, 'glass');
+  // Trennwand zwischen den Hälften über die ganze Höhe; hinüber geht es nur durch die Glasröhre am Förderband
+  seg(WALL_X, -300, WALL_X, track.H, 5, 0.3, 'wall');
   seg(22, -300, 22, track.H, 6, 0.3, 'frame');
   seg(2378, -300, 2378, track.H, 6, 0.3, 'frame');
   // Start-Trichter
@@ -361,10 +391,10 @@ export function buildStatics(track: Track) {
   label('band', CONV_X - 70, foot + 50);
   label('abfahrt', 1700, 160);
   // Gabelung: Glastrichter über der Kippweiche
-  // Öffnung leicht rechts der Achse: die Murmeln kommen mit Schwung von links, so verteilt die Wippe etwa halbe-halbe
-  const fo = 18;
-  seg(2250, 235, 2276 + fo, 298, 3, 0.2, 'glass');
-  seg(2335, 170, 2302 + fo, 298, 3, 0.2, 'glass');
+  // breite Öffnung: die Murmeln landen mal links, mal rechts der Achse
+  const fo = 4, fw = 15;
+  seg(2250, 235, 2276 + fo - fw, 298, 3, 0.2, 'glass');
+  seg(2335, 170, 2302 + fo + fw, 298, 3, 0.2, 'glass');
   label('gabel', 2190, 300);
   label('looping', 2020, 405);
   label('spirale', 1420, 700);
@@ -379,6 +409,8 @@ export function buildStatics(track: Track) {
   track.labels = labels;
   track.wippes = wippes;
   track.wheels = wheels;
+  track.turns = turns;
+  track.drums = drums;
   track.route = routeClean.map(([x, y]) => [Math.round(x), Math.round(y)]);
 }
 
@@ -514,7 +546,7 @@ function pathAt(pts: Pt[], cum: number[], s: number): [number, number, number, n
 
 export const F = { done: 1, tube: 2, basket: 4, shield: 8, boost: 16, behind: 32, glass: 64 };
 
-type Kin = '' | 'wheelWait' | 'wheel' | 'convWait' | 'conv' | 'loop' | 'swing' | 'spiral';
+type Kin = '' | 'wheelWait' | 'wheel' | 'convWait' | 'conv' | 'over' | 'loop' | 'swing' | 'spiral';
 
 interface Marble {
   i: number;
@@ -567,6 +599,12 @@ export class Race {
   wheel: { ang: number; slots: number[]; queue: number[] }[];
   conv = { t: 0, slots: new Map<number, number>(), arrived: 0, n: 0, len: 0 };
   rocker = { a: 0, w: 0, side: 1 };
+  /** Drehwinkel der Drehkreuze und Trommeln */
+  turnAng: number[];
+  drumAng: number[];
+  private overCum: number[];
+  private hitsThisStep = 0;
+  private boingAt = new Map<number, number>();
   loopsTried = 0;
   loopsMade = 0;
   /** Aufenthaltszeit je Reihe (für die Abnutzung) */
@@ -592,6 +630,9 @@ export class Race {
     }));
     this.queue = this.marbles.slice();
     this.wippe = track.wippes.map((w) => ({ a: w.rest, w: 0 }));
+    this.turnAng = track.turns.map(() => 0);
+    this.drumAng = track.drums.map(() => 0);
+    this.overCum = cumOf(track.over);
     this.wheel = track.wheels.map(() => ({ ang: 0, slots: new Array(8).fill(-1), queue: [] }));
     this.rowTime = track.rows.map(() => 0);
     const c = track.conv;
@@ -715,6 +756,7 @@ export class Race {
   }
 
   step() {
+    this.hitsThisStep = 0;
     const h = TICK / SUB;
     for (let k = 0; k < SUB; k++) this.sub(h);
     if (this.t >= this.nextSample) {
@@ -751,6 +793,8 @@ export class Race {
     }
     for (const ev of this.events) if (!ev.done && t >= ev.at) this.runEvent(ev);
     this.track.wheels.forEach((wd, k) => (this.wheel[k].ang += wd.w * dt));
+    this.track.turns.forEach((td, k) => (this.turnAng[k] += td.w * dt));
+    this.track.drums.forEach((dd, k) => (this.drumAng[k] += dd.w * dt));
     this.conv.t += dt;
     const quake = t < this.quakeUntil;
     const live = this.marbles.filter((m) => m.on && !m.place);
@@ -787,7 +831,11 @@ export class Race {
           continue;
         }
         const [qx, qy] = closest(s.ax, s.ay, s.bx, s.by, m.x, m.y);
-        if (this.hit(m, qx, qy, s.th, s.e) && s.kind === 'rail' && s.row >= 0) row = s.row;
+        const vBefore = Math.hypot(m.vx, m.vy);
+        if (!this.hit(m, qx, qy, s.th, s.e)) continue;
+        if (s.kind === 'rail' && s.row >= 0) row = s.row;
+        if (s.kind === 'tramp') this.bounce(m, qx, qy, s);
+        else if (vBefore > 420 && this.hitsThisStep < 3 && Math.abs(m.vy) < vBefore * 0.5) { this.hitsThisStep++; this.fx.push(['hit', Math.round(m.x), Math.round(m.y), Math.min(9, Math.round(vBefore / 100))]); }
       }
       if (row >= 0) m.row = row;
       for (const p of this.pinBands.get(Math.floor(m.y / 100)) ?? []) {
@@ -797,6 +845,8 @@ export class Race {
       for (const wd of this.track.wheels) if (Math.abs(m.x - wd.cx) < 80 && Math.abs(m.y - wd.cy) < 80) this.hit(m, wd.cx, wd.cy, wd.hub, 0.2);
       this.wippeHit(m);
       this.rockerHit(m);
+      this.turnHit(m);
+      this.drumHit(m, dt);
       this.partHit(m);
       if (m.contact) {
         let k = 0.08;
@@ -830,6 +880,7 @@ export class Race {
         if (vn < 0) {
           const J = (-(1 + 0.55) * vn) / 2;
           a.vx -= J * nx; a.vy -= J * ny; b.vx += J * nx; b.vy += J * ny;
+          if (vn < -200 && this.hitsThisStep < 3) { this.hitsThisStep++; this.fx.push(['hit', Math.round(a.x), Math.round(a.y), Math.min(9, Math.round(-vn / 100))]); }
         }
       }
     }
@@ -885,10 +936,90 @@ export class Race {
 
   /** Die beiden Hälften sind strikt getrennt (außer über Förderband, Spirale und Rohrpost) */
   private keepHalf(m: Marble) {
-    if (this.t < m.crossUntil || m.y < 185) return;
+    if (this.t < m.crossUntil) return;
     const col = this.track.rows[m.row].col;
     if (col === 0 && m.x > WALL_X - 5 - R) { m.x = WALL_X - 5 - R; if (m.vx > 0) m.vx *= -0.3; }
-    else if (col === 1 && m.x < WALL_X + 5 + R && this.track.rows[m.row].key !== 'R0') { m.x = WALL_X + 5 + R; if (m.vx < 0) m.vx *= -0.3; }
+    else if (col === 1 && m.x < WALL_X + 5 + R) { m.x = WALL_X + 5 + R; if (m.vx < 0) m.vx *= -0.3; }
+  }
+
+  /** Trampolin: federt mindestens so stark zurück, dass die Murmel über die Kante kommt */
+  private bounce(m: Marble, qx: number, qy: number, s: Seg) {
+    let nx = m.x - qx, ny = m.y - qy;
+    const d = Math.hypot(nx, ny) || 1;
+    nx /= d; ny /= d;
+    const vn = m.vx * nx + m.vy * ny;
+    const want = 470 + this.rnd() * 130;
+    if (vn < want) { m.vx += (want - vn) * nx; m.vy += (want - vn) * ny; }
+    const key = Math.round(s.ax * 7 + s.ay);
+    if ((this.boingAt.get(key) ?? -1) < this.t - 0.12) { this.boingAt.set(key, this.t); this.fx.push(['boing', Math.round(qx), Math.round(qy)]); }
+  }
+
+  /** Drehkreuz: vier Arme, die sich fest drehen (Murmeln können sie nicht aufhalten) */
+  private turnHit(m: Marble) {
+    this.track.turns.forEach((td, k) => {
+      if (Math.abs(m.x - td.cx) > td.r + 16 || Math.abs(m.y - td.cy) > td.r + 16) return;
+      for (let a = 0; a < 4; a++) {
+        const ang = this.turnAng[k] + (a * Math.PI) / 2;
+        const bx = td.cx + Math.cos(ang) * td.r, by = td.cy + Math.sin(ang) * td.r;
+        const [qx, qy] = closest(td.cx, td.cy, bx, by, m.x, m.y);
+        this.movingHit(m, qx, qy, td.cx, td.cy, td.w, 3, 0.3);
+      }
+    });
+  }
+
+  /** Stoß gegen eine sich drehende Fläche (Drehkreuz, Trommel-Rippen) */
+  private movingHit(m: Marble, qx: number, qy: number, cx: number, cy: number, w: number, th: number, e: number) {
+    let nx = m.x - qx, ny = m.y - qy;
+    const d = Math.hypot(nx, ny);
+    if (d >= R + th || d === 0) return false;
+    nx /= d; ny /= d;
+    m.x += nx * (R + th - d); m.y += ny * (R + th - d);
+    const svx = -w * (qy - cy), svy = w * (qx - cx);
+    const vn = (m.vx - svx) * nx + (m.vy - svy) * ny;
+    if (vn < 0) { m.vx -= (1 + e) * vn * nx; m.vy -= (1 + e) * vn * ny; }
+    m.w = (m.vx * -ny + m.vy * nx) / R;
+    m.contact = true;
+    return true;
+  }
+
+  /** Lotterie-Trommel: Wand mit Öffnungen, drei Rippen, Reibung nimmt die Murmeln mit */
+  private drumHit(m: Marble, dt: number) {
+    this.track.drums.forEach((dd, k) => {
+      const dx = m.x - dd.cx, dy = m.y - dd.cy;
+      const dist = Math.hypot(dx, dy);
+      if (dist > dd.r + 20 || dist === 0) return;
+      const ang = Math.atan2(dy, dx);
+      const near = (a: number) => Math.abs(((ang - a + 3 * Math.PI) % (2 * Math.PI)) - Math.PI) < (a === dd.inA ? 0.5 : dd.gap);
+      const open = near(dd.inA) || near(dd.outA);
+      const th = 3;
+      if (!open) {
+        const nx = dx / dist, ny = dy / dist;
+        if (dist < dd.r && dist > dd.r - th - R) {
+          // innen an der Wand: nach innen schieben, Reibung in Drehrichtung
+          m.x = dd.cx + nx * (dd.r - th - R); m.y = dd.cy + ny * (dd.r - th - R);
+          const vn = m.vx * nx + m.vy * ny;
+          if (vn > 0) { m.vx -= 1.4 * vn * nx; m.vy -= 1.4 * vn * ny; }
+          const tx = -ny, ty = nx, wall = dd.w * dd.r;
+          const vt = m.vx * tx + m.vy * ty;
+          const f = 1 - Math.exp(-6 * dt);
+          m.vx += (wall - vt) * f * tx; m.vy += (wall - vt) * f * ty;
+          m.contact = true;
+        } else if (dist >= dd.r && dist < dd.r + th + R) {
+          m.x = dd.cx + nx * (dd.r + th + R); m.y = dd.cy + ny * (dd.r + th + R);
+          const vn = m.vx * nx + m.vy * ny;
+          if (vn < 0) { m.vx -= 1.3 * vn * nx; m.vy -= 1.3 * vn * ny; }
+          m.contact = true;
+        }
+      }
+      if (dist < dd.r) {
+        for (let a = 0; a < 3; a++) {
+          const ra = this.drumAng[k] + (a * 2 * Math.PI) / 3;
+          const c = Math.cos(ra), s = Math.sin(ra);
+          const [qx, qy] = closest(dd.cx + c * (dd.r - 18), dd.cy + s * (dd.r - 18), dd.cx + c * dd.r, dd.cy + s * dd.r, m.x, m.y);
+          this.movingHit(m, qx, qy, dd.cx, dd.cy, dd.w, 3, 0.2);
+        }
+      }
+    });
   }
 
   /** Freie Murmel betritt einen Baustein mit eigener Bewegung */
@@ -945,6 +1076,20 @@ export class Race {
       }
       return;
     }
+    if (m.kin === 'over') {
+      const ov = tr.over, cum = this.overCum;
+      m.ts += 300 * dt;
+      const len = cum[cum.length - 1];
+      if (m.ts >= len) {
+        const [ex, ey, tx, ty] = pathAt(ov, cum, len);
+        m.kin = ''; m.x = ex; m.y = ey; m.vx = tx * 300; m.vy = ty * 300;
+        m.crossUntil = this.t + 0.8;
+        return;
+      }
+      const [x, y] = pathAt(ov, cum, m.ts);
+      m.x = x; m.y = y; m.a += (300 / R) * dt;
+      return;
+    }
     if (m.kin === 'convWait') {
       const c = tr.conv;
       let k = 0;
@@ -957,7 +1102,8 @@ export class Race {
       const s = (this.conv.t * c.v + m.slot * c.sp) % this.conv.len;
       if (s < m.lastS) {
         this.conv.slots.delete(m.slot);
-        m.kin = ''; m.x = c.x + 30; m.y = c.y1 + 4; m.vx = 190; m.vy = -30;
+        // oben angekommen: durch die Glasröhre über die Trennwand
+        m.kin = 'over'; m.ts = 0;
         return;
       }
       m.lastS = s;
@@ -1086,11 +1232,13 @@ export class Race {
   /** Kippweiche als echte Wippe: das Gewicht der Murmel kippt sie, eine Feder holt sie zur Mitte zurück */
   private stepRocker(dt: number) {
     const st = this.rocker;
-    st.w += -st.a * 60 * dt;
-    st.w *= Math.exp(-8 * dt);
+    // keine Feder: sie bleibt, wie sie ist, und schwingt mit ihrem Schwung weiter (nur Lagerreibung)
+    // prallt am Anschlag zurück und schaukelt mit ihrem Schwung weiter
+    const eb = 0.8, fr = 0.2;
+    st.w *= Math.exp(-fr * dt);
     st.a += st.w * dt;
-    if (st.a > 0.42) { st.a = 0.42; st.w = Math.min(0, st.w) * -0.25; }
-    if (st.a < -0.42) { st.a = -0.42; st.w = Math.max(0, st.w) * -0.25; }
+    if (st.a > 0.42) { if (st.w > 0.6) this.fx.push(['clack', this.track.rocker.px + 50, this.track.rocker.py]); st.a = 0.42; st.w = -Math.max(0, st.w) * eb; }
+    if (st.a < -0.42) { if (st.w < -0.6) this.fx.push(['clack', this.track.rocker.px - 50, this.track.rocker.py]); st.a = -0.42; st.w = -Math.min(0, st.w) * eb; }
   }
 
   private wippeHit(m: Marble) {
@@ -1123,11 +1271,11 @@ export class Race {
   private stepWippes(dt: number) {
     this.track.wippes.forEach((wd, k) => {
       const st = this.wippe[k];
-      st.w += -(st.a - wd.rest) * 2 * dt;
-      st.w *= Math.exp(-1.5 * dt);
+      // echte Wippe: keine Rückstellfeder, sie behält Lage und Schwung
+      st.w *= Math.exp(-0.8 * dt);
       st.a += st.w * dt;
-      if (st.a > 0.42) { st.a = 0.42; st.w = Math.min(0, st.w); }
-      if (st.a < -0.42) { st.a = -0.42; st.w = Math.max(0, st.w); }
+      if (st.a > 0.42) { if (st.w > 0.6) this.fx.push(['clack', wd.px + wd.half, wd.py]); st.a = 0.42; st.w = Math.min(0, st.w) * -0.25; }
+      if (st.a < -0.42) { if (st.w < -0.6) this.fx.push(['clack', wd.px - wd.half, wd.py]); st.a = -0.42; st.w = Math.max(0, st.w) * -0.25; }
     });
   }
 
@@ -1403,8 +1551,9 @@ export class Race {
   }
 
   /** Zustand der beweglichen Bausteine: Radwinkel×100, Förderband-Weg, Weichenwinkel×100 */
-  blocks(): { wh: number[]; cv: number; rk: number } {
-    return { wh: this.wheel.map((w) => Math.round((w.ang % (2 * Math.PI)) * 100)), cv: Math.round((this.conv.t * this.track.conv.v) % this.track.conv.sp), rk: Math.round(this.rocker.a * 100) };
+  blocks(): { wh: number[]; cv: number; rk: number; tn: number[]; dr: number[] } {
+    const deg = (a: number) => Math.round((((a % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI)) * 100);
+    return { wh: this.wheel.map((w) => deg(w.ang)), cv: Math.round((this.conv.t * this.track.conv.v) % this.track.conv.sp), rk: Math.round(this.rocker.a * 100), tn: this.turnAng.map(deg), dr: this.drumAng.map(deg) };
   }
 
   /** Stream-Daten: [x, y, Drehung×100, Flags] je Murmel */
@@ -1417,6 +1566,7 @@ export class Race {
       if (m.shield) f |= F.shield;
       if (this.t < m.boostUntil) f |= F.boost;
       if (m.kin === 'conv' || m.kin === 'convWait') f |= F.behind;
+      if (m.kin === 'over') f |= F.glass;
       if (m.kin === 'spiral') f |= F.glass;
       return [Math.round(m.x), Math.round(m.on ? m.y : -60), Math.round(m.a * 100) % 628, f];
     });

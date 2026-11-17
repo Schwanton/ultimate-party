@@ -2,6 +2,13 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.34.0
+
+- Murmel-Mayhem: Drei neue Bausteine – Trampolin (die Murmeln springen über die Kante), Drehkreuz (vier Arme drehen sich über der Schiene) und Lotterie-Trommel (die Murmeln purzeln in einer drehenden Trommel, bis sie vorn herausfallen)
+- Die Hälften sind jetzt ganz getrennt: Auch Katapult und Federklappe schießen nicht mehr hinüber. Vom Förderband geht es durch eine Glasröhre über die Trennwand
+- Wippe und Weiche ohne Rückfeder: Sie bleiben, wie sie sind, und schaukeln mit ihrem Schwung weiter – am Anschlag prallen sie zurück
+- Geräusche: Rollen je nach Tempo, Klicken bei Zusammenstößen, Klacken der Wippen, Rauschen in den Glasröhren, Rattern am Förderband und ein „Boing“ am Trampolin
+
 ## 0.33.0
 
 - Murmel-Mayhem: Die Weiche an der Gabelung ist jetzt eine echte Wippe – das Gewicht der Murmeln kippt sie, danach federt sie zurück. Wie viele über den Looping rollen, ist jedes Rennen anders (meist etwa die Hälfte)

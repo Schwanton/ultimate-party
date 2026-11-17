@@ -4,7 +4,7 @@
   "lastRound": "letzte Runde, Punkte doppelt",
   "double": "Punkte doppelt",
   "lookAtTv": "Schau auf den Fernseher.",
-  "intro.text": "Jede Farbe schickt {n} Murmeln über eine riesige Bahn: Treppen, Schanzen, Nagelfelder, Förderband, Looping und Glasspirale. Vor jedem Rennen baut ihr heimlich Teile ein.",
+  "intro.text": "Jede Farbe schickt {n} Murmeln über eine riesige Bahn: Treppen, Schanzen, Trampoline, Drehkreuze, Lotterie-Trommeln, Förderband, Looping und Glasspirale. Vor jedem Rennen baut ihr heimlich Teile ein.",
   "intro.r1": "Grüne Hilfen wirken nur für deine Farbe: Schwungrad, Federklappe, Magnet, Glaskuppel.",
   "intro.r2": "Rote Fallen treffen alle anderen Farben: Honig, Schlagbaum, Prallpilz, Falltür, Ventilator, Bürsten.",
   "intro.r3": "Gelbe Klappen, Rohrpost und Katapult legst du im Rennen live auf dem Handy um.",
@@ -175,5 +175,9 @@
   "track.looping": "LOOPING",
   "track.spirale": "GLASSPIRALE",
   "end.rad": "Mühlrad",
-  "flight.new": "NEU"
+  "flight.new": "NEU",
+  "track.trampolin": "TRAMPOLIN",
+  "track.drehkreuz": "DREHKREUZ",
+  "track.lotterie": "LOTTERIE-TROMMEL",
+  "end.lotterie": "Lotterie-Trommel"
 }

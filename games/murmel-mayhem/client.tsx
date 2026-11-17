@@ -100,6 +100,9 @@ interface Geo {
   pins: [number, number][];
   wippes: { px: number; py: number; half: number; rest: number }[];
   wheels: { cx: number; cy: number; r: number; hub: number; n: number }[];
+  turns: { cx: number; cy: number; r: number; w: number }[];
+  drums: { cx: number; cy: number; r: number; w: number; inA: number; outA: number; gap: number }[];
+  over: Pt[];
   conv: { x: number; y0: number; y1: number; sp: number; v: number };
   rocker: { px: number; py: number; half: number };
   loop: { cx: number; cy: number; r: number };
@@ -183,7 +186,16 @@ function renderTrack(geo: Geo, t: (k: string) => string): { back: HTMLCanvasElem
     if (s.kind === 'glass') line(g, s.ax, s.ay, s.bx, s.by, [['rgba(217,238,252,.55)', 6, 0], ['rgba(255,255,255,.25)', 2, -1]]);
     else if (s.kind === 'frame') line(g, s.ax, s.ay, s.bx, s.by, [['#2a1a0c', 14, 0], ['#6e4a14', 9, 0]]);
     else if (s.kind === 'wall') line(g, s.ax, s.ay, s.bx, s.by, [['#3d270b', 12, 0], ['#a87a30', 8, 0], ['#f3d38a', 2, 0]]);
-    else line(g, s.ax, s.ay, s.bx, s.by, RAIL);
+    else if (s.kind === 'tramp') {
+      // Trampolin: rot-weißes Sprungtuch zwischen zwei Federn
+      line(g, s.ax, s.ay, s.bx, s.by, [['#3d270b', 9, 0]]);
+      const n = 8;
+      for (let k = 0; k < n; k++) {
+        const f0 = k / n, f1 = (k + 1) / n;
+        line(g, s.ax + (s.bx - s.ax) * f0, s.ay + (s.by - s.ay) * f0, s.ax + (s.bx - s.ax) * f1, s.ay + (s.by - s.ay) * f1, [[k % 2 ? '#f4e6c8' : '#d3452f', 5, 0]]);
+      }
+      for (const [x, y] of [[s.ax, s.ay], [s.bx, s.by]]) { g.strokeStyle = '#a87a30'; g.lineWidth = 2; g.beginPath(); for (let k = 0; k < 5; k++) g.lineTo(x + (k % 2 ? 4 : -4), y + 4 + k * 4); g.stroke(); }
+    } else line(g, s.ax, s.ay, s.bx, s.by, RAIL);
   }
   for (const [x, y] of geo.pins) { g.fillStyle = disc(g, x, y, 3.6); g.beginPath(); g.arc(x, y, 3.6, 0, Math.PI * 2); g.fill(); }
   for (const w of geo.wippes) {
@@ -381,7 +393,7 @@ function drawPart(g: G2, it: PubItem, geo: Geo, st: PartState, now: number, owne
 }
 
 /** Bewegliche Bausteine: Mühlräder, Förderband-Körbe, Kippweiche */
-interface Blocks { wh: number[]; cv: number; rk: number }
+interface Blocks { wh: number[]; cv: number; rk: number; tn?: number[]; dr?: number[] }
 function drawWheels(g: G2, geo: Geo, b: Blocks | null, now: number) {
   geo.wheels.forEach((w, k) => {
     const ang = b ? (b.wh[k] ?? 0) / 100 : -now / 900;
@@ -410,15 +422,57 @@ function drawRocker(g: G2, geo: Geo, a: number) {
   line(g, rk.px - c * rk.half, rk.py - s * rk.half, rk.px + c * rk.half, rk.py + s * rk.half, RAIL);
   g.fillStyle = '#3d270b'; g.beginPath(); g.arc(rk.px, rk.py, 4, 0, Math.PI * 2); g.fill();
 }
+/** Glasröhren (Spirale und Röhre über die Trennwand), Murmeln darin werden zwischen Füllung und Rand gezeichnet */
 function drawSpiral(g: G2, geo: Geo, inner?: () => void) {
-  const sp = geo.spiral;
+  const tubes = [geo.spiral, geo.over ?? []].filter((t) => t.length > 1);
   g.lineCap = 'round'; g.lineJoin = 'round';
   g.strokeStyle = 'rgba(191,227,255,.14)'; g.lineWidth = 26;
-  g.beginPath(); sp.forEach(([x, y], k) => (k ? g.lineTo(x, y) : g.moveTo(x, y))); g.stroke();
+  for (const sp of tubes) { g.beginPath(); sp.forEach(([x, y], k) => (k ? g.lineTo(x, y) : g.moveTo(x, y))); g.stroke(); }
   inner?.();
   g.strokeStyle = 'rgba(217,238,252,.5)'; g.lineWidth = 2;
-  for (const off of [-12, 12]) { g.beginPath(); sp.forEach(([x, y], k) => (k ? g.lineTo(x + off, y) : g.moveTo(x + off, y))); g.stroke(); }
+  for (const sp of tubes) for (const off of [-12, 12]) { g.beginPath(); sp.forEach(([x, y], k) => (k ? g.lineTo(x + off, y) : g.moveTo(x + off, y))); g.stroke(); }
+  const sp = geo.spiral;
   g.fillStyle = brassGrad(g, sp[0][1] - 20, sp[0][1] + 20); g.beginPath(); g.ellipse(sp[0][0], sp[0][1] - 2, 22, 10, 0, 0, Math.PI * 2); g.fill();
+}
+
+/** Drehkreuze: Messingnabe mit vier Armen */
+function drawTurns(g: G2, geo: Geo, b: Blocks | null, now: number) {
+  (geo.turns ?? []).forEach((td, k) => {
+    const ang = b?.tn ? (b.tn[k] ?? 0) / 100 : (td.w * now) / 1000;
+    for (let a = 0; a < 4; a++) {
+      const r2 = ang + (a * Math.PI) / 2;
+      line(g, td.cx, td.cy, td.cx + Math.cos(r2) * td.r, td.cy + Math.sin(r2) * td.r, [['#3d270b', 8, 0], ['#c8963c', 4, 0]]);
+    }
+    g.fillStyle = disc(g, td.cx, td.cy, 8); g.beginPath(); g.arc(td.cx, td.cy, 8, 0, Math.PI * 2); g.fill();
+  });
+}
+
+/** Lotterie-Trommeln: Glasring mit Messingrippen, oben Einwurf, vorn Ausgang */
+function drawDrums(g: G2, geo: Geo, b: Blocks | null, now: number, inner?: () => void) {
+  (geo.drums ?? []).forEach((dd, k) => {
+    const ang = b?.dr ? (b.dr[k] ?? 0) / 100 : (dd.w * now) / 1000;
+    g.fillStyle = 'rgba(191,227,255,.08)'; g.beginPath(); g.arc(dd.cx, dd.cy, dd.r, 0, Math.PI * 2); g.fill();
+    // Ring mit zwei Öffnungen
+    const arcs: [number, number][] = [];
+    const gaps = [[dd.inA, 0.5], [dd.outA, dd.gap]].map(([a, w]) => [((a - w) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI), w * 2]).sort((x, y) => x[0] - y[0]);
+    for (let i = 0; i < gaps.length; i++) {
+      const start = gaps[i][0] + gaps[i][1];
+      const end = i + 1 < gaps.length ? gaps[i + 1][0] : gaps[0][0] + 2 * Math.PI;
+      arcs.push([start, end]);
+    }
+    for (const [a0, a1] of arcs) {
+      g.strokeStyle = '#3d270b'; g.lineWidth = 9; g.beginPath(); g.arc(dd.cx, dd.cy, dd.r + 1.5, a0, a1); g.stroke();
+      g.strokeStyle = 'rgba(217,238,252,.75)'; g.lineWidth = 4; g.beginPath(); g.arc(dd.cx, dd.cy, dd.r + 1.5, a0, a1); g.stroke();
+    }
+    inner?.();
+    for (let a = 0; a < 3; a++) {
+      const ra = ang + (a * 2 * Math.PI) / 3, c = Math.cos(ra), s = Math.sin(ra);
+      line(g, dd.cx + c * (dd.r - 18), dd.cy + s * (dd.r - 18), dd.cx + c * dd.r, dd.cy + s * dd.r, [['#3d270b', 7, 0], ['#c8963c', 3, 0]]);
+    }
+    g.strokeStyle = 'rgba(200,150,60,.5)'; g.lineWidth = 2;
+    for (let a = 0; a < 3; a++) { const ra = ang + (a * 2 * Math.PI) / 3 + Math.PI / 3; g.beginPath(); g.moveTo(dd.cx, dd.cy); g.lineTo(dd.cx + Math.cos(ra) * (dd.r - 6), dd.cy + Math.sin(ra) * (dd.r - 6)); g.stroke(); }
+    g.fillStyle = disc(g, dd.cx, dd.cy, 7); g.beginPath(); g.arc(dd.cx, dd.cy, 7, 0, Math.PI * 2); g.fill();
+  });
 }
 
 /* ================= TV ================= */
@@ -470,7 +524,9 @@ function Overview({ geo, version, items, width, height, t, colorOf, highlight, f
     g.drawImage(layer.front, 0, 0);
     for (const wd of geo.wippes) line(g, wd.px - Math.cos(wd.rest) * wd.half, wd.py - Math.sin(wd.rest) * wd.half, wd.px + Math.cos(wd.rest) * wd.half, wd.py + Math.sin(wd.rest) * wd.half, RAIL);
     drawWheels(g, geo, null, 0);
-    drawRocker(g, geo, 0.42);
+    drawTurns(g, geo, null, 0);
+    drawDrums(g, geo, null, 0);
+    drawRocker(g, geo, 0);
     drawSpiral(g, geo);
     const freshIds = new Set((fresh ?? []).map((f) => f.id));
     for (const it of items) {
@@ -798,12 +854,50 @@ function HostRace({ view, t, player }: HostViewProps) {
         sfx.custom((s) => s.tone(300, 0.35, { type: 'sine', vol: 0.06, to: 900 }));
       } else if (kind === 'gust') {
         sfx.custom((s) => s.noise(0.8, { filter: 900, sweepTo: 400, vol: 0.08 }));
+      } else if (kind === 'hit' || kind === 'clack' || kind === 'boing') {
+        // Geräusche nur, wenn es im Bild passiert
+        const x = Number(e[1]), y = Number(e[2]);
+        const cm = cam.current;
+        if (Math.abs(x - cm.x) > 800 || Math.abs(y - cm.y) > 500) continue;
+        if (kind === 'hit') {
+          const str = Number(e[3]) || 3;
+          sfx.custom((s) => { s.tone(1700 + Math.random() * 1400, 0.035, { type: 'triangle', vol: Math.min(0.05, 0.007 * str) }); s.noise(0.02, { filter: 5000, type: 'highpass', vol: Math.min(0.04, 0.005 * str) }); });
+        } else if (kind === 'clack') {
+          sfx.custom((s) => { s.tone(300, 0.07, { type: 'square', vol: 0.035, to: 220 }); s.noise(0.05, { filter: 700, type: 'lowpass', vol: 0.08 }); });
+        } else {
+          sfx.custom((s) => s.tone(150, 0.28, { type: 'sine', vol: 0.07, to: 430 }));
+        }
       } else if (kind === 'giant') {
         effects.current.push({ kind: 'ring', x: Number(e[1]), y: Number(e[2]), at: n, color: '#bbbbbb', r: 50 });
       }
     }
     if (banner.current && n - banner.current.at < 50) setBannerText({ text: banner.current.text, key: banner.current.at });
   }, [fr]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  /** Hintergrund-Geräusche: Rollen je nach Tempo, Rauschen in den Glasröhren, Rattern am Förderband */
+  useEffect(() => {
+    if (flight) return;
+    const id = setInterval(() => {
+      const { prev, cur } = frames.current;
+      if (!cur || !prev) return;
+      const cm = cam.current;
+      let n = 0, sum = 0, glass = 0, behind = 0;
+      cur.m.forEach((q, i) => {
+        const p = prev.m[i] ?? q;
+        if (q[3] & FLAG.done || Math.abs(q[0] - cm.x) > 700 || Math.abs(q[1] - cm.y) > 420) return;
+        if (q[3] & FLAG.glass) glass++;
+        else if (q[3] & FLAG.behind) behind++;
+        else { const v = Math.hypot(q[0] - p[0], q[1] - p[1]) * 30; if (v < 2000) { n++; sum += v; } }
+      });
+      const avg = n ? sum / n : 0;
+      sfx.custom((s) => {
+        if (n && avg > 40) s.noise(0.27, { filter: 160 + Math.min(900, avg * 0.7), type: 'lowpass', vol: Math.min(0.09, 0.016 * Math.sqrt(n)) * Math.min(1, avg / 350) });
+        if (glass) s.noise(0.27, { filter: 2600, type: 'bandpass', vol: 0.012 * Math.min(4, glass) });
+        if (behind) { s.tone(95, 0.04, { type: 'square', vol: 0.025 }); s.tone(95, 0.04, { type: 'square', vol: 0.02, at: 0.12 }); }
+      });
+    }, 220);
+    return () => clearInterval(id);
+  }, [flight]);
 
   useEffect(() => {
     if (!bannerText) return;
@@ -902,7 +996,9 @@ function HostRace({ view, t, player }: HostViewProps) {
         g.fillStyle = '#3d270b'; g.beginPath(); g.arc(wd.px, wd.py, 4, 0, Math.PI * 2); g.fill();
       });
       drawWheels(g, geo, blocks, n);
-      drawRocker(g, geo, blocks ? blocks.rk / 100 : 0.42);
+      drawTurns(g, geo, blocks, n);
+      drawDrums(g, geo, blocks, n);
+      drawRocker(g, geo, blocks ? blocks.rk / 100 : 0);
       /** Bei der Kamerafahrt führen die Teile vor, was sie tun (Falltür klappt auf, Schlagbaum geht zu …) */
       const demo = (it: PubItem): [PubItem, PartState] => {
         const st = stOf(it.id);
@@ -1217,9 +1313,12 @@ function PlanSvg({ geo, scale, children }: { geo: Geo; scale: number; children?:
       <rect width={geo.W} height={geo.H} fill="#1f150d" />
       <line x1={geo.conv.x} y1={geo.conv.y0} x2={geo.conv.x} y2={geo.conv.y1} stroke="#6e4a14" strokeWidth={22} strokeDasharray="14 10" />
       {geo.segs.map((s, i) => (
-        <line key={i} x1={s.ax} y1={s.ay} x2={s.bx} y2={s.by} stroke={s.kind === 'glass' ? '#9fc2d8' : '#c8963c'} strokeWidth={s.kind === 'glass' ? 5 : 11} strokeLinecap="round" opacity={s.kind === 'glass' ? 0.6 : 1} />
+        <line key={i} x1={s.ax} y1={s.ay} x2={s.bx} y2={s.by} stroke={s.kind === 'glass' ? '#9fc2d8' : s.kind === 'tramp' ? '#d3452f' : '#c8963c'} strokeWidth={s.kind === 'glass' ? 5 : 11} strokeLinecap="round" opacity={s.kind === 'glass' ? 0.6 : 1} />
       ))}
       {geo.wheels.map((w, i) => <circle key={`w${i}`} cx={w.cx} cy={w.cy} r={w.r + 10} fill="none" stroke="#a87a30" strokeWidth={10} />)}
+      {(geo.drums ?? []).map((w, i) => <circle key={`d${i}`} cx={w.cx} cy={w.cy} r={w.r} fill="rgba(191,227,255,.12)" stroke="#9fc2d8" strokeWidth={6} />)}
+      {(geo.turns ?? []).map((w, i) => <g key={`t${i}`}><line x1={w.cx - w.r} y1={w.cy} x2={w.cx + w.r} y2={w.cy} stroke="#c8963c" strokeWidth={8} /><line x1={w.cx} y1={w.cy - w.r} x2={w.cx} y2={w.cy + w.r} stroke="#c8963c" strokeWidth={8} /></g>)}
+      {(geo.over ?? []).length > 1 && <polyline points={geo.over.map((p) => p.join(',')).join(' ')} fill="none" stroke="#9fc2d8" strokeWidth={20} opacity={0.4} />}
       <circle cx={geo.loop.cx} cy={geo.loop.cy} r={geo.loop.r} fill="none" stroke="#c8963c" strokeWidth={10} />
       <polyline points={geo.spiral.map((p) => p.join(',')).join(' ')} fill="none" stroke="#9fc2d8" strokeWidth={20} opacity={0.4} />
       <rect x={geo.finish.x0} y={geo.finish.y - 40} width={geo.finish.x1 - geo.finish.x0} height={40} fill="rgba(233,196,106,.25)" />

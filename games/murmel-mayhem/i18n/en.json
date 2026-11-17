@@ -4,7 +4,7 @@
   "lastRound": "last round, double points",
   "double": "double points",
   "lookAtTv": "Look at the TV.",
-  "intro.text": "Every colour sends {n} marbles over a giant track: stairs, ski jumps, pin fields, conveyor, loop and glass spiral. Before each race you secretly build in parts.",
+  "intro.text": "Every colour sends {n} marbles over a giant track: stairs, ski jumps, trampolines, turnstiles, lottery drums, conveyor, loop and glass spiral. Before each race you secretly build in parts.",
   "intro.r1": "Green helpers only work for your colour: flywheel, spring flap, magnet, glass dome.",
   "intro.r2": "Red traps hit every other colour: honey, barrier, bumper, trapdoor, fan, brushes.",
   "intro.r3": "Yellow flaps, pneumatic tube and catapult can be flipped live on your phone during the race.",
@@ -175,5 +175,9 @@
   "track.looping": "LOOP",
   "track.spirale": "GLASS SPIRAL",
   "end.rad": "mill wheel",
-  "flight.new": "NEW"
+  "flight.new": "NEW",
+  "track.trampolin": "TRAMPOLINE",
+  "track.drehkreuz": "TURNSTILE",
+  "track.lotterie": "LOTTERY DRUM",
+  "end.lotterie": "lottery drum"
 }
