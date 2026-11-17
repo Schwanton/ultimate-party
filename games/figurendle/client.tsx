@@ -188,77 +188,69 @@ function HostSolo({ view, t, player }: HostViewProps) {
 function CellBox({ cell, h = 50, size = 14, anim }: { cell: Cell; h?: number; size?: number; anim?: CSSProperties }) {
   return (
     <div style={{ ...anim, background: C[cell.c], color: FG[cell.c], borderRadius: 4, minHeight: h, padding: 4, boxSizing: 'border-box', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', fontSize: size, fontWeight: 700, lineHeight: 1.1, boxShadow: 'inset 0 -3px 0 rgba(0,0,0,.18)', overflow: 'hidden', overflowWrap: 'break-word', hyphens: 'auto' }}>
-      <span style={{ fontSize: cell.t.length > 18 ? size - 2 : size }}>{cell.t}</span>
+      {cell.t.includes(', ')
+        ? <span style={{ fontSize: size - 3, whiteSpace: 'pre-line' }}>{cell.t.split(', ').join('\n')}</span>
+        : <span style={{ fontSize: cell.t.length > 18 ? size - 2 : size }}>{cell.t}</span>}
       {cell.a && <span style={{ fontSize: size + 3 }}>{ARROW[cell.a]}</span>}
     </div>
   );
 }
 
 function HostBrett({ view, t, player }: HostViewProps) {
-  const board = view.board as { name: string; by: string; cells: Cell[]; gain: number }[];
+  const board = view.board as { name: string; by: string; cells: Cell[]; gain: number; img?: string | null }[];
   const cols = (view.short ?? view.cols) as string[];
-  const gains = view.gains as { id: string; g: number }[];
   const len = view.misses as number;
   const prev = useRef(len);
   useEffect(() => {
     if (len <= prev.current) { prev.current = len; return; }
     prev.current = len;
-    const timers = cols.map((_, k) => setTimeout(() => sfx.play('pop'), k * STEP * 1000));
-    if (board[0]?.gain) timers.push(setTimeout(() => sfx.play('ding'), cols.length * STEP * 1000));
+    const timers = cols.map((_, k) => setTimeout(() => sfx.play('pop'), (k + 1) * STEP * 1000));
+    if (board[0]?.gain) timers.push(setTimeout(() => sfx.play('ding'), (cols.length + 1) * STEP * 1000));
     return () => timers.forEach(clearTimeout);
   }, [len]);
-  const grid = `150px repeat(${cols.length}, minmax(0, 1fr))`;
+  const grid = `250px repeat(${cols.length}, minmax(0, 1fr))`;
   const left = Math.max(0, view.letterAfter - len);
   return (
-    <Frame>
-      <Header view={view} t={t} />
-      <div style={{ flex: 1, minHeight: 0, display: 'flex', gap: 20 }}>
-        <Panel style={{ flex: 1, minWidth: 0, padding: 14, display: 'flex', flexDirection: 'column', gap: 6, overflow: 'hidden' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: grid, gap: 5, fontSize: 14, fontWeight: 800, color: MUTED, textAlign: 'center' }}>
-            <span style={{ textAlign: 'left' }}>{t('brett.figure')}</span>
-            {cols.map((c) => <span key={c} style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c}</span>)}
-          </div>
-          {board.length === 0 && <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: DISPLAY, fontSize: 40, color: MUTED }}>{t('brett.empty')}</div>}
-          {board.slice(0, 8).map((b, i) => {
-            const p = player(b.by);
-            return (
-              <div key={len - i} className={i === 0 ? 'anim-up' : undefined} style={{ display: 'grid', gridTemplateColumns: grid, gap: 5 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-                  {p && <Avatar player={p} size={30} flat />}
-                  <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, lineHeight: 1.1 }}>
-                    <span style={{ fontSize: 17, fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{b.name}</span>
-                    <span style={{ fontSize: 13, color: MUTED }}>{t('by', { name: p?.name ?? '?' })}{b.gain ? ` · +${b.gain}` : ''}</span>
-                  </div>
-                </div>
-                {b.cells.map((c, k) => <CellBox key={k} cell={c} anim={pop(k + 1, i === 0)} />)}
-              </div>
-            );
-          })}
-        </Panel>
-        <div style={{ width: 250, flex: 'none', display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <div style={{ background: INK, color: '#f3e6c4', borderRadius: 6, padding: 16, display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <span style={{ fontSize: 14, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, color: '#d9c08a' }}>{t('brett.letter')}</span>
-            {view.letter
-              ? <span className="anim-pop" style={{ fontFamily: DISPLAY, fontSize: 72, lineHeight: 1 }}>{view.letter}</span>
-              : <span style={{ fontFamily: DISPLAY, fontSize: 36, lineHeight: 1.05 }}>{t('brett.letterIn', { n: left })}</span>}
-            <span style={{ fontSize: 15 }}>{t('brett.letterCount', { n: len, max: view.letterAfter })}</span>
-          </div>
-          <Panel style={{ padding: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <span style={{ fontSize: 14, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, color: MUTED }}>{t('brett.gains')}</span>
-            {gains.length === 0 && <span style={{ fontSize: 16, color: MUTED }}>{t('brett.noGains')}</span>}
-            {gains.slice(0, 6).map((g) => {
-              const p = player(g.id);
-              return (
-                <div key={g.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, fontSize: 18, fontWeight: 700 }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>{p && <Avatar player={p} size={26} flat />}<span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p?.name ?? '?'}</span></span>
-                  <span style={{ color: C.g }}>+{g.g}</span>
-                </div>
-              );
-            })}
-          </Panel>
-          <Legend t={t} size={15} />
-          <div style={{ marginTop: 'auto', fontSize: 16, fontWeight: 700, color: MUTED, lineHeight: 1.3 }}>{t('brett.rule')}</div>
+    <Frame gap={14}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 20, flex: 'none', paddingLeft: 36 }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 18 }}>
+          <Title />
+          <span style={{ fontSize: 22, fontWeight: 700, color: MUTED }}>{t('round', { n: view.round, total: view.total })}{view.mult > 1 ? ` · ${t('double')}` : ''}</span>
         </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          {view.letter
+            ? <span className="anim-pop" style={{ background: INK, color: '#f3e6c4', borderRadius: 999, padding: '6px 18px', fontSize: 22, fontWeight: 800 }}>{t('brett.letter')}: <span style={{ fontFamily: DISPLAY, fontSize: 30 }}>{view.letter}</span></span>
+            : <span style={{ fontSize: 20, fontWeight: 700, color: MUTED }}>{t('brett.letter')}: {t('brett.letterIn', { n: left })}</span>}
+          <Chip>{t(`mode.${view.mode}`)}</Chip>
+        </div>
+      </div>
+      <Panel style={{ flex: 1, minHeight: 0, padding: 14, display: 'flex', flexDirection: 'column', gap: 7, overflow: 'hidden' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: grid, gap: 7, fontSize: 18, fontWeight: 800, color: MUTED, textAlign: 'center' }}>
+          <span style={{ textAlign: 'left' }}>{t('brett.figure')}</span>
+          {cols.map((c) => <span key={c} style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c}</span>)}
+        </div>
+        {board.length === 0 && <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: DISPLAY, fontSize: 48, color: MUTED }}>{t('brett.empty')}</div>}
+        {board.slice(0, 6).map((b, i) => {
+          const p = player(b.by);
+          return (
+            <div key={len - i} className={i === 0 ? 'anim-up' : undefined} style={{ display: 'grid', gridTemplateColumns: grid, gap: 7 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+                {b.img
+                  ? <img src={b.img} alt="" referrerPolicy="no-referrer" style={{ width: 58, height: 70, objectFit: 'cover', objectPosition: 'top', borderRadius: 4, border: `2px solid ${EDGE}`, flex: 'none', background: '#d8bf86' }} />
+                  : p && <Avatar player={p} size={46} flat />}
+                <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, lineHeight: 1.12 }}>
+                  <span style={{ fontSize: 22, fontWeight: 800, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{b.name}</span>
+                  <span style={{ fontSize: 16, color: MUTED, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t('by', { name: p?.name ?? '?' })}{b.gain ? ` · +${b.gain}` : ''}</span>
+                </div>
+              </div>
+              {b.cells.map((c, k) => <CellBox key={k} cell={c} h={74} size={18} anim={pop(k + 1, i === 0)} />)}
+            </div>
+          );
+        })}
+      </Panel>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, flex: 'none', padding: '0 70px 0 96px' }}>
+        <Legend t={t} />
+        <span style={{ fontSize: 18, fontWeight: 700, color: MUTED }}>{t('brett.rule')}</span>
       </div>
     </Frame>
   );
@@ -271,7 +263,7 @@ function Poster({ secret, t }: { secret: { name: string; img: string | null; fac
       <span style={{ fontFamily: DISPLAY, fontSize: 72, lineHeight: 0.9, letterSpacing: 2 }}>{t('reveal.wanted')}</span>
       <div style={{ width: 320, height: 290, border: `3px solid ${INK}`, background: '#d8bf86', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
         {secret.img
-          ? <img src={secret.img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', filter: 'sepia(.25)' }} />
+          ? <img referrerPolicy="no-referrer" src={secret.img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', filter: 'sepia(.25)' }} />
           : <span style={{ fontFamily: DISPLAY, fontSize: 120, color: '#a88a52' }}>{secret.name.charAt(0)}</span>}
       </div>
       <span style={{ fontFamily: DISPLAY, fontSize: 20, letterSpacing: 3 }}>{t('reveal.deadOrAlive')}</span>
@@ -455,7 +447,7 @@ function Search({ figs, tried, disabled, onPick, t, label }: { figs: FigEntry[];
               <button key={f.id} type="button" disabled={off} onClick={() => { onPick(f.id); setQ(''); }}
                 style={{ width: '100%', minHeight: 52, display: 'flex', alignItems: 'center', gap: 10, padding: '6px 12px', border: 0, borderBottom: '1px solid #e3d3ad', background: 'transparent', fontFamily: FONT, textAlign: 'left', cursor: off ? 'default' : 'pointer', opacity: done.has(f.id) ? 0.45 : 1 }}>
                 <span style={{ width: 38, height: 38, borderRadius: 6, background: '#d8bf86', color: MUTED, fontWeight: 800, fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none', overflow: 'hidden' }}>
-                  {f.img ? <img src={f.img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} /> : f.n.charAt(0)}
+                  {f.img ? <img referrerPolicy="no-referrer" src={f.img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} /> : f.n.charAt(0)}
                 </span>
                 <span style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.15, minWidth: 0 }}>
                   <span style={{ fontSize: 18, fontWeight: 800, color: INK }}>{f.n}</span>
@@ -606,7 +598,7 @@ function PhoneSolved({ view, t, send, player }: ControllerViewProps) {
       <span style={{ fontSize: 22, fontWeight: 800, textAlign: 'center', marginTop: 10 }}>{t('phone.placeTries', { place: view.place, n: view.tries })}</span>
       <div style={{ background: POSTER, border: '3px solid #6b4a1e', borderRadius: 6, padding: 16, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
         <span style={{ fontSize: 14, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, color: MUTED }}>{t('phone.figure')}</span>
-        {view.img && <img src={view.img} alt="" style={{ width: 120, height: 120, objectFit: 'cover', objectPosition: 'top', border: `3px solid ${INK}` }} />}
+        {view.img && <img referrerPolicy="no-referrer" src={view.img} alt="" style={{ width: 120, height: 120, objectFit: 'cover', objectPosition: 'top', border: `3px solid ${INK}` }} />}
         <span style={{ fontFamily: DISPLAY, fontSize: 38, lineHeight: 1.05, color: RUST, textAlign: 'center' }}>{view.name}</span>
         <span style={{ fontSize: 15, fontWeight: 700, color: C.r }}>{t('phone.secret')}</span>
       </div>
@@ -638,7 +630,7 @@ function PhoneReveal({ view, t }: ControllerViewProps) {
     <Phone>
       <PhoneTop />
       <PhoneMsg title={view.place ? t('phone.found') : t('phone.notFound')} text={t('phone.solution')}>
-        {view.img && <img src={view.img} alt="" style={{ width: 140, height: 140, objectFit: 'cover', objectPosition: 'top', border: `3px solid ${INK}` }} />}
+        {view.img && <img referrerPolicy="no-referrer" src={view.img} alt="" style={{ width: 140, height: 140, objectFit: 'cover', objectPosition: 'top', border: `3px solid ${INK}` }} />}
         <span style={{ fontFamily: DISPLAY, fontSize: 40, color: RUST, lineHeight: 1.05 }}>{view.name}</span>
         <span style={{ fontSize: 30, fontWeight: 800, color: view.points ? C.g : MUTED }}>+{view.points}</span>
       </PhoneMsg>

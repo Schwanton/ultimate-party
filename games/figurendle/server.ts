@@ -17,6 +17,8 @@ interface ColDef { thema: string; titel?: string; spalten: Col[] }
 
 const T = { intro: 10, revealSolo: 5, revealStep: 0.45, revealMax: 14, revealBrett: 9, scores: 7, cooldown: 3 };
 const LETTER_AFTER = 10;
+/** Bis alle Felder eines Tipps aufgeploppt sind (wie im Client: 0,28 s Abstand) + kurze Pause */
+const popTime = (n: number) => n * 0.28 + 1.4;
 const BRETT_HIT = 1000;
 const BRETT_GREEN = 100;
 const MAX_ROWS = 400;
@@ -45,54 +47,40 @@ function shortId(id: string) {
   return id.replace(/^[^-]+-/, '').toLowerCase();
 }
 
-export async function downloadImages(base: string, figs: Fig[], have: Map<string, string>): Promise<void> {
-  const want = figs.filter((f) => typeof f.wiki === 'string' && f.wiki && !have.has(f.id.toLowerCase()) && !have.has(shortId(f.id)) && !failed.has(f.id));
+const LOG = () => path.join(IMG_DIR, 'protokoll.txt');
+function log(line: string) {
+  try { fs.appendFileSync(LOG(), `${new Date().toISOString()} ${line}\n`); } catch { /* egal */ }
+}
+
+/** Lädt die Bilder (Feld „bild“ im Pack) auf diesen Rechner, damit sie auch ohne Internet da sind. */
+export async function downloadImages(figs: Fig[], have: Map<string, string>): Promise<void> {
+  const want = figs.filter((f) => typeof f.bild === 'string' && /^https:\/\//.test(f.bild) && !have.has(f.id.toLowerCase()) && !have.has(shortId(f.id)) && !failed.has(f.id));
   if (!want.length) return;
   fs.mkdirSync(IMG_DIR, { recursive: true });
-  const headers = { 'User-Agent': 'UP-Ultimate-Party/1.0 (Partyspiel Figurendle; github.com/Schwanton/ultimate-party)' };
-  const sources = new Map<string, string>();
-  for (let i = 0; i < want.length; i += 40) {
-    const part = want.slice(i, i + 40);
-    const titles = part.map((f) => String(f.wiki).replace(/_/g, ' '));
-    try {
-      const url = `${base.replace(/\/$/, '')}/api.php?action=query&prop=pageimages&piprop=thumbnail&pithumbsize=480&format=json&formatversion=2&redirects=1&titles=${encodeURIComponent(titles.join('|'))}`;
-      const res = await fetch(url, { headers, signal: AbortSignal.timeout(20000) });
-      const data = (await res.json()) as { query?: { pages?: { title: string; thumbnail?: { source: string } }[]; normalized?: { from: string; to: string }[]; redirects?: { from: string; to: string }[] } };
-      const q = data.query ?? {};
-      const follow = (t: string) => {
-        for (const list of [q.normalized ?? [], q.redirects ?? []]) for (const m of list) if (m.from === t) t = m.to;
-        return t;
-      };
-      const byTitle = new Map((q.pages ?? []).map((p) => [p.title, p.thumbnail?.source]));
-      part.forEach((f, k) => {
-        const src = byTitle.get(follow(titles[k]));
-        if (src) sources.set(f.id, src);
-        else failed.add(f.id);
-      });
-    } catch {
-      return; // kein Internet o. Ä.: beim nächsten Spiel noch einmal versuchen
-    }
-  }
-  const queue = [...sources];
+  log(`Lade ${want.length} Bilder …`);
+  const headers = { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36', Accept: 'image/webp,image/png,image/*;q=0.8' };
+  const queue = [...want];
+  let ok = 0;
   const worker = async () => {
-    for (let job = queue.shift(); job; job = queue.shift()) {
-      const [id, src] = job;
+    for (let f = queue.shift(); f; f = queue.shift()) {
       try {
-        const res = await fetch(src, { headers, signal: AbortSignal.timeout(30000) });
+        const res = await fetch(String(f.bild), { headers, signal: AbortSignal.timeout(30000) });
         const type = res.headers.get('content-type') ?? '';
         const ext = type.includes('png') ? 'png' : type.includes('webp') ? 'webp' : type.includes('jpeg') || type.includes('jpg') ? 'jpg' : null;
-        if (!res.ok || !ext) { failed.add(id); continue; }
+        if (!res.ok || !ext) { failed.add(f.id); log(`${f.id}: HTTP ${res.status} ${type}`); continue; }
         const buf = Buffer.from(await res.arrayBuffer());
-        if (buf.length < 500 || buf.length > 8_000_000) { failed.add(id); continue; }
-        const tmp = path.join(IMG_DIR, `.${shortId(id)}.tmp`);
+        if (buf.length < 500 || buf.length > 8_000_000) { failed.add(f.id); log(`${f.id}: Größe ${buf.length}`); continue; }
+        const tmp = path.join(IMG_DIR, `.${shortId(f.id)}.tmp`);
         fs.writeFileSync(tmp, buf);
-        fs.renameSync(tmp, path.join(IMG_DIR, `${shortId(id)}.${ext}`));
-      } catch {
-        /* nächstes Mal */
+        fs.renameSync(tmp, path.join(IMG_DIR, `${shortId(f.id)}.${ext}`));
+        ok++;
+      } catch (e) {
+        log(`${f.id}: ${(e as Error).message}`);
       }
     }
   };
   await Promise.all([worker(), worker(), worker(), worker()]);
+  log(`Fertig: ${ok} von ${want.length} gespeichert.`);
 }
 
 export default {
@@ -114,7 +102,9 @@ export default {
     const figs = figsAll.filter((f) => def && f.thema === def.thema);
     const byId = new Map(figs.map((f) => [f.id, f]));
     let imgs = imageIndex();
-    const img = (f: Fig) => imgs.get(f.id.toLowerCase()) ?? imgs.get(shortId(f.id)) ?? null;
+    const useWiki = ctx.options.bilder !== 'aus';
+    // Eigenes Bild auf diesem Rechner, sonst (Einstellung „Figurenbilder“) direkt aus dem Wiki
+    const img = (f: Fig) => imgs.get(f.id.toLowerCase()) ?? imgs.get(shortId(f.id)) ?? (useWiki && typeof f.bild === 'string' && /^https:\/\//.test(f.bild) ? f.bild : null);
     const sub = (f: Fig) => {
       const g = f.werte[cols[1]?.key ?? ''];
       return Array.isArray(g) ? String(g[0] ?? '') : g ? String(g) : '';
@@ -122,9 +112,8 @@ export default {
     const makeList = () => figs.map((f) => ({ id: f.id, n: f.name, a: f.auch ?? [], s: sub(f), img: img(f) })).sort((a, b) => a.n.localeCompare(b.n));
     let figList = makeList();
     // Fehlende Bilder im Hintergrund aus dem Wiki laden (Einstellung „Figurenbilder“), nicht in automatischen Tests
-    const wikiBase = (def as { wiki?: unknown } | null)?.wiki;
-    if (ctx.options.bilder !== 'aus' && typeof wikiBase === 'string' && /^https:\/\//.test(wikiBase) && process.env.UP_NO_UPDATE !== '1') {
-      downloading ??= downloadImages(wikiBase, figs, imgs).finally(() => { downloading = null; });
+    if (useWiki && process.env.UP_NO_UPDATE !== '1') {
+      downloading ??= downloadImages(figs, imgs).finally(() => { downloading = null; });
       void downloading.then(() => { imgs = imageIndex(); figList = makeList(); });
     }
 
@@ -138,7 +127,7 @@ export default {
     let secret: Fig = secrets[0];
     let roundStart = scores.snapshot();
     // Jeder für sich
-    let solo = new Map<string, { guesses: Fig[]; cells: Cell[][]; place: number; points: number; gaveUp: boolean }>();
+    let solo = new Map<string, { guesses: Fig[]; cells: Cell[][]; place: number; points: number; gaveUp: boolean; pending?: boolean }>();
     // Gemeinsames Brett
     let board: { fig: Fig; by: string; cells: Cell[]; gain: number }[] = [];
     let greens: boolean[] = [];
@@ -204,14 +193,14 @@ export default {
       if (mode === 'solo') {
         const players = ids.map((id) => {
           const s = solo.get(id)!;
-          return { id, rows: s.cells.map((row) => row.map((c) => c.c).join('')), n: s.guesses.length, place: s.place, gaveUp: s.gaveUp };
+          return { id, rows: s.cells.map((row) => row.map((c) => c.c).join('')), n: s.guesses.length, place: s.pending ? 0 : s.place, gaveUp: s.gaveUp };
         });
         ctx.setHostView({ screen: 'guess', ...base(), figs: undefined, players, solved: players.filter((p) => p.place).length });
       } else {
         const misses = board.length;
         ctx.setHostView({
           screen: 'guess', ...base(), figs: undefined,
-          board: board.slice().reverse().slice(0, 60).map((b) => ({ name: b.fig.name, by: b.by, cells: b.cells, gain: b.gain })),
+          board: board.slice().reverse().slice(0, 12).map((b) => ({ name: b.fig.name, by: b.by, cells: b.cells, gain: b.gain, img: img(b.fig) })),
           misses, letter: letter(misses), letterAfter: LETTER_AFTER,
           gains: [...gains].filter(([, g]) => g > 0).sort((a, b) => b[1] - a[1]).map(([id, g]) => ({ id, g })),
         });
@@ -222,7 +211,7 @@ export default {
       const vip = ctx.vip() === id;
       if (mode === 'solo') {
         const s = solo.get(id)!;
-        if (s.place) {
+        if (s.place && !s.pending) {
           const waiting = ids.filter((p) => { const o = solo.get(p)!; return !o.place && !o.gaveUp; });
           return ctx.setPlayerView(id, { screen: 'solved', ...base(), figs: undefined, name: secret.name, img: img(secret), place: s.place, tries: s.guesses.length, points: s.points, waiting, vip });
         }
@@ -266,7 +255,16 @@ export default {
         s.place = [...solo.values()].filter((o) => o.place).length + 1;
         s.points = soloPoints(s.guesses.length - 1, s.place) * mult();
         scores.add(id, s.points);
-        ids.forEach((p) => { const o = solo.get(p)!; if (o.place || o.gaveUp) playerView(p); });
+        // Erst alle Felder aufploppen lassen, dann „Getroffen!“
+        s.pending = true;
+        const r = round;
+        ctx.after(popTime(cols.length), () => {
+          if (round !== r || phase !== 'guess') return;
+          s.pending = false;
+          ids.forEach((p) => { const o = solo.get(p)!; if ((o.place && !o.pending) || o.gaveUp) playerView(p); });
+          hostView();
+          checkEnd();
+        });
       }
       playerView(id);
       hostView();
@@ -274,7 +272,7 @@ export default {
     }
 
     function guessBrett(id: string, fig: Fig) {
-      if (cooling.has(id) || board.some((b) => b.fig.id === fig.id) || board.length >= MAX_ROWS) return;
+      if (winner || cooling.has(id) || board.some((b) => b.fig.id === fig.id) || board.length >= MAX_ROWS) return;
       const cells = compare(fig, secret, cols, lang);
       let gain = 0;
       if (fig.id === secret.id) {
@@ -287,7 +285,13 @@ export default {
       }
       board.push({ fig, by: id, cells, gain });
       if (gain) { gains.set(id, (gains.get(id) ?? 0) + gain); scores.add(id, gain); }
-      if (winner) return reveal();
+      if (winner) {
+        // Erst alle Felder aufploppen lassen, dann die Auflösung
+        updateAll();
+        const r = round;
+        ctx.after(popTime(cols.length), () => { if (round === r) reveal(); });
+        return;
+      }
       cooling.add(id);
       const r = round;
       // Testspieler raten langsamer, damit man im Entwicklermodus mitspielen kann
@@ -301,7 +305,7 @@ export default {
 
     function checkEnd() {
       if (phase !== 'guess' || mode !== 'solo') return;
-      const open = ids.filter((id) => { const s = solo.get(id)!; return !s.place && !s.gaveUp && connected(id); });
+      const open = ids.filter((id) => { const s = solo.get(id)!; return (!s.place || s.pending) && !s.gaveUp && connected(id); });
       if (!open.length) reveal();
     }
 
@@ -388,7 +392,7 @@ export default {
           const s = solo.get(id)!;
           if (s.place || s.gaveUp) return;
           s.gaveUp = true;
-          ids.forEach((p) => { const o = solo.get(p)!; if (o.place || o.gaveUp) playerView(p); });
+          ids.forEach((p) => { const o = solo.get(p)!; if ((o.place && !o.pending) || o.gaveUp) playerView(p); });
           hostView();
           checkEnd();
           return;

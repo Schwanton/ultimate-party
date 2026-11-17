@@ -1,8 +1,8 @@
 {
  "name": "One Piece",
  "author": "UP!",
- "version": "1.1.0",
- "description": "120 One-Piece-Figuren, Werte aus dem One-Piece-Wiki (onepiece.fandom.com, Stand Nov. 2026). Bilder werden aus dem Wiki auf deinen Rechner geladen.",
+ "version": "1.2.0",
+ "description": "206 One-Piece-Figuren, Werte aus dem One-Piece-Wiki (onepiece.fandom.com, Stand Nov. 2026). Bilder werden aus dem Wiki auf deinen Rechner geladen.",
  "items": [
   {
    "thema": "one-piece",
@@ -20,7 +20,8 @@
      "key": "gruppe",
      "label": "Zugehörigkeit",
      "kurz": "Gruppe",
-     "typ": "liste"
+     "typ": "liste",
+     "leer": "keine"
     },
     {
      "key": "frucht",
@@ -111,6 +112,7 @@
    ],
    "bekanntheit": 1,
    "wiki": "Monkey_D._Luffy",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/6/6d/Monkey_D._Luffy_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -142,6 +144,7 @@
    ],
    "bekanntheit": 1,
    "wiki": "Roronoa_Zoro",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/5/52/Roronoa_Zoro_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -166,6 +169,7 @@
    "auch": [],
    "bekanntheit": 1,
    "wiki": "Nami",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/6/68/Nami_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "weiblich",
     "gruppe": [
@@ -188,6 +192,7 @@
    ],
    "bekanntheit": 1,
    "wiki": "Usopp",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/3/35/Usopp_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -212,6 +217,7 @@
    ],
    "bekanntheit": 1,
    "wiki": "Sanji",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/b/b6/Sanji_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -238,6 +244,7 @@
    ],
    "bekanntheit": 1,
    "wiki": "Tony_Tony_Chopper",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/a/af/Tony_Tony_Chopper_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -262,6 +269,7 @@
    ],
    "bekanntheit": 1,
    "wiki": "Nico_Robin",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/b/bc/Nico_Robin_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "weiblich",
     "gruppe": [
@@ -286,6 +294,7 @@
    ],
    "bekanntheit": 1,
    "wiki": "Franky",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/8/8c/Franky_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -306,6 +315,7 @@
    "auch": [],
    "bekanntheit": 1,
    "wiki": "Brook",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/4/41/Brook_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -331,6 +341,7 @@
    ],
    "bekanntheit": 1,
    "wiki": "Jinbe",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/8/81/Jinbe_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -357,6 +368,7 @@
    ],
    "bekanntheit": 1,
    "wiki": "Shanks",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/6/66/Shanks_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -382,6 +394,7 @@
    "auch": [],
    "bekanntheit": 1,
    "wiki": "Buggy",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/f/f7/Buggy_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -410,6 +423,7 @@
    ],
    "bekanntheit": 1,
    "wiki": "Dracule_Mihawk",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/b/bf/Dracule_Mihawk_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -437,6 +451,7 @@
    ],
    "bekanntheit": 1,
    "wiki": "Crocodile",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/f/fd/Crocodile_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -466,6 +481,7 @@
    ],
    "bekanntheit": 1,
    "wiki": "Edward_Newgate",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/b/b7/Edward_Newgate_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -495,6 +511,7 @@
    ],
    "bekanntheit": 1,
    "wiki": "Marco",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/4/4a/Polo_Marco_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -523,6 +540,7 @@
    ],
    "bekanntheit": 1,
    "wiki": "Portgas_D._Ace",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/4/4f/Portgas_D._Ace_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -552,6 +570,7 @@
    ],
    "bekanntheit": 1,
    "wiki": "Marshall_D._Teach",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/f/ff/Marshall_D._Teach_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -581,6 +600,7 @@
    ],
    "bekanntheit": 1,
    "wiki": "Kaidou",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/2/2d/Kaidou_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -610,6 +630,7 @@
    ],
    "bekanntheit": 1,
    "wiki": "Charlotte_Linlin",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/d/d8/Charlotte_Linlin_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "weiblich",
     "gruppe": [
@@ -639,6 +660,7 @@
    ],
    "bekanntheit": 1,
    "wiki": "Charlotte_Katakuri",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/2/2e/Charlotte_Katakuri_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -667,6 +689,7 @@
    ],
    "bekanntheit": 2,
    "wiki": "Charlotte_Pudding",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/6/60/Charlotte_Pudding_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "weiblich",
     "gruppe": [
@@ -691,6 +714,7 @@
    ],
    "bekanntheit": 2,
    "wiki": "Charlotte_Cracker",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/6/64/Charlotte_Cracker_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -718,6 +742,7 @@
    ],
    "bekanntheit": 3,
    "wiki": "Charlotte_Smoothie",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/c/c5/Charlotte_Smoothie_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "weiblich",
     "gruppe": [
@@ -746,6 +771,7 @@
    ],
    "bekanntheit": 3,
    "wiki": "Charlotte_Brulee",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/d/d9/Charlotte_Br%C3%BBl%C3%A9e_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "weiblich",
     "gruppe": [
@@ -768,6 +794,7 @@
    "auch": [],
    "bekanntheit": 3,
    "wiki": "Pekoms",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/1/15/Pekoms_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -795,6 +822,7 @@
    ],
    "bekanntheit": 1,
    "wiki": "Donquixote_Doflamingo",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/7/7e/Donquixote_Doflamingo_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -825,6 +853,7 @@
    ],
    "bekanntheit": 2,
    "wiki": "Donquixote_Rosinante",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/7/71/Donquixote_Rosinante_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -847,6 +876,7 @@
    "auch": [],
    "bekanntheit": 3,
    "wiki": "Vergo",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/c/cf/Vergo_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -870,6 +900,7 @@
    "auch": [],
    "bekanntheit": 3,
    "wiki": "Monet",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/9/98/Monet_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "weiblich",
     "gruppe": [
@@ -892,6 +923,7 @@
    "auch": [],
    "bekanntheit": 3,
    "wiki": "Sugar",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/e/e9/Sugar_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "weiblich",
     "gruppe": [
@@ -914,6 +946,7 @@
    "auch": [],
    "bekanntheit": 3,
    "wiki": "Trebol",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/f/f5/Trebol_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -942,6 +975,7 @@
    ],
    "bekanntheit": 1,
    "wiki": "Trafalgar_D._Water_Law",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/4/4d/Trafalgar_D._Water_Law_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -968,6 +1002,7 @@
    "auch": [],
    "bekanntheit": 2,
    "wiki": "Bepo",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/5/5f/Bepo_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -990,6 +1025,7 @@
    ],
    "bekanntheit": 1,
    "wiki": "Eustass_Kid",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/4/47/Eustass_Kid_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -1016,6 +1052,7 @@
    "auch": [],
    "bekanntheit": 2,
    "wiki": "Killer",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/7/70/Killer_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -1041,6 +1078,7 @@
    ],
    "bekanntheit": 2,
    "wiki": "Jewelry_Bonney",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/6/62/Jewelry_Bonney_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "weiblich",
     "gruppe": [
@@ -1067,6 +1105,7 @@
    ],
    "bekanntheit": 2,
    "wiki": "Basil_Hawkins",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/f/f8/Basil_Hawkins_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -1095,6 +1134,7 @@
    ],
    "bekanntheit": 2,
    "wiki": "X_Drake",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/0/04/X_Drake_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -1122,6 +1162,7 @@
    ],
    "bekanntheit": 3,
    "wiki": "Scratchmen_Apoo",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/d/d0/Scratchmen_Apoo_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -1147,6 +1188,7 @@
    "auch": [],
    "bekanntheit": 3,
    "wiki": "Urouge",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/f/fb/Urouge_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -1169,6 +1211,7 @@
    ],
    "bekanntheit": 2,
    "wiki": "Capone_Bege",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/9/99/Capone_Bege_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -1193,6 +1236,7 @@
    ],
    "bekanntheit": 1,
    "wiki": "Boa_Hancock",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/f/f0/Boa_Hancock_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "weiblich",
     "gruppe": [
@@ -1220,6 +1264,7 @@
    "auch": [],
    "bekanntheit": 3,
    "wiki": "Marguerite",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/c/cc/Marguerite_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "weiblich",
     "gruppe": [
@@ -1244,6 +1289,7 @@
    ],
    "bekanntheit": 2,
    "wiki": "Gecko_Moria",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/b/be/Gecko_Moria_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -1267,6 +1313,7 @@
    "auch": [],
    "bekanntheit": 2,
    "wiki": "Perona",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/4/4a/Perona_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "weiblich",
     "gruppe": [
@@ -1289,6 +1336,7 @@
    "auch": [],
    "bekanntheit": 3,
    "wiki": "Absalom",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/5/56/Absalom_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -1313,6 +1361,7 @@
    ],
    "bekanntheit": 2,
    "wiki": "Bartholomew_Kuma",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/8/8d/Bartholomew_Kuma_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -1341,6 +1390,7 @@
    ],
    "bekanntheit": 1,
    "wiki": "Monkey_D._Garp",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/e/e1/Monkey_D._Garp_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -1365,6 +1415,7 @@
    "auch": [],
    "bekanntheit": 2,
    "wiki": "Sengoku",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/2/24/Sengoku_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -1393,6 +1444,7 @@
    ],
    "bekanntheit": 1,
    "wiki": "Sakazuki",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/d/d7/Sakazuki_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -1420,6 +1472,7 @@
    ],
    "bekanntheit": 1,
    "wiki": "Kuzan",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/d/d6/Kuzan_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -1447,6 +1500,7 @@
    ],
    "bekanntheit": 1,
    "wiki": "Borsalino",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/1/14/Borsalino_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -1474,6 +1528,7 @@
    ],
    "bekanntheit": 2,
    "wiki": "Issho",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/e/e8/Issho_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -1501,6 +1556,7 @@
    ],
    "bekanntheit": 2,
    "wiki": "Aramaki",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/0/05/Aramaki_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -1528,6 +1584,7 @@
    ],
    "bekanntheit": 1,
    "wiki": "Koby",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/b/b8/Koby_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -1551,6 +1608,7 @@
    "auch": [],
    "bekanntheit": 2,
    "wiki": "Helmeppo",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/a/a3/Helmeppo_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -1573,6 +1631,7 @@
    "auch": [],
    "bekanntheit": 1,
    "wiki": "Smoker",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/c/c4/Smoker_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -1598,6 +1657,7 @@
    "auch": [],
    "bekanntheit": 2,
    "wiki": "Tashigi",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/1/1e/Tashigi_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "weiblich",
     "gruppe": [
@@ -1623,6 +1683,7 @@
    ],
    "bekanntheit": 3,
    "wiki": "Morgan",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/e/e5/Morgan_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -1645,6 +1706,7 @@
    ],
    "bekanntheit": 1,
    "wiki": "Monkey_D._Dragon",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/f/f5/Monkey_D._Dragon_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -1665,6 +1727,7 @@
    "auch": [],
    "bekanntheit": 1,
    "wiki": "Sabo",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/c/c2/Sabo_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -1692,6 +1755,7 @@
    ],
    "bekanntheit": 1,
    "wiki": "Silvers_Rayleigh",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/b/b1/Silvers_Rayleigh_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -1719,6 +1783,7 @@
    ],
    "bekanntheit": 1,
    "wiki": "Gol_D._Roger",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/2/24/Gol_D._Roger_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -1743,6 +1808,7 @@
    "auch": [],
    "bekanntheit": 3,
    "wiki": "Crocus",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/3/34/Crocus_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -1767,6 +1833,7 @@
    ],
    "bekanntheit": 1,
    "wiki": "Nefertari_Vivi",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/0/09/Nefertari_Vivi_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "weiblich",
     "gruppe": [
@@ -1789,6 +1856,7 @@
    ],
    "bekanntheit": 3,
    "wiki": "Nefertari_Cobra",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/7/7f/Nefertari_Cobra_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -1811,6 +1879,7 @@
    ],
    "bekanntheit": 1,
    "wiki": "Enel",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/a/ad/Enel_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -1837,6 +1906,7 @@
    ],
    "bekanntheit": 3,
    "wiki": "Wiper",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/b/b9/Wyper_Manga_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -1857,6 +1927,7 @@
    "auch": [],
    "bekanntheit": 1,
    "wiki": "Arlong",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/0/01/Arlong_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -1880,6 +1951,7 @@
    ],
    "bekanntheit": 3,
    "wiki": "Hachi",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/3/3d/Hatchan_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -1903,6 +1975,7 @@
    ],
    "bekanntheit": 2,
    "wiki": "Kuro",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/7/7e/Kuro_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -1925,6 +1998,7 @@
    ],
    "bekanntheit": 2,
    "wiki": "Don_Krieg",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/b/bb/Krieg_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -1945,6 +2019,7 @@
    "auch": [],
    "bekanntheit": 3,
    "wiki": "Gin",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/4/49/Gin_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -1965,6 +2040,7 @@
    "auch": [],
    "bekanntheit": 2,
    "wiki": "Alvida",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/c/cd/Alvida_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "weiblich",
     "gruppe": [
@@ -1990,6 +2066,7 @@
    ],
    "bekanntheit": 3,
    "wiki": "Galdino",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/1/13/Galdino_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2015,6 +2092,7 @@
    ],
    "bekanntheit": 3,
    "wiki": "Daz_Bonez",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/e/e9/Daz_Bonez_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2041,6 +2119,7 @@
    ],
    "bekanntheit": 2,
    "wiki": "Bentham",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/0/0e/Bentham_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2065,6 +2144,7 @@
    ],
    "bekanntheit": 1,
    "wiki": "Rob_Lucci",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/d/d7/Rob_Lucci_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2090,6 +2170,7 @@
    "auch": [],
    "bekanntheit": 2,
    "wiki": "Kaku",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/0/09/Kaku_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2115,6 +2196,7 @@
    "auch": [],
    "bekanntheit": 2,
    "wiki": "Kalifa",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/b/b3/Kalifa_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "weiblich",
     "gruppe": [
@@ -2140,6 +2222,7 @@
    "auch": [],
    "bekanntheit": 3,
    "wiki": "Spandam",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/e/e7/Spandam_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2162,6 +2245,7 @@
    ],
    "bekanntheit": 3,
    "wiki": "Iceburg",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/0/00/Iceburg_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2184,6 +2268,7 @@
    ],
    "bekanntheit": 2,
    "wiki": "Kozuki_Oden",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/7/7a/Kouzuki_Oden_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2211,6 +2296,7 @@
    ],
    "bekanntheit": 2,
    "wiki": "Kozuki_Momonosuke",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/8/8b/Kouzuki_Momonosuke_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2237,6 +2323,7 @@
    ],
    "bekanntheit": 2,
    "wiki": "Kin'emon",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/e/ec/Kin%27emon_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2265,6 +2352,7 @@
    ],
    "bekanntheit": 3,
    "wiki": "Kikunojo",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/1/12/Kikunojo_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "weiblich",
     "gruppe": [
@@ -2289,6 +2377,7 @@
    "auch": [],
    "bekanntheit": 3,
    "wiki": "Denjiro",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/7/7e/Denjiro_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2313,6 +2402,7 @@
    "auch": [],
    "bekanntheit": 3,
    "wiki": "Kawamatsu",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/5/5e/Kawamatsu_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2337,6 +2427,7 @@
    "auch": [],
    "bekanntheit": 3,
    "wiki": "Nekomamushi",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/a/a2/Nekomamushi_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2361,6 +2452,7 @@
    "auch": [],
    "bekanntheit": 3,
    "wiki": "Inuarashi",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/9/9f/Inuarashi_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2385,6 +2477,7 @@
    "auch": [],
    "bekanntheit": 2,
    "wiki": "Carrot",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/e/e2/Carrot_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "weiblich",
     "gruppe": [
@@ -2405,6 +2498,7 @@
    "auch": [],
    "bekanntheit": 1,
    "wiki": "Yamato",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/b/bd/Yamato_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2433,6 +2527,7 @@
    ],
    "bekanntheit": 2,
    "wiki": "King",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/8/8f/King_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2458,6 +2553,7 @@
    "auch": [],
    "bekanntheit": 2,
    "wiki": "Queen",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/5/52/Queen_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2483,6 +2579,7 @@
    "auch": [],
    "bekanntheit": 2,
    "wiki": "Jack",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/3/3f/Jack_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2508,6 +2605,7 @@
    "auch": [],
    "bekanntheit": 2,
    "wiki": "Shirahoshi",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/c/c1/Shirahoshi_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "weiblich",
     "gruppe": [
@@ -2532,6 +2630,7 @@
    ],
    "bekanntheit": 3,
    "wiki": "Hody_Jones",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/f/f3/Hody_Jones_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2554,6 +2653,7 @@
    ],
    "bekanntheit": 2,
    "wiki": "Caesar_Clown",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/a/a6/Caesar_Clown_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2578,6 +2678,7 @@
    ],
    "bekanntheit": 2,
    "wiki": "Vegapunk",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/b/b9/Vegapunk_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2600,6 +2701,7 @@
    "auch": [],
    "bekanntheit": 2,
    "wiki": "Bartolomeo",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/e/eb/Bartolomeo_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2622,6 +2724,7 @@
    "auch": [],
    "bekanntheit": 3,
    "wiki": "Cavendish",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/a/a1/Cavendish_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2645,6 +2748,7 @@
    "auch": [],
    "bekanntheit": 3,
    "wiki": "Rebecca",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/f/f6/Rebecca_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "weiblich",
     "gruppe": [
@@ -2667,6 +2771,7 @@
    "auch": [],
    "bekanntheit": 3,
    "wiki": "Kyros",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/c/c4/Kyros_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2687,6 +2792,7 @@
    "auch": [],
    "bekanntheit": 3,
    "wiki": "Shiryu",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/4/4a/Shiryu_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2713,6 +2819,7 @@
    ],
    "bekanntheit": 3,
    "wiki": "Jesus_Burgess",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/4/43/Jesus_Burgess_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2740,6 +2847,7 @@
    ],
    "bekanntheit": 3,
    "wiki": "Van_Augur",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/9/95/Van_Augur_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2762,6 +2870,7 @@
    "auch": [],
    "bekanntheit": 3,
    "wiki": "Laffitte",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/0/00/Laffitte_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2784,6 +2893,7 @@
    ],
    "bekanntheit": 2,
    "wiki": "Benn_Beckman",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/1/12/Benn_Beckman_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2806,6 +2916,7 @@
    "auch": [],
    "bekanntheit": 2,
    "wiki": "Yasopp",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/1/15/Yasopp_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2830,6 +2941,7 @@
    ],
    "bekanntheit": 3,
    "wiki": "Lucky_Roux",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/5/59/Lucky_Roux_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2855,6 +2967,7 @@
    ],
    "bekanntheit": 2,
    "wiki": "Zeff",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/d/d9/Zeff_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2875,6 +2988,7 @@
    "auch": [],
    "bekanntheit": 3,
    "wiki": "Dalton",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/0/07/Dalton_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2899,6 +3013,7 @@
    ],
    "bekanntheit": 3,
    "wiki": "Kureha",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/1/1b/Kureha_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "weiblich",
     "gruppe": [
@@ -2919,6 +3034,7 @@
    "auch": [],
    "bekanntheit": 3,
    "wiki": "Wapol",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/3/33/Wapol_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2941,6 +3057,7 @@
    "auch": [],
    "bekanntheit": 2,
    "wiki": "Magellan",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/9/9e/Magellan_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2963,6 +3080,7 @@
    "auch": [],
    "bekanntheit": 3,
    "wiki": "Hannyabal",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/8/86/Hannyabal_Manga_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -2983,6 +3101,7 @@
    "auch": [],
    "bekanntheit": 3,
    "wiki": "Foxy",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/7/7d/Foxy_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -3007,6 +3126,7 @@
    ],
    "bekanntheit": 3,
    "wiki": "Vinsmoke_Reiju",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/a/a3/Vinsmoke_Reiju_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "weiblich",
     "gruppe": [
@@ -3029,6 +3149,7 @@
    ],
    "bekanntheit": 3,
    "wiki": "Vinsmoke_Judge",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/6/6f/Vinsmoke_Judge_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
    "werte": {
     "geschlecht": "männlich",
     "gruppe": [
@@ -3040,6 +3161,2070 @@
     "groesse": 272,
     "herkunft": "North Blue",
     "arc": "Whole Cake Island"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-kuina",
+   "name": "Kuina",
+   "auch": [
+    "Shimotsuki Kuina"
+   ],
+   "bekanntheit": 2,
+   "wiki": "Kuina",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/c/c1/Shimotsuki_Kuina_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "weiblich",
+    "gruppe": [
+     "Shimotsuki-Familie"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 150,
+    "herkunft": "East Blue",
+    "arc": "Romance Dawn"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-makino",
+   "name": "Makino",
+   "auch": [],
+   "bekanntheit": 2,
+   "wiki": "Makino",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/5/5a/Makino_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "weiblich",
+    "gruppe": [
+     "Partys Bar"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 166,
+    "herkunft": "East Blue",
+    "arc": "Romance Dawn"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-kaya",
+   "name": "Kaya",
+   "auch": [],
+   "bekanntheit": 2,
+   "wiki": "Kaya",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/f/f5/Kaya_Manga_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "weiblich",
+    "gruppe": [],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 169,
+    "herkunft": "East Blue",
+    "arc": "Syrup"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-nojiko",
+   "name": "Nojiko",
+   "auch": [],
+   "bekanntheit": 2,
+   "wiki": "Nojiko",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/2/2d/Nojiko_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "weiblich",
+    "gruppe": [
+     "Kokos"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 170,
+    "herkunft": "East Blue",
+    "arc": "Arlong Park"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-genzo",
+   "name": "Genzo",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Genzo",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/f/fe/Genzo_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Kokos"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 173,
+    "herkunft": "East Blue",
+    "arc": "Arlong Park"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-bellmere",
+   "name": "Bellemere",
+   "auch": [
+    "Bell-mère",
+    "Bellmere"
+   ],
+   "bekanntheit": 2,
+   "wiki": "Bell-mère",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/3/3f/Bell-m%C3%A8re_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "weiblich",
+    "gruppe": [
+     "Marine"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 186,
+    "herkunft": "East Blue",
+    "arc": "Arlong Park"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-johnny",
+   "name": "Johnny",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Johnny",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/e/ee/Johnny_Manga_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Kopfgeldjäger"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 186,
+    "herkunft": "East Blue",
+    "arc": "Baratie"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-yosaku",
+   "name": "Yosaku",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Yosaku",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/4/4a/Yosaku_Manga_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Kopfgeldjäger"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 185,
+    "herkunft": "East Blue",
+    "arc": "Baratie"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-igaram",
+   "name": "Igaram",
+   "auch": [
+    "Mr. 8"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Igaram",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/a/a4/Igaram_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Königreich Alabasta"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 218,
+    "herkunft": "Grand Line",
+    "arc": "Whisky Peak"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-pell",
+   "name": "Pell",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Pell",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/b/be/Pell_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Königreich Alabasta"
+    ],
+    "frucht": [
+     "Zoan"
+    ],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 189,
+    "herkunft": "Grand Line",
+    "arc": "Alabasta"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-mr5",
+   "name": "Mr. 5",
+   "auch": [
+    "Gem"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Gem",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/1/14/Gem_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "New Spiders Café"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [],
+    "kopfgeld": 10000000,
+    "groesse": 197,
+    "herkunft": "South Blue",
+    "arc": "Whisky Peak"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-valentine",
+   "name": "Miss Valentine",
+   "auch": [
+    "Mikita"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Mikita",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/b/bc/Mikita_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "weiblich",
+    "gruppe": [
+     "New Spiders Café"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [],
+    "kopfgeld": 7500000,
+    "groesse": 177,
+    "herkunft": "West Blue",
+    "arc": "Whisky Peak"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-doublefinger",
+   "name": "Miss Doublefinger",
+   "auch": [
+    "Zala"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Zala",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/6/60/Zala_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "weiblich",
+    "gruppe": [
+     "New Spiders Café"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [],
+    "kopfgeld": 35000000,
+    "groesse": 187,
+    "herkunft": "Grand Line",
+    "arc": "Alabasta"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-bellamy",
+   "name": "Bellamy",
+   "auch": [],
+   "bekanntheit": 2,
+   "wiki": "Bellamy",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/2/27/Bellamy_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Bellamy-Piraten"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [
+     "Observation",
+     "Rüstung"
+    ],
+    "kopfgeld": 195000000,
+    "groesse": 240,
+    "herkunft": "North Blue",
+    "arc": "Jaya"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-ganfall",
+   "name": "Gan Fall",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Gan_Fall",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/5/5f/Gan_Fall_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Skypia"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 180,
+    "herkunft": "Himmelsinseln",
+    "arc": "Skypia"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-conis",
+   "name": "Conis",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Conis",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/9/9f/Conis_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "weiblich",
+    "gruppe": [
+     "Skypia"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 176,
+    "herkunft": "Himmelsinseln",
+    "arc": "Skypia"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-paulie",
+   "name": "Paulie",
+   "auch": [],
+   "bekanntheit": 2,
+   "wiki": "Paulie",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/6/62/Paulie_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Galley-La"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 195,
+    "herkunft": "Grand Line",
+    "arc": "Water 7"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-kokoro",
+   "name": "Kokoro",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Kokoro",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/c/cc/Kokoro_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "weiblich",
+    "gruppe": [
+     "Toms Arbeiter"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 168,
+    "herkunft": "Grand Line",
+    "arc": "Water 7"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-blueno",
+   "name": "Blueno",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Blueno",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/2/2b/Blueno_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "CP0"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [
+     "Observation",
+     "Rüstung"
+    ],
+    "kopfgeld": 0,
+    "groesse": 258,
+    "herkunft": "North Blue",
+    "arc": "Water 7"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-jabra",
+   "name": "Jabra",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Jabra",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/1/12/Jabra_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "CP0"
+    ],
+    "frucht": [
+     "Zoan"
+    ],
+    "haki": [
+     "Observation",
+     "Rüstung"
+    ],
+    "kopfgeld": 0,
+    "groesse": 212,
+    "herkunft": "North Blue",
+    "arc": "Enies Lobby"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-kumadori",
+   "name": "Kumadori",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Kumadori",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/8/86/Kumadori_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "CP0"
+    ],
+    "frucht": [],
+    "haki": [
+     "Observation",
+     "Rüstung"
+    ],
+    "kopfgeld": 0,
+    "groesse": 338,
+    "herkunft": "South Blue",
+    "arc": "Enies Lobby"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-hogback",
+   "name": "Hogback",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Hogback",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/4/4a/Hogback_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Thriller-Bark-Piraten"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 223,
+    "herkunft": "West Blue",
+    "arc": "Thriller Bark"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-oars",
+   "name": "Oz",
+   "auch": [
+    "Oars"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Oars",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/5/55/Oars_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Thriller-Bark-Piraten"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 6700,
+    "herkunft": "North Blue",
+    "arc": "Thriller Bark"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-duval",
+   "name": "Duval",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Duval",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/8/86/Duval_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Rosy Life Riders"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 470,
+    "herkunft": "Grand Line",
+    "arc": "Sabaody"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-shakky",
+   "name": "Shakky",
+   "auch": [
+    "Shakuyaku"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Shakuyaku",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/e/e8/Shakuyaku_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "weiblich",
+    "gruppe": [
+     "Shakkys Bar"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 186,
+    "herkunft": "Unbekannt",
+    "arc": "Sabaody"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-sandersonia",
+   "name": "Boa Sandersonia",
+   "auch": [
+    "Sandersonia"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Boa_Sandersonia",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/8/8c/Boa_Sandersonia_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "weiblich",
+    "gruppe": [
+     "Kuja-Piraten"
+    ],
+    "frucht": [
+     "Zoan"
+    ],
+    "haki": [
+     "Observation",
+     "Rüstung"
+    ],
+    "kopfgeld": 40000000,
+    "groesse": 453,
+    "herkunft": "Calm Belt",
+    "arc": "Amazon Lily"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-marigold",
+   "name": "Boa Marigold",
+   "auch": [
+    "Marigold"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Boa_Marigold",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/6/6c/Boa_Marigold_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "weiblich",
+    "gruppe": [
+     "Kuja-Piraten"
+    ],
+    "frucht": [
+     "Zoan"
+    ],
+    "haki": [
+     "Observation",
+     "Rüstung"
+    ],
+    "kopfgeld": 40000000,
+    "groesse": 432,
+    "herkunft": "Calm Belt",
+    "arc": "Amazon Lily"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-tsuru",
+   "name": "Tsuru",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Tsuru",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/9/91/Tsuru_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "weiblich",
+    "gruppe": [
+     "Marine"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [
+     "Observation",
+     "Rüstung"
+    ],
+    "kopfgeld": 0,
+    "groesse": 204,
+    "herkunft": "North Blue",
+    "arc": "Jaya"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-hina",
+   "name": "Hina",
+   "auch": [],
+   "bekanntheit": 2,
+   "wiki": "Hina",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/0/0d/Hina_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "weiblich",
+    "gruppe": [
+     "Marine"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 181,
+    "herkunft": "West Blue",
+    "arc": "Alabasta"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-sentomaru",
+   "name": "Sentomaru",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Sentomaru",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/9/97/Sentomaru_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Marine"
+    ],
+    "frucht": [],
+    "haki": [
+     "Observation",
+     "Rüstung"
+    ],
+    "kopfgeld": 0,
+    "groesse": 279,
+    "herkunft": "Grand Line",
+    "arc": "Sabaody"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-jozu",
+   "name": "Jozu",
+   "auch": [],
+   "bekanntheit": 2,
+   "wiki": "Jozu",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/6/61/Jozu_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Whitebeard-Piraten"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [
+     "Observation",
+     "Rüstung"
+    ],
+    "kopfgeld": 0,
+    "groesse": 503,
+    "herkunft": "West Blue",
+    "arc": "Jaya"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-vista",
+   "name": "Vista",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Vista",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/7/78/Vista_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Whitebeard-Piraten"
+    ],
+    "frucht": [],
+    "haki": [
+     "Observation",
+     "Rüstung"
+    ],
+    "kopfgeld": 0,
+    "groesse": 328,
+    "herkunft": "North Blue",
+    "arc": "Marineford"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-izo",
+   "name": "Izo",
+   "auch": [
+    "Izou"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Izo",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/8/81/Izou_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Whitebeard-Piraten",
+     "Kozuki-Familie"
+    ],
+    "frucht": [],
+    "haki": [
+     "Observation",
+     "Rüstung"
+    ],
+    "kopfgeld": 510000000,
+    "groesse": 192,
+    "herkunft": "Grand Line",
+    "arc": "Marineford"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-oarsjr",
+   "name": "Little Oars Jr.",
+   "auch": [
+    "Oars Jr."
+   ],
+   "bekanntheit": 3,
+   "wiki": "Little_Oars_Jr.",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/b/bc/Little_Oars_Jr._Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Whitebeard-Piraten"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 550000000,
+    "groesse": 6000,
+    "herkunft": "Grand Line",
+    "arc": "Marineford"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-weevil",
+   "name": "Edward Weevil",
+   "auch": [
+    "Weevil"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Edward_Weevil",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/b/be/Edward_Weevil_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Samurai der Meere"
+    ],
+    "frucht": [],
+    "haki": [
+     "Observation",
+     "Rüstung"
+    ],
+    "kopfgeld": 480000000,
+    "groesse": 680,
+    "herkunft": "Grand Line",
+    "arc": "Zou"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-pizarro",
+   "name": "Avalo Pizarro",
+   "auch": [
+    "Pizarro"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Avalo_Pizarro",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/e/ef/Avalo_Pizarro_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Blackbeard-Piraten"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 505,
+    "herkunft": "North Blue",
+    "arc": "Marineford"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-devon",
+   "name": "Catarina Devon",
+   "auch": [
+    "Devon"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Catarina_Devon",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/4/4a/Catarina_Devon_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "weiblich",
+    "gruppe": [
+     "Blackbeard-Piraten"
+    ],
+    "frucht": [
+     "Zoan"
+    ],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 361,
+    "herkunft": "South Blue",
+    "arc": "Marineford"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-wolf",
+   "name": "Sanjuan Wolf",
+   "auch": [
+    "San Juan Wolf"
+   ],
+   "bekanntheit": 3,
+   "wiki": "San_Juan_Wolf",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/c/c8/Sanjuan_Wolf_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Blackbeard-Piraten"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 18000,
+    "herkunft": "West Blue",
+    "arc": "Marineford"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-vasco",
+   "name": "Vasco Shot",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Vasco_Shot",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/6/66/Vasco_Shot_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Blackbeard-Piraten"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 573,
+    "herkunft": "South Blue",
+    "arc": "Marineford"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-docq",
+   "name": "Doc Q",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Doc_Q",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/c/c4/Doc_Q_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Blackbeard-Piraten"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [],
+    "kopfgeld": 72000000,
+    "groesse": 342,
+    "herkunft": "North Blue",
+    "arc": "Jaya"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-fishertiger",
+   "name": "Fisher Tiger",
+   "auch": [
+    "Tiger"
+   ],
+   "bekanntheit": 2,
+   "wiki": "Fisher_Tiger",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/c/c5/Fisher_Tiger_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Sonnen-Piraten"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 230000000,
+    "groesse": 520,
+    "herkunft": "Grand Line",
+    "arc": "Amazon Lily"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-otohime",
+   "name": "Otohime",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Otohime",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/c/c7/Otohime_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "weiblich",
+    "gruppe": [
+     "Ryugu-Königreich"
+    ],
+    "frucht": [],
+    "haki": [
+     "Observation"
+    ],
+    "kopfgeld": 0,
+    "groesse": 224,
+    "herkunft": "Grand Line",
+    "arc": "Fischmenscheninsel"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-neptune",
+   "name": "Neptun",
+   "auch": [
+    "Neptune"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Neptune",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/4/40/Neptune_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Ryugu-Königreich"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 1220,
+    "herkunft": "Grand Line",
+    "arc": "Fischmenscheninsel"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-fukaboshi",
+   "name": "Fukaboshi",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Fukaboshi",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/2/29/Fukaboshi_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Ryugu-Königreich"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 604,
+    "herkunft": "Grand Line",
+    "arc": "Fischmenscheninsel"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-decken",
+   "name": "Vander Decken IX",
+   "auch": [
+    "Decken"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Vander_Decken_IX",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/d/d3/Vander_Decken_IX_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Flying-Piraten"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 352,
+    "herkunft": "Grand Line",
+    "arc": "Fischmenscheninsel"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-hiyori",
+   "name": "Kozuki Hiyori",
+   "auch": [
+    "Hiyori",
+    "Komurasaki"
+   ],
+   "bekanntheit": 2,
+   "wiki": "Kozuki_Hiyori",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/9/97/Kouzuki_Hiyori_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "weiblich",
+    "gruppe": [
+     "Kozuki-Familie"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 170,
+    "herkunft": "Grand Line",
+    "arc": "Wano"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-orochi",
+   "name": "Kurozumi Orochi",
+   "auch": [
+    "Orochi"
+   ],
+   "bekanntheit": 2,
+   "wiki": "Kurozumi_Orochi",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/4/49/Kurozumi_Orochi_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Kurozumi-Familie"
+    ],
+    "frucht": [
+     "Zoan"
+    ],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 350,
+    "herkunft": "Grand Line",
+    "arc": "Wano"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-kanjuro",
+   "name": "Kanjuro",
+   "auch": [
+    "Kurozumi Kanjuro"
+   ],
+   "bekanntheit": 2,
+   "wiki": "Kurozumi_Kanjuro",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/a/ad/Kurozumi_Kanjuro_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Kurozumi-Familie"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [
+     "Observation",
+     "Rüstung"
+    ],
+    "kopfgeld": 0,
+    "groesse": 347,
+    "herkunft": "Grand Line",
+    "arc": "Dressrosa"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-tama",
+   "name": "Tama",
+   "auch": [
+    "O-Tama",
+    "Kurozumi Tama"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Tama",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/6/6d/Kurozumi_Tama_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "weiblich",
+    "gruppe": [
+     "Kurozumi-Familie"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 108,
+    "herkunft": "Grand Line",
+    "arc": "Wano"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-raizo",
+   "name": "Raizo",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Raizo",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/2/23/Raizo_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Kozuki-Familie",
+     "Rote Schwertscheiden"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [
+     "Observation",
+     "Rüstung"
+    ],
+    "kopfgeld": 0,
+    "groesse": 311,
+    "herkunft": "Grand Line",
+    "arc": "Zou"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-ashura",
+   "name": "Ashura Doji",
+   "auch": [
+    "Ashura"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Ashura_Doji",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/4/44/Ashura_Doji_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Kozuki-Familie",
+     "Rote Schwertscheiden"
+    ],
+    "frucht": [],
+    "haki": [
+     "Observation",
+     "Rüstung"
+    ],
+    "kopfgeld": 0,
+    "groesse": 544,
+    "herkunft": "Grand Line",
+    "arc": "Wano"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-shinobu",
+   "name": "Shinobu",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Shinobu",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/3/3f/Shinobu_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "weiblich",
+    "gruppe": [
+     "Kozuki-Familie"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 180,
+    "herkunft": "Grand Line",
+    "arc": "Wano"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-ulti",
+   "name": "Ulti",
+   "auch": [],
+   "bekanntheit": 2,
+   "wiki": "Ulti",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/d/dc/Ulti_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "weiblich",
+    "gruppe": [
+     "Bestien-Piraten"
+    ],
+    "frucht": [
+     "Zoan"
+    ],
+    "haki": [
+     "Observation",
+     "Rüstung"
+    ],
+    "kopfgeld": 400000000,
+    "groesse": 173,
+    "herkunft": "Grand Line",
+    "arc": "Wano"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-pageone",
+   "name": "Page One",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Page_One",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/4/46/Page_One_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Bestien-Piraten"
+    ],
+    "frucht": [
+     "Zoan"
+    ],
+    "haki": [
+     "Observation",
+     "Rüstung"
+    ],
+    "kopfgeld": 290000000,
+    "groesse": 171,
+    "herkunft": "Grand Line",
+    "arc": "Wano"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-whoswho",
+   "name": "Who's-Who",
+   "auch": [
+    "Whos Who"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Who's-Who",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/9/94/Who%27s-Who_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Bestien-Piraten"
+    ],
+    "frucht": [
+     "Zoan"
+    ],
+    "haki": [
+     "Observation",
+     "Rüstung"
+    ],
+    "kopfgeld": 546000000,
+    "groesse": 336,
+    "herkunft": "North Blue",
+    "arc": "Wano"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-blackmaria",
+   "name": "Black Maria",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Black_Maria",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/e/e2/Black_Maria_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "weiblich",
+    "gruppe": [
+     "Bestien-Piraten"
+    ],
+    "frucht": [
+     "Zoan"
+    ],
+    "haki": [
+     "Observation",
+     "Rüstung"
+    ],
+    "kopfgeld": 480000000,
+    "groesse": 820,
+    "herkunft": "Grand Line",
+    "arc": "Wano"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-sasaki",
+   "name": "Sasaki",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Sasaki",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/d/d7/Sasaki_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Bestien-Piraten"
+    ],
+    "frucht": [
+     "Zoan"
+    ],
+    "haki": [
+     "Observation",
+     "Rüstung"
+    ],
+    "kopfgeld": 472000000,
+    "groesse": 318,
+    "herkunft": "Grand Line",
+    "arc": "Wano"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-perospero",
+   "name": "Charlotte Perospero",
+   "auch": [
+    "Perospero"
+   ],
+   "bekanntheit": 2,
+   "wiki": "Charlotte_Perospero",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/7/7e/Charlotte_Perospero_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Big-Mom-Piraten"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [
+     "Observation",
+     "Rüstung"
+    ],
+    "kopfgeld": 700000000,
+    "groesse": 333,
+    "herkunft": "Grand Line",
+    "arc": "Whole Cake Island"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-oven",
+   "name": "Charlotte Oven",
+   "auch": [
+    "Oven"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Charlotte_Oven",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/f/f0/Charlotte_Oven_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Big-Mom-Piraten"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [
+     "Observation",
+     "Rüstung"
+    ],
+    "kopfgeld": 300000000,
+    "groesse": 492,
+    "herkunft": "Grand Line",
+    "arc": "Whole Cake Island"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-daifuku",
+   "name": "Charlotte Daifuku",
+   "auch": [
+    "Daifuku"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Charlotte_Daifuku",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/c/cd/Charlotte_Daifuku_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Big-Mom-Piraten"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [
+     "Observation",
+     "Rüstung"
+    ],
+    "kopfgeld": 300000000,
+    "groesse": 489,
+    "herkunft": "Grand Line",
+    "arc": "Whole Cake Island"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-ichiji",
+   "name": "Vinsmoke Ichiji",
+   "auch": [
+    "Ichiji"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Vinsmoke_Ichiji",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/7/7c/Vinsmoke_Ichiji_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Germa 66"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 186,
+    "herkunft": "North Blue",
+    "arc": "Whole Cake Island"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-niji",
+   "name": "Vinsmoke Niji",
+   "auch": [
+    "Niji"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Vinsmoke_Niji",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/d/d6/Vinsmoke_Niji_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Germa 66"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 185,
+    "herkunft": "North Blue",
+    "arc": "Whole Cake Island"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-yonji",
+   "name": "Vinsmoke Yonji",
+   "auch": [
+    "Yonji"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Vinsmoke_Yonji",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/e/e7/Vinsmoke_Yonji_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Germa 66"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 194,
+    "herkunft": "North Blue",
+    "arc": "Whole Cake Island"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-viola",
+   "name": "Viola",
+   "auch": [
+    "Violet"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Viola",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/d/d7/Viola_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "weiblich",
+    "gruppe": [
+     "Riku-Familie"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 178,
+    "herkunft": "Grand Line",
+    "arc": "Dressrosa"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-riku",
+   "name": "Riku Doldo III",
+   "auch": [
+    "Riku"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Riku_Doldo_III",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/4/48/Riku_Doldo_III_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Riku-Familie"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 261,
+    "herkunft": "Grand Line",
+    "arc": "Dressrosa"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-leo",
+   "name": "Leo",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Leo",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/b/be/Leo_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Tontatta-Königreich"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 23,
+    "herkunft": "Grand Line",
+    "arc": "Dressrosa"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-koala",
+   "name": "Koala",
+   "auch": [],
+   "bekanntheit": 2,
+   "wiki": "Koala",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/3/3d/Koala_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "weiblich",
+    "gruppe": [
+     "Revolutionäre Armee"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 160,
+    "herkunft": "Unbekannt",
+    "arc": "Fischmenscheninsel"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-hack",
+   "name": "Hack",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Hack",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/4/43/Hack_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Revolutionäre Armee"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 280,
+    "herkunft": "Grand Line",
+    "arc": "Dressrosa"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-betty",
+   "name": "Belo Betty",
+   "auch": [
+    "Betty"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Belo_Betty",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/d/dd/Belo_Betty_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "weiblich",
+    "gruppe": [
+     "Revolutionäre Armee"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [
+     "Observation",
+     "Rüstung"
+    ],
+    "kopfgeld": 457000000,
+    "groesse": 196,
+    "herkunft": "East Blue",
+    "arc": "Reverie"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-karasu",
+   "name": "Karasu",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Karasu",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/9/9a/Karasu_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Revolutionäre Armee"
+    ],
+    "frucht": [
+     "Logia"
+    ],
+    "haki": [
+     "Observation",
+     "Rüstung"
+    ],
+    "kopfgeld": 400000000,
+    "groesse": 265,
+    "herkunft": "North Blue",
+    "arc": "Nach dem Krieg"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-lindbergh",
+   "name": "Lindbergh",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Lindbergh",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/e/e1/Lindbergh_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Revolutionäre Armee"
+    ],
+    "frucht": [],
+    "haki": [
+     "Observation",
+     "Rüstung"
+    ],
+    "kopfgeld": 316000000,
+    "groesse": 149,
+    "herkunft": "Unbekannt",
+    "arc": "Reverie"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-xebec",
+   "name": "Rocks D. Xebec",
+   "auch": [
+    "Xebec",
+    "Rocks"
+   ],
+   "bekanntheit": 2,
+   "wiki": "Rocks_D._Xebec",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/f/fb/Rocks_D._Xebec_Manga_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Rocks-Piraten"
+    ],
+    "frucht": [],
+    "haki": [
+     "Rüstung",
+     "Königs"
+    ],
+    "kopfgeld": 0,
+    "groesse": 435,
+    "herkunft": "West Blue",
+    "arc": "Wano"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-charlos",
+   "name": "Charlos",
+   "auch": [
+    "Rosward Charlos",
+    "Sankt Charlos"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Charlos",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/b/bc/Rosward_Charlos_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Weltaristokraten"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 230,
+    "herkunft": "Red Line",
+    "arc": "Sabaody"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-dorry",
+   "name": "Dorry",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Dorry",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/2/2d/Dorry_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Riesenkrieger-Piraten"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 1800000000,
+    "groesse": 2260,
+    "herkunft": "Grand Line",
+    "arc": "Little Garden"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-brogy",
+   "name": "Brogy",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Brogy",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/b/bf/Brogy_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Riesenkrieger-Piraten"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 1800000000,
+    "groesse": 2130,
+    "herkunft": "Grand Line",
+    "arc": "Little Garden"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-hajrudin",
+   "name": "Hajrudin",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Hajrudin",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/b/b8/Hajrudin_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Neue Riesenkrieger-Piraten"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 2200,
+    "herkunft": "Grand Line",
+    "arc": "Dressrosa"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-sai",
+   "name": "Sai",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Sai",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/d/db/Sai_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Happo-Marine"
+    ],
+    "frucht": [],
+    "haki": [
+     "Observation",
+     "Rüstung"
+    ],
+    "kopfgeld": 210000000,
+    "groesse": 242,
+    "herkunft": "West Blue",
+    "arc": "Dressrosa"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-chinjao",
+   "name": "Chinjao",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Chinjao",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/b/b0/Chinjao_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Happo-Marine"
+    ],
+    "frucht": [],
+    "haki": [
+     "Observation",
+     "Rüstung",
+     "Königs"
+    ],
+    "kopfgeld": 542000000,
+    "groesse": 520,
+    "herkunft": "West Blue",
+    "arc": "Dressrosa"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-baby5",
+   "name": "Baby 5",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Baby_5",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/e/e1/Baby_5_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "weiblich",
+    "gruppe": [
+     "Happo-Marine"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 181,
+    "herkunft": "North Blue",
+    "arc": "Punk Hazard"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-ideo",
+   "name": "Ideo",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Ideo",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/3/30/Ideo_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Ideo-Piraten"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 225,
+    "herkunft": "Grand Line",
+    "arc": "Dressrosa"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-orlumbus",
+   "name": "Orlumbus",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Orlumbus",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/1/1b/Orlumbus_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Yonta-Maria-Flotte"
+    ],
+    "frucht": [],
+    "haki": [],
+    "kopfgeld": 148000000,
+    "groesse": 480,
+    "herkunft": "Grand Line",
+    "arc": "Dressrosa"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-diamante",
+   "name": "Diamante",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Diamante",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/7/72/Diamante_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Donquixote-Piraten"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [
+     "Observation",
+     "Rüstung"
+    ],
+    "kopfgeld": 99000000,
+    "groesse": 525,
+    "herkunft": "North Blue",
+    "arc": "Dressrosa"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-pica",
+   "name": "Pica",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Pica",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/a/a4/Pica_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Donquixote-Piraten"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [
+     "Observation",
+     "Rüstung"
+    ],
+    "kopfgeld": 99000000,
+    "groesse": 470,
+    "herkunft": "North Blue",
+    "arc": "Dressrosa"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-buffalo",
+   "name": "Buffalo",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Buffalo",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/a/ab/Buffalo_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Donquixote-Piraten"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [],
+    "kopfgeld": 0,
+    "groesse": 696,
+    "herkunft": "North Blue",
+    "arc": "Punk Hazard"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-gladius",
+   "name": "Gladius",
+   "auch": [],
+   "bekanntheit": 3,
+   "wiki": "Gladius",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/3/3d/Gladius_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Donquixote-Piraten"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [],
+    "kopfgeld": 31000000,
+    "groesse": 260,
+    "herkunft": "North Blue",
+    "arc": "Punk Hazard"
+   }
+  },
+  {
+   "thema": "one-piece",
+   "id": "op-senorpink",
+   "name": "Señor Pink",
+   "auch": [
+    "Senor Pink"
+   ],
+   "bekanntheit": 3,
+   "wiki": "Senor_Pink",
+   "bild": "https://static.wikia.nocookie.net/onepiece/images/4/48/Senor_Pink_Anime_Infobox.png/revision/latest/scale-to-width-down/400",
+   "werte": {
+    "geschlecht": "männlich",
+    "gruppe": [
+     "Donquixote-Piraten"
+    ],
+    "frucht": [
+     "Paramecia"
+    ],
+    "haki": [],
+    "kopfgeld": 58000000,
+    "groesse": 244,
+    "herkunft": "North Blue",
+    "arc": "Dressrosa"
    }
   }
  ]

@@ -32,6 +32,8 @@ export interface Fig {
   bekanntheit?: number;
   /** Seite im Wiki des Themas (für Bilder) */
   wiki?: string;
+  /** Bildadresse (z. B. im Wiki) */
+  bild?: string;
   werte: Record<string, unknown>;
   [field: string]: unknown;
 }

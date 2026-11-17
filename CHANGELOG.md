@@ -2,6 +2,13 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.36.0
+
+- Figurendle: 206 One-Piece-Figuren (vorher 120), z. B. Kuina, Makino, Bellemere, Bellamy, Fisher Tiger, Orochi, Kanjuro, Black Maria, Perospero, die Vinsmoke-Brüder, Koala, Rocks D. Xebec, Dorry und Brogy – Werte wieder aus dem One-Piece-Wiki
+- Die Figurenbilder werden jetzt direkt aus dem Wiki angezeigt (Steckbrief, Vorschläge beim Tippen, Handy und neu auch auf dem gemeinsamen Brett). Zusätzlich speichert UP! sie im Hintergrund auf deinem Rechner
+- Gemeinsames Brett: Die Leiste rechts ist weg – die Hinweis-Kacheln sind jetzt viel größer und besser lesbar. Der Anfangsbuchstabe steht oben neben dem Spieltitel
+- Wer die richtige Figur tippt, sieht erst noch alle Kacheln nacheinander grün aufploppen – danach geht es zum „Getroffen!“ bzw. zur Auflösung
+
 ## 0.35.0
 
 - Murmel-Mayhem: Sieben Bahnformen – Klassisch, Turm, X-Bahn, Sanduhr, Drei Türme, Treppenhaus und Querbahn. Jede Partie bekommt eine davon, zufällig auch gespiegelt
