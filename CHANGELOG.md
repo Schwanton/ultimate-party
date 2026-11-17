@@ -2,6 +2,11 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.34.1
+
+- Murmel-Mayhem: In der letzten Reihe und vor dem Förderband gibt es Rücklaufsperren – dort rollt keine Murmel mehr rückwärts aus dem Bild
+- Trampolin: Die Lücke zwischen Sprungtuch und weiterführender Schiene ist geschlossen
+
 ## 0.34.0
 
 - Murmel-Mayhem: Drei neue Bausteine – Trampolin (die Murmeln springen über die Kante), Drehkreuz (vier Arme drehen sich über der Schiene) und Lotterie-Trommel (die Murmeln purzeln in einer drehenden Trommel, bis sie vorn herausfallen)

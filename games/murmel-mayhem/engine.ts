@@ -276,6 +276,8 @@ export function buildStatics(track: Track) {
   for (const r of track.rows) {
     const p = r.pts;
     const d = r.dir;
+    // Reihen ohne Schiene darunter (vor dem Förderband und vor dem Ziel) bekommen Rücklaufsperren
+    const noFloor = r.key === 'L4' || r.key === 'R5';
     if (r.mid) {
       const [mx, my] = p[1];
       const [nx, ny] = p[2];
@@ -294,13 +296,15 @@ export function buildStatics(track: Track) {
         seg(a[0], a[1], mx + d * 65, my + 24, 4, 0.25, 'rail', r.i);
         seg(mx + d * 65, my + 24, mx + d * 86, my + 17, 4, 0.25, 'rail', r.i);
         seg(mx + d * 40, my + 74, mx + d * 142, my + 90, 4, 0.25, 'rail', r.i);
+        if (noFloor) seg(mx + d * 40, my + 74, mx + d * 40, my + 58, 3, 0.2, 'wall');
         seg(nx, ny, p[3][0], p[3][1], 4, 0.25, 'rail', r.i);
         label('schanze', mx + d * 90, my - 30);
       } else if (r.mid === 'trampolin') {
         // Schiene endet, darunter ein federndes Tuch (vorn tiefer), dahinter geht es höher weiter
         seg(mx + d * 2, my + 6, mx + d * 2, my + 64, 3, 0.2, 'wall');
-        seg(mx + d * 8, my + 64, mx + d * 116, my + 72, 4, 0.9, 'tramp', r.i);
-        seg(mx + d * 124, my + 74, mx + d * 124, my + 46, 3, 0.2, 'wall');
+        seg(mx + d * 8, my + 64, mx + d * 144, my + 74, 4, 0.9, 'tramp', r.i);
+        // vordere Kante geht lückenlos in die weiterführende Schiene über
+        seg(nx, my + 76, nx, ny, 3, 0.2, 'wall');
         seg(nx, ny, p[3][0], p[3][1], 4, 0.25, 'rail', r.i);
         label('trampolin', mx + d * 75, my - 30);
       } else if (r.mid === 'drehkreuz') {
@@ -312,6 +316,7 @@ export function buildStatics(track: Track) {
         // Nägel-Stufe: oben endet die Schiene, unten geht es versetzt weiter, dazwischen Nägel
         const x2 = mx - d * 26;
         seg(x2, my + 50 - 26 * SLOPE, p[3][0], p[3][1], 4, 0.25, 'rail', r.i);
+        if (noFloor) seg(x2, my + 50 - 26 * SLOPE, x2, my + 12, 3, 0.2, 'wall');
         for (let x = mx + d * 4, k = 0; d > 0 ? x < mx + 140 : x > mx - 140; x += d * 32, k++) pins.push({ x, y: my + Math.abs(x - mx) * SLOPE + 16 + (k % 2 ? 4 : 0), r: 3.6 });
         label('stufe', mx + d * 70, my - 30);
       }
