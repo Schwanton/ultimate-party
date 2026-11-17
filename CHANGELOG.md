@@ -2,6 +2,14 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.35.0
+
+- Murmel-Mayhem: Sieben Bahnformen – Klassisch, Turm, X-Bahn, Sanduhr, Drei Türme, Treppenhaus und Querbahn. Jede Partie bekommt eine davon, zufällig auch gespiegelt
+- X-Bahn: Die beiden Wege kreuzen sich – die hintere Bahn ist etwas dunkler, die Murmeln der beiden Wege stoßen nicht zusammen
+- Querbahn: ohne Klappen (Farbklappe, Abkürzungsklappe), weil sie dort eine ganze lange Reihe überspringen würden
+- Rechts im Rennen steht jetzt der Zieleinlauf: von oben Platz, Murmel und die gewonnenen Punkte
+- Die Weiche an der Gabelung ist leichter und kippt viel öfter um – nicht mehr alle Murmeln nehmen denselben Weg. Auch die Wippen reagieren stärker auf jede Murmel
+
 ## 0.34.1
 
 - Murmel-Mayhem: In der letzten Reihe und vor dem Förderband gibt es Rücklaufsperren – dort rollt keine Murmel mehr rückwärts aus dem Bild

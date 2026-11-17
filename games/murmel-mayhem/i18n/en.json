@@ -179,5 +179,6 @@
   "track.trampolin": "TRAMPOLINE",
   "track.drehkreuz": "TURNSTILE",
   "track.lotterie": "LOTTERY DRUM",
-  "end.lotterie": "lottery drum"
+  "end.lotterie": "lottery drum",
+  "race.list": "FINISH"
 }

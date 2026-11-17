@@ -10,7 +10,7 @@
 import { INPUT_GRACE, Scores, shuffle, type GameContext, type GameServerModule } from '@up/sdk';
 import {
   HOLE, Race, SORT, TICK, TOGGLE, addSocket, generateGoodTrack, makeTube, newItem, railY, rowNumber, swapEnd, tubeForward,
-  type CardKind, type Item, type ItemKind, type RaceEvent, type Socket, type Track,
+  type CardKind, type DesignName, type Item, type ItemKind, type RaceEvent, type Socket, type Track,
 } from './engine';
 import { PALETTE, PATTERNS, contrast, nearestFree, validDesign, type Design } from './muster';
 
@@ -27,15 +27,16 @@ function geo(track: Track, phone = false) {
   return {
     W: track.W,
     H: r1(track.H),
-    rows: track.rows.map((r) => ({ i: r.i, key: r.key, dir: r.dir, pts: r.pts.map(([x, y]) => [r1(x), r1(y)]), end: r.end, mid: r.mid, wear: r.wear })),
-    segs: track.segs.filter((s) => !phone || s.kind === 'rail' || s.kind === 'glass' || s.kind === 'tramp').map((s) => ({ ax: r1(s.ax), ay: r1(s.ay), bx: r1(s.bx), by: r1(s.by), kind: s.kind })),
-    pins: phone ? [] : track.pins.map((p) => [r1(p.x), r1(p.y)]),
+    design: track.design,
+    mirrored: track.mirrored,
+    rows: track.rows.map((r) => ({ i: r.i, key: r.key, dir: r.dir, layer: r.layer, pts: r.pts.map(([x, y]) => [r1(x), r1(y)]), end: r.end, wear: r.wear })),
+    segs: track.segs.filter((s) => !phone || s.kind === 'rail' || s.kind === 'glass' || s.kind === 'tramp').map((s) => ({ ax: r1(s.ax), ay: r1(s.ay), bx: r1(s.bx), by: r1(s.by), kind: s.kind, layer: s.layer })),
+    pins: phone ? [] : track.pins.map((p) => [r1(p.x), r1(p.y), p.layer]),
     wippes: track.wippes,
-    wheels: track.wheels.map((w) => ({ cx: r1(w.cx), cy: r1(w.cy), r: w.r, hub: w.hub, n: w.n })),
+    wheels: [],
     turns: track.turns,
     drums: track.drums,
-    over: track.over,
-    conv: track.conv,
+    lifts: track.lifts.map((l) => ({ ...l, y0: r1(l.y0), over: l.over.map(([x, y]) => [r1(x), r1(y)]) })),
     rocker: track.rocker,
     loop: track.loop,
     spiral: track.spiral,
@@ -58,8 +59,10 @@ export default {
     const scores = new Scores(ids);
     const total = Number(ctx.options.rounds) || 5;
     const perPlayer = N <= 4 ? 6 : N <= 8 ? 4 : 3;
-    const { track, check } = generateGoodTrack(4, 2);
-    ctx.log('Murmel-Mayhem Bahn', track.rows.map((r) => `${r.key}:${r.mid ?? '-'}/${r.end}`).join(' '), 'Ähnlichkeit', check.rho.toFixed(2), 'Zeit', check.time.toFixed(0), 'im Ziel', check.done.toFixed(2));
+    // zum Testen lässt sich die Bahnform über MM_DESIGN festlegen
+    const forced = (globalThis as { process?: { env: Record<string, string | undefined> } }).process?.env.MM_DESIGN as DesignName | undefined;
+    const { track, check } = generateGoodTrack(4, 2, Math.random, forced);
+    ctx.log('Murmel-Mayhem Bahn', track.design, track.mirrored ? 'gespiegelt' : '', track.rows.map((r) => `${r.key}:${r.mids.map((m) => m.kind).join('+') || '-'}/${r.end}`).join(' '), 'Ähnlichkeit', check.rho.toFixed(2), 'Zeit', check.time.toFixed(0), 'im Ziel', check.done.toFixed(2));
     /** Höchstzahl Teile je Spieler: 4, bei vielen Spielern weniger (es gibt nur so viele Bauplätze) */
     const cap = () => Math.max(2, Math.min(4, Math.floor((track.sockets.length * 0.85) / N)));
 
@@ -149,6 +152,8 @@ export default {
 
     /* ---------- Angebote ---------- */
     function makeOffers() {
+      // Klappen nur, wenn es Plätze dafür gibt (die Querbahn hat keine)
+      const avail = ITEMS.filter((k) => !HOLE.includes(k) || track.sockets.some((s) => s.hole));
       offers = new Map();
       const rank = scores.ranking();
       const behind = new Set(rank.slice(Math.ceil(rank.length / 2)).map((r) => r.playerId));
@@ -162,11 +167,11 @@ export default {
         };
         const hand: CardKind[] = [];
         while (hand.length < 3) {
-          const k = Math.random() < 1 / 6 ? EVENTS[Math.floor(Math.random() * EVENTS.length)] : draw(ITEMS);
+          const k = Math.random() < 1 / 6 ? EVENTS[Math.floor(Math.random() * EVENTS.length)] : draw(avail);
           if (hand.includes(k) && Math.random() < 0.7) continue;
           hand.push(k);
         }
-        if (!hand.some((k) => SORT[k] === 'weiche')) hand[Math.floor(Math.random() * 3)] = draw(ITEMS.filter((k) => SORT[k] === 'weiche'));
+        if (!hand.some((k) => SORT[k] === 'weiche')) hand[Math.floor(Math.random() * 3)] = draw(avail.filter((k) => SORT[k] === 'weiche'));
         offers.set(id, hand);
       }
     }

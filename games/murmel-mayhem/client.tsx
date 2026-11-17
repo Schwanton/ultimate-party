@@ -41,7 +41,7 @@ const ICON: Record<string, string> = {
   tausch: 'M4 8h14l-3-3M20 16H6l3 3',
 };
 
-const FLAG = { done: 1, tube: 2, basket: 4, shield: 8, boost: 16, behind: 32, glass: 64 };
+const FLAG = { done: 1, tube: 2, basket: 4, shield: 8, boost: 16, behind: 32, glass: 64, back: 128 };
 const IT = { on: 1, closed: 2, gust: 4, kick: 8 };
 const R = 9;
 const FALLBACK: Design = { c: 12, c2: 13, p: 'uni' };
@@ -91,21 +91,22 @@ function Badge({ kind, size = 48, dim = false, owner }: { kind: string; size?: n
 /* ================= Bahn ================= */
 
 type Pt = [number, number];
-interface Row { i: number; key: string; dir: number; pts: Pt[]; end: string; mid: string | null; wear: number }
+interface Row { i: number; key: string; dir: number; layer?: number; pts: Pt[]; end: string; wear: number }
 interface Geo {
   W: number;
   H: number;
   rows: Row[];
-  segs: { ax: number; ay: number; bx: number; by: number; kind: string }[];
-  pins: [number, number][];
+  design?: string;
+  mirrored?: boolean;
+  segs: { ax: number; ay: number; bx: number; by: number; kind: string; layer?: number }[];
+  pins: [number, number, number?][];
   wippes: { px: number; py: number; half: number; rest: number }[];
   wheels: { cx: number; cy: number; r: number; hub: number; n: number }[];
   turns: { cx: number; cy: number; r: number; w: number }[];
   drums: { cx: number; cy: number; r: number; w: number; inA: number; outA: number; gap: number }[];
-  over: Pt[];
-  conv: { x: number; y0: number; y1: number; sp: number; v: number };
-  rocker: { px: number; py: number; half: number };
-  loop: { cx: number; cy: number; r: number };
+  lifts: { x: number; y0: number; y1: number; d: number; sp: number; v: number; over: Pt[] }[];
+  rocker: { px: number; py: number; half: number } | null;
+  loop: { cx: number; cy: number; r: number; dir?: number } | null;
   spiral: Pt[];
   sockets: { id: number; x: number; y: number; row: number; hole: boolean }[];
   finish: { x0: number; x1: number; y: number };
@@ -161,11 +162,20 @@ function renderTrack(geo: Geo, t: (k: string) => string): { back: HTMLCanvasElem
     g.lineWidth = r * 0.22; g.setLineDash([r * 0.25, r * 0.2]); g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2); g.stroke();
   }
   g.setLineDash([]); g.globalAlpha = 1;
-  const c = geo.conv;
-  for (const dx of [-12, 12]) line(g, c.x + dx, c.y0 + 10, c.x + dx, c.y1 - 10, [['#2a1a0c', 8, 0], ['#8a6424', 4, 0]]);
-  g.strokeStyle = '#5a3a12'; g.lineWidth = 3; g.setLineDash([6, 5]);
-  g.beginPath(); g.moveTo(c.x, c.y0 + 10); g.lineTo(c.x, c.y1 - 10); g.stroke(); g.setLineDash([]);
-  for (const cy of [c.y0 + 10, c.y1 - 10]) { g.fillStyle = disc(g, c.x, cy, 16); g.beginPath(); g.arc(c.x, cy, 16, 0, Math.PI * 2); g.fill(); }
+  for (const c of geo.lifts ?? []) {
+    for (const dx of [-12, 12]) line(g, c.x + dx, c.y0 + 10, c.x + dx, c.y1 - 10, [['#2a1a0c', 8, 0], ['#8a6424', 4, 0]]);
+    g.strokeStyle = '#5a3a12'; g.lineWidth = 3; g.setLineDash([6, 5]);
+    g.beginPath(); g.moveTo(c.x, c.y0 + 10); g.lineTo(c.x, c.y1 - 10); g.stroke(); g.setLineDash([]);
+    for (const cy of [c.y0 + 10, c.y1 - 10]) { g.fillStyle = disc(g, c.x, cy, 16); g.beginPath(); g.arc(c.x, cy, 16, 0, Math.PI * 2); g.fill(); }
+  }
+  // X-Bahn: die hintere Strecke liegt auf der hinteren Ebene (etwas dunkler)
+  const backSegs = geo.segs.filter((s) => s.layer === 1);
+  for (const s of backSegs) {
+    if (s.kind === 'glass') line(g, s.ax, s.ay, s.bx, s.by, [['rgba(217,238,252,.32)', 6, 0]]);
+    else if (s.kind === 'tramp') line(g, s.ax, s.ay, s.bx, s.by, [['#3d270b', 9, 0], ['#a33a28', 5, 0]]);
+    else line(g, s.ax, s.ay, s.bx, s.by, [['#2a1a0c', 11, 0], ['#8d6a32', 7, 0], ['#c9ae7c', 2, -2]]);
+  }
+  for (const [x, y, l] of geo.pins) if (l === 1) { g.fillStyle = '#8a6a3a'; g.beginPath(); g.arc(x, y, 3.6, 0, Math.PI * 2); g.fill(); }
 
   const front = document.createElement('canvas');
   front.width = geo.W;
@@ -183,6 +193,7 @@ function renderTrack(geo: Geo, t: (k: string) => string): { back: HTMLCanvasElem
     g.fillText(t(mk.kind === 'delle' ? 'track.delle' : 'track.poliert'), x, y + 40);
   }
   for (const s of geo.segs) {
+    if (s.layer === 1) continue;
     if (s.kind === 'glass') line(g, s.ax, s.ay, s.bx, s.by, [['rgba(217,238,252,.55)', 6, 0], ['rgba(255,255,255,.25)', 2, -1]]);
     else if (s.kind === 'frame') line(g, s.ax, s.ay, s.bx, s.by, [['#2a1a0c', 14, 0], ['#6e4a14', 9, 0]]);
     else if (s.kind === 'wall') line(g, s.ax, s.ay, s.bx, s.by, [['#3d270b', 12, 0], ['#a87a30', 8, 0], ['#f3d38a', 2, 0]]);
@@ -197,18 +208,22 @@ function renderTrack(geo: Geo, t: (k: string) => string): { back: HTMLCanvasElem
       for (const [x, y] of [[s.ax, s.ay], [s.bx, s.by]]) { g.strokeStyle = '#a87a30'; g.lineWidth = 2; g.beginPath(); for (let k = 0; k < 5; k++) g.lineTo(x + (k % 2 ? 4 : -4), y + 4 + k * 4); g.stroke(); }
     } else line(g, s.ax, s.ay, s.bx, s.by, RAIL);
   }
-  for (const [x, y] of geo.pins) { g.fillStyle = disc(g, x, y, 3.6); g.beginPath(); g.arc(x, y, 3.6, 0, Math.PI * 2); g.fill(); }
+  for (const [x, y, l] of geo.pins) if (l !== 1) { g.fillStyle = disc(g, x, y, 3.6); g.beginPath(); g.arc(x, y, 3.6, 0, Math.PI * 2); g.fill(); }
   for (const w of geo.wippes) {
     g.fillStyle = brassGrad(g, w.py, w.py + 30);
     g.beginPath(); g.moveTo(w.px - 12, w.py + 30); g.lineTo(w.px, w.py); g.lineTo(w.px + 12, w.py + 30); g.closePath(); g.fill();
   }
   const lp = geo.loop;
-  g.strokeStyle = '#3d270b'; g.lineWidth = 11; g.beginPath(); g.arc(lp.cx, lp.cy, lp.r, 0, Math.PI * 2); g.stroke();
-  g.strokeStyle = '#c8963c'; g.lineWidth = 7; g.beginPath(); g.arc(lp.cx, lp.cy, lp.r, 0, Math.PI * 2); g.stroke();
-  g.strokeStyle = '#fbe7b0'; g.lineWidth = 2; g.beginPath(); g.arc(lp.cx, lp.cy, lp.r - 2, Math.PI * 1.1, Math.PI * 1.6); g.stroke();
+  if (lp) {
+    g.strokeStyle = '#3d270b'; g.lineWidth = 11; g.beginPath(); g.arc(lp.cx, lp.cy, lp.r, 0, Math.PI * 2); g.stroke();
+    g.strokeStyle = '#c8963c'; g.lineWidth = 7; g.beginPath(); g.arc(lp.cx, lp.cy, lp.r, 0, Math.PI * 2); g.stroke();
+    g.strokeStyle = '#fbe7b0'; g.lineWidth = 2; g.beginPath(); g.arc(lp.cx, lp.cy, lp.r - 2, Math.PI * 1.1, Math.PI * 1.6); g.stroke();
+  }
   const rk = geo.rocker;
-  g.fillStyle = brassGrad(g, rk.py, rk.py + 30);
-  g.beginPath(); g.moveTo(rk.px - 12, rk.py + 30); g.lineTo(rk.px, rk.py); g.lineTo(rk.px + 12, rk.py + 30); g.closePath(); g.fill();
+  if (rk) {
+    g.fillStyle = brassGrad(g, rk.py, rk.py + 30);
+    g.beginPath(); g.moveTo(rk.px - 12, rk.py + 30); g.lineTo(rk.px, rk.py); g.lineTo(rk.px + 12, rk.py + 30); g.closePath(); g.fill();
+  }
   for (const l of geo.labels) {
     g.globalAlpha = 0.85; g.fillStyle = '#e7c27a'; g.textAlign = 'center';
     g.font = `700 ${l.t === 'ziel' ? 22 : 13}px ${DISPLAY}`;
@@ -393,7 +408,7 @@ function drawPart(g: G2, it: PubItem, geo: Geo, st: PartState, now: number, owne
 }
 
 /** Bewegliche Bausteine: Mühlräder, Förderband-Körbe, Kippweiche */
-interface Blocks { wh: number[]; cv: number; rk: number; tn?: number[]; dr?: number[] }
+interface Blocks { wh: number[]; cv: number[]; rk: number; tn?: number[]; dr?: number[] }
 function drawWheels(g: G2, geo: Geo, b: Blocks | null, now: number) {
   geo.wheels.forEach((w, k) => {
     const ang = b ? (b.wh[k] ?? 0) / 100 : -now / 900;
@@ -407,31 +422,34 @@ function drawWheels(g: G2, geo: Geo, b: Blocks | null, now: number) {
   });
 }
 function drawBuckets(g: G2, geo: Geo, b: Blocks | null, now: number) {
-  const c = geo.conv;
-  const len = c.y0 - c.y1;
-  const off = b ? b.cv : ((now / 1000) * c.v) % c.sp;
-  g.strokeStyle = '#e7c27a'; g.lineWidth = 2.5;
-  for (let s = off; s < len; s += c.sp) {
-    const y = c.y0 - s;
-    g.beginPath(); g.moveTo(c.x - 11, y - 14); g.lineTo(c.x - 11, y); g.lineTo(c.x + 11, y); g.lineTo(c.x + 11, y - 14); g.stroke();
-  }
+  (geo.lifts ?? []).forEach((c, k) => {
+    const len = c.y0 - c.y1;
+    const off = b ? (b.cv[k] ?? 0) : ((now / 1000) * c.v) % c.sp;
+    g.strokeStyle = '#e7c27a'; g.lineWidth = 2.5;
+    for (let s = off; s < len; s += c.sp) {
+      const y = c.y0 - s;
+      g.beginPath(); g.moveTo(c.x - 11, y - 14); g.lineTo(c.x - 11, y); g.lineTo(c.x + 11, y); g.lineTo(c.x + 11, y - 14); g.stroke();
+    }
+  });
 }
 function drawRocker(g: G2, geo: Geo, a: number) {
   const rk = geo.rocker;
+  if (!rk) return;
   const c = Math.cos(a), s = Math.sin(a);
   line(g, rk.px - c * rk.half, rk.py - s * rk.half, rk.px + c * rk.half, rk.py + s * rk.half, RAIL);
   g.fillStyle = '#3d270b'; g.beginPath(); g.arc(rk.px, rk.py, 4, 0, Math.PI * 2); g.fill();
 }
 /** Glasröhren (Spirale und Röhre über die Trennwand), Murmeln darin werden zwischen Füllung und Rand gezeichnet */
 function drawSpiral(g: G2, geo: Geo, inner?: () => void) {
-  const tubes = [geo.spiral, geo.over ?? []].filter((t) => t.length > 1);
+  const tubes = [geo.spiral ?? [], ...(geo.lifts ?? []).map((l) => l.over)].filter((t) => t.length > 1);
   g.lineCap = 'round'; g.lineJoin = 'round';
   g.strokeStyle = 'rgba(191,227,255,.14)'; g.lineWidth = 26;
   for (const sp of tubes) { g.beginPath(); sp.forEach(([x, y], k) => (k ? g.lineTo(x, y) : g.moveTo(x, y))); g.stroke(); }
   inner?.();
   g.strokeStyle = 'rgba(217,238,252,.5)'; g.lineWidth = 2;
   for (const sp of tubes) for (const off of [-12, 12]) { g.beginPath(); sp.forEach(([x, y], k) => (k ? g.lineTo(x + off, y) : g.moveTo(x + off, y))); g.stroke(); }
-  const sp = geo.spiral;
+  const sp = geo.spiral ?? [];
+  if (sp.length < 2) return;
   g.fillStyle = brassGrad(g, sp[0][1] - 20, sp[0][1] + 20); g.beginPath(); g.ellipse(sp[0][0], sp[0][1] - 2, 22, 10, 0, 0, Math.PI * 2); g.fill();
 }
 
@@ -834,7 +852,7 @@ function HostRace({ view, t, player }: HostViewProps) {
         if (m) effects.current.push({ kind: 'ring', x: m[0], y: m[1], at: n, color: '#9fd7ff', r: 20 });
       } else if (kind === 'loop') {
         const m = fr.m[Number(e[1])];
-        if (m && Number(e[2]) === 1) { effects.current.push({ kind: 'text', x: geo.loop.cx, y: geo.loop.cy - 70, at: n, color: '#f6dd9c', text: t('race.loop') }); sfx.custom((s) => s.tone(700, 0.25, { type: 'sine', vol: 0.05, to: 1400 })); }
+        if (m && geo.loop && Number(e[2]) === 1) { effects.current.push({ kind: 'text', x: geo.loop.cx, y: geo.loop.cy - 70, at: n, color: '#f6dd9c', text: t('race.loop') }); sfx.custom((s) => s.tone(700, 0.25, { type: 'sine', vol: 0.05, to: 1400 })); }
       } else if (kind === 'finish') {
         const i = Number(e[1]);
         const place = Number(e[2]);
@@ -982,7 +1000,7 @@ function HostRace({ view, t, player }: HostViewProps) {
       const M = cur ? cur.m.length : 0;
       if (cur) for (let i = 0; i < M; i++) {
         const [x, y, ang, f] = pos(i);
-        if (f & FLAG.behind) drawDesignMarble(g, x, y, ang, ownerDesigns[cur.ow[i]] ?? FALLBACK, R, 0.9);
+        if (f & FLAG.behind || (f & FLAG.back && !(f & (FLAG.glass | FLAG.done)))) drawDesignMarble(g, x, y, ang, ownerDesigns[cur.ow[i]] ?? FALLBACK, R, f & FLAG.behind ? 0.9 : 1);
       }
       blit(layer.front);
       // Ölpest
@@ -1024,7 +1042,7 @@ function HostRace({ view, t, player }: HostViewProps) {
       }
       if (cur) for (let i = 0; i < M; i++) {
         const [x, y, ang, f] = pos(i);
-        if (y < -30 || f & (FLAG.behind | FLAG.glass)) continue;
+        if (y < -30 || f & (FLAG.behind | FLAG.glass) || (f & FLAG.back && !(f & FLAG.done))) continue;
         const d = ownerDesigns[cur.ow[i]] ?? FALLBACK;
         if (f & FLAG.boost) { g.globalAlpha = 0.3; g.fillStyle = mainColor(d); g.beginPath(); g.arc(x, y, 15, 0, Math.PI * 2); g.fill(); g.globalAlpha = 1; }
         drawDesignMarble(g, x, y, ang, d, R, f & FLAG.tube ? 0.85 : 1);
@@ -1122,16 +1140,14 @@ function HostRace({ view, t, player }: HostViewProps) {
     return () => cancelAnimationFrame(raf);
   }, [layer, items, ownerColors, ownerDesigns, geo, flight, freshIds, flightPath]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const ranking: { pid: string; done: number; owner: number }[] = [];
+  // Zieleinlauf-Liste: alle Murmeln nach aktuellem Platz, angekommene mit ihren Punkten
+  const list: { i: number; place: number; pts: number; done: boolean }[] = [];
   if (fr) {
-    const seen = new Set<number>();
-    for (const i of fr.o) {
-      const ow = fr.ow[i];
-      if (seen.has(ow)) continue;
-      seen.add(ow);
-      const p = player(pids[ow]);
-      if (p) ranking.push({ pid: p.id, owner: ow, done: fr.m.filter((m, k) => fr.ow[k] === ow && m[3] & FLAG.done).length });
-    }
+    const M = fr.m.length, mult = view.mult ?? 1;
+    fr.o.forEach((i, k) => {
+      const done = !!(fr.m[i][3] & FLAG.done);
+      list.push({ i, place: k + 1, done, pts: done ? ((M - k) * 10 + (k === 0 ? 100 : 0)) * mult : 0 });
+    });
   }
   const barH = 560;
   return (
@@ -1166,16 +1182,16 @@ function HostRace({ view, t, player }: HostViewProps) {
               </div>
               <span style={{ fontSize: 11, color: DIM }}>{t('race.finish')}</span>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1, minWidth: 0 }}>
-              <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: 1.5, color: DIM }}>{t('race.best')}</span>
-              {ranking.slice(0, 12).map((r, k) => {
-                const p = player(r.pid)!;
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 1, flex: 1, minWidth: 0 }}>
+              <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: 1.5, color: DIM, marginBottom: 3 }}>{t('race.list')}</span>
+              {list.map((r) => {
+                const h = Math.max(13, Math.min(24, Math.floor((barH + 10) / Math.max(1, list.length))));
                 return (
-                  <div key={r.pid} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '5px 7px', borderRadius: 8, background: 'rgba(255,255,255,.03)' }}>
-                    <span style={{ width: 16, fontFamily: DISPLAY, fontWeight: 700, fontSize: 14, color: BRASS }}>{k + 1}</span>
-                    <Marble d={ownerDesigns[r.owner]} size={18} />
-                    <span style={{ flex: 1, minWidth: 0, fontSize: 15, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</span>
-                    {r.done > 0 && <span style={{ fontSize: 12, color: BRASS_L }}>{r.done}✓</span>}
+                  <div key={r.i} style={{ height: h, display: 'flex', alignItems: 'center', gap: 6, padding: '0 6px', borderRadius: 6, background: r.done ? (r.place === 1 ? 'rgba(233,196,106,.22)' : 'rgba(233,196,106,.08)') : 'transparent', opacity: r.done ? 1 : 0.55 }}>
+                    <span style={{ width: 22, fontFamily: DISPLAY, fontWeight: 700, fontSize: Math.min(14, h - 2), color: BRASS }}>{r.place}.</span>
+                    <img src={marbleUrl(ownerDesigns[fr!.ow[r.i]] ?? FALLBACK)} alt="" style={{ width: h - 4, height: h - 4 }} />
+                    <span style={{ flex: 1 }} />
+                    <span style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: Math.min(15, h - 2), color: r.done ? BRASS_L : DIM }}>{r.done ? `+${r.pts}` : '·'}</span>
                   </div>
                 );
               })}
@@ -1311,16 +1327,16 @@ function PlanSvg({ geo, scale, children }: { geo: Geo; scale: number; children?:
   return (
     <svg width={geo.W * scale} height={geo.H * scale} viewBox={`0 0 ${geo.W} ${geo.H}`} style={{ display: 'block' }}>
       <rect width={geo.W} height={geo.H} fill="#1f150d" />
-      <line x1={geo.conv.x} y1={geo.conv.y0} x2={geo.conv.x} y2={geo.conv.y1} stroke="#6e4a14" strokeWidth={22} strokeDasharray="14 10" />
+      {(geo.lifts ?? []).map((c, i) => <line key={`l${i}`} x1={c.x} y1={c.y0} x2={c.x} y2={c.y1} stroke="#6e4a14" strokeWidth={22} strokeDasharray="14 10" />)}
       {geo.segs.map((s, i) => (
         <line key={i} x1={s.ax} y1={s.ay} x2={s.bx} y2={s.by} stroke={s.kind === 'glass' ? '#9fc2d8' : s.kind === 'tramp' ? '#d3452f' : '#c8963c'} strokeWidth={s.kind === 'glass' ? 5 : 11} strokeLinecap="round" opacity={s.kind === 'glass' ? 0.6 : 1} />
       ))}
       {geo.wheels.map((w, i) => <circle key={`w${i}`} cx={w.cx} cy={w.cy} r={w.r + 10} fill="none" stroke="#a87a30" strokeWidth={10} />)}
       {(geo.drums ?? []).map((w, i) => <circle key={`d${i}`} cx={w.cx} cy={w.cy} r={w.r} fill="rgba(191,227,255,.12)" stroke="#9fc2d8" strokeWidth={6} />)}
       {(geo.turns ?? []).map((w, i) => <g key={`t${i}`}><line x1={w.cx - w.r} y1={w.cy} x2={w.cx + w.r} y2={w.cy} stroke="#c8963c" strokeWidth={8} /><line x1={w.cx} y1={w.cy - w.r} x2={w.cx} y2={w.cy + w.r} stroke="#c8963c" strokeWidth={8} /></g>)}
-      {(geo.over ?? []).length > 1 && <polyline points={geo.over.map((p) => p.join(',')).join(' ')} fill="none" stroke="#9fc2d8" strokeWidth={20} opacity={0.4} />}
-      <circle cx={geo.loop.cx} cy={geo.loop.cy} r={geo.loop.r} fill="none" stroke="#c8963c" strokeWidth={10} />
-      <polyline points={geo.spiral.map((p) => p.join(',')).join(' ')} fill="none" stroke="#9fc2d8" strokeWidth={20} opacity={0.4} />
+      {(geo.lifts ?? []).map((c, i) => <polyline key={`o${i}`} points={c.over.map((p) => p.join(',')).join(' ')} fill="none" stroke="#9fc2d8" strokeWidth={20} opacity={0.4} />)}
+      {geo.loop && <circle cx={geo.loop.cx} cy={geo.loop.cy} r={geo.loop.r} fill="none" stroke="#c8963c" strokeWidth={10} />}
+      {(geo.spiral ?? []).length > 1 && <polyline points={geo.spiral.map((p) => p.join(',')).join(' ')} fill="none" stroke="#9fc2d8" strokeWidth={20} opacity={0.4} />}
       <rect x={geo.finish.x0} y={geo.finish.y - 40} width={geo.finish.x1 - geo.finish.x0} height={40} fill="rgba(233,196,106,.25)" />
       {children}
     </svg>

@@ -179,5 +179,6 @@
   "track.trampolin": "TRAMPOLIN",
   "track.drehkreuz": "DREHKREUZ",
   "track.lotterie": "LOTTERIE-TROMMEL",
-  "end.lotterie": "Lotterie-Trommel"
+  "end.lotterie": "Lotterie-Trommel",
+  "race.list": "ZIELEINLAUF"
 }
