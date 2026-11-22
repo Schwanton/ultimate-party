@@ -1,0 +1,50 @@
+{
+  "id": "tank-trouble",
+  "name": { "de": "Tank Trouble", "en": "Tank Trouble" },
+  "description": {
+    "de": "Panzer von oben wie bei Wii Play: Kugeln prallen einmal von der Wand ab, Minen sprengen Klötze weg, ein Treffer reicht. Kampagne: alle zusammen gegen farbige Computer-Panzer durch 10 Missionen. Duell: jeder gegen jeden mit Powerups.",
+    "en": "Top-down tanks like in Wii Play: bullets bounce off walls once, mines blow up blocks, one hit is enough. Campaign: everyone together against coloured computer tanks through 10 missions. Duel: free-for-all with power-ups."
+  },
+  "minPlayers": 1,
+  "maxPlayers": 8,
+  "audience": false,
+  "minutes": 15,
+  "color": "#38E1FF",
+  "tags": ["quick"],
+  "sdkVersion": 1,
+  "version": "0.1.0",
+  "author": "UP!",
+  "options": [
+    {
+      "id": "mode",
+      "label": { "de": "Modus", "en": "Mode" },
+      "help": { "de": "Kampagne: gemeinsam gegen Computer-Panzer. Duell: jeder gegen jeden.", "en": "Campaign: together against computer tanks. Duel: free-for-all." },
+      "default": "kampagne",
+      "choices": [
+        { "value": "kampagne", "label": { "de": "Kampagne", "en": "Campaign" } },
+        { "value": "duell", "label": { "de": "Duell", "en": "Duel" } }
+      ]
+    },
+    {
+      "id": "rounds",
+      "label": { "de": "Duell-Runden", "en": "Duel rounds" },
+      "default": 5,
+      "choices": [
+        { "value": 3, "label": { "de": "3", "en": "3" } },
+        { "value": 5, "label": { "de": "5", "en": "5" } },
+        { "value": 8, "label": { "de": "8", "en": "8" } }
+      ]
+    },
+    {
+      "id": "cpu",
+      "label": { "de": "Computer-Gegner im Duell", "en": "Computer opponents in duel" },
+      "default": 0,
+      "choices": [
+        { "value": 0, "label": { "de": "0", "en": "0" } },
+        { "value": 1, "label": { "de": "1", "en": "1" } },
+        { "value": 2, "label": { "de": "2", "en": "2" } },
+        { "value": 3, "label": { "de": "3", "en": "3" } }
+      ]
+    }
+  ]
+}

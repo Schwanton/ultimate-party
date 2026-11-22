@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState, type PointerEvent as RPointerEvent } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ControllerViewProps, GameClientModule, HostViewProps, PlayerInfo } from '@up/sdk';
-import { Avatar, Confetti, Crown, HostHeader, PhoneWait, Podium, Scoreboard, sfx, useServerNow, useStream, vibrate } from '@up/ui';
+import { Avatar, Confetti, Crown, HostHeader, Joystick, PhoneWait, Podium, Scoreboard, sfx, useServerNow, useStream, vibrate } from '@up/ui';
 
 const MINT = '#36F5C8';
 const MINT_D = '#1BA884';
@@ -178,47 +178,6 @@ function HostArena({ view, t, player }: HostViewProps) {
 
 /* ================= Handy ================= */
 
-function Joystick({ onMove, color }: { onMove: (x: number, y: number) => void; color: string }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [knob, setKnob] = useState<[number, number]>([0, 0]);
-  const active = useRef(false);
-  const last = useRef({ x: 0, y: 0, at: 0 });
-  const send = (x: number, y: number, force = false) => {
-    const n = performance.now();
-    if (!force && n - last.current.at < 45 && Math.hypot(x - last.current.x, y - last.current.y) < 0.3) return;
-    last.current = { x, y, at: n };
-    onMove(x, y);
-  };
-  const update = (e: RPointerEvent) => {
-    const el = ref.current!;
-    const rect = el.getBoundingClientRect();
-    const R = rect.width / 2;
-    let x = (e.clientX - rect.left - R) / (R * 0.8), y = (e.clientY - rect.top - R) / (R * 0.8);
-    const len = Math.hypot(x, y);
-    if (len > 1) [x, y] = [x / len, y / len];
-    setKnob([x, y]);
-    send(Math.round(x * 100) / 100, Math.round(y * 100) / 100);
-  };
-  const end = () => {
-    active.current = false;
-    setKnob([0, 0]);
-    send(0, 0, true);
-  };
-  // Während gehalten wird regelmäßig nachsenden (falls eine Nachricht verloren geht)
-  useEffect(() => {
-    const id = setInterval(() => active.current && onMove(last.current.x, last.current.y), 400);
-    return () => clearInterval(id);
-  }, [onMove]);
-  return (
-    <div ref={ref} role="application" aria-label="Joystick"
-      onPointerDown={(e) => { e.preventDefault(); active.current = true; (e.target as Element).setPointerCapture?.(e.pointerId); update(e); }}
-      onPointerMove={(e) => active.current && update(e)} onPointerUp={end} onPointerCancel={end}
-      style={{ width: 280, height: 280, borderRadius: '50%', background: 'radial-gradient(circle, #262048 0 60%, #1C1738 61%)', boxShadow: `inset 0 0 0 4px ${color}55`, position: 'relative', touchAction: 'none', alignSelf: 'center' }}>
-      <div style={{ position: 'absolute', left: '50%', top: '50%', width: 110, height: 110, borderRadius: '50%', background: color, boxShadow: `0 6px 0 rgba(0,0,0,.35), 0 0 24px ${color}`, transform: `translate(calc(-50% + ${knob[0] * 100}px), calc(-50% + ${knob[1] * 100}px))`, transition: active.current ? undefined : 'transform .15s' }} />
-    </div>
-  );
-}
-
 function Controller({ view, t, send, me }: ControllerViewProps) {
   const now = useServerNow(200);
   const [cooldown, setCooldown] = useState(0);
@@ -241,7 +200,7 @@ function Controller({ view, t, send, me }: ControllerViewProps) {
             {count > 0 && <span className="display" style={{ marginLeft: 'auto', fontSize: 44, fontWeight: 800 }}>{count}</span>}
           </div>
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 22, opacity: view.live ? 1 : 0.5 }}>
-            <Joystick onMove={onMove} color={view.color} />
+            <Joystick onMove={onMove} color={view.color} size={230} zoneStyle={{ width: '100%', height: 310, alignSelf: 'stretch' }} />
             <button type="button" disabled={!view.live || Date.now() < cooldown}
               onPointerDown={(e) => { e.preventDefault(); vibrate(40); send({ type: 'dash' }); setCooldown(Date.now() + 2200); setTimeout(() => setCooldown(0), 2250); }}
               style={{ minHeight: 96, border: 0, borderRadius: 26, background: Date.now() < cooldown ? '#262048' : MINT, color: '#110D24', fontFamily: 'var(--display)', fontSize: 30, fontWeight: 800, boxShadow: Date.now() < cooldown ? undefined : `0 7px 0 ${MINT_D}`, touchAction: 'manipulation' }}>

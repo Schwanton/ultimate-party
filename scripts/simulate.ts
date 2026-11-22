@@ -76,6 +76,12 @@ const scenarios: { game: string; players: number; options?: Record<string, numbe
   { game: 'figurendle', players: 4 },
   { game: 'figurendle', players: 12 },
   { game: 'figurendle', players: 14 }, // 2 davon Publikum
+  { game: 'tank-trouble', players: 1 },
+  { game: 'tank-trouble', players: 4 },
+  { game: 'tank-trouble', players: 8 },
+  { game: 'tank-trouble', players: 2, options: { mode: 'duell', rounds: 3 } },
+  { game: 'tank-trouble', players: 8, options: { mode: 'duell', rounds: 3 } },
+  { game: 'tank-trouble', players: 1, options: { mode: 'duell', rounds: 3, cpu: 2 } },
   // mit Spiel-Einstellungen
   { game: 'mic-drop', players: 4, options: { rounds: 5, answerTime: 0.75 } },
   { game: 'flunkerfakt', players: 4, options: { questions: 3 } },

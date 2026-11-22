@@ -13,3 +13,4 @@ export { useDraft } from './draft';
 export { useStream } from '../net';
 export { useKeepAwake } from './keepAwake';
 export { FullscreenButton, useFullscreen, toggleFullscreen, fullscreenSupported } from './fullscreen';
+export { Joystick } from './joystick';

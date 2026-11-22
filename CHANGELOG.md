@@ -2,6 +2,14 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.37.0
+
+- Neues Spiel: **Tank Trouble** – Panzer von oben wie bei Wii Play, für 1 bis 8 Spieler. Kugeln prallen einmal von der Wand ab (auch eure eigenen treffen euch!), Minen sprengen die pinken Klötze weg, ein Treffer reicht
+- Kampagne: Alle zusammen gegen farbige Computer-Panzer durch 10 Missionen – vom ruhigen Wachposten bis zum unsichtbaren Geist und der schwarzen Elite. Jeder hat 3 Leben, nach Mission 5 gibt es eins dazu
+- Duell: Jeder gegen jeden in zufälligen Arenen, mit Powerups (Schild, Rakete, Doppel-Abprall, Turbo, Extra-Mine). Auf Wunsch fahren bis zu 3 Computer-Gegner mit
+- Handy quer halten: links fahren, rechts zielen, Feuer und Mine in der Mitte. Beim Zielen zeigt der Fernseher eine Ziellinie mit dem ersten Abprall
+- Alle Sticks (Tank Trouble, Sumo, Bonk!) wandern jetzt mit: Der Mittelpunkt liegt dort, wo dein Daumen das Feld zuerst berührt – kein genaues Treffen der Stick-Mitte mehr nötig
+
 ## 0.36.0
 
 - Figurendle: 206 One-Piece-Figuren (vorher 120), z. B. Kuina, Makino, Bellemere, Bellamy, Fisher Tiger, Orochi, Kanjuro, Black Maria, Perospero, die Vinsmoke-Brüder, Koala, Rocks D. Xebec, Dorry und Brogy – Werte wieder aus dem One-Piece-Wiki

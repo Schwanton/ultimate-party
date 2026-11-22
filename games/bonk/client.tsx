@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as RPointerEvent } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import type { ControllerViewProps, GameClientModule, HostViewProps, PlayerInfo } from '@up/sdk';
-import { Avatar, Confetti, Crown, HostHeader, HostTimer, PhoneTimer, PhoneWait, Podium, Scoreboard, sfx, useServerNow, useStream, vibrate } from '@up/ui';
+import { Avatar, Confetti, Crown, HostHeader, HostTimer, Joystick, PhoneTimer, PhoneWait, Podium, Scoreboard, sfx, useServerNow, useStream, vibrate } from '@up/ui';
 import { BELTS, ICON, WEAPON_COLOR, walkable } from './arena';
 import { POWERUP, PRICE, RARITY_COLOR, REROLL_PRICE, WEAPON_PRICE } from './powerups';
 
@@ -776,42 +776,6 @@ function useLandscape() {
   return land;
 }
 
-function Joystick({ onMove, color, size }: { onMove: (x: number, y: number) => void; color: string; size: number }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [knob, setKnob] = useState<[number, number]>([0, 0]);
-  const active = useRef(false);
-  const last = useRef({ x: 0, y: 0, at: 0 });
-  const send = (x: number, y: number, force = false) => {
-    const n = performance.now();
-    if (!force && n - last.current.at < 45 && Math.hypot(x - last.current.x, y - last.current.y) < 0.3) return;
-    last.current = { x, y, at: n };
-    onMove(x, y);
-  };
-  const update = (e: RPointerEvent) => {
-    const rect = ref.current!.getBoundingClientRect();
-    const R = rect.width / 2;
-    let x = (e.clientX - rect.left - R) / (R * 0.8), y = (e.clientY - rect.top - R) / (R * 0.8);
-    const len = Math.hypot(x, y);
-    if (len > 1) [x, y] = [x / len, y / len];
-    setKnob([x, y]);
-    send(Math.round(x * 100) / 100, Math.round(y * 100) / 100);
-  };
-  const end = () => { active.current = false; setKnob([0, 0]); send(0, 0, true); };
-  useEffect(() => {
-    const id = setInterval(() => active.current && onMove(last.current.x, last.current.y), 400);
-    return () => clearInterval(id);
-  }, [onMove]);
-  const k = size * 0.4;
-  return (
-    <div ref={ref} role="application" aria-label="Joystick"
-      onPointerDown={(e) => { e.preventDefault(); active.current = true; (e.target as Element).setPointerCapture?.(e.pointerId); update(e); }}
-      onPointerMove={(e) => active.current && update(e)} onPointerUp={end} onPointerCancel={end}
-      style={{ width: size, height: size, borderRadius: '50%', background: 'radial-gradient(circle, #1C1738 0 60%, #110D24 61%)', boxShadow: `inset 0 0 0 3px ${color}66, 0 0 18px ${color}33`, position: 'relative', touchAction: 'none', flex: 'none' }}>
-      <div style={{ position: 'absolute', left: '50%', top: '50%', width: k, height: k, borderRadius: '50%', background: color, boxShadow: `0 0 22px ${color}`, transform: `translate(calc(-50% + ${knob[0] * size * 0.36}px), calc(-50% + ${knob[1] * size * 0.36}px))`, transition: active.current ? undefined : 'transform .15s', pointerEvents: 'none' }} />
-    </div>
-  );
-}
-
 function RoundButton({ size, color, label, sub, icon, onDown, onUp, ready = 1, ariaLabel, style }: {
   size: number; color: string; label?: string; sub?: string; icon?: string; onDown: () => void; onUp?: () => void; ready?: number; ariaLabel: string; style?: CSSProperties;
 }) {
@@ -943,7 +907,7 @@ function PlayController({ view, t, send, me }: ControllerViewProps) {
     <div style={{ position: 'fixed', inset: 0, zIndex: 20, background: INK, color: '#fff', display: 'flex', flexDirection: land ? 'row' : 'column', alignItems: land ? 'center' : 'stretch', justifyContent: 'space-between', padding: land ? '14px max(24px, env(safe-area-inset-right)) 14px max(24px, env(safe-area-inset-left))' : 'max(20px, env(safe-area-inset-top)) 18px max(26px, env(safe-area-inset-bottom))', gap: 12, touchAction: 'none', userSelect: 'none', WebkitUserSelect: 'none', opacity: live || count > 0 ? 1 : 0.92 }}>
       {land ? (
         <>
-          <Joystick onMove={onMove} color={color} size={stick} />
+          <Joystick onMove={onMove} color={color} size={stick} zoneStyle={{ width: stick * 1.25, height: '100%' }} />
           {info}
           {buttons}
         </>
@@ -952,7 +916,7 @@ function PlayController({ view, t, send, me }: ControllerViewProps) {
           {info}
           <div style={{ flex: 1 }} />
           <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 8 }}>
-            <Joystick onMove={onMove} color={color} size={stick} />
+            <Joystick onMove={onMove} color={color} size={stick} zoneStyle={{ width: stick * 1.2, height: stick * 1.4 }} />
             {buttons}
           </div>
         </>
