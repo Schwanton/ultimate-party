@@ -2,12 +2,14 @@ import { resolveOptions, type GameManifest, type Lang } from '@up/sdk';
 import { net } from '../net';
 
 /** Einstellungen eines Spiels (Rundenanzahl usw.) – auf dem TV und auf dem Handy des VIP */
-export function GameOptionsForm({ game, values, lang, compact = false, disabled = false }: {
+export function GameOptionsForm({ game, values, lang, compact = false, disabled = false, onSet }: {
   game: GameManifest; values: Record<string, unknown> | undefined; lang: Lang; compact?: boolean; disabled?: boolean;
+  /** statt der normalen Spiel-Einstellung etwas anderes ändern (z. B. nur für Olympia) */
+  onSet?: (id: string, value: number | string) => void;
 }) {
   const defs = game.options ?? [];
   const current = resolveOptions(defs, values);
-  const set = (id: string, value: number | string) => net.send('gameOption', { gameId: game.id, id, value });
+  const set = (id: string, value: number | string) => (onSet ? onSet(id, value) : net.send('gameOption', { gameId: game.id, id, value }));
   if (!defs.length) return null;
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: compact ? 12 : 18 }}>

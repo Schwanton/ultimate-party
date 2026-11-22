@@ -119,8 +119,19 @@ const scenarios: { game: string; players: number; options?: Record<string, numbe
   { game: 'figurendle', players: 10, options: { variante: 'brett', rounds: 5, schwierigkeit: 'profi' } },
   { game: 'figurendle', players: 2, options: { rounds: 10, schwierigkeit: 'leicht' } },
 ];
+// Olympia-Modus: mehrere Spiele hintereinander mit Medaillen (npm test -- olympia)
+const olympiaScenarios: { players: number; settings: Record<string, unknown>; list?: string[] }[] = [
+  { players: 4, settings: { pick: 'vip', scoring: 'medals', teams: 0, count: 3 }, list: ['sumo', 'mainstream', 'cash-out'] },
+  { players: 6, settings: { pick: 'random', scoring: 'points', teams: 2, teamMode: 'switch', count: 3 } },
+  { players: 5, settings: { pick: 'open', scoring: 'medalpoints', teams: 0, count: 3 } },
+  { players: 7, settings: { pick: 'secret', scoring: 'medals', teams: 3, teamMode: 'free', count: 3 } },
+  { players: 4, settings: { pick: 'vip', scoring: 'medals', teams: 2, teamMode: 'vip', count: 3 }, list: ['bonk', 'schaetzmeister', 'murmel-mayhem'] },
+  { players: 3, settings: { pick: 'random', scoring: 'medals', teams: 0, count: 8 } },
+];
+
 // Nur bestimmte Spiele testen:  npm test -- mehrheit wer-wars
 const only = process.argv.slice(2);
+const testOlympia = !only.length || only.includes('olympia');
 if (only.length) scenarios.splice(0, scenarios.length, ...scenarios.filter((s) => only.includes(s.game)));
 
 const server = spawn(process.execPath, ['--import', 'tsx', path.join(ROOT, 'server/index.ts')], {
@@ -131,6 +142,9 @@ const server = spawn(process.execPath, ['--import', 'tsx', path.join(ROOT, 'serv
 let serverErrors = '';
 server.stderr.on('data', (d) => (serverErrors += String(d)));
 server.stdout.on('data', () => {});
+server.on('exit', (code) => {
+  if (code !== null && code !== 0) console.log(`\nServer abgestürzt (Code ${code}):\n${serverErrors.slice(-3000)}`);
+});
 
 function connect(): Promise<WebSocket> {
   return new Promise((resolve, reject) => {
@@ -197,9 +211,97 @@ async function run({ game, players, options }: { game: string; players: number; 
   return { seconds: ((Date.now() - t0) / 1000).toFixed(1), ranked: ranking.length, top: ranking[0]?.score ?? 0, screens: [...screens].join(',') };
 }
 
+async function runOlympia({ players, settings, list }: (typeof olympiaScenarios)[number]) {
+  const ws = await connect();
+  let id = 1;
+  const pending = new Map<number, (m: any) => void>();
+  let state: any = null;
+  const phases: string[] = [];
+  ws.on('message', (raw) => {
+    const m = JSON.parse(String(raw));
+    if (m.t === 'reply') pending.get(m.re)?.(m);
+    if (m.t === 'state') {
+      state = m;
+      const ph = m.room?.olympia?.phase;
+      if (ph && phases.at(-1) !== ph) phases.push(ph);
+    }
+  });
+  const req = (t: string, p: object = {}) => new Promise<any>((res) => {
+    const rid = id++;
+    pending.set(rid, res);
+    ws.send(JSON.stringify({ t, id: rid, ...p }));
+  });
+  const send = (t: string, p: object = {}) => ws.send(JSON.stringify({ t, ...p }));
+  const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+  await req('host:create', { lang: 'de' });
+  send('bots:add', { count: players });
+  await wait(300);
+  send('olympia:open');
+  await wait(100);
+  send('olympia:set', { patch: settings });
+  await wait(100);
+  if (list) {
+    for (const g of [...state.room.settings.olympia.list]) send('olympia:remove', { gameId: g });
+    for (const g of list) send('olympia:add', { gameId: g });
+    await wait(150);
+    if (JSON.stringify(state.room.settings.olympia.list) !== JSON.stringify(list)) throw new Error('Disziplinen nicht übernommen');
+  }
+  const started = await req('olympia:start');
+  if (!started.ok) throw new Error(`Start fehlgeschlagen: ${started.error}`);
+  const t0 = Date.now();
+  let skipped = false;
+  while (Date.now() - t0 < 240_000) {
+    await wait(150);
+    const o = state?.room?.olympia;
+    if (state?.host?.notice) throw new Error(`Spiel abgebrochen: ${state.host.notice}`);
+    if (!o) throw new Error('Olympia ist verschwunden');
+    // VIP teilt ein: einfach „Fertig“
+    if (o.phase === 'teams' && o.teamMode === 'vip') send('olympia:next');
+    // Einmal eine Disziplin abbrechen (Spiel beenden), wenn es mehr als 3 gibt
+    if (o.phase === 'playing' && o.disciplines.length > 3 && !skipped && o.current === 1) {
+      skipped = true;
+      send('lobby');
+    }
+    if (o.phase === 'ceremony') break;
+  }
+  const o = state?.room?.olympia;
+  ws.close();
+  if (o?.phase !== 'ceremony') throw new Error(`nicht fertig geworden (zuletzt: ${o?.phase})`);
+  const done = o.disciplines.filter((d: any) => d.status === 'done');
+  if (!done.length) throw new Error('keine Disziplin gewertet');
+  for (const d of done) if (!d.results.length) throw new Error(`${d.gameId}: keine Ergebnisse`);
+  const medals = o.standings.reduce((a: number, s: any) => a + s.gold + s.silver + s.bronze, 0);
+  if (medals < done.length) throw new Error('zu wenige Medaillen');
+  if (settings.teams && o.teams.reduce((a: number, t: any) => a + t.members.length, 0) !== players) throw new Error('nicht alle in Teams');
+  const top = o.standings[0];
+  return {
+    seconds: ((Date.now() - t0) / 1000).toFixed(1),
+    summary: `${done.length}/${o.disciplines.length} Disziplinen (${o.disciplines.map((d: any) => d.gameId + (d.status === 'done' ? '' : '×')).join(', ')}), Sieger ${top.id}: ${top.gold}G ${top.silver}S ${top.bronze}B ${top.points}P`,
+    phases: phases.join('>'),
+  };
+}
+
 let failed = 0;
 try {
   await waitForServer();
+  if (testOlympia) {
+    for (const s of olympiaScenarios) {
+      const label = `olympia       ${String(s.players).padStart(3)} Spieler ${JSON.stringify(s.settings)}`;
+      try {
+        const r = await runOlympia(s);
+        console.log(`✔ ${label}  ${r.seconds}s  ${r.summary}  [${r.phases}]`);
+      } catch (e) {
+        failed++;
+        console.log(`✘ ${label}  ${(e as Error).message}`);
+      }
+      if (serverErrors.includes('Fehler im Spiel')) {
+        console.log(serverErrors);
+        serverErrors = '';
+        failed++;
+      }
+    }
+  }
   for (const s of scenarios) {
     const label = `${s.game.padEnd(13)} ${String(s.players).padStart(3)} Spieler${s.options ? ' ' + JSON.stringify(s.options) : ''}`;
     try {

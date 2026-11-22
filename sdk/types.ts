@@ -71,6 +71,11 @@ export interface GameManifest {
   /** Spiel-Einstellungen, die in der Lobby gewählt werden (Rundenanzahl usw.) */
   options?: GameOption[];
   /**
+   * Olympia-Modus: false = Spiel taugt nicht als Disziplin (z. B. kooperativ, alle gewinnen gemeinsam).
+   * options = kürzere Einstellungen für Olympia (z. B. { "rounds": 3 }). Ohne Angabe kürzt UP! „rounds“ selbst.
+   */
+  olympia?: false | { options?: GameOptionValues };
+  /**
    * Titelbild für Lobby und Spielauswahl, relativ zum Spielordner (z. B. "bilder/titelbild.webp").
    * Ohne Angabe nimmt UP! automatisch bilder/titelbild.webp, .png oder .jpg, falls vorhanden.
    * Jedes Format geht (am besten 16:9, z. B. ein Screenshot vom TV); das Bild wird passend zugeschnitten.
@@ -281,6 +286,88 @@ export interface RoomSnapshot {
   vote: GameVote | null;
   /** zuletzt per Zufall gezogenes Spiel (für die Walzen-Animation auf dem TV) */
   roll: { reel: string[]; at: number } | null;
+  /** Olympia-Modus (null = aus) */
+  olympia: OlympiaState | null;
+}
+
+/* ---------- Olympia-Modus ---------- */
+
+/** Wie die Disziplinen bestimmt werden */
+export type OlympiaPick = 'vip' | 'random' | 'secret' | 'open';
+/** Wertung: nur Medaillen, Punkte 10/8/6/5/4/3/2/1 oder Gold 3 / Silber 2 / Bronze 1 */
+export type OlympiaScoring = 'medals' | 'points' | 'medalpoints';
+/** Teameinteilung: Zufall + wechseln, nur Zufall, VIP teilt ein, freie Wahl */
+export type OlympiaTeamMode = 'switch' | 'random' | 'vip' | 'free';
+
+export interface OlympiaSettings {
+  pick: OlympiaPick;
+  scoring: OlympiaScoring;
+  /** 0 = jeder für sich, sonst Anzahl Teams (2–4) */
+  teams: number;
+  teamMode: OlympiaTeamMode;
+  /** Spiele mit kürzeren Einstellungen spielen */
+  short: boolean;
+  /** Anzahl Disziplinen (3–8) */
+  count: number;
+  /** Disziplinen (bei „VIP stellt zusammen“ und „Zufall“) */
+  list: string[];
+  /** von Hand geänderte Spiel-Einstellungen für Olympia (gameId → Werte) */
+  options: Record<string, GameOptionValues>;
+}
+
+export interface OlympiaTeam {
+  id: string;
+  /** Schlüssel für Name und Farbe: fire, wave, forest, flash */
+  key: string;
+  color: string;
+  members: string[];
+}
+
+/** Ergebnis einer Disziplin für einen Teilnehmer (Spieler oder Team) */
+export interface OlympiaPlace {
+  id: string;
+  place: number;
+  /** 1 = Gold, 2 = Silber, 3 = Bronze, 0 = keine */
+  medal: number;
+  points: number;
+}
+
+export interface OlympiaDiscipline {
+  gameId: string;
+  status: 'next' | 'now' | 'done' | 'skipped';
+  results: OlympiaPlace[];
+  /** Platz jedes Spielers im Spiel (auch im Teammodus) */
+  playerPlaces: Record<string, number>;
+}
+
+export interface OlympiaStanding {
+  id: string;
+  rank: number;
+  gold: number;
+  silver: number;
+  bronze: number;
+  points: number;
+}
+
+export interface OlympiaState {
+  phase: 'setup' | 'teams' | 'pick' | 'opening' | 'playing' | 'medals' | 'ceremony';
+  /** Ende der aktuellen Phase (0 = wartet auf VIP/TV) */
+  deadline: number;
+  duration: number;
+  scoring: OlympiaScoring;
+  disciplines: OlympiaDiscipline[];
+  /** Index der aktuellen bzw. zuletzt gespielten Disziplin */
+  current: number;
+  teams: OlympiaTeam[] | null;
+  teamMode: OlympiaTeamMode;
+  /** „Jeder wählt“: Spieler-ID → Spiel-ID */
+  picks: Record<string, string>;
+  pickMode: OlympiaPick;
+  /** Spiele, die gewählt werden können */
+  pickPool: string[];
+  /** Spieler oder Teams, die mitmachen (Reihenfolge für Anzeigen) */
+  entrants: string[];
+  standings: OlympiaStanding[];
 }
 
 /** Wie das nächste Spiel gewählt wird: VIP wählt (Standard), Abstimmung oder Zufall */
@@ -312,6 +399,8 @@ export interface RoomSettings {
   voteAll?: boolean;
   /** Abstimmung: Stimmen pro Person (1 oder 3) */
   votesPerPlayer?: number;
+  /** Einstellungen des Olympia-Modus */
+  olympia?: OlympiaSettings;
 }
 
 export interface HostViewProps<V = any> {

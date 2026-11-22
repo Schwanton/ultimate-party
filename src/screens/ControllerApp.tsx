@@ -7,6 +7,7 @@ import { Avatar, Crown, FullscreenButton, Logo, useKeepAwake, isLight, shade, vi
 import { GameOptionsForm, optionsSummary } from './GameOptions';
 import { fitOf, gameDesc, useTagFilter } from './GameLibrary';
 import { PhoneVote, PickModeSwitch, VoteOptions, pickModeOf, votesFor } from './PickMode';
+import { OlympiaPhone, OlympiaPhoneSetup, olympiaRunning } from './Olympia';
 
 const params = new URLSearchParams(location.search);
 
@@ -158,6 +159,8 @@ function InRoom() {
         <p style={{ fontSize: 19 }}>{t('game.spectating')}</p>
       </div>
     );
+  } else if (olympiaRunning(room)) {
+    content = <OlympiaPhone room={room} me={me} games={listGames(room.dev)} t={t} />;
   } else if (picking) {
     content = <AvatarPicker onDone={() => setPicking(false)} />;
   } else {
@@ -173,7 +176,10 @@ function InRoom() {
       )}
       {content}
       {room.phase === 'game' && !room.finished && isVip && <EndGameButton t={t} />}
-      {room.phase === 'game' && room.finished && (
+      {room.phase === 'game' && room.finished && olympiaRunning(room) && (
+        <p className="muted" style={{ textAlign: 'center' }}>{t('olympia.medalsSoonPhone')}</p>
+      )}
+      {room.phase === 'game' && room.finished && !olympiaRunning(room) && (
         isVip ? (
           <div style={{ display: 'flex', gap: 10 }} className="anim-up">
             <button className="up-btn full" onClick={() => net.request('start')}>{t('game.again')}</button>
@@ -259,11 +265,14 @@ function PhoneLobby({ onEditAvatar }: { onEditAvatar: () => void }) {
         </button>
       </section>
 
+      {room.olympia && <OlympiaPhoneSetup room={room} me={me} games={all} t={t} />}
+      {!room.olympia && (<>
       {isVip && (
         <section style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           <span className="up-label">{t('pick.label')}</span>
           <PickModeSwitch mode={mode} t={t} />
           {mode === 'vote' && <VoteOptions room={room} t={t} />}
+          <button className="up-btn ghost full" style={{ color: 'var(--yellow)' }} onClick={() => net.send('olympia:open')}>{t('olympia.button')}</button>
         </section>
       )}
       {voting && room.vote && <PhoneVote vote={room.vote} games={all} room={room} me={me} t={t} isVip={isVip} />}
@@ -339,6 +348,7 @@ function PhoneLobby({ onEditAvatar }: { onEditAvatar: () => void }) {
           );
         })}
       </div>
+      </>)}
       </>)}
     </>
   );

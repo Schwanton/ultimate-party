@@ -152,6 +152,12 @@ function handle(ws: WebSocket, msg: any) {
   const isHost = s.role === 'host';
   const isVip = s.role === 'player' && room?.vipId === s.playerId;
 
+  // Während Olympia läuft, bestimmt Olympia das Spiel
+  const olympiaBusy = !!room?.olympia && room.olympia.phase !== 'setup';
+  if (olympiaBusy && ['select', 'start', 'pickMode', 'vote:options', 'vote:start', 'vote:end', 'random', 'gamevote', 'gameOption'].includes(msg.t)) {
+    return reply(ws, msg, { ok: false, error: 'olympia_running' });
+  }
+
   switch (msg.t) {
     case 'ping':
       return reply(ws, msg, { now: Date.now() });
@@ -219,6 +225,55 @@ function handle(ws: WebSocket, msg: any) {
       return;
     case 'lobby':
       if (room && (isHost || isVip)) room.backToLobby();
+      return;
+
+    /* ---- Olympia (Host oder VIP, Teamwahl und Spielewahl: alle) ---- */
+    case 'olympia:open':
+      if (room && (isHost || isVip)) room.openOlympia();
+      return;
+    case 'olympia:close':
+      if (room && (isHost || isVip)) room.closeOlympia();
+      return;
+    case 'olympia:set':
+      if (room && (isHost || isVip) && msg.patch && typeof msg.patch === 'object') room.setOlympia(msg.patch);
+      return;
+    case 'olympia:add':
+      if (room && (isHost || isVip)) room.olympiaAdd(String(msg.gameId));
+      return;
+    case 'olympia:remove':
+      if (room && (isHost || isVip)) room.olympiaRemove(String(msg.gameId));
+      return;
+    case 'olympia:move':
+      if (room && (isHost || isVip)) room.olympiaMove(String(msg.gameId), Number(msg.dir));
+      return;
+    case 'olympia:reroll':
+      if (room && (isHost || isVip)) room.olympiaReroll();
+      return;
+    case 'olympia:option':
+      if (room && (isHost || isVip)) room.olympiaOption(String(msg.gameId), String(msg.id), msg.value);
+      return;
+    case 'olympia:optionReset':
+      if (room && (isHost || isVip)) room.olympiaOptionReset(String(msg.gameId));
+      return;
+    case 'olympia:start': {
+      if (!room || !(isHost || isVip)) return;
+      const error = room.startOlympia();
+      return reply(ws, msg, { ok: !error, error });
+    }
+    case 'olympia:next':
+      if (room && (isHost || isVip)) room.olympiaNext();
+      return;
+    case 'olympia:end':
+      if (room && (isHost || isVip)) room.endOlympia();
+      return;
+    case 'olympia:assign':
+      if (room && (isHost || isVip)) room.olympiaAssign(String(msg.playerId), String(msg.teamId));
+      return;
+    case 'olympia:team':
+      if (room && s.playerId) room.olympiaJoinTeam(s.playerId, String(msg.teamId));
+      return;
+    case 'olympia:pick':
+      if (room && s.playerId) room.olympiaPickGame(s.playerId, String(msg.gameId));
       return;
     case 'pickMode':
       if (room && (isHost || isVip)) room.setPickMode(String(msg.mode));

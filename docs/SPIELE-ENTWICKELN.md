@@ -63,6 +63,7 @@ games/mein-spiel/
 ```
 
   Im Spiel: `ctx.options.rounds` (immer gültig, sonst Standardwert).
+- `olympia` – (optional) Verhalten im Olympia-Modus. `false` = das Spiel taugt nicht als Disziplin (z. B. kooperativ, alle gewinnen gemeinsam). Mit `options` legst du kürzere Einstellungen fest, z. B. `"olympia": { "options": { "rounds": 2 } }`. Ohne Angabe kürzt UP! eine Zahl-Einstellung `rounds` auf etwa 60 %. Medaillen gibt es nach der Rangliste aus `ctx.finish()`.
 
 ## Grundidee: Ansichten statt Spielzustand
 
@@ -125,7 +126,7 @@ export default {
 | `ctx.after(sek, fn)` | kurze Pause, z. B. für Animationen |
 | `ctx.secret(id)` | geheime Einstellung lesen, z. B. einen API-Schlüssel (im Manifest unter `secrets` deklarieren; der Host trägt ihn in den Einstellungen ein) |
 | `ctx.store.get(schlüssel)` / `ctx.store.set(schlüssel, wert)` | dauerhaft speichern, auch über Neustarts hinweg (`.up-data/store/<spiel>.json`), z. B. einen laufenden Run. In Tests wird nichts geschrieben. |
-| `ctx.finish(ranking)` | Spiel beendet; Rangliste wird gemeldet (später für den Olympia-Modus) |
+| `ctx.finish(ranking)` | Spiel beendet; Rangliste wird gemeldet (Olympia-Modus vergibt danach Medaillen) |
 
 Eigenschaften in Ansichten mit Sonderbedeutung: `input: true` lässt das Handy kurz vibrieren (neue Aufgabe).
 

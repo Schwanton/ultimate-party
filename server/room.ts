@@ -4,9 +4,14 @@ import { randomUUID } from 'node:crypto';
 import type { WebSocket } from 'ws';
 import {
   ANIMALS, type Avatar, type GameContext, type GameServer, type Lang, type PlayerInfo,
-  resolveOptions, type GameVote, type RankingEntry, type RoomSettings, type RoomSnapshot, type TimerHandle,
+  resolveOptions, type GameManifest, type GameVote, type OlympiaSettings, type OlympiaState, type RankingEntry, type RoomSettings,
+  type RoomSnapshot, type TimerHandle,
 } from '../sdk/types';
 import { shuffle } from '../sdk/util';
+import {
+  OLYMPIA_MAX, OLYMPIA_MIN, cleanOlympiaSettings, makeTeams, olympiaAllowed, olympiaOptions, resolvePicks,
+  scoreDiscipline, smallestTeam, standingsOf,
+} from '../sdk/olympia';
 import { allGames, getGame, type LoadedGame } from './registry';
 import { BOOT_ID, DEV, QUIET, TIME_SCALE } from './config';
 import { getSecret, secretStatus, setSecret } from './secrets';
@@ -68,6 +73,9 @@ export class Room {
   /** Abstimmung über das nächste Spiel (nur in der Lobby) */
   vote: GameVote | null = null;
   roll: { reel: string[]; at: number } | null = null;
+  /** Olympia-Modus (null = aus) */
+  olympia: OlympiaState | null = null;
+  private olympiaTimer: ReturnType<typeof setTimeout> | null = null;
   private voteTimer: ReturnType<typeof setTimeout> | null = null;
   private lastPlayedId: string | null = null;
   usedContent = new Set<string>();
@@ -123,6 +131,7 @@ export class Room {
     if (ws) state.sockets.add(ws);
     this.players.set(id, state);
     this.updateVip();
+    this.olympiaAddPlayer(id);
     if (inGame && this.game?.loaded.manifest.audience && this.game.server?.onAudienceJoin) {
       this.game.memberIds.add(id);
       this.safe(() => this.game?.server?.onAudienceJoin?.(id));
@@ -233,6 +242,8 @@ export class Room {
   /** Regelmäßig aufgerufen: Spieler, die die Lobby verlassen haben, entfernen. */
   tick() {
     if (this.phase !== 'lobby') return;
+    // Während Olympia niemanden entfernen – sonst fehlen Namen im Medaillenspiegel
+    if (this.olympia && this.olympia.phase !== 'setup') return;
     const now = Date.now();
     let changed = false;
     for (const p of [...this.players.values()]) {
@@ -463,7 +474,8 @@ export class Room {
     this.game = null;
   }
 
-  backToLobby() {
+  /** Spiel beenden und alle zurück in die Lobby-Phase (ohne nächstes Spiel zu bestimmen) */
+  private leaveGame() {
     this.stopGame();
     this.phase = 'lobby';
     for (const p of this.players.values()) {
@@ -472,10 +484,398 @@ export class Room {
       p.info.role = 'player';
     }
     this.updateVip();
+  }
+
+  backToLobby() {
+    // Bei Olympia: Disziplin abgebrochen → ohne Medaillen weiter zur Auswertung
+    if (this.olympia?.phase === 'playing') return this.olympiaSkip();
+    this.leaveGame();
     // Je nach Einstellung gleich das nächste Spiel bestimmen
     if (this.settings.pickMode === 'vote') this.startVote();
     else if (this.settings.pickMode === 'random') this.rollGame();
     this.touch();
+  }
+
+  /* ---------------- Olympia-Modus ---------------- */
+
+  /** Einstellungen eines Spiels: bei Olympia gekürzt bzw. von Hand angepasst */
+  optionsFor(m: GameManifest) {
+    if (this.olympia?.phase === 'playing') return olympiaOptions(m, this.olympiaSettings(), this.settings.gameOptions[m.id]);
+    return resolveOptions(m.options, this.settings.gameOptions[m.id]);
+  }
+
+  olympiaSettings(): OlympiaSettings {
+    return cleanOlympiaSettings(this.settings.olympia);
+  }
+
+  private saveOlympiaSettings(next: OlympiaSettings) {
+    this.settings.olympia = next;
+    this.remember();
+  }
+
+  /** Spiele, die als Disziplin taugen und zur Spielerzahl passen */
+  olympiaPool(): string[] {
+    const n = this.eligible().length;
+    return allGames().map((g) => g.manifest)
+      .filter((m) => !m.hidden && olympiaAllowed(m) && n >= m.minPlayers && n <= m.maxPlayers)
+      .map((m) => m.id);
+  }
+
+  /** Liste auf die gewünschte Anzahl bringen (fehlende per Zufall auffüllen) */
+  private fillOlympiaList(cur: OlympiaSettings, count: number): string[] {
+    const pool = this.olympiaPool();
+    const list = cur.list.filter((id) => getGame(id) && olympiaAllowed(getGame(id)!.manifest)).slice(0, count);
+    for (const id of shuffle(pool.filter((g) => !list.includes(g)))) {
+      if (list.length >= count) break;
+      list.push(id);
+    }
+    return list;
+  }
+
+  private emptyOlympia(): OlympiaState {
+    const cur = this.olympiaSettings();
+    return {
+      phase: 'setup', deadline: 0, duration: 0, scoring: cur.scoring, disciplines: [], current: 0, teams: null, teamMode: cur.teamMode,
+      picks: {}, pickMode: cur.pick, pickPool: [], entrants: [], standings: [],
+    };
+  }
+
+  /** Olympia-Übersicht in der Lobby öffnen */
+  openOlympia() {
+    if (this.phase !== 'lobby' || this.olympia) return;
+    this.clearVote();
+    this.roll = null;
+    const cur = this.olympiaSettings();
+    if ((cur.pick === 'vip' || cur.pick === 'random') && cur.list.length < OLYMPIA_MIN) {
+      this.saveOlympiaSettings({ ...cur, list: this.fillOlympiaList(cur, cur.count) });
+    }
+    this.olympia = this.emptyOlympia();
+    this.touch();
+  }
+
+  /** Olympia verlassen (Übersicht schließen oder nach der Siegerehrung) */
+  closeOlympia() {
+    if (!this.olympia) return;
+    if (this.olympia.phase !== 'setup' && this.olympia.phase !== 'ceremony') return;
+    this.clearOlympiaTimer();
+    this.olympia = null;
+    if (this.phase === 'game') this.leaveGame();
+    if (this.settings.pickMode === 'vote') this.startVote();
+    else if (this.settings.pickMode === 'random') this.rollGame();
+    this.touch();
+  }
+
+  /** Einstellungen in der Übersicht ändern */
+  setOlympia(patch: Record<string, unknown>) {
+    if (this.olympia?.phase !== 'setup') return;
+    const cur = this.olympiaSettings();
+    const next = cleanOlympiaSettings({ ...cur, ...patch, list: cur.list, options: cur.options });
+    if (next.pick === 'vip' || next.pick === 'random') {
+      // Anzahl geändert oder Liste zu kurz: auffüllen bzw. kürzen
+      if (patch.count !== undefined || next.list.length < OLYMPIA_MIN) next.list = this.fillOlympiaList(next, next.count);
+      if (patch.count === undefined) next.count = Math.max(OLYMPIA_MIN, Math.min(OLYMPIA_MAX, next.list.length));
+    }
+    this.saveOlympiaSettings(next);
+    this.olympia = { ...this.olympia, scoring: next.scoring, teamMode: next.teamMode, pickMode: next.pick };
+    this.touch();
+  }
+
+  /** Disziplin hinzufügen (VIP stellt zusammen) */
+  olympiaAdd(gameId: string) {
+    if (this.olympia?.phase !== 'setup') return;
+    const cur = this.olympiaSettings();
+    const m = getGame(gameId)?.manifest;
+    if (!m || !olympiaAllowed(m) || cur.list.includes(gameId) || cur.list.length >= OLYMPIA_MAX) return;
+    const list = [...cur.list, gameId];
+    this.saveOlympiaSettings({ ...cur, list, count: Math.max(OLYMPIA_MIN, list.length), pick: cur.pick === 'random' ? 'vip' : cur.pick });
+    this.olympia = { ...this.olympia, pickMode: this.olympiaSettings().pick };
+    this.touch();
+  }
+
+  olympiaRemove(gameId: string) {
+    if (this.olympia?.phase !== 'setup') return;
+    const cur = this.olympiaSettings();
+    const list = cur.list.filter((g) => g !== gameId);
+    this.saveOlympiaSettings({ ...cur, list, count: Math.max(OLYMPIA_MIN, list.length) });
+    this.touch();
+  }
+
+  /** Disziplin nach oben/unten schieben */
+  olympiaMove(gameId: string, dir: number) {
+    if (this.olympia?.phase !== 'setup') return;
+    const cur = this.olympiaSettings();
+    const i = cur.list.indexOf(gameId);
+    const j = i + (dir < 0 ? -1 : 1);
+    if (i < 0 || j < 0 || j >= cur.list.length) return;
+    const list = [...cur.list];
+    [list[i], list[j]] = [list[j], list[i]];
+    this.saveOlympiaSettings({ ...cur, list });
+    this.touch();
+  }
+
+  /** Zufall: neue Disziplinen ziehen */
+  olympiaReroll() {
+    if (this.olympia?.phase !== 'setup') return;
+    const cur = this.olympiaSettings();
+    this.saveOlympiaSettings({ ...cur, list: this.fillOlympiaList({ ...cur, list: [] }, cur.count) });
+    this.touch();
+  }
+
+  /** Spiel-Einstellung nur für Olympia ändern */
+  olympiaOption(gameId: string, id: string, value: unknown) {
+    if (this.olympia?.phase !== 'setup') return;
+    const m = getGame(gameId)?.manifest;
+    if (!m?.options?.some((o) => o.id === id) || (typeof value !== 'number' && typeof value !== 'string')) return;
+    const cur = this.olympiaSettings();
+    this.saveOlympiaSettings({ ...cur, options: { ...cur.options, [gameId]: { ...cur.options[gameId], [id]: value } } });
+    this.touch();
+  }
+
+  /** Spiel-Einstellungen für Olympia zurücksetzen */
+  olympiaOptionReset(gameId: string) {
+    if (this.olympia?.phase !== 'setup') return;
+    const cur = this.olympiaSettings();
+    const options = { ...cur.options };
+    delete options[gameId];
+    this.saveOlympiaSettings({ ...cur, options });
+    this.touch();
+  }
+
+  private clearOlympiaTimer() {
+    if (this.olympiaTimer) clearTimeout(this.olympiaTimer);
+    this.olympiaTimer = null;
+  }
+
+  /** Phase setzen; seconds = 0 heißt: wartet auf VIP/TV */
+  private olympiaPhase(phase: OlympiaState['phase'], seconds: number, onEnd?: () => void) {
+    const o = this.olympia;
+    if (!o) return;
+    this.clearOlympiaTimer();
+    const ms = seconds * 1000 * TIME_SCALE;
+    o.phase = phase;
+    o.duration = seconds ? ms : 0;
+    o.deadline = seconds ? Date.now() + ms : 0;
+    if (seconds && onEnd) this.olympiaTimer = setTimeout(() => { this.olympiaTimer = null; onEnd(); }, ms);
+    this.touch();
+  }
+
+  /** Olympia starten: Teams → Spielewahl → Eröffnung → Disziplinen */
+  startOlympia(): string | null {
+    const o = this.olympia;
+    if (!o || o.phase !== 'setup' || this.phase !== 'lobby') return 'no_game';
+    const cur = this.olympiaSettings();
+    const ids = this.eligible().map((p) => p.info.id);
+    if (ids.length < 2 || (cur.teams && ids.length < cur.teams)) return 'not_enough_players';
+    if ((cur.pick === 'vip' || cur.pick === 'random') && cur.list.length < 1) return 'no_game';
+    if ((cur.pick === 'secret' || cur.pick === 'open') && !this.olympiaPool().length) return 'no_game';
+    this.clearVote();
+    this.roll = null;
+    Object.assign(o, {
+      scoring: cur.scoring, teamMode: cur.teamMode, pickMode: cur.pick, disciplines: [], current: 0, picks: {}, pickPool: [],
+      teams: null, entrants: ids, standings: [],
+    });
+    if (cur.teams) {
+      o.teams = makeTeams(cur.teamMode === 'free' ? [] : ids, cur.teams, shuffle);
+      o.entrants = o.teams.map((t) => t.id);
+      const seconds = { switch: 15, random: 6, free: 25, vip: 0 }[cur.teamMode];
+      this.olympiaPhase('teams', seconds, () => this.finishTeams());
+    } else {
+      this.olympiaAfterTeams();
+    }
+    this.updateStandings();
+    return null;
+  }
+
+  /** Teamwahl: Spieler wechselt (Zufall + wechseln, freie Wahl) */
+  olympiaJoinTeam(playerId: string, teamId: string) {
+    const o = this.olympia;
+    if (o?.phase !== 'teams' || !o.teams || (o.teamMode !== 'switch' && o.teamMode !== 'free')) return;
+    const target = o.teams.find((t) => t.id === teamId);
+    const source = o.teams.find((t) => t.members.includes(playerId));
+    if (!target || target === source || !this.players.has(playerId)) return;
+    // Zufall + wechseln: nur in ein Team, das nicht größer ist als das eigene
+    if (o.teamMode === 'switch' && source && target.members.length > source.members.length) return;
+    if (source) source.members = source.members.filter((m) => m !== playerId);
+    target.members.push(playerId);
+    this.touch();
+  }
+
+  /** VIP teilt ein: Spieler in ein Team schieben */
+  olympiaAssign(playerId: string, teamId: string) {
+    const o = this.olympia;
+    if (o?.phase !== 'teams' || !o.teams || o.teamMode !== 'vip') return;
+    const target = o.teams.find((t) => t.id === teamId);
+    if (!target || !this.players.has(playerId)) return;
+    for (const t of o.teams) t.members = t.members.filter((m) => m !== playerId);
+    target.members.push(playerId);
+    this.touch();
+  }
+
+  /** Teamwahl beenden (Zeit um oder VIP „Fertig“) */
+  finishTeams() {
+    const o = this.olympia;
+    if (o?.phase !== 'teams' || !o.teams) return;
+    const all = this.eligible().map((p) => p.info.id);
+    for (const id of shuffle(all.filter((id) => !o.teams!.some((t) => t.members.includes(id))))) smallestTeam(o.teams).members.push(id);
+    o.teams = o.teams.filter((t) => t.members.length > 0);
+    o.entrants = o.teams.map((t) => t.id);
+    this.updateStandings();
+    this.olympiaAfterTeams();
+  }
+
+  private olympiaAfterTeams() {
+    const o = this.olympia!;
+    const cur = this.olympiaSettings();
+    if (cur.pick === 'secret' || cur.pick === 'open') {
+      o.picks = {};
+      o.pickPool = this.olympiaPool();
+      this.olympiaPhase('pick', 45, () => this.finishPicks());
+      for (const p of this.players.values()) {
+        if (!p.info.isBot) continue;
+        setTimeout(() => this.olympiaPickGame(p.info.id, o.pickPool[Math.floor(Math.random() * o.pickPool.length)]), (800 + Math.random() * 2500) * TIME_SCALE);
+      }
+    } else {
+      const fitting = this.olympiaPool();
+      const list = cur.pick === 'random' && !cur.list.length ? this.fillOlympiaList(cur, cur.count) : cur.list;
+      this.beginDisciplines(list.filter((id) => fitting.includes(id)).length ? list.filter((id) => fitting.includes(id)) : list);
+    }
+  }
+
+  /** „Jeder wählt“: Spieler tippt ein Spiel an (erneut tippen = ändern) */
+  olympiaPickGame(playerId: string, gameId: string) {
+    const o = this.olympia;
+    if (o?.phase !== 'pick' || !o.pickPool.includes(gameId) || !this.players.has(playerId)) return;
+    o.picks[playerId] = gameId;
+    const voters = this.eligible();
+    if (voters.every((p) => o.picks[p.info.id])) this.olympiaPhase('pick', 2.5, () => this.finishPicks());
+    else this.touch();
+  }
+
+  finishPicks() {
+    const o = this.olympia;
+    if (o?.phase !== 'pick') return;
+    const cur = this.olympiaSettings();
+    this.beginDisciplines(resolvePicks(Object.values(o.picks), cur.count, o.pickPool));
+  }
+
+  private beginDisciplines(list: string[]) {
+    const o = this.olympia!;
+    o.disciplines = list.map((gameId) => ({ gameId, status: 'next', results: [], playerPlaces: {} }));
+    o.current = 0;
+    if (!o.disciplines.length) return this.olympiaCeremony();
+    this.olympiaPhase('opening', 8, () => this.startDiscipline(0));
+  }
+
+  private startDiscipline(i: number): void {
+    const o = this.olympia;
+    if (!o) return;
+    const d = o.disciplines[i];
+    if (!d) return this.olympiaCeremony();
+    o.current = i;
+    d.status = 'now';
+    this.clearOlympiaTimer();
+    o.phase = 'playing';
+    o.deadline = 0;
+    o.duration = 0;
+    this.selectedGameId = d.gameId;
+    const error = this.startGame();
+    if (error) {
+      // Spiel passt gerade nicht (z. B. zu wenige Spieler): überspringen
+      d.status = 'skipped';
+      this.leaveGame();
+      if (i + 1 < o.disciplines.length) return this.startDiscipline(i + 1);
+      return this.olympiaCeremony();
+    }
+    this.touch();
+  }
+
+  /** Ein Spiel hat seine Rangliste gemeldet */
+  olympiaGameFinished(gameId: string, ranking: RankingEntry[]) {
+    const o = this.olympia;
+    const d = o?.disciplines[o.current];
+    if (!o || o.phase !== 'playing' || !d || d.gameId !== gameId || d.status !== 'now') return;
+    const { results, playerPlaces } = scoreDiscipline(ranking, o.entrants, o.teams, o.scoring);
+    d.results = results;
+    d.playerPlaces = playerPlaces;
+    d.status = 'done';
+    this.updateStandings();
+    // Kurz das Endergebnis des Spiels zeigen, dann Medaillen
+    this.clearOlympiaTimer();
+    o.deadline = Date.now() + 6000 * TIME_SCALE;
+    o.duration = 6000 * TIME_SCALE;
+    this.olympiaTimer = setTimeout(() => { this.olympiaTimer = null; this.olympiaMedals(); }, 6000 * TIME_SCALE);
+  }
+
+  /** Disziplin abgebrochen (Spiel beendet oder abgestürzt): ohne Medaillen weiter */
+  olympiaSkip() {
+    const o = this.olympia;
+    if (!o || o.phase !== 'playing') return;
+    const d = o.disciplines[o.current];
+    if (d && d.status === 'now') d.status = 'skipped';
+    this.olympiaMedals();
+  }
+
+  private olympiaMedals() {
+    const o = this.olympia;
+    if (!o) return;
+    if (this.phase === 'game') this.leaveGame();
+    this.olympiaPhase('medals', 10, () => this.olympiaNext());
+  }
+
+  /** Weiter zur nächsten Disziplin bzw. zur Siegerehrung */
+  olympiaNext() {
+    const o = this.olympia;
+    if (!o) return;
+    if (o.phase === 'opening') return this.startDiscipline(0);
+    if (o.phase === 'teams') return this.finishTeams();
+    if (o.phase === 'pick') return this.finishPicks();
+    if (o.phase !== 'medals') return;
+    const next = o.disciplines.findIndex((d, i) => i > o.current && d.status === 'next');
+    if (next >= 0) this.startDiscipline(next);
+    else this.olympiaCeremony();
+  }
+
+  /** Olympia vorzeitig beenden → Siegerehrung mit dem bisherigen Stand */
+  endOlympia() {
+    const o = this.olympia;
+    if (!o || o.phase === 'setup' || o.phase === 'ceremony') return;
+    if (o.phase === 'playing') {
+      const d = o.disciplines[o.current];
+      if (d?.status === 'now') d.status = 'skipped';
+      this.leaveGame();
+    }
+    if (!o.disciplines.some((d) => d.status === 'done')) {
+      // Noch nichts gespielt: zurück zur Übersicht
+      this.clearOlympiaTimer();
+      this.olympia = this.emptyOlympia();
+      return this.touch();
+    }
+    this.olympiaCeremony();
+  }
+
+  private olympiaCeremony() {
+    if (this.phase === 'game') this.leaveGame();
+    this.updateStandings();
+    this.olympiaPhase('ceremony', 0);
+  }
+
+  /** Spieler kommt während Olympia dazu */
+  private olympiaAddPlayer(id: string) {
+    const o = this.olympia;
+    if (!o || o.phase === 'setup' || o.phase === 'ceremony') return;
+    if (o.teams) {
+      if (o.phase === 'teams' && o.teamMode === 'free') return; // wählt selbst
+      if (!o.teams.some((t) => t.members.includes(id))) smallestTeam(o.teams).members.push(id);
+    } else if (!o.entrants.includes(id)) {
+      o.entrants.push(id);
+    }
+    this.updateStandings();
+  }
+
+  private updateStandings() {
+    const o = this.olympia;
+    if (!o) return;
+    o.standings = standingsOf(o.disciplines, o.entrants, o.scoring);
   }
 
   /** Geheime Einstellung wurde vom Host geändert → laufendes Spiel informieren */
@@ -529,7 +929,7 @@ export class Room {
     };
     return {
       lang: room.lang,
-      options: resolveOptions(g.loaded.manifest.options, room.settings.gameOptions[g.id]),
+      options: room.optionsFor(g.loaded.manifest),
       players,
       audience: () => [...room.players.values()].filter((p) => p.info.role === 'audience' && g.memberIds.has(p.info.id)).map((p) => ({ ...p.info })),
       player: (id) => {
@@ -613,6 +1013,7 @@ export class Room {
         g.finished = true;
         g.ranking = ranking;
         room.results.push({ gameId: g.id, ranking });
+        room.olympiaGameFinished(g.id, ranking);
         room.touch();
       },
       secret: (id) => getSecret(g.id, id),
@@ -741,6 +1142,7 @@ export class Room {
       dev: DEV,
       vote: this.vote,
       roll: this.roll,
+      olympia: this.olympia,
     };
   }
 

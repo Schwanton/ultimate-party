@@ -2,6 +2,15 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.39.0
+
+- Neu: **Olympia** – mehrere Spiele hintereinander als ein Wettkampf. Knopf „Olympia“ in der Lobby (TV oder Handy des VIP)
+- 3 bis 8 Disziplinen. Wählen kann der VIP, der Zufall, oder jeder sucht sich auf dem Handy ein Spiel aus – geheim oder offen (dann seht ihr live, was die anderen nehmen)
+- Nach jedem Spiel gibt es Gold, Silber und Bronze und den Medaillenspiegel, am Ende eine Siegerehrung auf dem Podest. Statt nur Medaillen geht auch eine Wertung mit Punkten
+- Allein oder in 2 bis 4 Teams (Feuer, Welle, Wald, Blitz). Teams per Zufall mit Wechseln, nur Zufall, vom VIP eingeteilt oder frei gewählt. Gewertet wird der Durchschnitt, kleinere Teams haben keinen Nachteil
+- Olympia kürzt die Spiele automatisch (z. B. Sumo 2 statt 3 Runden). In der Olympia-Übersicht kannst du jedes Spiel antippen und die Einstellungen nur für Olympia ändern
+- Kooperative Spiele (Der Abgrund, Schwarmsinn, Tick Tack Boom) und Kronenduell sind bei Olympia ausgeblendet
+
 ## 0.38.1
 
 - Neue Titelbilder für **Cash Out or Crash Out!**, **Guess the Clicks!** und **Mic Drop** – zu sehen in der Spielauswahl, der Lobby und beim Abstimmen

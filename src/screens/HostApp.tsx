@@ -10,6 +10,7 @@ import { GameOptionsForm, optionsSummary } from './GameOptions';
 import { UpdateBanner } from './Update';
 import { GameCover, GameLibrary, fitOf, gameDesc, gameName, gameTags, playersLabel } from './GameLibrary';
 import { HostVoteBoard, PickModeSwitch, PickedBadge, VoteOptions, pickModeOf, useRoll } from './PickMode';
+import { OlympiaGameBadge, OlympiaHost, OlympiaSetup, olympiaRunning } from './Olympia';
 
 async function connectHost() {
   const saved = loadSession('host');
@@ -76,7 +77,18 @@ export function HostApp() {
       <Stage>
         {s.status !== 'open' && <ConnectionBanner text={t('status.reconnecting')} />}
         {Host && s.host.view ? <Host view={s.host.view} room={room} t={t} player={player} setSecret={async (id: string, value: string) => !!(await net.request('secret', { gameId: room.gameId, id, value })).ok} /> : <div className="muted">…</div>}
-        <GameMenu finished={room.finished} vip={room.vipId ? player(room.vipId) : undefined} />
+        <OlympiaGameBadge room={room} t={t} />
+        <GameMenu finished={room.finished && !olympiaRunning(room)} vip={room.vipId ? player(room.vipId) : undefined} />
+        <CornerJoin code={room.code} url={`${room.joinUrl}/?r=${room.code}`} />
+      </Stage>
+    );
+  }
+
+  if (olympiaRunning(room)) {
+    return (
+      <Stage>
+        {s.status !== 'open' && <ConnectionBanner text={t('status.reconnecting')} />}
+        <OlympiaHost room={room} games={s.host.games.filter((g) => !g.hidden || room.dev)} t={t} />
         <CornerJoin code={room.code} url={`${room.joinUrl}/?r=${room.code}`} />
       </Stage>
     );
@@ -292,6 +304,7 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
         </div>
 
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {room.olympia ? <OlympiaSetup room={room} games={games} t={t} /> : (<>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <span className="up-label" style={{ fontSize: 14, whiteSpace: 'nowrap' }}>{t('pick.label')}</span>
             <PickModeSwitch mode={pickModeOf(room)} t={t} big />
@@ -299,6 +312,7 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
             {pickModeOf(room) === 'random' && <button className="up-btn ghost small" style={{ whiteSpace: 'nowrap' }} onClick={() => net.send('random')}>{t('pick.reroll')}</button>}
             {pickModeOf(room) === 'vote' && room.vote?.result && <button className="up-btn ghost small" style={{ whiteSpace: 'nowrap' }} onClick={() => net.send('vote:start')}>{t('pick.newVote')}</button>}
             {pickModeOf(room) === 'vote' && !room.vote && <button className="up-btn ghost small" style={{ whiteSpace: 'nowrap' }} onClick={() => net.send('vote:start')}>{t('pick.startVote')}</button>}
+            <button className="up-btn small" style={{ whiteSpace: 'nowrap', background: 'var(--surface)', color: 'var(--yellow)', boxShadow: '0 0 0 2px var(--yellow)' }} onClick={() => net.send('olympia:open')}>{t('olympia.button')}</button>
           </div>
           {pickModeOf(room) === 'vote' && <VoteOptions room={room} t={t} />}
           {pickModeOf(room) === 'vote' && room.vote && !room.vote.result ? (
@@ -309,6 +323,7 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
               summary={selected?.options?.length ? optionsSummary(selected, room.settings.gameOptions?.[selected.id], room.lang) : ''}
               onLibrary={() => setLibraryOpen(true)} onOptions={() => setOptionsOpen(true)} />
           )}
+          </>)}
         </div>
       </main>
     </>
