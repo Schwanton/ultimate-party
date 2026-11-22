@@ -2,6 +2,10 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.38.1
+
+- Neue Titelbilder für **Cash Out or Crash Out!**, **Guess the Clicks!** und **Mic Drop** – zu sehen in der Spielauswahl, der Lobby und beim Abstimmen
+
 ## 0.38.0
 
 - Neues Spiel: **Tick Tack Boom** – eine Bombe tickt, und ihr entschärft sie gemeinsam. Wer die Bombe sieht, hat die Regeln nicht, und wer die Regeln hat, sieht die Bombe nicht. Also redet! Für 2 bis 8 Spieler, weitere schauen zu
