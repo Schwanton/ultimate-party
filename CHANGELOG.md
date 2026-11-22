@@ -2,6 +2,14 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.38.0
+
+- Neues Spiel: **Tick Tack Boom** – eine Bombe tickt, und ihr entschärft sie gemeinsam. Wer die Bombe sieht, hat die Regeln nicht, und wer die Regeln hat, sieht die Bombe nicht. Also redet! Für 2 bis 8 Spieler, weitere schauen zu
+- Spielart „Entschärfer“: Nur einer sieht die Bombe auf dem Handy und beschreibt sie. Die anderen haben je ein Kapitel der geheimen Anleitung und sagen, was zu tun ist. Jede Bombe entschärft jemand anderes
+- Spielart „Alle an Deck“: Die Bombe ist auf dem Fernseher. Jedes Modul bedient ein anderer – und die Anleitung dafür hat wieder jemand anderes
+- 12 Module: Kabelsalat, Der große Knopf, Hieroglyphen, Blinklicht, Funkspruch, Irrgarten, Wortsalat, Zahlenschloss, dazu das Doppelschloss (zwei Handys gleichzeitig) und der Stimmzettel (alle stimmen ab). Ab Stufe 5 nerven Überdruck und Fangfrage
+- 3, 4 oder 5 Bomben pro Partie, jede schwerer als die davor. Jeder Fehler macht die Uhr schneller. Auf Wunsch werden die Regeln jede Partie neu gemischt
+
 ## 0.37.0
 
 - Neues Spiel: **Tank Trouble** – Panzer von oben wie bei Wii Play, für 1 bis 8 Spieler. Kugeln prallen einmal von der Wand ab (auch eure eigenen treffen euch!), Minen sprengen die pinken Klötze weg, ein Treffer reicht

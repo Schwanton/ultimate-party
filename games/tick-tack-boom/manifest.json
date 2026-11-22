@@ -1,0 +1,55 @@
+{
+  "id": "tick-tack-boom",
+  "name": { "de": "Tick Tack Boom", "en": "Tick Tack Boom" },
+  "description": {
+    "de": "Eine Bombe tickt – entschärft sie gemeinsam! Wer die Bombe sieht, hat die Regeln nicht, und wer die Regeln hat, sieht die Bombe nicht. Also redet!",
+    "en": "A bomb is ticking – defuse it together! Whoever sees the bomb doesn't have the rules, and whoever has the rules can't see the bomb. So talk!"
+  },
+  "minPlayers": 2,
+  "maxPlayers": 8,
+  "audience": true,
+  "minutes": 20,
+  "color": "#D9472B",
+  "tags": ["social"],
+  "sdkVersion": 1,
+  "autoSounds": false,
+  "noDeck": true,
+  "version": "0.1.0",
+  "author": "UP!",
+  "options": [
+    {
+      "id": "mode",
+      "label": { "de": "Spielart", "en": "Mode" },
+      "help": {
+        "de": "Entschärfer: Nur einer sieht die Bombe auf dem Handy, die anderen lesen die Anleitung. Alle an Deck: Die Bombe ist auf dem Fernseher, jedes Modul bedient ein anderer – und die Anleitung dafür hat wieder jemand anderes.",
+        "en": "Defuser: only one player sees the bomb on their phone, the others read the manual. All hands: the bomb is on the TV, each module is operated by someone else – and someone else again has its manual."
+      },
+      "default": "a",
+      "choices": [
+        { "value": "a", "label": { "de": "Entschärfer", "en": "Defuser" } },
+        { "value": "b", "label": { "de": "Alle an Deck", "en": "All hands" } }
+      ]
+    },
+    {
+      "id": "bombs",
+      "label": { "de": "Bomben", "en": "Bombs" },
+      "help": { "de": "Jede Bombe ist schwerer als die davor.", "en": "Each bomb is harder than the one before." },
+      "default": 4,
+      "choices": [
+        { "value": 3, "label": { "de": "3", "en": "3" } },
+        { "value": 4, "label": { "de": "4", "en": "4" } },
+        { "value": 5, "label": { "de": "5", "en": "5" } }
+      ]
+    },
+    {
+      "id": "mix",
+      "label": { "de": "Regeln neu mischen", "en": "Shuffle rules" },
+      "help": { "de": "An: Die Anleitung ist jede Partie ein bisschen anders, damit man sie nicht auswendig kann.", "en": "On: the manual is a little different every game, so nobody can memorise it." },
+      "default": "off",
+      "choices": [
+        { "value": "off", "label": { "de": "Aus", "en": "Off" } },
+        { "value": "on", "label": { "de": "An", "en": "On" } }
+      ]
+    }
+  ]
+}

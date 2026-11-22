@@ -82,6 +82,14 @@ const scenarios: { game: string; players: number; options?: Record<string, numbe
   { game: 'tank-trouble', players: 2, options: { mode: 'duell', rounds: 3 } },
   { game: 'tank-trouble', players: 8, options: { mode: 'duell', rounds: 3 } },
   { game: 'tank-trouble', players: 1, options: { mode: 'duell', rounds: 3, cpu: 2 } },
+  { game: 'tick-tack-boom', players: 2 },
+  { game: 'tick-tack-boom', players: 4 },
+  { game: 'tick-tack-boom', players: 8 },
+  { game: 'tick-tack-boom', players: 10 }, // 2 davon Publikum
+  { game: 'tick-tack-boom', players: 2, options: { mode: 'b', bombs: 5 } },
+  { game: 'tick-tack-boom', players: 5, options: { mode: 'b', bombs: 5, mix: 'on' } },
+  { game: 'tick-tack-boom', players: 8, options: { mode: 'b', bombs: 3 } },
+  { game: 'tick-tack-boom', players: 3, options: { bombs: 5, mix: 'on' } },
   // mit Spiel-Einstellungen
   { game: 'mic-drop', players: 4, options: { rounds: 5, answerTime: 0.75 } },
   { game: 'flunkerfakt', players: 4, options: { questions: 3 } },
