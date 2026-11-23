@@ -2,6 +2,10 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.39.1
+
+- Neue Titelbilder für **Mainstream**, **Murmel-Mayhem** und **Montagsmaler** – zu sehen in der Spielauswahl, der Lobby und beim Abstimmen
+
 ## 0.39.0
 
 - Neu: **Olympia** – mehrere Spiele hintereinander als ein Wettkampf. Knopf „Olympia“ in der Lobby (TV oder Handy des VIP)
