@@ -47,11 +47,31 @@ interface RunningGame {
   loaded: LoadedGame;
   server: GameServer | null;
   hostView: object | null;
-  timers: Set<ReturnType<typeof setTimeout>>;
+  timers: Set<GameTimer>;
   finished: boolean;
   ranking: RankingEntry[] | null;
   memberIds: Set<string>;
+  /** Pause: Zeitpunkt (echte Zeit), seit wann pausiert ist; null = läuft */
+  pausedAt: number | null;
+  /** wer pausiert hat: 'tv' oder die Spieler-ID */
+  pausedBy: string | null;
+  /** Summe aller bisherigen Pausen (ms) – die Spiel-Uhr läuft um so viel nach */
+  shift: number;
 }
+
+/** Ein geplanter Aufruf eines Spiels (ctx.after, ctx.timer …) – lässt sich anhalten */
+interface GameTimer {
+  handle: ReturnType<typeof setTimeout> | null;
+  /** fällig um (echte Zeit) */
+  due: number;
+  /** Restzeit während der Pause */
+  left: number;
+  fire: () => void;
+}
+
+/** Echte Uhr (Date.now wird während Spiel-Aufrufen durch die Spiel-Uhr ersetzt, siehe Room.safe) */
+const realNow = Date.now.bind(Date);
+let clockPatched = false;
 
 export interface ServerMessage {
   [key: string]: unknown;
@@ -442,7 +462,7 @@ export class Room {
     }
     players.forEach((p) => (p.info.role = 'player'));
     const g: RunningGame = {
-      id: m.id, loaded, server: null, hostView: null, timers: new Set(), finished: false, ranking: null,
+      id: m.id, loaded, server: null, hostView: null, timers: new Set(), finished: false, ranking: null, pausedAt: null, pausedBy: null, shift: 0,
       memberIds: new Set([...players, ...(m.audience ? rest : [])].map((p) => p.info.id)),
     };
     this.game = g;
@@ -468,7 +488,7 @@ export class Room {
   stopGame() {
     const g = this.game;
     if (!g) return;
-    g.timers.forEach((t) => clearTimeout(t));
+    g.timers.forEach((t) => t.handle && clearTimeout(t.handle));
     g.timers.clear();
     try { g.server?.dispose?.(); } catch { /* egal */ }
     this.game = null;
@@ -887,11 +907,44 @@ export class Room {
 
   action(playerId: string, action: unknown) {
     const g = this.game;
-    if (!g || !g.server || !g.memberIds.has(playerId)) return;
+    if (!g || !g.server || !g.memberIds.has(playerId) || g.pausedAt !== null) return;
     this.safe(() => g.server?.onAction(playerId, action));
   }
 
+  /** Spiel anhalten oder fortsetzen (VIP oder TV). Geplante Abläufe des Spiels warten, die Spiel-Uhr steht. */
+  setPaused(paused: boolean, by: string) {
+    const g = this.game;
+    if (!g || g.finished) return;
+    const now = realNow();
+    if (paused && g.pausedAt === null) {
+      g.pausedAt = now;
+      g.pausedBy = by;
+      for (const t of g.timers) {
+        if (t.handle) clearTimeout(t.handle);
+        t.handle = null;
+        t.left = Math.max(0, t.due - now);
+      }
+    } else if (!paused && g.pausedAt !== null) {
+      g.shift += now - g.pausedAt;
+      g.pausedAt = null;
+      g.pausedBy = null;
+      for (const t of g.timers) {
+        t.due = now + t.left;
+        t.handle = setTimeout(t.fire, t.left);
+      }
+    } else return;
+    this.touch();
+  }
+
   private safe(fn: () => void): boolean {
+    // Während eines Spiel-Aufrufs zeigt Date.now die Spiel-Uhr: Pausen zählen nicht mit
+    const g = this.game;
+    const patch = !!g && g.shift + (g.pausedAt !== null ? 1 : 0) > 0 && !clockPatched;
+    if (patch) {
+      const game = g!;
+      clockPatched = true;
+      Date.now = () => (game.pausedAt ?? realNow()) - game.shift;
+    }
     try {
       fn();
       return true;
@@ -900,19 +953,31 @@ export class Room {
       this.notice = `game_error`;
       this.backToLobby();
       return false;
+    } finally {
+      if (patch) {
+        Date.now = realNow;
+        clockPatched = false;
+      }
     }
   }
 
   private createContext(g: RunningGame, players: PlayerInfo[]): GameContext {
     const room = this;
     const alive = () => room.game === g;
-    const schedule = (ms: number, fn: () => void) => {
-      const t = setTimeout(() => {
-        g.timers.delete(t);
+    const schedule = (ms: number, fn: () => void): GameTimer => {
+      const timer: GameTimer = { handle: null, due: realNow() + ms, left: ms, fire: () => {} };
+      timer.fire = () => {
+        timer.handle = null;
+        g.timers.delete(timer);
         if (alive()) room.safe(fn);
-      }, ms);
-      g.timers.add(t);
-      return t;
+      };
+      g.timers.add(timer);
+      if (g.pausedAt === null) timer.handle = setTimeout(timer.fire, ms);
+      return timer;
+    };
+    const cancel = (timer: GameTimer) => {
+      if (timer.handle) clearTimeout(timer.handle);
+      g.timers.delete(timer);
     };
     const setView = (p: PlayerState, view: object) => {
       p.view = view;
@@ -983,10 +1048,7 @@ export class Room {
         return {
           deadline: Date.now() + ms,
           duration: ms,
-          cancel: () => {
-            clearTimeout(t);
-            g.timers.delete(t);
-          },
+          cancel: () => cancel(t),
         };
       },
       timerAt(deadline, onEnd, opts): TimerHandle {
@@ -995,17 +1057,14 @@ export class Room {
         return {
           deadline: Date.now() + ms,
           duration: ms,
-          cancel: () => {
-            clearTimeout(t);
-            g.timers.delete(t);
-          },
+          cancel: () => cancel(t),
         };
       },
       after(seconds, fn) {
         schedule(seconds * 1000 * TIME_SCALE, fn);
       },
       clearTimers() {
-        g.timers.forEach((t) => clearTimeout(t));
+        g.timers.forEach((t) => t.handle && clearTimeout(t.handle));
         g.timers.clear();
       },
       finish(ranking) {
@@ -1143,6 +1202,8 @@ export class Room {
       vote: this.vote,
       roll: this.roll,
       olympia: this.olympia,
+      pause: this.game && this.game.pausedAt !== null ? { at: this.game.pausedAt, shift: this.game.shift, by: this.game.pausedBy } : null,
+      clockShift: this.game ? this.game.shift : 0,
     };
   }
 

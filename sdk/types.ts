@@ -288,6 +288,10 @@ export interface RoomSnapshot {
   roll: { reel: string[]; at: number } | null;
   /** Olympia-Modus (null = aus) */
   olympia: OlympiaState | null;
+  /** Spiel pausiert (null = läuft): seit wann (Serverzeit), bisherige Pausen (ms), wer ('tv' oder Spieler-ID) */
+  pause?: { at: number; shift: number; by: string | null } | null;
+  /** Summe der Pausen im laufenden Spiel (ms): Spiel-Uhr = Serverzeit − clockShift */
+  clockShift?: number;
 }
 
 /* ---------- Olympia-Modus ---------- */

@@ -11,6 +11,7 @@ import { UpdateBanner } from './Update';
 import { GameCover, GameLibrary, fitOf, gameDesc, gameName, gameTags, playersLabel } from './GameLibrary';
 import { HostVoteBoard, PickModeSwitch, PickedBadge, VoteOptions, pickModeOf, useRoll } from './PickMode';
 import { OlympiaGameBadge, OlympiaHost, OlympiaSetup, olympiaRunning } from './Olympia';
+import { HostPause, PauseIcon, PlayIcon } from './Pause';
 
 async function connectHost() {
   const saved = loadSession('host');
@@ -78,6 +79,7 @@ export function HostApp() {
         {s.status !== 'open' && <ConnectionBanner text={t('status.reconnecting')} />}
         {Host && s.host.view ? <Host view={s.host.view} room={room} t={t} player={player} setSecret={async (id: string, value: string) => !!(await net.request('secret', { gameId: room.gameId, id, value })).ok} /> : <div className="muted">…</div>}
         <OlympiaGameBadge room={room} t={t} />
+        <HostPause room={room} t={t} />
         <GameMenu finished={room.finished && !olympiaRunning(room)} vip={room.vipId ? player(room.vipId) : undefined} />
         <CornerJoin code={room.code} url={`${room.joinUrl}/?r=${room.code}`} />
       </Stage>
@@ -163,7 +165,7 @@ function ConnectionBanner({ text }: { text: string }) {
 function GameMenu({ finished, vip }: { finished: boolean; vip?: PlayerInfo }) {
   const s = useNet();
   const t = useT(s.room!.lang);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState<false | 'menu' | 'end'>(false);
   if (finished) {
     return (
       <div className="anim-fade" style={{ position: 'absolute', top: 30, right: 56, zIndex: 45, display: 'flex', gap: 12, alignItems: 'center', background: 'var(--surface)', padding: '10px 12px 10px 20px', borderRadius: 22 }}>
@@ -173,9 +175,19 @@ function GameMenu({ finished, vip }: { finished: boolean; vip?: PlayerInfo }) {
       </div>
     );
   }
+  const paused = !!s.room!.pause;
   return (
-    <div style={{ position: 'absolute', right: 14, bottom: 12, zIndex: 45, display: 'flex', gap: 8, alignItems: 'center' }}>
-      {open && (
+    <div style={{ position: 'absolute', right: 14, bottom: 12, zIndex: 85, display: 'flex', gap: 8, alignItems: 'center' }}>
+      {open === 'menu' && (
+        <>
+          <button className="up-btn small" style={{ display: 'flex', alignItems: 'center', gap: 8 }} onClick={() => { setOpen(false); net.send('pause', { paused: !paused }); }}>
+            {paused ? <PlayIcon size={18} /> : <PauseIcon size={18} />} {paused ? t('game.resume') : t('game.pause')}
+          </button>
+          <button className="up-btn ghost small" onClick={() => setOpen('end')}>{t('game.end')}</button>
+          <button className="up-btn ghost small" onClick={() => setOpen(false)}>{t('common.cancel')}</button>
+        </>
+      )}
+      {open === 'end' && (
         <>
           <span className="muted" style={{ fontSize: 14 }}>{t('game.confirmLobby')}</span>
           <button className="up-btn small" onClick={() => { setOpen(false); net.send('lobby'); }}>{t('common.yes')}</button>
@@ -184,7 +196,7 @@ function GameMenu({ finished, vip }: { finished: boolean; vip?: PlayerInfo }) {
       )}
       {!open && <FullscreenButton enter={t('fullscreen.enter')} exit={t('fullscreen.exit')} size={36} style={{ color: 'var(--faint)', opacity: 0.6 }} />}
       {!open && (
-        <button aria-label={t('game.toLobby')} title={t('game.toLobby')} onClick={() => setOpen(true)}
+        <button aria-label={t('game.menu')} title={t('game.menu')} onClick={() => setOpen('menu')}
           style={{ width: 36, height: 36, borderRadius: 12, border: 0, background: 'var(--surface)', color: 'var(--faint)', opacity: 0.6, fontSize: 18 }}>⋯</button>
       )}
     </div>

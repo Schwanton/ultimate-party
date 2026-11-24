@@ -3,6 +3,7 @@ import type { ControllerViewProps, GameClientModule, HostViewProps } from '@up/s
 import { Avatar, Confetti, Crown, Joystick, PhoneWait, Podium, Scoreboard, sfx, useServerNow, useStream, vibrate } from '@up/ui';
 import { COLS, ROWS } from './levels';
 import { BARREL, CELL, H, POWERUPS, W, traceShot } from './engine';
+import { battleTrack, play, type MusicState } from './sound';
 
 const BG = '#070B18';
 const FLOOR = '#0C1226';
@@ -148,7 +149,7 @@ function MissionCard({ view, t, player, room }: HostViewProps) {
   const total = enemies.reduce((s, e) => s + e.count, 0);
   const ids = room.players.filter((p) => p.role === 'player').map((p) => p.id);
   useEffect(() => {
-    sfx.custom((s) => { s.tone(220, 0.25, { type: 'square', vol: 0.08, to: 440 }); s.tone(440, 0.35, { type: 'square', vol: 0.06, at: 0.25, to: 660 }); });
+    play.missionIntro();
   }, [view.mission]);
   return (
     <Screen>
@@ -195,7 +196,7 @@ function MissionCard({ view, t, player, room }: HostViewProps) {
 
 interface Fx { kind: string; x: number; y: number; at: number; v: number; color?: string; text?: string }
 
-function HostArena({ view, t, player }: HostViewProps) {
+function HostArena({ view, t, player, room }: HostViewProps) {
   const frame = useStream<Frame>();
   const now = useServerNow(200);
   const tanks = view.tanks as TankInfo[];
@@ -209,6 +210,9 @@ function HostArena({ view, t, player }: HostViewProps) {
   const lastEv = useRef(0);
   const flash = useRef(new Map<number, number>());
   const keyRef = useRef(-1);
+  const sound = useRef({ engine: 0, beep: 0 });
+  const paused = useRef(false);
+  paused.current = !!room.pause;
   const info = useRef(tanks);
   info.current = tanks;
 
@@ -254,35 +258,37 @@ function HostArena({ view, t, player }: HostViewProps) {
         const owner = e[4] as number, rocket = e[5] as number;
         fx.current.push({ kind: 'muzzle', x, y, at: n, v: 0, color: colorOf(owner) });
         flash.current.set(owner, n);
-        sfx.custom((s) => rocket ? s.noise(0.18, { filter: 1500, sweepTo: 5000, vol: 0.1 }) : s.tone(700, 0.07, { type: 'square', vol: 0.06, to: 300 }));
+        if (rocket) play.rocket(); else play.shot();
       } else if (kind === 'bounce') {
         fx.current.push({ kind: 'spark', x, y, at: n, v: 8, color: '#FFFFFF' });
-        sfx.custom((s) => s.tone(1400, 0.04, { type: 'triangle', vol: 0.04 }));
+        play.bounce();
       } else if (kind === 'spark') {
         fx.current.push({ kind: 'spark', x, y, at: n, v: 14, color: '#FFD23F' });
-        sfx.custom((s) => s.noise(0.06, { filter: 2500, vol: 0.05 }));
+        play.fizzle();
       } else if (kind === 'kill') {
         const i = e[4] as number;
         fx.current.push({ kind: 'blast', x, y, at: n, v: 40, color: colorOf(i) });
         wrecks.current.push({ x, y, color: colorOf(i) });
-        sfx.custom((s) => { s.noise(0.45, { filter: 700, type: 'lowpass', vol: 0.45 }); s.tone(110, 0.35, { type: 'sine', vol: 0.35, to: 40 }); });
+        play.tankHit();
       } else if (kind === 'boom') {
         fx.current.push({ kind: 'blast', x, y, at: n, v: e[4] as number, color: '#FF9F1C' });
-        sfx.custom((s) => { s.noise(0.6, { filter: 450, type: 'lowpass', vol: 0.55 }); s.tone(70, 0.5, { type: 'sine', vol: 0.45, to: 30 }); });
+        play.mineBoom();
       } else if (kind === 'block') {
         fx.current.push({ kind: 'ring', x, y, at: n, v: 26, color: SOFT });
+        play.block();
       } else if (kind === 'mine') {
-        sfx.custom((s) => s.tone(300, 0.08, { type: 'square', vol: 0.06, to: 200 }));
+        play.minePlace();
       } else if (kind === 'pick') {
         const k = POWERUPS[e[5] as number];
         fx.current.push({ kind: 'ring', x, y, at: n, v: 30, color: POWER_COLOR[k] });
         fx.current.push({ kind: 'text', x, y: y - 26, at: n, v: 0, color: POWER_COLOR[k], text: t(`p.${k}`) });
-        sfx.custom((s) => { s.tone(660, 0.1, { type: 'triangle', vol: 0.12 }); s.tone(990, 0.15, { type: 'triangle', vol: 0.12, at: 0.08 }); });
+        play.pickup();
       } else if (kind === 'shield') {
         fx.current.push({ kind: 'ring', x, y, at: n, v: 34, color: '#9FF3FF' });
-        sfx.custom((s) => s.tone(1200, 0.2, { type: 'sine', vol: 0.12, to: 400 }));
+        play.shieldBreak();
       } else if (kind === 'power') {
         fx.current.push({ kind: 'ring', x, y, at: n, v: 22, color: '#FFFFFF' });
+        play.powerSpawn();
       }
     }
   }, [fr]);
@@ -312,6 +318,17 @@ function HostArena({ view, t, player }: HostViewProps) {
         const p = prev.tk[i] ?? c;
         return { x: lerp(p[0], c[0]), y: lerp(p[1], c[1]), body: lerpAng(p[2] / 100, c[2] / 100), turret: lerpAng(p[3] / 100, c[3] / 100), f: c[4] };
       });
+
+      // Motorengeräusch und Minen-Piepen
+      if (n - sound.current.engine > 110 && !paused.current) {
+        sound.current.engine = n;
+        const moving = pos.filter((p) => (p.f & F.alive) && (p.f & F.moving)).length;
+        if (moving) play.engine(moving);
+      }
+      if (cur.m.some((m) => m[3]) && n - sound.current.beep > 240 && !paused.current) {
+        sound.current.beep = n;
+        play.mineBeep();
+      }
 
       // Kettenspuren stempeln
       if (tc) {
@@ -420,6 +437,31 @@ function HostArena({ view, t, player }: HostViewProps) {
 
   const startAt = view.startAt as number | undefined;
   const count = view.phase === 'ready' && startAt && now < startAt ? Math.ceil((startAt - now) / 1000) : 0;
+  useEffect(() => {
+    if (view.phase === 'ready' && count > 0) play.countdown(count);
+  }, [count, view.phase]);
+  useEffect(() => {
+    if (view.phase === 'fight') play.countdown(0);
+    else if (view.phase === 'clear') play.clear();
+    else if (view.phase === 'fail') play.fail();
+    else if (view.phase === 'roundEnd') view.winner ? sfx.play('fanfare', { always: true }) : play.fail();
+  }, [view.phase, view.key]);
+  // Musik: Marsch-Trommeln, je mehr Gegnerarten (Kampagne) bzw. je enger das Duell, desto mehr Instrumente
+  const enemyTypes = Object.values(view.enemies as Record<string, [number, number]>).filter((e) => e[0] > 0).length;
+  const aliveCount = (view.alive as string[]).length;
+  const musicState = useRef<MusicState>({ layers: 1, urgent: false });
+  musicState.current = {
+    layers: view.phase !== 'fight' ? 1 : view.mode === 'kampagne' ? Math.min(5, 1 + enemyTypes) : aliveCount <= 2 ? 5 : 4,
+    urgent: view.mode === 'kampagne' ? enemyTypes > 0 && Object.values(view.enemies as Record<string, [number, number]>).reduce((a, e) => a + e[0], 0) === 1 : aliveCount <= 2,
+  };
+  const track = useMemo(() => battleTrack(musicState), []);
+  const musicOn = view.phase === 'ready' || view.phase === 'fight';
+  useEffect(() => {
+    if (!musicOn) { sfx.stopMusic(); return; }
+    sfx.startMusic(track);
+  }, [musicOn, track]);
+  useEffect(() => () => sfx.stopMusic(), []);
+
   const players = tanks.filter((x) => x.kind === 'player' && x.pid);
   const aliveIds = new Set<string>(view.alive as string[]);
   const campaign = view.mode === 'kampagne';
@@ -706,8 +748,22 @@ function FireButton({ size, onFire, label, disabled }: { size: number; onFire: (
   );
 }
 
-function MineButton({ label, count, onPress }: { label: string; count: number; onPress: () => void }) {
+function MineButton({ label, count, onPress, compact }: { label: string; count: number; onPress: () => void; compact?: boolean }) {
   const [down, setDown] = useState(false);
+  if (compact) {
+    return (
+      <button type="button" aria-label={`${label} (${count})`}
+        onPointerDown={(e) => { e.preventDefault(); setDown(true); onPress(); }}
+        onPointerUp={() => setDown(false)} onPointerCancel={() => setDown(false)} onContextMenu={(e) => e.preventDefault()}
+        style={{
+          width: 62, height: 62, borderRadius: '50%', border: '2px solid #FFD23F', background: down ? '#FFD23F' : 'rgba(255,210,63,.13)', flex: 'none', alignSelf: 'flex-end', marginBottom: 18,
+          color: down ? '#0A0F1E' : '#FFD23F', fontFamily: DISPLAY, fontWeight: 700, fontSize: 12, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 1,
+          touchAction: 'none', userSelect: 'none', WebkitUserSelect: 'none', opacity: count > 0 ? 1 : 0.45, padding: 0,
+        }}>
+        <PowerIcon kind="mine" size={20} color={down ? '#0A0F1E' : '#FFD23F'} />{count}
+      </button>
+    );
+  }
   return (
     <button type="button" aria-label={label}
       onPointerDown={(e) => { e.preventDefault(); setDown(true); onPress(); }}
@@ -738,8 +794,8 @@ function PlayController({ view, t, send, me }: ControllerViewProps) {
   const count = view.startAt && now < view.startAt ? Math.ceil((view.startAt - now) / 1000) : 0;
   const ammo = view.ammo ? String(view.ammo).split(':') : null;
   const vh = window.innerHeight, vw = window.innerWidth;
-  const stick = land ? Math.min(vh * 0.5, 200) : Math.min(vw * 0.4, 170);
-  const fireSize = land ? Math.min(vh * 0.34, 132) : Math.min(vw * 0.3, 120);
+  const stick = land ? Math.min(vh * 0.5, 200) : Math.min(vw * 0.36, 160);
+  const fireSize = land ? Math.min(vh * 0.6, vw * 0.27, 240) : Math.min(vw * 0.64, vh * 0.33, 280);
 
   const top = (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap', paddingLeft: 40 }}>
@@ -763,9 +819,9 @@ function PlayController({ view, t, send, me }: ControllerViewProps) {
   );
   const center = (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
-      {count > 0 ? <span key={count} className="anim-pop" style={{ fontFamily: DISPLAY, fontSize: 56, fontWeight: 700 }}>{count}</span> : null}
+      {count > 0 ? <span key={count} className="anim-pop" style={{ fontFamily: DISPLAY, fontSize: land ? 40 : 56, fontWeight: 700, position: land ? 'absolute' : undefined, top: land ? 52 : undefined }}>{count}</span> : null}
       <FireButton size={fireSize} label={t('phone.fire')} onFire={fire} disabled={!view.live || (view.bullets ?? 0) <= 0} />
-      <MineButton label={t('phone.mine')} count={view.mines ?? 0} onPress={mine} />
+      {land && <MineButton label={t('phone.mine')} count={view.mines ?? 0} onPress={mine} />}
     </div>
   );
   const driveStick = <Joystick onMove={onMove} color={color} size={stick} label={t('phone.drive')} ariaLabel={t('phone.drive')} zoneStyle={land ? { flex: 1, height: '100%', width: 'auto' } : { flex: 1, height: stick * 1.5, width: 'auto' }} />;
@@ -784,8 +840,9 @@ function PlayController({ view, t, send, me }: ControllerViewProps) {
         <>
           <p style={{ textAlign: 'center', color: MUTED, fontSize: 14 }}>{t('phone.rotate')}</p>
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{center}</div>
-          <div style={{ display: 'flex', gap: 8 }}>
+          <div style={{ display: 'flex', gap: 4, alignItems: 'stretch' }}>
             {driveStick}
+            <MineButton compact label={t('phone.mine')} count={view.mines ?? 0} onPress={mine} />
             {aimStick}
           </div>
         </>

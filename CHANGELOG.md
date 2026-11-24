@@ -2,6 +2,13 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.40.0
+
+- Pause in allen Spielen: Der VIP tippt auf dem Handy oben links auf das ×, dort gibt es jetzt „Pausieren“ und „Spiel beenden“. Am Fernseher geht das über die drei Punkte unten rechts. Während der Pause steht das Spiel komplett still – auch alle Countdowns – und Musik und Geräusche schweigen. Mit „Weiter“ geht es genau dort weiter
+- Tank Trouble: eigene Musik wie bei Wii Play – Marsch-Trommeln, und je mehr Gegnerarten noch fahren (bzw. je enger das Duell wird), desto mehr Instrumente spielen mit. Beim letzten Gegner wird sie schneller
+- Tank Trouble: neue Geräusche für Motoren, Schüsse, Raketen, Abpraller, Treffer, Minen (Legen, Piepen kurz vor der Explosion, Explosion), gesprengte Klötze, Powerups, Countdown, geschaffte und verlorene Missionen
+- Tank Trouble: Der Feuer-Knopf ist viel größer. Hochkant liegt der Minen-Knopf klein unten zwischen den beiden Sticks
+
 ## 0.39.2
 
 - Neue Titelbilder für **Heiße Kartoffel**, **Flunkerfakt** und **Bonk!** – zu sehen in der Spielauswahl, der Lobby und beim Abstimmen

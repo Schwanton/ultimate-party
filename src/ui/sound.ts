@@ -64,8 +64,8 @@ class Sfx {
         this.ctx = new AC();
         this.fxGain = this.ctx.createGain();
         this.musicGain = this.ctx.createGain();
-        this.fxGain.gain.value = this.fxVolume;
-        this.musicGain.gain.value = this.musicVolume;
+        this.fxGain.gain.value = this.paused ? 0 : this.fxVolume;
+        this.musicGain.gain.value = this.paused ? 0 : this.musicVolume;
         this.fxGain.connect(this.ctx.destination);
         this.musicGain.connect(this.ctx.destination);
         const len = this.ctx.sampleRate;
@@ -78,13 +78,31 @@ class Sfx {
     } catch { /* kein Audio */ }
   }
 
+  /** Pause: alles stumm, keine neuen Klänge, Musik wartet */
+  private paused = false;
+  pauseAll() {
+    if (this.paused) return;
+    this.paused = true;
+    if (this.fxGain) this.fxGain.gain.value = 0;
+    if (this.musicGain) this.musicGain.gain.value = 0;
+  }
+  resumeAll() {
+    if (!this.paused) return;
+    this.paused = false;
+    if (this.fxGain) this.fxGain.gain.value = this.fxVolume;
+    if (this.musicGain) this.musicGain.gain.value = this.musicVolume;
+  }
+  get isPaused() {
+    return this.paused;
+  }
+
   setVolumes(fx: number, music: number) {
     this.fxVolume = fx;
     this.musicVolume = music;
     save('up:fx', fx);
     save('up:music', music);
-    if (this.fxGain) this.fxGain.gain.value = fx;
-    if (this.musicGain) this.musicGain.gain.value = music;
+    if (this.fxGain && !this.paused) this.fxGain.gain.value = fx;
+    if (this.musicGain && !this.paused) this.musicGain.gain.value = music;
     this.emit();
   }
 
@@ -138,7 +156,7 @@ class Sfx {
 
   /** Sound abspielen. `always` spielt auch, wenn das Spiel die automatischen Sounds abgeschaltet hat. */
   play(name: SoundName, opts: { always?: boolean } = {}) {
-    if (!this.enabledOnDevice || (!this.auto && !opts.always)) return;
+    if (!this.enabledOnDevice || this.paused || (!this.auto && !opts.always)) return;
     this.unlock();
     if (!this.ctx || this.ctx.state !== 'running') return;
     try {
@@ -148,7 +166,7 @@ class Sfx {
 
   /** Eigener Klang, z. B. sfx.custom((s) => s.tone(440, 0.1)). Spielt auch bei autoSounds: false. */
   custom(fn: (api: SynthApi) => void) {
-    if (!this.enabledOnDevice) return;
+    if (!this.enabledOnDevice || this.paused) return;
     this.unlock();
     if (!this.ctx || this.ctx.state !== 'running') return;
     try {
@@ -263,7 +281,7 @@ class Sfx {
 
   private scheduleTrack(track: MusicTrack) {
     const c = this.ctx;
-    if (!c || c.state !== 'running' || this.musicVolume <= 0) return;
+    if (!c || c.state !== 'running' || this.musicVolume <= 0 || this.paused) return;
     if (this.musicNext < c.currentTime) this.musicNext = c.currentTime + 0.05;
     while (this.musicNext < c.currentTime + 0.2) {
       const at = this.musicNext - c.currentTime;
@@ -277,7 +295,7 @@ class Sfx {
 
   private scheduleMusic() {
     const c = this.ctx;
-    if (!c || c.state !== 'running' || this.musicVolume <= 0) return;
+    if (!c || c.state !== 'running' || this.musicVolume <= 0 || this.paused) return;
     const step = 60 / 112 / 2; // Achtel bei 112 bpm
     if (this.musicNext < c.currentTime) this.musicNext = c.currentTime + 0.05;
     const chords = [[261.63, 329.63, 392], [220, 261.63, 329.63], [174.61, 220, 261.63], [196, 246.94, 293.66]];

@@ -226,6 +226,9 @@ function handle(ws: WebSocket, msg: any) {
     case 'lobby':
       if (room && (isHost || isVip)) room.backToLobby();
       return;
+    case 'pause':
+      if (room && (isHost || isVip)) room.setPaused(!!msg.paused, isHost ? 'tv' : String(s.playerId));
+      return;
 
     /* ---- Olympia (Host oder VIP, Teamwahl und Spielewahl: alle) ---- */
     case 'olympia:open':

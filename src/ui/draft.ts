@@ -14,6 +14,7 @@
 
 import { useEffect, useRef } from 'react';
 import { net } from '../net';
+import { gameNow } from './Timer';
 
 const FINAL_PUSHES = [5, 3, 2, 1, 0.4, -0.3]; // Sekunden vor Ablauf (negativ = danach)
 
@@ -46,7 +47,7 @@ export function useDraft<T>(value: T, push: ((value: T) => void) | null | undefi
   // Kurz vor Ablauf mehrmals – auch wenn sich nichts geändert hat (falls eine Nachricht verloren ging)
   useEffect(() => {
     if (!active || !deadline) return;
-    const now = Date.now() + net.state.offset;
+    const now = gameNow();
     const ids = FINAL_PUSHES.map((s) => deadline - s * 1000 - now)
       .filter((ms) => ms > 0)
       .map((ms) => setTimeout(() => hasContent(latest.current) && flush(true), ms));

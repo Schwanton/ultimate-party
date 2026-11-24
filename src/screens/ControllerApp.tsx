@@ -8,6 +8,7 @@ import { GameOptionsForm, optionsSummary } from './GameOptions';
 import { fitOf, gameDesc, useTagFilter } from './GameLibrary';
 import { PhoneVote, PickModeSwitch, VoteOptions, pickModeOf, votesFor } from './PickMode';
 import { OlympiaPhone, OlympiaPhoneSetup, olympiaRunning } from './Olympia';
+import { PauseIcon, PhonePause, PlayIcon } from './Pause';
 
 const params = new URLSearchParams(location.search);
 
@@ -175,7 +176,8 @@ function InRoom() {
         </div>
       )}
       {content}
-      {room.phase === 'game' && !room.finished && isVip && <EndGameButton t={t} />}
+      {room.phase === 'game' && !room.finished && <PhonePause room={room} t={t} isVip={isVip} />}
+      {room.phase === 'game' && !room.finished && isVip && <EndGameButton t={t} paused={!!room.pause} />}
       {room.phase === 'game' && room.finished && olympiaRunning(room) && (
         <p className="muted" style={{ textAlign: 'center' }}>{t('olympia.medalsSoonPhone')}</p>
       )}
@@ -193,13 +195,13 @@ function InRoom() {
   );
 }
 
-/** VIP: kleiner Knopf oben links über dem Spiel – öffnet eine Rückfrage, dann alle zurück in die Lobby */
-function EndGameButton({ t }: { t: (k: string, v?: Record<string, string | number>) => string }) {
-  const [ask, setAsk] = useState(false);
+/** VIP: kleiner Knopf oben links über dem Spiel – öffnet das Spielmenü: Pause/Weiter oder Spiel beenden (mit Rückfrage) */
+function EndGameButton({ t, paused }: { t: (k: string, v?: Record<string, string | number>) => string; paused: boolean }) {
+  const [ask, setAsk] = useState<false | 'menu' | 'end'>(false);
   return (
     <>
-      <button type="button" aria-label={t('game.end')} title={t('game.end')} onClick={() => setAsk(true)} style={{
-        position: 'fixed', top: 'calc(env(safe-area-inset-top, 0px) + 6px)', left: 'calc(env(safe-area-inset-left, 0px) + 6px)', zIndex: 90,
+      <button type="button" aria-label={t('game.menu')} title={t('game.menu')} onClick={() => setAsk('menu')} style={{
+        position: 'fixed', top: 'calc(env(safe-area-inset-top, 0px) + 6px)', left: 'calc(env(safe-area-inset-left, 0px) + 6px)', zIndex: 93,
         width: 36, height: 36, padding: 0, border: 0, borderRadius: '50%', background: 'rgba(17,13,36,.72)', color: '#fff',
         boxShadow: '0 0 0 1.5px rgba(255,255,255,.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.85,
       }}>
@@ -207,12 +209,25 @@ function EndGameButton({ t }: { t: (k: string, v?: Record<string, string | numbe
       </button>
       {ask && (
         <div onClick={() => setAsk(false)} style={{ position: 'fixed', inset: 0, zIndex: 95, background: 'rgba(10,7,22,.78)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-          <div role="alertdialog" aria-modal="true" aria-label={t('game.end')} className="up-card anim-pop" onClick={(e) => e.stopPropagation()} style={{ width: '100%', maxWidth: 360, display: 'flex', flexDirection: 'column', gap: 14, padding: 20 }}>
-            <p style={{ fontSize: 18, fontWeight: 700 }}>{t('game.endConfirm')}</p>
-            <div style={{ display: 'flex', gap: 10 }}>
-              <button className="up-btn ghost full" onClick={() => setAsk(false)}>{t('common.cancel')}</button>
-              <button className="up-btn full" style={{ background: 'var(--red)', boxShadow: '0 5px 0 #A81B2B', color: '#fff' }} onClick={() => { setAsk(false); net.send('lobby'); }}>{t('game.end')}</button>
-            </div>
+          <div role="alertdialog" aria-modal="true" aria-label={t('game.menu')} className="up-card anim-pop" onClick={(e) => e.stopPropagation()} style={{ width: '100%', maxWidth: 360, display: 'flex', flexDirection: 'column', gap: 12, padding: 20 }}>
+            {ask === 'menu' ? (
+              <>
+                <p style={{ fontSize: 18, fontWeight: 700 }}>{t('game.menu')}</p>
+                <button className="up-btn full" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }} onClick={() => { setAsk(false); net.send('pause', { paused: !paused }); }}>
+                  {paused ? <PlayIcon size={22} /> : <PauseIcon size={22} />} {paused ? t('game.resume') : t('game.pause')}
+                </button>
+                <button className="up-btn full" style={{ background: 'var(--red)', boxShadow: '0 5px 0 #A81B2B', color: '#fff' }} onClick={() => setAsk('end')}>{t('game.end')}</button>
+                <button className="up-btn ghost full" onClick={() => setAsk(false)}>{t('common.cancel')}</button>
+              </>
+            ) : (
+              <>
+                <p style={{ fontSize: 18, fontWeight: 700 }}>{t('game.endConfirm')}</p>
+                <div style={{ display: 'flex', gap: 10 }}>
+                  <button className="up-btn ghost full" onClick={() => setAsk(false)}>{t('common.cancel')}</button>
+                  <button className="up-btn full" style={{ background: 'var(--red)', boxShadow: '0 5px 0 #A81B2B', color: '#fff' }} onClick={() => { setAsk(false); net.send('lobby'); }}>{t('game.end')}</button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}

@@ -3,10 +3,18 @@ import { net } from '../net';
 import { sfx } from './sound';
 
 /** Aktuelle Serverzeit, aktualisiert sich regelmäßig. */
+/** Spiel-Uhr: Serverzeit ohne die Pausen des laufenden Spiels; steht still, solange pausiert ist */
+export function gameNow(): number {
+  const room = net.state.room;
+  const pause = room?.pause;
+  if (pause) return pause.at - pause.shift;
+  return Date.now() + net.state.offset - (room?.clockShift ?? 0);
+}
+
 export function useServerNow(intervalMs = 200): number {
-  const [now, setNow] = useState(() => Date.now() + net.state.offset);
+  const [now, setNow] = useState(gameNow);
   useEffect(() => {
-    const id = setInterval(() => setNow(Date.now() + net.state.offset), intervalMs);
+    const id = setInterval(() => setNow(gameNow()), intervalMs);
     return () => clearInterval(id);
   }, [intervalMs]);
   return now;
