@@ -3,7 +3,7 @@
 import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import type { ControllerViewProps, GameClientModule, HostViewProps, Translate } from '@up/sdk';
 import { Avatar, Confetti, PhoneWait, sfx, useServerNow, vibrate } from '@up/ui';
-import { FLIGHT, PIRATE_RANGE, TECHS, YEAR, techCost, type Tech } from './engine';
+import { FLIGHT, PIRATE_RANGE, TECHS, YEAR, buildLinks, findRoute, hopTime, blocked, techCost, type Links, type Nebula, type Tech } from './engine';
 
 /* ---------- Farben ---------- */
 
@@ -18,14 +18,18 @@ const PANEL = '#0d1430';
 const CARD = '#121a3d';
 const KIND_COLOR = { eco: '#FFD23F', ind: '#FF8A5B', sci: '#A98BFF' } as const;
 const DISPLAY = "var(--display)";
+const HEART = '#FF4FD8';
+const SP_COLOR: Record<string, string> = { gold: '#FFD23F', yard: '#FF8A5B', lab: '#A98BFF', fort: '#E8ECFF', heart: HEART };
+const WH_COLORS = ['#6BFFE0', '#FF9BF0'];
 
 /* ---------- Typen der Ansichten ---------- */
 
-type MapEntry = [number, number, string, number];
+/** [x, y, Name, Heimat von, besonderer Stern] */
+type MapEntry = [number, number, string, number, string];
 type Emp = { id: string; n: string; c: string; ai: boolean; p: boolean; o: boolean };
 type StarDyn = [number, number | string];
-/** [id, Besitzer, Schiffe, x0, y0, Ziel, t0, t1, getarnt(eigene)] */
-type FleetT = [number, number, number | string, number, number, number, number, number, number];
+/** [id, Besitzer, Schiffe, x0, y0, Ziel, t0, t1, getarnt(eigene), weitere Stationen (eigene), Wurmloch] */
+type FleetT = [number, number, number | string, number, number, number, number, number, number, number[] | 0, number];
 /** [id, Besitzer, Schiffe, x, y] */
 type ParkT = [number, number, number | string, number, number];
 type Clock = { sim: number; at: number; speed: number };
@@ -33,6 +37,8 @@ type Fx = { id: number; star: number; k: string; at: number };
 
 interface MapData {
   map: MapEntry[];
+  neb?: [number, number, number][];
+  wh?: [number, number][];
   emp: Emp[];
   st: StarDyn[];
   fl?: FleetT[];
@@ -46,6 +52,11 @@ const fmt = (sec: number) => {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 };
 const d2 = (ax: number, ay: number, bx: number, by: number) => Math.hypot(ax - bx, ay - by);
+const starName = (map: MapEntry[], i: number, t: Translate) => (map[i]?.[4] === 'heart' ? t('heart') : map[i]?.[2] ?? '');
+const nebOf = (v: { neb?: [number, number, number][] }): Nebula[] => (v.neb ?? []).map(([x, y, r]) => ({ x, y, r }));
+function useLinks(v: { map: MapEntry[]; neb?: [number, number, number][]; wh?: [number, number][] }): Links {
+  return useMemo(() => buildLinks(v.map.map((m) => [m[0], m[1]]), nebOf(v), v.wh ?? []), [v.map, v.neb, v.wh]);
+}
 
 /** Aktuelle Spielzeit aus dem letzten Stand hochrechnen */
 function useSim(clock: Clock | undefined, interval = 100) {
@@ -119,10 +130,30 @@ interface MapProps {
   blink?: number;
   /** Besitzer pro Stern überschreiben (Zeitraffer) */
   owners?: number[];
+  /** geplanter Weg ab dem gewählten Stern (Stationen) */
+  route?: number[] | null;
+  /** markierte eigene Sterne (Schiffe herholen) */
+  picks?: Set<number>;
+  /** Zielstern-Aufträge [von, nach] */
+  rallies?: [number, number][];
   onTap?: (x: number, y: number, u: number) => void;
 }
 
-function StarMap({ v, w, h, box, sim, speed, now, me = -1, tv, names, sel, target, range, reach, blink, owners, onTap }: MapProps) {
+/** Kleines Abzeichen für besondere Sterne */
+function SpecialMark({ x, y, sp, u, k }: { x: number; y: number; sp: string; u: number; k: number }) {
+  const c = SP_COLOR[sp];
+  const r = 13 * u * k;
+  if (sp === 'gold') return <circle cx={x} cy={y} r={r} fill="none" stroke={c} strokeWidth={2.2 * u} strokeDasharray={`${2 * u} ${2.2 * u}`} />;
+  if (sp === 'yard') return <rect x={x - r} y={y - r} width={2 * r} height={2 * r} rx={2 * u} fill="none" stroke={c} strokeWidth={2 * u} transform={`rotate(45 ${x} ${y})`} />;
+  if (sp === 'lab') return <circle cx={x} cy={y} r={r} fill="none" stroke={c} strokeWidth={2.2 * u} strokeDasharray={`${7 * u} ${4 * u}`} />;
+  if (sp === 'fort') {
+    const pts = Array.from({ length: 6 }, (_, i) => { const a = (Math.PI / 3) * i + Math.PI / 6; return `${x + Math.cos(a) * r},${y + Math.sin(a) * r}`; }).join(' ');
+    return <polygon points={pts} fill="none" stroke={c} strokeWidth={2.2 * u} />;
+  }
+  return null;
+}
+
+function StarMap({ v, w, h, box, sim, speed, now, me = -1, tv, names, sel, target, range, reach, blink, owners, route, picks, rallies, onTap }: MapProps) {
   const uid = useId().replace(/:/g, '');
   const svgRef = useRef<SVGSVGElement>(null);
   const [bx, by, bw, bh] = box;
@@ -148,32 +179,75 @@ function StarMap({ v, w, h, box, sim, speed, now, me = -1, tv, names, sel, targe
           <feGaussianBlur stdDeviation={3.2 * u} result="b" />
           <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
         </filter>
+        <radialGradient id={`n${uid}`}>
+          <stop offset="0%" stopColor="#7a4fc4" stopOpacity={0.55} />
+          <stop offset="70%" stopColor="#4a2d86" stopOpacity={0.4} />
+          <stop offset="100%" stopColor="#3a2370" stopOpacity={0} />
+        </radialGradient>
       </defs>
+      {/* Nebelfelder */}
+      {v.neb?.map(([x, y, r], i) => <circle key={`n${i}`} cx={x} cy={y} r={r * 1.18} fill={`url(#n${uid})`} />)}
+      {/* Wurmlöcher: schwache Verbindung */}
+      {v.wh?.map(([a, b], i) => (
+        <line key={`w${i}`} x1={v.map[a][0]} y1={v.map[a][1]} x2={v.map[b][0]} y2={v.map[b][1]} stroke={WH_COLORS[i % 2]} strokeOpacity={0.16} strokeWidth={1.5 * u} strokeDasharray={`${2 * u} ${7 * u}`} />
+      ))}
+      {/* Zielstern-Aufträge */}
+      {rallies?.map(([a, b]) => (
+        <line key={`r${a}`} x1={v.map[a][0]} y1={v.map[a][1]} x2={v.map[b][0]} y2={v.map[b][1]} stroke={ownerColor(v.emp, me)} strokeOpacity={0.35} strokeWidth={1.6 * u} strokeDasharray={`${1.5 * u} ${4 * u}`} />
+      ))}
       {/* Reichweite */}
       {src && range != null && (
         <circle cx={src.x} cy={src.y} r={range} fill={CYAN} fillOpacity={0.05} stroke={CYAN} strokeOpacity={0.5} strokeWidth={1.2 * u} strokeDasharray={`${4 * u} ${6 * u}`} />
       )}
       {src && target != null && (
-        <line x1={src.x} y1={src.y} x2={v.map[target][0]} y2={v.map[target][1]} stroke={CYAN} strokeWidth={3 * u} strokeDasharray={`${7 * u} ${6 * u}`} />
+        <polyline points={[[src.x, src.y], ...(route ?? [target]).map((i) => [v.map[i][0], v.map[i][1]])].map((p) => p.join(',')).join(' ')} fill="none" stroke={CYAN} strokeWidth={3 * u} strokeDasharray={`${7 * u} ${6 * u}`} strokeLinejoin="round" />
       )}
+      {route && route.length > 1 && route.slice(0, -1).map((i) => <circle key={`rt${i}`} cx={v.map[i][0]} cy={v.map[i][1]} r={11 * u} fill="none" stroke={CYAN} strokeWidth={2 * u} />)}
       {/* Flugbahnen */}
       {v.fl?.map((f) => {
-        const [id, o, , x0, y0, to, t0, t1, cl] = f;
+        const [id, o, , x0, y0, to, t0, t1, cl, path, whl] = f;
         const [tx, ty] = v.map[to];
         const p = Math.min(1, Math.max(0, (sim - t0) / Math.max(0.01, t1 - t0)));
         const x = x0 + (tx - x0) * p, y = y0 + (ty - y0) * p;
-        return <line key={`l${id}`} x1={x} y1={y} x2={tx} y2={ty} stroke={ownerColor(v.emp, o)} strokeWidth={2 * u * k} strokeDasharray={`${6 * u} ${6 * u}`} opacity={cl ? 0.45 : 0.8} />;
+        const pts = [[x, y], [tx, ty], ...(path || []).map((i) => [v.map[i][0], v.map[i][1]])];
+        return <polyline key={`l${id}`} points={pts.map((q) => q.join(',')).join(' ')} fill="none" stroke={ownerColor(v.emp, o)} strokeWidth={2 * u * k} strokeDasharray={whl ? `${2 * u} ${4 * u}` : `${6 * u} ${6 * u}`} opacity={cl ? 0.45 : 0.8} />;
       })}
       {/* Sterne */}
-      {v.map.map(([x, y, , home], i) => {
+      {v.map.map(([x, y, , home, sp], i) => {
         const o = own(i);
         const c = ownerColor(v.emp, o);
         const mine = me >= 0 && o === me;
+        const whi = v.wh?.findIndex(([a, b]) => a === i || b === i) ?? -1;
+        const extra = (
+          <>
+            {sp && sp !== 'heart' && <SpecialMark x={x} y={y} sp={sp} u={u} k={k} />}
+            {whi >= 0 && (
+              <>
+                <circle cx={x} cy={y} r={15 * u * k} fill="none" stroke={WH_COLORS[whi % 2]} strokeWidth={2 * u} strokeDasharray={`${9 * u} ${5 * u}`} />
+                <circle cx={x} cy={y} r={10 * u * k} fill="none" stroke={WH_COLORS[whi % 2]} strokeOpacity={0.6} strokeWidth={1.4 * u} strokeDasharray={`${4 * u} ${4 * u}`} />
+              </>
+            )}
+            {reach?.has(i) && <circle cx={x} cy={y} r={(sp === 'heart' ? 24 : 15) * u} fill="none" stroke={INK} strokeOpacity={0.55} strokeWidth={1.4 * u} strokeDasharray={`${3 * u} ${3 * u}`} />}
+            {picks?.has(i) && <circle cx={x} cy={y} r={19 * u} fill="none" stroke="#FFD23F" strokeWidth={3 * u} />}
+          </>
+        );
+        if (sp === 'heart') {
+          const r = 11 * u * k;
+          const pts = Array.from({ length: 10 }, (_, q) => { const a = (Math.PI / 5) * q - Math.PI / 2; const rr = q % 2 ? r * 0.5 : r; return `${x + Math.cos(a) * rr},${y + Math.sin(a) * rr}`; }).join(' ');
+          return (
+            <g key={i}>
+              <circle cx={x} cy={y} r={30 * u * k} fill={o >= 0 ? c : HEART} opacity={0.14} />
+              <circle cx={x} cy={y} r={19 * u * k} fill="none" stroke={HEART} strokeWidth={2.4 * u} filter={glow} />
+              <polygon points={pts} fill={o >= 0 ? c : HEART} filter={glow} />
+              {extra}
+            </g>
+          );
+        }
         if (o < 0) {
           return (
             <g key={i}>
-              <circle cx={x} cy={y} r={5 * u * k} fill={NEUTRAL} />
-              {reach?.has(i) && <circle cx={x} cy={y} r={14 * u} fill="none" stroke={INK} strokeOpacity={0.55} strokeWidth={1.4 * u} strokeDasharray={`${3 * u} ${3 * u}`} />}
+              <circle cx={x} cy={y} r={5 * u * k} fill={sp ? SP_COLOR[sp] : NEUTRAL} opacity={sp ? 0.8 : 1} />
+              {extra}
             </g>
           );
         }
@@ -182,7 +256,7 @@ function StarMap({ v, w, h, box, sim, speed, now, me = -1, tv, names, sel, targe
             <circle cx={x} cy={y} r={(home >= 0 ? 22 : 18) * u * k} fill={c} opacity={mine ? 0.22 : 0.13} />
             {home >= 0 && <circle cx={x} cy={y} r={12 * u * k} fill="none" stroke={c} strokeWidth={2 * u} />}
             <circle cx={x} cy={y} r={(home >= 0 ? 7 : 6) * u * k} fill={c} filter={glow} />
-            {reach?.has(i) && <circle cx={x} cy={y} r={15 * u} fill="none" stroke={INK} strokeOpacity={0.55} strokeWidth={1.4 * u} strokeDasharray={`${3 * u} ${3 * u}`} />}
+            {extra}
           </g>
         );
       })}
@@ -202,7 +276,7 @@ function StarMap({ v, w, h, box, sim, speed, now, me = -1, tv, names, sel, targe
           return (
             <g key={i}>
               {ships != null && (
-                <text x={x} y={y + (o >= 0 ? 27 : 21) * u * k} fontSize={(o >= 0 ? 15 : 13) * u * k} fontWeight={800} fill={o >= 0 ? ownerColor(v.emp, o) : NEUTRAL}>{ships}</text>
+                <text x={x} y={y + (v.map[i][4] === 'heart' ? 34 : o >= 0 ? 27 : 21) * u * k} fontSize={(o >= 0 ? 15 : 13) * u * k} fontWeight={800} fill={o >= 0 ? ownerColor(v.emp, o) : NEUTRAL}>{ships}</text>
               )}
               {names && <text x={x} y={y - (o >= 0 ? 17 : 11) * u * k} fontSize={11 * u * k} fontFamily="var(--body)" fill={MUTED}>{name}</text>}
             </g>
@@ -266,7 +340,7 @@ function StarMap({ v, w, h, box, sim, speed, now, me = -1, tv, names, sel, targe
 
 function messageText(m: any, v: any, t: Translate): { text: string; name?: string; color?: string } {
   const e = m.e != null && m.e >= 0 ? v.emp[m.e] : null;
-  const star = m.star != null ? v.map[m.star]?.[2] : '';
+  const star = m.star != null ? starName(v.map, m.star, t) : '';
   const N = '\u0001';
   switch (m.k) {
     case 'conquer': return { text: t('msg.conquer', { name: N, star }), name: e?.n, color: e?.c };
@@ -275,6 +349,8 @@ function messageText(m: any, v: any, t: Translate): { text: string; name?: strin
     case 'spawn': return { text: t('msg.spawn', { name: N }), name: e?.n, color: e?.c };
     case 'out': return { text: t('msg.out', { name: N }), name: e?.n, color: e?.c };
     case 'gift': return { text: t('msg.gift') };
+    case 'heart': return { text: t('msg.heart', { name: N }), name: e?.n, color: e?.c };
+    case 'mission': return { text: t('msg.mission') };
     default: return { text: '' };
   }
 }
@@ -287,7 +363,7 @@ function useMessageSounds(msgs: any[] | undefined, tvSide: boolean) {
       if (m.id <= last.current) continue;
       if (m.k === 'conquer') sfx.play('stamp');
       else if (m.k === 'hold') sfx.play('pop');
-      else if (m.k === 'gift') sfx.play('ding');
+      else if (m.k === 'gift' || m.k === 'mission') sfx.play('ding');
       else if (m.k === 'pirate' || m.k === 'spawn') sfx.play('sneaky');
     }
     last.current = msgs.at(-1)?.id ?? last.current;
@@ -303,6 +379,26 @@ function phaseInfo(v: any, sim: number, now: number, t: Translate) {
   const left = Math.max(0, yearEnd - sim);
   const speed = v.clock?.speed || 1;
   return { label: v.phase === 'resolve' ? t('phase.resolve') : t('phase.year'), time: fmt(left / speed), frac: 1 - Math.min(1, left / YEAR), plan: false };
+}
+
+/** Zeichenerklärung für besondere Sterne, Herz, Wurmloch und Nebel */
+function Legend({ t, size = 13 }: { t: Translate; size?: number }) {
+  const icon = (sp: string) => {
+    const x = 9, y = 9, u = 0.62;
+    if (sp === 'heart') return <polygon points={Array.from({ length: 10 }, (_, q) => { const a = (Math.PI / 5) * q - Math.PI / 2; const rr = q % 2 ? 3.5 : 7; return `${x + Math.cos(a) * rr},${y + Math.sin(a) * rr}`; }).join(' ')} fill={HEART} />;
+    if (sp === 'wh') return <circle cx={x} cy={y} r={6.5} fill="none" stroke={WH_COLORS[0]} strokeWidth={1.8} strokeDasharray="5 3" />;
+    if (sp === 'neb') return <circle cx={x} cy={y} r={7.5} fill="#5b3a9c" opacity={0.8} />;
+    return <><circle cx={x} cy={y} r={2.6} fill={SP_COLOR[sp]} /><SpecialMark x={x} y={y} sp={sp} u={u} k={0.85} /></>;
+  };
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 12px', fontSize: size, color: MUTED }}>
+      {['gold', 'yard', 'lab', 'fort', 'heart', 'wh', 'neb'].map((k) => (
+        <span key={k} style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+          <svg width={18} height={18} viewBox="0 0 18 18" aria-hidden="true">{icon(k)}</svg>{t(`sp.${k}`)}
+        </span>
+      ))}
+    </div>
+  );
 }
 
 function TvPlay({ v, t }: { v: any; t: Translate }) {
@@ -322,6 +418,7 @@ function TvPlay({ v, t }: { v: any; t: Translate }) {
     <div style={{ position: 'absolute', inset: 0, display: 'flex', background: 'radial-gradient(circle at 38% 45%, #111a3a 0%, #070b1a 70%)', color: INK, overflow: 'hidden' }}>
       <div style={{ position: 'relative', width: 980, height: 720 }}>
         <StarMap v={v} w={980} h={720} box={box} sim={sim} speed={v.clock?.speed ?? 0} now={now} tv names={ppf >= 30} />
+        <div style={{ position: 'absolute', left: 74, bottom: 12, right: 18, pointerEvents: 'none', opacity: 0.85 }}><Legend t={t} /></div>
         {bannerOn && (
           <div key={v.banner.at} className="anim-pop" style={{ position: 'absolute', left: 0, right: 0, top: 26, display: 'flex', justifyContent: 'center', pointerEvents: 'none' }}>
             <span style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 64, padding: '6px 34px', borderRadius: 24, background: 'rgba(7,11,26,.82)', border: `2px solid ${CYAN}`, boxShadow: `0 0 30px ${CYAN}66`, color: INK }}>
@@ -352,8 +449,8 @@ function TvPlay({ v, t }: { v: any; t: Translate }) {
           </div>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: many ? 5 : 9 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: MUTED }}><span>{t('stars')}</span><span>{t('winAt', { n: v.half })}</span></div>
-          {(v.rank as [number, number][]).map(([e, n]) => {
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: MUTED }}><span>{t('points')}</span><span>{t('winAt', { n: v.half })}</span></div>
+          {(v.rank as [number, number, number, number][]).map(([e, n, stars, hy]) => {
             const emp: Emp = v.emp[e];
             return (
               <div key={e} style={{ display: 'flex', alignItems: 'center', gap: 10, opacity: emp.o ? 0.4 : 1 }}>
@@ -361,7 +458,8 @@ function TvPlay({ v, t }: { v: any; t: Translate }) {
                 <span style={{ flex: 1, fontWeight: 700, fontSize: many ? 15 : 17, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {emp.n}{emp.ai && <span style={{ color: FAINT, fontWeight: 500, fontSize: 12 }}> · {t('ai')}</span>}{emp.p && <span style={{ color: '#FF8A5B', fontWeight: 700, fontSize: 12 }}> · {t('pirate')}</span>}
                 </span>
-                <span style={{ fontFamily: DISPLAY, fontSize: many ? 18 : 22, fontWeight: 800 }}>{n}</span>
+                <span style={{ fontSize: 12, color: FAINT, whiteSpace: 'nowrap' }}>{t('starsShort', { n: stars })}{hy > 0 ? <span style={{ color: HEART }}> ♥{hy}</span> : null}</span>
+                <span style={{ fontFamily: DISPLAY, fontSize: many ? 17 : 20, fontWeight: 800, minWidth: 52, textAlign: 'right' }}>{n}</span>
               </div>
             );
           })}
@@ -396,25 +494,29 @@ function TvIntro({ v, t }: { v: any; t: Translate }) {
     [CYAN, t('intro.conquer')],
     ['#FFD23F', t('intro.build')],
     ['#A98BFF', t('intro.research')],
+    ['#FFD23F', t('intro.special')],
+    [HEART, t('intro.heart')],
     ['#FF4FD8', t('intro.pacts')],
+    ['#6BFFE0', t('intro.missions')],
   ];
   return (
     <div style={{ position: 'absolute', inset: 0, display: 'flex', background: 'radial-gradient(circle at 30% 50%, #111a3a 0%, #070b1a 70%)', color: INK }}>
       <div style={{ width: 560, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <StarMap v={v} w={520} h={600} box={box} sim={sim} speed={0} now={now} tv />
       </div>
-      <div style={{ flex: 1, padding: '44px 48px 40px 10px', display: 'flex', flexDirection: 'column', gap: 18 }}>
-        <span className="anim-pop" style={{ fontFamily: DISPLAY, fontSize: 72, fontWeight: 800, lineHeight: 1, color: CYAN, textShadow: `0 0 24px ${CYAN}88` }}>{t('title')}</span>
+      <div style={{ flex: 1, padding: '30px 44px 30px 10px', display: 'flex', flexDirection: 'column', gap: 11 }}>
+        <span className="anim-pop" style={{ fontFamily: DISPLAY, fontSize: 60, fontWeight: 800, lineHeight: 1, color: CYAN, textShadow: `0 0 24px ${CYAN}88` }}>{t('title')}</span>
         {rules.map(([c, text], i) => (
           <div key={i} className="anim-up" style={{ display: 'flex', gap: 14, alignItems: 'flex-start', animationDelay: `${0.2 + i * 0.25}s` }}>
             <span style={{ width: 14, height: 14, borderRadius: 7, background: c, boxShadow: `0 0 10px ${c}`, marginTop: 7, flex: 'none' }} />
-            <span style={{ fontSize: 21, lineHeight: 1.35 }}>{text}</span>
+            <span style={{ fontSize: 18, lineHeight: 1.3 }}>{text}</span>
           </div>
         ))}
-        <div className="anim-up" style={{ fontSize: 21, lineHeight: 1.35, padding: '12px 16px', borderRadius: 14, background: CARD, border: `1px solid ${LINE}`, animationDelay: '1.3s' }}>
+        <div className="anim-up" style={{ fontSize: 18, lineHeight: 1.3, padding: '10px 14px', borderRadius: 14, background: CARD, border: `1px solid ${LINE}`, animationDelay: '1.3s' }}>
           {t('intro.goal', { n: v.half, years: v.years })}
         </div>
-        {v.rounds && <span style={{ fontSize: 18, color: '#FFD23F' }}>{t('intro.rounds')}</span>}
+        {v.rounds && <span style={{ fontSize: 16, color: '#FFD23F' }}>{t('intro.rounds')}</span>}
+        <Legend t={t} size={14} />
         <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', fontSize: 20, color: MUTED }}>
           <span>{v.total > 0 ? t('intro.ready', { n: v.ready, total: v.total }) : ''}</span>
           <span style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 30, color: INK }}>{fmt(left)}</span>
@@ -435,7 +537,7 @@ function TvReplay({ v, t }: { v: any; t: Translate }) {
   useEffect(() => { sfx.play('pop'); }, [i]);
   const b = useMemo(() => boundsOf(v.map), [v.map]);
   const box = useMemo(() => fitBox(b.minX, b.minY, b.maxX, b.maxY, 980, 640, 1.2), [b]);
-  const data: MapData = { map: v.map, emp: v.emp, st: hist[i].map((o) => [o, 0] as StarDyn) };
+  const data: MapData = { map: v.map, neb: v.neb, wh: v.wh, emp: v.emp, st: hist[i].map((o) => [o, 0] as StarDyn) };
   const counts = v.emp.map((_: Emp, e: number) => hist[i].filter((o) => o === e).length);
   return (
     <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 50% 50%, #111a3a 0%, #070b1a 70%)', color: INK }}>
@@ -458,34 +560,60 @@ function TvReplay({ v, t }: { v: any; t: Translate }) {
   );
 }
 
+type MissionV = { k: string; star?: number; target?: number; pts: number; done: boolean; failed: boolean };
+function missionText(m: MissionV, map: MapEntry[], emp: Emp[], t: Translate) {
+  switch (m.k) {
+    case 'hold': return t('mis.hold', { star: m.star != null ? starName(map, m.star, t) : '' });
+    case 'conquer': return t('mis.conquer', { name: m.target != null ? emp[m.target]?.n ?? '' : '' });
+    default: return t(`mis.${m.k}`);
+  }
+}
+
 function TvFinal({ v, t, player }: { v: any; t: Translate; player: HostViewProps['player'] }) {
-  const res: { e: number; stars: number; ships: number; pts: number }[] = v.result;
+  const res: { e: number; stars: number; ships: number; heart: number; mis: number; pts: number }[] = v.result;
   const win = res[0] ? v.emp[res[0].e] as Emp : null;
   useEffect(() => { sfx.play('fanfare'); }, []);
+  const small = res.length > 6;
+  const tiny = res.length > 9;
   return (
-    <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 50% 30%, #16204a 0%, #070b1a 70%)', color: INK, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '36px 60px', gap: 20 }}>
+    <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 50% 30%, #16204a 0%, #070b1a 70%)', color: INK, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '26px 50px', gap: 14 }}>
       <Confetti silent />
       {win && (
-        <span className="anim-pop" style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 56, color: win.c, textShadow: `0 0 26px ${win.c}88`, textAlign: 'center' }}>
+        <span className="anim-pop" style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 50, color: win.c, textShadow: `0 0 26px ${win.c}88`, textAlign: 'center' }}>
           {t('final.win', { name: win.n })}
         </span>
       )}
-      <div style={{ width: 760, display: 'flex', flexDirection: 'column', gap: res.length > 8 ? 6 : 10 }}>
+      <div style={{ width: 1100, display: 'flex', flexDirection: 'column', gap: tiny ? 4 : 7 }}>
         <div style={{ display: 'flex', fontSize: 14, color: MUTED, padding: '0 18px' }}>
-          <span style={{ flex: 1 }} /><span style={{ width: 110, textAlign: 'right' }}>{t('stars')}</span><span style={{ width: 130, textAlign: 'right' }}>{t('points')}</span>
+          <span style={{ flex: 1 }} />
+          <span style={{ width: 100, textAlign: 'right' }}>{t('stars')}</span>
+          <span style={{ width: 90, textAlign: 'right' }}>{t('final.heart')}</span>
+          <span style={{ width: 110, textAlign: 'right' }}>{t('final.missions')}</span>
+          <span style={{ width: 110, textAlign: 'right' }}>{t('points')}</span>
         </div>
         {res.map((r, i) => {
           const emp: Emp = v.emp[r.e];
           const p = !emp.ai ? player(emp.id) : undefined;
-          const small = res.length > 8;
+          const ms: MissionV[] = v.missions?.[r.e] ?? [];
+          const num = (n: number | string, w: number, color?: string) => <span style={{ width: w, textAlign: 'right', fontFamily: DISPLAY, fontWeight: 800, fontSize: tiny ? 17 : 21, color }}>{n}</span>;
           return (
-            <div key={r.e} className="anim-up" style={{ display: 'flex', alignItems: 'center', gap: 14, padding: small ? '5px 18px' : '9px 18px', borderRadius: 14, background: i === 0 ? '#1b2a55' : CARD, border: `1px solid ${i === 0 ? emp.c : LINE}`, animationDelay: `${i * 0.08}s` }}>
-              <span style={{ width: 30, fontFamily: DISPLAY, fontWeight: 800, fontSize: small ? 18 : 22, color: MUTED }}>{i + 1}.</span>
-              {p ? <Avatar player={p} size={small ? 30 : 40} /> : <span style={{ width: small ? 30 : 40, height: small ? 30 : 40, borderRadius: '50%', border: `2px solid ${emp.c}`, boxSizing: 'border-box' }} />}
-              <span style={{ width: 12, height: 12, borderRadius: 6, background: emp.c, boxShadow: `0 0 8px ${emp.c}` }} />
-              <b style={{ flex: 1, fontSize: small ? 17 : 20 }}>{emp.n}{emp.ai && <span style={{ color: FAINT, fontWeight: 500, fontSize: 14 }}> · {t('ai')}</span>}</b>
-              <span style={{ width: 110, textAlign: 'right', fontFamily: DISPLAY, fontWeight: 800, fontSize: small ? 18 : 22 }}>{r.stars}</span>
-              <span style={{ width: 130, textAlign: 'right', fontFamily: DISPLAY, fontWeight: 800, fontSize: small ? 18 : 22, color: '#FFD23F' }}>{emp.ai ? '–' : r.pts}</span>
+            <div key={r.e} className="anim-up" style={{ display: 'flex', alignItems: 'center', gap: 14, padding: tiny ? '3px 18px' : small ? '6px 18px' : '9px 18px', borderRadius: 14, background: i === 0 ? '#1b2a55' : CARD, border: `1px solid ${i === 0 ? emp.c : LINE}`, animationDelay: `${i * 0.08}s` }}>
+              <span style={{ width: 30, fontFamily: DISPLAY, fontWeight: 800, fontSize: tiny ? 17 : 21, color: MUTED }}>{i + 1}.</span>
+              {p ? <Avatar player={p} size={tiny ? 26 : 36} /> : <span style={{ width: tiny ? 26 : 36, height: tiny ? 26 : 36, borderRadius: '50%', border: `2px solid ${emp.c}`, boxSizing: 'border-box', flex: 'none' }} />}
+              <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <b style={{ fontSize: tiny ? 16 : 19, color: emp.c }}>{emp.n}{emp.ai && <span style={{ color: FAINT, fontWeight: 500, fontSize: 13 }}> · {t('ai')}</span>}</b>
+                {!tiny && ms.length > 0 && (
+                  <span style={{ fontSize: 12.5, color: MUTED, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {ms.map((m, j) => (
+                      <span key={j} style={{ marginRight: 14, color: m.done ? '#7CFFB2' : FAINT }}>{m.done ? '✓' : '✗'} {missionText(m, v.map, v.emp, t)}{m.done ? ` +${m.pts}` : ''}</span>
+                    ))}
+                  </span>
+                )}
+              </div>
+              {num(r.stars, 100)}
+              {num(r.heart ? `♥${r.heart}` : '–', 90, r.heart ? HEART : FAINT)}
+              {num(tiny ? `${ms.filter((m) => m.done).length}/${ms.length}` : r.mis ? `+${r.mis}` : '–', 110, r.mis ? '#7CFFB2' : FAINT)}
+              {num(emp.ai ? `(${r.pts})` : r.pts, 110, '#FFD23F')}
             </div>
           );
         })}
@@ -540,7 +668,7 @@ function PhoneHeader({ v, t, vip }: { v: any; t: Translate; vip: boolean }) {
   );
 }
 
-type Tab = 'map' | 'build' | 'research' | 'chat';
+type Tab = 'map' | 'build' | 'stars' | 'research' | 'chat';
 
 function PhonePlay({ v, t, send, vip }: { v: any; t: Translate; send: (a: any) => void; vip: boolean }) {
   const [tab, setTab] = useState<Tab>('map');
@@ -567,24 +695,28 @@ function PhonePlay({ v, t, send, vip }: { v: any; t: Translate; send: (a: any) =
     const id = setTimeout(() => setNoteShown(null), 4000);
     return () => clearTimeout(id);
   }, [lastNote?.id]);
-  const tabs: [Tab, string][] = [['map', t('tab.map')], ['build', t('tab.build')], ['research', t('tab.research')], ['chat', t('tab.chat')]];
+  const tabs: [Tab, string][] = [['map', t('tab.map')], ['build', t('tab.build')], ['stars', t('tab.stars')], ['research', t('tab.research')], ['chat', t('tab.chat')]];
   return (
     <PhoneShell vip={vip}>
       <PhoneHeader v={v} t={t} vip={vip} />
       {noteShown === lastNote?.id && lastNote && (
         <div className="anim-pop" style={{ margin: '0 14px 8px', padding: '9px 12px', borderRadius: 12, background: '#1b2a55', border: `1px solid ${CYAN}`, fontSize: 15, fontWeight: 700 }}>
-          {lastNote.k === 'tech' ? t('note.tech', { tech: t(`tech.${lastNote.tech}`), n: lastNote.level }) : t('note.spawn', { n: lastNote.ships })}
+          {lastNote.k === 'tech' ? t('note.tech', { tech: t(`tech.${lastNote.tech}`), n: lastNote.level })
+            : lastNote.k === 'rally' ? t('note.rally', { star: starName(v.map, lastNote.star, t) })
+            : lastNote.k === 'mission' ? t('note.mission')
+            : t('note.spawn', { n: lastNote.ships })}
         </div>
       )}
       <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
         {tab === 'map' && <MapTab v={v} t={t} send={send} />}
         {tab === 'build' && <BuildTab v={v} t={t} send={send} />}
+        {tab === 'stars' && <StarsTab v={v} t={t} send={send} />}
         {tab === 'research' && <ResearchTab v={v} t={t} send={send} />}
         {tab === 'chat' && <ChatTab v={v} t={t} send={send} />}
       </div>
-      <nav aria-label={t('tab.nav')} style={{ display: 'flex', gap: 6, padding: '8px 14px 0' }}>
+      <nav aria-label={t('tab.nav')} style={{ display: 'flex', gap: 3, padding: '8px 8px 0' }}>
         {tabs.map(([id, label]) => (
-          <button key={id} type="button" onClick={() => setTab(id)} style={{ flex: 1, height: 46, borderRadius: 10, border: 'none', background: tab === id ? '#1d2a55' : 'transparent', color: tab === id ? CYAN : MUTED, fontFamily: 'var(--body)', fontWeight: tab === id ? 700 : 500, fontSize: 14, position: 'relative' }}>
+          <button key={id} type="button" onClick={() => setTab(id)} style={{ flex: 1, minWidth: 0, height: 46, padding: 0, borderRadius: 10, border: 'none', background: tab === id ? '#1d2a55' : 'transparent', color: tab === id ? CYAN : MUTED, fontFamily: 'var(--body)', fontWeight: tab === id ? 700 : 500, fontSize: 13, position: 'relative' }}>
             {label}
             {id === 'chat' && unread > 0 && <span style={{ marginLeft: 5, display: 'inline-block', minWidth: 18, height: 18, lineHeight: '18px', borderRadius: 9, background: '#FF4FD8', color: BG, fontSize: 11, fontWeight: 700 }}>{unread}</span>}
           </button>
@@ -594,45 +726,89 @@ function PhonePlay({ v, t, send, vip }: { v: any; t: Translate; send: (a: any) =
   );
 }
 
-/* ---------- Karte: Flotte schicken ---------- */
+/* ---------- Karte: Flotte schicken, herholen, Zielstern ---------- */
+
+type Mode = 'send' | 'pull' | 'rally';
+
+function GuardRow({ v, t, send }: { v: any; t: Translate; send: (a: any) => void }) {
+  const g: number = v.guard ?? 1;
+  const set = (n: number) => send({ type: 'guard', n: Math.max(0, n) });
+  const small: CSSProperties = { width: 38, height: 34, borderRadius: 10, border: '1px solid #3a4677', background: 'transparent', color: INK, fontSize: 18, fontWeight: 700 };
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14 }}>
+      <span style={{ flex: 1, color: MUTED }}>{t('guard.label')}</span>
+      <button type="button" aria-label={t('guard.less')} style={small} onClick={() => set(g - 1)}>−</button>
+      <span style={{ minWidth: 30, textAlign: 'center', fontFamily: DISPLAY, fontWeight: 800, fontSize: 18 }}>{g}</span>
+      <button type="button" aria-label={t('guard.more')} style={small} onClick={() => set(g + 1)}>+</button>
+    </div>
+  );
+}
 
 function MapTab({ v, t, send }: { v: any; t: Translate; send: (a: any) => void }) {
   const [ref, size] = useSize<HTMLDivElement>();
   const { sim, now } = useSim(v.clock, 150);
   const [src, setSrc] = useState<{ star?: number; pk?: number } | null>(null);
   const [target, setTarget] = useState<number | null>(null);
+  const [mode, setMode] = useState<Mode>('send');
+  const [picks, setPicks] = useState<Set<number>>(new Set());
   const [n, setN] = useState(1);
   const [info, setInfo] = useState<number | null>(null);
+  const [whole, setWhole] = useState(false);
   const map: MapEntry[] = v.map;
   const st: StarDyn[] = v.st;
   const pk: ParkT[] = v.pk ?? [];
   const me: number = v.me;
+  const guard: number = v.guard ?? 1;
+  const links = useLinks(v);
+  const neb = useMemo(() => nebOf(v), [v.neb]);
+  const owners = useMemo(() => st.map((x) => x[0]), [st]);
   const planned = (from: number) => ((v.orders ?? []) as any[]).filter((o) => o.parked == null && o.from === from).reduce((a, o) => a + o.n, 0);
+  const shipsAt = (i: number) => Math.max(0, Number(st[i][1]) - planned(i));
   const srcPk = src?.pk != null ? pk.find((p) => p[0] === src.pk && p[1] === me) : undefined;
   const srcValid = src?.star != null ? st[src.star]?.[0] === me : !!srcPk;
-  const avail = !srcValid ? 0 : src?.star != null ? Math.max(0, Number(st[src.star][1]) - planned(src.star)) : Number(srcPk?.[2] ?? 0);
+  const avail = !srcValid ? 0 : src?.star != null ? shipsAt(src.star) : Number(srcPk?.[2] ?? 0);
   const range = srcPk ? PIRATE_RANGE : v.range;
   const origin = src?.star != null ? { x: map[src.star][0], y: map[src.star][1] } : srcPk ? { x: srcPk[3], y: srcPk[4] } : null;
+  const allN = avail - guard >= 1 ? avail - guard : avail;
+  const rallies = useMemo(() => ((v.my ?? []) as number[][]).filter((m) => m[8] >= 0).map((m) => [m[0], m[8]] as [number, number]), [v.my]);
+  const rallyOf = src?.star != null ? ((v.my ?? []) as number[][]).find((m) => m[0] === src.star)?.[8] ?? -1 : -1;
+  // direkt erreichbare Sterne
   const reach = useMemo(() => {
     const set = new Set<number>();
     if (!origin || !srcValid) return set;
-    map.forEach(([x, y], i) => { if (i !== src?.star && d2(origin.x, origin.y, x, y) <= range + 1e-6) set.add(i); });
+    map.forEach(([x, y], i) => {
+      if (i === src?.star) return;
+      if (src?.star != null ? hopTime(links, src.star, i, range) != null : d2(origin.x, origin.y, x, y) <= range + 1e-6 && !blocked(neb, origin.x, origin.y, x, y)) set.add(i);
+    });
     return set;
-  }, [origin?.x, origin?.y, range, srcValid, map, src?.star]);
+  }, [origin?.x, origin?.y, range, srcValid, map, src?.star, links, neb]);
+  const routeTo = (to: number): number[] | null => {
+    if (src?.star != null) return findRoute(links, owners, me, src.star, to, range);
+    return reach.has(to) ? [to] : null;
+  };
+  const route = target != null && srcValid ? routeTo(target) : null;
   useEffect(() => {
-    if (src && (!srcValid || avail < 1)) { setSrc(null); setTarget(null); }
+    if (src && (!srcValid || (mode === 'send' && avail < 1 && src.pk != null))) { setSrc(null); setTarget(null); setMode('send'); }
   }, [srcValid, avail]);
   useEffect(() => { setN((x) => Math.max(1, Math.min(avail, x))); }, [avail]);
+  useEffect(() => { if (target != null && !route) setTarget(null); }, [route == null]);
 
   const b = useMemo(() => boundsOf(map), [map]);
   const box = useMemo<[number, number, number, number]>(() => {
     if (!size.w || !size.h) return [0, 0, 1, 1];
-    if (origin && srcValid) {
+    if (origin && srcValid && !whole && mode === 'send') {
       const r = range + 1.3;
-      return fitBox(origin.x - r, origin.y - r, origin.x + r, origin.y + r, size.w, size.h, 0);
+      let x0 = origin.x - r, y0 = origin.y - r, x1 = origin.x + r, y1 = origin.y + r;
+      for (const i of route ?? []) {
+        x0 = Math.min(x0, map[i][0] - 1.2); y0 = Math.min(y0, map[i][1] - 1.2);
+        x1 = Math.max(x1, map[i][0] + 1.2); y1 = Math.max(y1, map[i][1] + 1.2);
+      }
+      return fitBox(x0, y0, x1, y1, size.w, size.h, 0);
     }
     return fitBox(b.minX, b.minY, b.maxX, b.maxY, size.w, size.h, 1);
-  }, [size.w, size.h, origin?.x, origin?.y, srcValid, range, b]);
+  }, [size.w, size.h, origin?.x, origin?.y, srcValid, range, b, whole, mode, route?.join(',')]);
+
+  const reset = () => { setSrc(null); setTarget(null); setMode('send'); setPicks(new Set()); setWhole(false); };
 
   const onTap = (x: number, y: number, u: number) => {
     const thr = 30 * u;
@@ -642,16 +818,35 @@ function MapTab({ v, t, send }: { v: any; t: Translate; send: (a: any) => void }
     const myPk = pk.filter((p) => p[1] === me).map((p) => ({ p, d: d2(x, y, p[3], p[4]) })).sort((a, b2) => a.d - b2.d)[0];
     const pkHit = myPk && myPk.d <= thr && myPk.d < bd ? myPk.p : null;
     setInfo(null);
+    if (src && srcValid && mode === 'pull') {
+      if (star >= 0 && star !== src.star && st[star][0] === me) {
+        const next = new Set(picks);
+        if (next.has(star)) next.delete(star); else next.add(star);
+        setPicks(next);
+        sfx.play('pop');
+      }
+      return;
+    }
+    if (src && srcValid && mode === 'rally') {
+      if (star >= 0 && star !== src.star && st[star][0] === me && src.star != null && findRoute(links, owners, me, src.star, star, range)) {
+        send({ type: 'rally', star: src.star, target: star });
+        sfx.play('ding');
+        vibrate(30);
+        reset();
+      }
+      return;
+    }
     if (src && srcValid) {
-      if (star >= 0 && star === src.star) { setSrc(null); setTarget(null); return; }
-      if (star >= 0 && reach.has(star) && !pkHit) { setTarget(star); setN(avail); return; }
-      if (star >= 0 && st[star][0] === me && Number(st[star][1]) - planned(star) > 0) { setSrc({ star }); setTarget(null); return; }
+      if (star >= 0 && star === src.star) { reset(); return; }
+      if (star >= 0 && !pkHit && avail >= 1 && routeTo(star)) { setTarget(star); setN(allN); return; }
+      if (star >= 0 && st[star][0] === me) { setSrc({ star }); setTarget(null); setWhole(false); return; }
       if (pkHit) { setSrc({ pk: pkHit[0] }); setTarget(null); return; }
+      if (star >= 0) setInfo(star);
       setTarget(null);
       return;
     }
     if (pkHit) { setSrc({ pk: pkHit[0] }); setTarget(null); return; }
-    if (star >= 0 && st[star][0] === me && Number(st[star][1]) - planned(star) > 0) { setSrc({ star }); setTarget(null); return; }
+    if (star >= 0 && st[star][0] === me) { setSrc({ star }); setTarget(null); return; }
     if (star >= 0) setInfo(star);
   };
 
@@ -660,20 +855,39 @@ function MapTab({ v, t, send }: { v: any; t: Translate; send: (a: any) => void }
     send(src.pk != null ? { type: 'send', parked: src.pk, to: target, n } : { type: 'send', from: src.star, to: target, n });
     vibrate(30);
     sfx.play('whoosh');
-    setSrc(null);
-    setTarget(null);
+    reset();
+  };
+  const pullable = (i: number) => (src?.star != null && findRoute(links, owners, me, i, src.star, v.range) ? Math.max(0, shipsAt(i) - guard) : 0);
+  const pullTotal = [...picks].reduce((a, i) => a + pullable(i), 0);
+  const doPull = () => {
+    if (src?.star == null || !pullTotal) return;
+    send({ type: 'pull', to: src.star, from: [...picks] });
+    vibrate(30);
+    sfx.play('whoosh');
+    reset();
   };
 
   const step = !src ? 1 : target == null ? 2 : 3;
-  const srcName = src?.star != null ? map[src.star][2] : t('pirateFleet');
-  const flight = origin && target != null ? d2(origin.x, origin.y, map[target][0], map[target][1]) * FLIGHT : 0;
+  const srcName = src?.star != null ? starName(map, src.star, t) : t('pirateFleet');
+  const flight = useMemo(() => {
+    if (!origin || target == null || !route) return 0;
+    let total = 0, from = src?.star ?? -1, ox = origin.x, oy = origin.y;
+    for (const i of route) {
+      total += from >= 0 && links.wh[from] === i ? FLIGHT : d2(ox, oy, map[i][0], map[i][1]) * FLIGHT;
+      from = i; ox = map[i][0]; oy = map[i][1];
+    }
+    return total;
+  }, [origin?.x, origin?.y, target, route?.join(',')]);
   const tgtOwner = target != null ? st[target][0] : -1;
   const ownerName = (o: number) => (o >= 0 ? v.emp[o].n : '');
   const describe = (i: number) => {
     const [o, ships] = st[i];
-    if (o === me) return t('target.own', { star: map[i][2], n: ships });
-    if (o < 0) return t('target.free', { star: map[i][2], n: ships });
-    return t('target.enemy', { star: map[i][2], name: ownerName(o), n: ships });
+    const sp = map[i][4];
+    const extra = sp ? ` ${t(`spd.${sp}`)}` : links.wh[i] >= 0 ? ` ${t('spd.wh', { star: starName(map, links.wh[i], t) })}` : '';
+    const nm = starName(map, i, t);
+    if (o === me) return t('target.own', { star: nm, n: ships }) + extra;
+    if (o < 0) return t('target.free', { star: nm, n: ships }) + extra;
+    return t('target.enemy', { star: nm, name: ownerName(o), n: ships }) + extra;
   };
   const chips = (
     <div style={{ display: 'flex', gap: 6, padding: '0 14px 8px', fontSize: 13 }}>
@@ -682,40 +896,79 @@ function MapTab({ v, t, send }: { v: any; t: Translate; send: (a: any) => void }
       ))}
     </div>
   );
+  const modeChip = mode !== 'send' && (
+    <div style={{ display: 'flex', padding: '0 14px 8px' }}>
+      <span style={{ flex: 1, textAlign: 'center', padding: '6px 0', borderRadius: 8, background: '#FFD23F', color: BG, fontWeight: 700, fontSize: 13 }}>{mode === 'pull' ? t('pull.title', { star: srcName }) : t('rally.title', { star: srcName })}</span>
+    </div>
+  );
 
   return (
     <>
-      {chips}
+      {modeChip || chips}
       <div ref={ref} style={{ flex: 1, minHeight: 160, position: 'relative', background: 'radial-gradient(circle at 50% 50%, #111a3a 0%, #070b1a 75%)', overflow: 'hidden' }}>
         {size.w > 0 && (
-          <StarMap v={v} w={size.w} h={size.h} box={box} sim={sim} speed={v.clock?.speed ?? 0} now={now} me={me} names={!!origin}
-            sel={src && srcValid ? { star: src.star, pk: srcPk } : null} target={target} range={origin ? range : undefined} reach={reach} onTap={onTap} />
+          <StarMap v={v} w={size.w} h={size.h} box={box} sim={sim} speed={v.clock?.speed ?? 0} now={now} me={me} names={!!origin && !whole && mode === 'send'}
+            sel={src && srcValid ? { star: src.star, pk: srcPk } : null} target={mode === 'send' ? target : null} range={origin && mode === 'send' ? range : undefined}
+            reach={mode === 'send' ? reach : undefined} route={mode === 'send' ? route : null} picks={mode === 'pull' ? picks : undefined} rallies={rallies} onTap={onTap} />
         )}
-        {origin && srcValid && (
-          <button type="button" onClick={() => { setSrc(null); setTarget(null); }} style={{ position: 'absolute', right: 10, top: 10, height: 34, padding: '0 12px', borderRadius: 17, border: `1px solid ${LINE}`, background: 'rgba(13,20,48,.85)', color: INK, fontSize: 13 }}>{t('map.whole')}</button>
+        {origin && srcValid && mode === 'send' && (
+          <button type="button" onClick={() => setWhole(!whole)} style={{ position: 'absolute', right: 10, top: 10, height: 34, padding: '0 12px', borderRadius: 17, border: `1px solid ${LINE}`, background: 'rgba(13,20,48,.85)', color: INK, fontSize: 13 }}>{whole ? t('map.zoom') : t('map.whole')}</button>
         )}
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '16px 16px 4px', background: PANEL, borderTop: `1px solid ${LINE}`, borderRadius: '20px 20px 0 0', marginTop: -14, position: 'relative' }}>
         {v.pirate && !pk.some((p) => p[1] === me) && <span style={{ fontSize: 15, color: '#FF8A5B', fontWeight: 700 }}>{t('pirate.wait')}</span>}
-        {step === 1 && (
+        {mode === 'pull' && src?.star != null && (
+          <>
+            <span style={{ fontSize: 15, color: MUTED }}>{t('pull.hint', { n: guard })}</span>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button type="button" style={{ ...ghost, flex: 1 }} onClick={() => { setMode('send'); setPicks(new Set()); }}>{t('back')}</button>
+              <button type="button" disabled={!pullTotal} style={btn(pullTotal ? CYAN : '#2a3360', pullTotal ? BG : FAINT, { flex: 1.6 })} onClick={doPull}>
+                {v.rounds ? t('pull.plan', { n: pullTotal }) : t('pull.go', { n: pullTotal })}
+              </button>
+            </div>
+          </>
+        )}
+        {mode === 'rally' && src?.star != null && (
+          <>
+            <span style={{ fontSize: 15, color: MUTED }}>{t('rally.hint', { n: guard })}</span>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button type="button" style={{ ...ghost, flex: 1 }} onClick={() => setMode('send')}>{t('back')}</button>
+              {rallyOf >= 0 && (
+                <button type="button" style={{ ...ghost, flex: 1.4 }} onClick={() => { send({ type: 'rally', star: src.star, target: null }); reset(); }}>{t('rally.clear')}</button>
+              )}
+            </div>
+          </>
+        )}
+        {mode === 'send' && step === 1 && (
           <>
             <span style={{ fontSize: 15, color: MUTED }}>{info != null ? describe(info) : v.pirate ? t('map.hintPirate') : t('map.hint')}</span>
+            {!v.pirate && <GuardRow v={v} t={t} send={send} />}
             {v.rounds && <PlanBox v={v} t={t} send={send} />}
           </>
         )}
-        {step === 2 && (
+        {mode === 'send' && step === 2 && (
           <>
             <span style={{ fontFamily: DISPLAY, fontSize: 22, fontWeight: 800 }}>{srcName} · {t('ships', { n: avail })}</span>
-            <span style={{ fontSize: 15, color: MUTED }}>{reach.size ? t('map.pickTarget', { n: range }) : t('map.noTarget')}</span>
+            <span style={{ fontSize: 15, color: MUTED }}>{info != null ? describe(info) : avail < 1 ? t('map.empty') : t('map.pickTarget', { n: range })}</span>
+            {src?.star != null && (
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button type="button" style={{ ...ghost, flex: 1, fontSize: 14 }} onClick={() => { setMode('pull'); setPicks(new Set()); setTarget(null); }}>{t('pull.btn')}</button>
+                <button type="button" style={{ ...ghost, flex: 1, fontSize: 14, borderColor: rallyOf >= 0 ? '#FFD23F' : '#3a4677' }} onClick={() => { setMode('rally'); setTarget(null); }}>
+                  {rallyOf >= 0 ? t('rally.btnSet', { star: starName(map, rallyOf, t) }) : t('rally.btn')}
+                </button>
+              </div>
+            )}
           </>
         )}
-        {step === 3 && target != null && (
+        {mode === 'send' && step === 3 && target != null && (
           <>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
-              <span style={{ fontFamily: DISPLAY, fontSize: 21, fontWeight: 800, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{srcName} → {map[target][2]}</span>
+              <span style={{ fontFamily: DISPLAY, fontSize: 21, fontWeight: 800, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{srcName} → {starName(map, target, t)}</span>
               <span style={{ fontSize: 14, color: MUTED, whiteSpace: 'nowrap' }}>{v.rounds ? t('arrive.rounds', { n: Math.max(1, Math.ceil(flight / YEAR)) }) : t('arrive', { time: fmt(flight) })}</span>
             </div>
-            <span style={{ fontSize: 14, color: tgtOwner >= 0 && tgtOwner !== me ? v.emp[tgtOwner].c : MUTED }}>{describe(target)}</span>
+            <span style={{ fontSize: 14, color: tgtOwner >= 0 && tgtOwner !== me ? v.emp[tgtOwner].c : MUTED }}>
+              {describe(target)}{route && route.length > 1 ? ` ${t('route.via', { n: route.length - 1 })}` : ''}
+            </span>
             <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               <span style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14 }}>
                 <span>{t('shipsLabel')}</span>
@@ -725,7 +978,7 @@ function MapTab({ v, t, send }: { v: any; t: Translate; send: (a: any) => void }
             </label>
             <div style={{ display: 'flex', gap: 10 }}>
               <button type="button" style={{ ...ghost, flex: 1 }} onClick={() => setN(Math.max(1, Math.ceil(avail / 2)))}>{t('half')}</button>
-              <button type="button" style={{ ...ghost, flex: 1 }} onClick={() => setN(avail)}>{t('all')}</button>
+              <button type="button" style={{ ...ghost, flex: 1 }} onClick={() => setN(allN)}>{src?.pk == null && allN < avail ? t('allGuard', { n: avail - allN }) : t('all')}</button>
               <button type="button" style={btn(CYAN, BG, { flex: 1.4, fontSize: 19, boxShadow: '0 0 18px rgba(61,245,255,0.5)' })} onClick={go}>{v.rounds ? t('plan') : t('go')}</button>
             </div>
           </>
@@ -759,9 +1012,86 @@ function PlanBox({ v, t, send }: { v: any; t: Translate; send: (a: any) => void 
   );
 }
 
-/* ---------- Ausbau ---------- */
+/* ---------- Bauen (zentral) ---------- */
+
+function MissionList({ v, t, list }: { v: any; t: Translate; list: MissionV[] }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      {list.map((m, i) => (
+        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', borderRadius: 12, background: m.done ? '#10301f' : CARD, border: `1px solid ${m.done ? '#3c8f5e' : m.failed ? '#5a2a3a' : LINE}`, fontSize: 14 }}>
+          <span style={{ fontSize: 16, width: 18, textAlign: 'center', color: m.done ? '#7CFFB2' : m.failed ? '#FF6B8A' : FAINT }}>{m.done ? '✓' : m.failed ? '✗' : '•'}</span>
+          <span style={{ flex: 1, lineHeight: 1.3 }}>{missionText(m, v.map, v.emp, t)}</span>
+          <span style={{ fontFamily: DISPLAY, fontWeight: 800, color: '#FFD23F', whiteSpace: 'nowrap' }}>+{m.pts}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 function BuildTab({ v, t, send }: { v: any; t: Translate; send: (a: any) => void }) {
+  const [border, setBorder] = useState(false);
+  const map: MapEntry[] = v.map;
+  if (!(v.my as number[][]).length) {
+    return (
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <span style={{ fontSize: 17, color: MUTED, lineHeight: 1.4 }}>{v.pirate ? t('build.pirate') : t('build.none')}</span>
+        {v.missions?.length > 0 && <><span style={{ fontSize: 13, color: MUTED }}>{t('missions.yours')}</span><MissionList v={v} t={t} list={v.missions} /></>}
+      </div>
+    );
+  }
+  const rows: { k: 'eco' | 'ind' | 'sci'; best: [number, number] | null; text: string }[] = [
+    { k: 'eco', best: v.best?.eco, text: t('build.eco', { n: 15 + 3 * v.tech.trade }) },
+    { k: 'ind', best: border ? v.best?.indB : v.best?.ind, text: t('build.ind', { n: 3 + v.tech.prod }) },
+    { k: 'sci', best: v.best?.sci, text: t('build.sci') },
+  ];
+  return (
+    <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 12, padding: '4px 16px 8px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+        <span style={{ fontFamily: DISPLAY, fontSize: 22, fontWeight: 800 }}>{t('tab.build')}</span>
+        <span style={{ fontSize: 13, color: MUTED }}>{t('build.cheapest')}</span>
+      </div>
+      {rows.map((r) => {
+        const cost = r.best?.[1] ?? 0;
+        const can = !!r.best && v.money >= cost;
+        return (
+          <div key={r.k} style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: 14, borderRadius: 16, background: PANEL, border: `1px solid ${LINE}`, flex: 'none' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
+                <span style={{ fontWeight: 700, fontSize: 17, color: KIND_COLOR[r.k] }}>{t(`kind.${r.k}`)}</span>
+                <span style={{ fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.best ? t('build.at', { star: starName(map, r.best[0], t) }) : '–'}</span>
+                <span style={{ fontSize: 12, color: MUTED }}>{r.text}</span>
+              </div>
+              <button type="button" disabled={!can} onClick={() => { send({ type: 'upgradeBest', kind: r.k, border: r.k === 'ind' && border }); sfx.play('pop'); }}
+                style={btn(can ? KIND_COLOR[r.k] : '#2a3360', can ? BG : FAINT, { width: 104, height: 52, fontSize: 16, flex: 'none' })}>+1 · {cost}</button>
+            </div>
+            {r.k === 'ind' && (
+              <div style={{ display: 'flex', gap: 6 }}>
+                {[false, true].map((bv) => (
+                  <button key={String(bv)} type="button" onClick={() => setBorder(bv)} style={{ flex: 1, height: 34, borderRadius: 10, border: border === bv ? 'none' : '1px solid #3a4677', background: border === bv ? '#FF8A5B' : 'transparent', color: border === bv ? BG : INK, fontSize: 13, fontWeight: border === bv ? 700 : 500 }}>
+                    {bv ? t('build.border') : t('build.cheap')}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
+      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 14px', borderRadius: 12, background: CARD, fontSize: 14, flex: 'none' }}>
+        <span style={{ color: MUTED }}>{t('build.income')}</span><span style={{ fontWeight: 700, color: '#FFD23F' }}>+{t('money', { n: v.income })}</span>
+      </div>
+      {v.missions?.length > 0 && (
+        <>
+          <span style={{ fontSize: 13, color: MUTED, marginTop: 4 }}>{t('missions.yours')}</span>
+          <MissionList v={v} t={t} list={v.missions} />
+        </>
+      )}
+    </div>
+  );
+}
+
+/* ---------- Sterne einzeln ausbauen ---------- */
+
+function StarsTab({ v, t, send }: { v: any; t: Translate; send: (a: any) => void }) {
   const my: number[][] = v.my;
   const map: MapEntry[] = v.map;
   const [sel, setSel] = useState<number | null>(null);
@@ -770,24 +1100,31 @@ function BuildTab({ v, t, send }: { v: any; t: Translate; send: (a: any) => void
   if (!cur) {
     return <div style={{ padding: 20, fontSize: 17, color: MUTED, lineHeight: 1.4 }}>{v.pirate ? t('build.pirate') : t('build.none')}</div>;
   }
-  const [i, eco, ind, sci, cEco, cInd, cSci, prod] = cur;
+  const [i, eco, ind, sci, cEco, cInd, cSci, prod, rally, inc] = cur;
+  const sp = map[i][4];
   const rows: { k: 'eco' | 'ind' | 'sci'; lvl: number; cost: number; text: string }[] = [
-    { k: 'eco', lvl: eco, cost: cEco, text: t('build.eco', { n: 10 + 3 * v.tech.trade }) },
-    { k: 'ind', lvl: ind, cost: cInd, text: t('build.ind', { n: 2 + v.tech.prod }) },
+    { k: 'eco', lvl: eco, cost: cEco, text: t('build.eco', { n: (15 + 3 * v.tech.trade) * (sp === 'gold' ? 2 : 1) }) },
+    { k: 'ind', lvl: ind, cost: cInd, text: t('build.ind', { n: 3 + v.tech.prod }) },
     { k: 'sci', lvl: sci, cost: cSci, text: t('build.sci') },
   ];
+  const c = v.emp[v.me].c;
   return (
     <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 14, padding: '4px 16px 8px' }}>
       <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4, flex: 'none' }}>
         {my.map((m) => (
-          <button key={m[0]} type="button" onClick={() => setSel(m[0])} style={{ height: 44, padding: '0 14px', borderRadius: 22, flex: 'none', border: m[0] === i ? 'none' : '1px solid #3a4677', background: m[0] === i ? CYAN : 'transparent', color: m[0] === i ? BG : INK, fontFamily: 'var(--body)', fontWeight: m[0] === i ? 700 : 500, fontSize: 14 }}>{map[m[0]][2]}</button>
+          <button key={m[0]} type="button" onClick={() => setSel(m[0])} style={{ height: 44, padding: '0 14px', borderRadius: 22, flex: 'none', border: m[0] === i ? 'none' : `1px solid ${map[m[0]][4] ? SP_COLOR[map[m[0]][4]] : '#3a4677'}`, background: m[0] === i ? CYAN : 'transparent', color: m[0] === i ? BG : INK, fontFamily: 'var(--body)', fontWeight: m[0] === i ? 700 : 500, fontSize: 14 }}>{starName(map, m[0], t)}</button>
         ))}
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: 16, borderRadius: 18, background: 'radial-gradient(circle at 20% 50%, #13305a 0%, #0d1430 70%)', border: `1px solid ${LINE}`, flex: 'none' }}>
-        <svg width="56" height="56" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="22" fill="none" stroke={v.emp[v.me].c} strokeWidth="2.5" /><circle cx="32" cy="32" r="12" fill={v.emp[v.me].c} style={{ filter: `drop-shadow(0 0 6px ${v.emp[v.me].c})` }} /></svg>
+        <svg width="56" height="56" viewBox="0 0 64 64" aria-hidden="true">
+          <circle cx="32" cy="32" r="22" fill="none" stroke={sp ? SP_COLOR[sp] : c} strokeWidth="2.5" strokeDasharray={sp === 'gold' || sp === 'lab' ? '5 4' : undefined} />
+          <circle cx="32" cy="32" r="12" fill={c} style={{ filter: `drop-shadow(0 0 6px ${c})` }} />
+        </svg>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
-          <span style={{ fontFamily: DISPLAY, fontSize: 25, fontWeight: 800 }}>{map[i][2]}</span>
-          <span style={{ fontSize: 14, color: MUTED }}>{map[i][3] === v.me ? `${t('home')} · ` : ''}{t('ships', { n: v.st[i][1] })} · {t('perYear', { n: prod })}</span>
+          <span style={{ fontFamily: DISPLAY, fontSize: 25, fontWeight: 800 }}>{starName(map, i, t)}</span>
+          <span style={{ fontSize: 14, color: MUTED }}>{map[i][3] === v.me ? `${t('home')} · ` : ''}{t('ships', { n: v.st[i][1] })} · {t('perYear', { n: prod })} · +{t('money', { n: inc })}</span>
+          {sp && <span style={{ fontSize: 13, color: SP_COLOR[sp] }}>{t(`spd.${sp}`)}</span>}
+          {rally >= 0 && <span style={{ fontSize: 13, color: '#FFD23F' }}>{t('rally.info', { star: starName(map, rally, t) })}</span>}
         </div>
       </div>
       {rows.map((r) => {
@@ -806,9 +1143,6 @@ function BuildTab({ v, t, send }: { v: any; t: Translate; send: (a: any) => void
           </div>
         );
       })}
-      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 14px', borderRadius: 12, background: CARD, fontSize: 14, flex: 'none' }}>
-        <span style={{ color: MUTED }}>{t('build.income')}</span><span style={{ fontWeight: 700, color: '#FFD23F' }}>+{t('money', { n: v.income })}</span>
-      </div>
     </div>
   );
 }
@@ -968,19 +1302,41 @@ function PhoneIntro({ v, t, send, vip }: { v: any; t: Translate; send: (a: any) 
   const home = (v.map as MapEntry[]).findIndex((m) => m[3] === v.me);
   const box = useMemo(() => size.w ? fitBox(b.minX, b.minY, b.maxX, b.maxY, size.w, size.h, 1) : [0, 0, 1, 1] as [number, number, number, number], [size.w, size.h, b]);
   const emp: Emp = v.emp[v.me];
+  const offer: MissionV[] = v.offer ?? [];
+  const need = Math.min(2, offer.length);
+  const [pick, setPick] = useState<number[]>([]);
+  const toggle = (i: number) => {
+    if (v.ready) return;
+    setPick((p) => (p.includes(i) ? p.filter((x) => x !== i) : p.length >= need ? [...p.slice(1), i] : [...p, i]));
+    sfx.play('pop');
+  };
+  const ok = pick.length === need;
   return (
     <PhoneShell vip={vip}>
-      <div style={{ padding: `6px 18px 10px ${vip ? 52 : 18}px`, display: 'flex', flexDirection: 'column', gap: 6 }}>
-        <span style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 26, color: emp.c }}>{t('phone.youAre', { name: emp.n })}</span>
-        <span style={{ fontSize: 15, color: MUTED }}>{t('phone.homeBlinks', { star: v.map[home]?.[2] ?? '' })}</span>
+      <div style={{ padding: `6px 18px 8px ${vip ? 52 : 18}px`, display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <span style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 24, color: emp.c }}>{t('phone.youAre', { name: emp.n })}</span>
+        <span style={{ fontSize: 14, color: MUTED }}>{t('phone.homeBlinks', { star: v.map[home]?.[2] ?? '' })}</span>
       </div>
-      <div ref={ref} style={{ flex: 1, minHeight: 200, background: 'radial-gradient(circle at 50% 50%, #111a3a 0%, #070b1a 75%)' }}>
+      <div ref={ref} style={{ flex: 1, minHeight: 130, background: 'radial-gradient(circle at 50% 50%, #111a3a 0%, #070b1a 75%)' }}>
         {size.w > 0 && <StarMap v={v} w={size.w} h={size.h} box={box} sim={0} speed={0} now={now} me={v.me} blink={home} />}
       </div>
-      <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <span style={{ fontSize: 15, lineHeight: 1.4, color: MUTED }}>{t('phone.introText')}</span>
-        <button type="button" disabled={v.ready} onClick={() => send({ type: 'ready' })} style={v.ready ? { ...ghost, width: '100%' } : btn(CYAN, BG, { width: '100%', height: 54, fontSize: 19 })}>
-          {v.ready ? t('phone.waitStart') : t('phone.ready')}
+      <div style={{ padding: '12px 16px 6px', display: 'flex', flexDirection: 'column', gap: 8, overflowY: 'auto', maxHeight: '58%' }}>
+        <span style={{ fontWeight: 700, fontSize: 16 }}>{t('missions.pick', { n: need })}</span>
+        <span style={{ fontSize: 13, color: MUTED, lineHeight: 1.35 }}>{t('missions.secret')}</span>
+        {offer.map((m, i) => {
+          const on = pick.includes(i);
+          return (
+            <button key={i} type="button" onClick={() => toggle(i)} disabled={v.ready}
+              style={{ display: 'flex', alignItems: 'center', gap: 10, minHeight: 50, padding: '8px 12px', borderRadius: 12, border: on ? `2px solid ${CYAN}` : `1px solid ${LINE}`, background: on ? '#0f2440' : PANEL, color: INK, textAlign: 'left', fontFamily: 'var(--body)', fontSize: 14, flex: 'none' }}>
+              <span style={{ width: 22, height: 22, borderRadius: 6, border: `2px solid ${on ? CYAN : '#3a4677'}`, background: on ? CYAN : 'transparent', color: BG, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none' }}>{on ? '✓' : ''}</span>
+              <span style={{ flex: 1, lineHeight: 1.3 }}>{missionText(m, v.map, v.emp, t)}</span>
+              <span style={{ fontFamily: DISPLAY, fontWeight: 800, color: '#FFD23F' }}>+{m.pts}</span>
+            </button>
+          );
+        })}
+        <button type="button" disabled={v.ready || !ok} onClick={() => { send({ type: 'missions', pick }); send({ type: 'ready' }); }}
+          style={v.ready ? { ...ghost, width: '100%', flex: 'none' } : btn(ok ? CYAN : '#2a3360', ok ? BG : FAINT, { width: '100%', height: 52, fontSize: 18, flex: 'none' })}>
+          {v.ready ? t('phone.waitStart') : ok ? t('phone.ready') : t('missions.pickMore', { n: need - pick.length })}
         </button>
       </div>
     </PhoneShell>
@@ -992,10 +1348,12 @@ function PhoneEnd({ v, t }: { v: any; t: Translate }) {
   const win = v.winner != null ? v.emp[v.winner] as Emp : null;
   return (
     <PhoneShell vip={false}>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, padding: 24, textAlign: 'center' }}>
-        <span style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 64, color: emp.c, textShadow: `0 0 20px ${emp.c}88` }}>{t('phone.place', { n: v.place })}</span>
-        <span style={{ fontSize: 20 }}>{t('phone.result', { stars: v.stars, pts: v.pts })}</span>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, padding: 22, textAlign: 'center', overflowY: 'auto' }}>
+        <span style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 60, color: emp.c, textShadow: `0 0 20px ${emp.c}88` }}>{t('phone.place', { n: v.place })}</span>
+        <span style={{ fontSize: 20 }}>{t('phone.result', { pts: v.pts })}</span>
+        <span style={{ fontSize: 14, color: MUTED }}>{t('phone.breakdown', { stars: v.stars, heart: v.heart, mis: v.mis })}</span>
         {win && <span style={{ fontSize: 17, color: MUTED }}>{v.winner === v.me ? t('phone.youWon') : t('final.win', { name: win.n })}</span>}
+        {v.missions?.length > 0 && <div style={{ width: '100%', maxWidth: 420, textAlign: 'left' }}><MissionList v={v} t={t} list={v.missions} /></div>}
         <span style={{ fontSize: 15, color: FAINT }}>{t('game.lookAtTv')}</span>
       </div>
     </PhoneShell>

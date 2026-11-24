@@ -113,6 +113,7 @@ const scenarios: { game: string; players: number; options?: Record<string, numbe
   { game: 'montagsmaler', players: 3, options: { mode: 'team' } },
   { game: 'sternenpakt', players: 3, options: { takt: 'rounds', years: 10 } },
   { game: 'sternenpakt', players: 2, options: { ai: 4, ships: 'rough', years: 20 } },
+  { game: 'sternenpakt', players: 5, options: { missions: 'announce', years: 30, takt: 'rounds' } },
   { game: 'murmel-mayhem', players: 3, options: { rounds: 3 } },
   { game: 'murmel-mayhem', players: 4, options: { rounds: 8 } },
   { game: 'figurendle', players: 3, options: { variante: 'brett', rounds: 3 } },

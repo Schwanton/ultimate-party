@@ -2,6 +2,19 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.41.0
+
+- Sternenpakt, große Überarbeitung nach den ersten Testrunden:
+- Jede Partie eine neue, zufällige Galaxie. Jedes Reich hat mehrere Nachbarn in ähnlichem Abstand. Durch violette Nebelfelder kann man nicht fliegen – so entstehen Engstellen. 1–2 Wurmloch-Paare (gestrichelte Ringe) verbinden weit entfernte Sterne: Der Flug hindurch dauert nur so lange wie 1 Feld
+- Besondere Sterne: Goldstern (doppeltes Geld), Werft (Industrie halb so teuer), Forschungsnebel (+2 Forschung) und Festung (Verteidiger +2)
+- Das Herz der Galaxie in der Mitte: 30 Schiffe bewachen es. Wer es beim Jahreswechsel hält, bekommt 150 Punkte
+- Ziel beliebig antippen, auch weit weg: Das Spiel fliegt automatisch über deine eigenen Sterne und zeigt den Weg gestrichelt
+- Neu an jedem eigenen Stern: „Schiffe herholen“ (Sterne antippen, von denen Schiffe kommen sollen) und „Zielstern für neue Schiffe“ (jedes neu gebaute Schiff fliegt sofort dorthin)
+- Wache: Du stellst ein, wie viele Schiffe beim Herholen, beim Zielstern und bei „Alle“ zurückbleiben (Standard 1)
+- Neuer Reiter „Bauen“: Wirtschaft, Industrie und Wissenschaft mit einem Tippen am günstigsten Stern ausbauen – Industrie auf Wunsch nahe der Grenze. Die einzelnen Sterne findest du unter „Sterne“
+- Schneller: 15 Geld je Wirtschaftsstufe, 3 Schiffe je Industriestufe, Forschung nur noch halb so teuer. Neu auch 30 Jahre als Dauer
+- Punkte: 100 je Stern am Ende und 150 je Jahr mit dem Herz. Dazu wählt jeder am Anfang 2 von 3 Geheimaufträgen (500–1500 Punkte), z. B. „Erobere einen Stern von Lena“ – die kommen erst am Ende dazu. Auf Wunsch meldet der Fernseher „Jemand hat einen Auftrag erfüllt!“ (mit zufälliger Verzögerung)
+
 ## 0.40.0
 
 - Pause in allen Spielen: Der VIP tippt auf dem Handy oben links auf das ×, dort gibt es jetzt „Pausieren“ und „Spiel beenden“. Am Fernseher geht das über die drei Punkte unten rechts. Während der Pause steht das Spiel komplett still – auch alle Countdowns – und Musik und Geräusche schweigen. Mit „Weiter“ geht es genau dort weiter
