@@ -2,6 +2,10 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.39.2
+
+- Neue Titelbilder für **Heiße Kartoffel**, **Flunkerfakt** und **Bonk!** – zu sehen in der Spielauswahl, der Lobby und beim Abstimmen
+
 ## 0.39.1
 
 - Neue Titelbilder für **Mainstream**, **Murmel-Mayhem** und **Montagsmaler** – zu sehen in der Spielauswahl, der Lobby und beim Abstimmen
