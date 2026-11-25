@@ -331,7 +331,7 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
             </div>
             <div key={qrBig ? 'big' : 'small'} style={{ flex: qrBig ? '1 1 100%' : '1 1 0', minWidth: 0, display: 'flex', flexDirection: qrBig ? 'row' : 'column', alignItems: qrBig ? 'center' : 'flex-start', justifyContent: 'space-between', gap: 6, animation: 'upFade .2s ease-out .28s both' }}>
               {!qrBig && <h2 style={{ fontSize: 24, fontWeight: 800 }}>{t('join.title')}</h2>}
-              <button type="button" title={t('lobby.copyAddress')} onClick={async () => { if (await copyText(room.joinUrl)) { setCopied(true); setTimeout(() => setCopied(false), 1800); } }}
+              <button type="button" title={t('lobby.copyAddress')} onClick={async () => { if (await copyText(joinUrl)) { setCopied(true); setTimeout(() => setCopied(false), 1800); } }}
                 style={{ border: 0, padding: '2px 0', background: 'transparent', textAlign: 'left', cursor: 'copy', fontSize: 15, fontWeight: 700, color: 'var(--muted)', wordBreak: 'break-all', textDecoration: 'underline dotted', textUnderlineOffset: 4 }}>
                 {room.joinUrl.replace(/^https?:\/\//, '')}
               </button>
@@ -507,13 +507,19 @@ function SelectedGame({ game, rolling, players, canStart, gameCount, lang, t, su
   }
   const fit = fitOf(game, players);
   const fitText = fit === 'few' ? t('lobby.needPlayers', { n: game.minPlayers - players }) : fit === 'many' ? t('lobby.tooManyShort') : '';
+  // Per Zufall gezogenes Spiel: derselbe Rahmen bleibt nach dem Ausrollen stehen (kein neues Einblenden)
+  const rolledId = roll?.reel[roll.reel.length - 1];
+  const rolled = rolledId ? games.find((g) => g.id === rolledId) : undefined;
+  const rollKey = roll && rolledId && (rolling || rolledId === game.id) ? `roll-${roll.at}` : null;
   return (
     <section style={{ flex: 1, minWidth: 0, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 14 }}>
       {/* Titelbild ganz und groß (16:9), passt sich der freien Höhe an */}
       <div style={{ flex: 1, minHeight: 160, containerType: 'size', display: 'flex', justifyContent: 'center' } as React.CSSProperties}>
-        <button key={rolling ? 'roll' : game.id} className={rolling ? undefined : 'anim-up'} onClick={onLibrary} aria-label={`${gameName(game, lang)} – ${t('lobby.changeGame')}`}
+        <button key={rollKey ?? game.id} className={rollKey ? undefined : 'anim-up'} onClick={onLibrary} aria-label={`${gameName(game, lang)} – ${t('lobby.changeGame')}`}
           style={{ border: 0, padding: 0, width: 'min(100cqw, 100cqh * 16 / 9)', aspectRatio: '16 / 9', alignSelf: 'flex-start', borderRadius: 24, overflow: 'hidden', position: 'relative', background: 'var(--surface)', boxShadow: `0 0 0 3px ${game.color}, 0 12px 40px rgba(0,0,0,.55)` }}>
-          {rolling && roll ? <SlotReel roll={roll} games={games} lang={lang} /> : <GameCover g={game} lang={lang} zoom showName letterSize={240} />}
+          {/* Darunter liegt schon das gezogene Spiel – wenn die Walze steht, bleibt das Bild einfach stehen */}
+          <GameCover g={rolling ? rolled ?? game : game} lang={lang} zoom={!rolling} showName letterSize={240} />
+          {rolling && roll && <SlotReel roll={roll} games={games} lang={lang} />}
           {!rolling && pickedBadge}
           {!rolling && <HeartCount n={hearts} big style={{ right: 16, top: 16 }} />}
           {/* Spielerzahl, Dauer und Kategorien unten auf dem Bild */}

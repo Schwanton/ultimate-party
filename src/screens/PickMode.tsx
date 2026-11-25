@@ -69,7 +69,7 @@ export function SlotReel({ roll, games, lang }: { roll: { reel: string[]; at: nu
     <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', background: '#000' }}>
       <div style={{ position: 'absolute', left: 0, right: 0, top: 0, height: `${n * 100}%`, transform: `translateY(-${offset}%)`, filter: speed > 0.15 ? `blur(${Math.min(6, speed * 3).toFixed(1)}px)` : undefined, willChange: 'transform' }}>
         {items.map((g, i) => (
-          <div key={i} style={{ position: 'relative', height: `${100 / n}%`, borderBottom: '6px solid #000' }}>
+          <div key={i} style={{ position: 'relative', height: `${100 / n}%`, borderBottom: i < n - 1 ? '6px solid #000' : undefined }}>
             <GameCover g={g} lang={lang} showName letterSize={200} />
           </div>
         ))}

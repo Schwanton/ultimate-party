@@ -2,6 +2,11 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.48.1
+
+- Beim Kopieren der Adresse wird der Raumcode im Link mitkopiert – wer den Link öffnet, landet direkt im richtigen Raum
+- Die Zufalls-Walze bleibt einfach auf dem gezogenen Spiel stehen, ohne dass das Bild noch einmal neu erscheint
+
 ## 0.48.0
 
 - Neue Spieler werden am Fernseher kurz oben begrüßt („Lena ist dabei!“) – mit einem kleinen Konfetti-Plopp
