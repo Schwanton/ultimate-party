@@ -10,11 +10,10 @@
   "audience": true,
   "minutes": 30,
   "color": "#8E1A17",
-  "cover": "bilder/hintergrund-lager.webp",
   "tags": ["team"],
   "sdkVersion": 1,
   "autoSounds": false,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "UP!",
   "options": [
     {

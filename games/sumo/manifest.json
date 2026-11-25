@@ -12,7 +12,7 @@
   "color": "#36F5C8",
   "tags": ["quick", "team"],
   "sdkVersion": 1,
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": "UP!",
   "options": [
     { "id": "rounds", "label": { "de": "Runden", "en": "Rounds" }, "default": 3, "min": 1, "max": 7 }

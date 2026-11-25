@@ -2,6 +2,10 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.44.2
+
+- Jetzt hat jedes Spiel ein eigenes Titelbild! Neu dabei: **Der Abgrund**, **Chaotic Tower Defense**, **Figurendle**, **Hochstapler**, **Kronenduell**, **Maulwurf**, **Schätzmeister**, **Schwarmsinn**, **Sternenpakt**, **Sumo**, **Tank Trouble**, **Tick Tack Boom**, **Vernissage** und **Wer war's?** – zu sehen in der Spielauswahl, der Lobby und beim Abstimmen
+
 ## 0.44.1
 
 Chaotic Tower Defense:
