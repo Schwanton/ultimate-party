@@ -9,7 +9,7 @@ import { HostSettings } from './HostSettings';
 import { GameOptionsForm, optionsSummary } from './GameOptions';
 import { UpdateBanner } from './Update';
 import { GameCover, GameLibrary, HeartCount, fitOf, gameDesc, gameName, gameTags, playersLabel } from './GameLibrary';
-import { HostVoteBoard, PickModeSwitch, PickedBadge, VoteOptions, pickModeOf, useRoll } from './PickMode';
+import { HostVoteBoard, PickModeSwitch, PickedBadge, SlotReel, VoteOptions, pickModeOf, useRoll } from './PickMode';
 import { OlympiaGameBadge, OlympiaHost, OlympiaSetup, olympiaRunning } from './Olympia';
 import { HostPause, PauseIcon, PlayIcon } from './Pause';
 
@@ -77,6 +77,8 @@ export function HostApp() {
     return (
       <Stage>
         {s.status !== 'open' && <ConnectionBanner text={t('status.reconnecting')} />}
+        {/* Nach dem Spiel: Rangliste über dem unscharfen Titelbild des Spiels */}
+        <LobbyBackdrop bright game={room.finished ? s.host.games.find((g) => g.id === room.gameId) : undefined} />
         {Host && s.host.view ? <Host view={s.host.view} room={room} t={t} player={player} setSecret={async (id: string, value: string) => !!(await net.request('secret', { gameId: room.gameId, id, value })).ok} /> : <div className="muted">…</div>}
         <OlympiaGameBadge room={room} t={t} />
         <HostPause room={room} t={t} />
@@ -243,6 +245,23 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
   const [optionsOpen, setOptionsOpen] = useState(false);
   const [libraryOpen, setLibraryOpen] = useState(false);
   const [qrBig, setQrBig] = useState(false);
+  const [copied, setCopied] = useState(false);
+  // Begrüßung: Wer neu dazukommt, erscheint kurz oben mit etwas Konfetti
+  const known = useRef<Set<string> | null>(null);
+  const [greet, setGreet] = useState<PlayerInfo | null>(null);
+  useEffect(() => {
+    const ids = new Set(players.map((p) => p.id));
+    if (known.current) {
+      const fresh = players.filter((p) => !known.current!.has(p.id));
+      if (fresh.length) setGreet(fresh[fresh.length - 1]);
+    }
+    known.current = ids;
+  }, [players.map((p) => p.id).join(',')]);
+  useEffect(() => {
+    if (!greet) return;
+    const id = setTimeout(() => setGreet(null), 2600);
+    return () => clearTimeout(id);
+  }, [greet]);
 
   const setLang = (lang: Lang) => {
     try { localStorage.setItem('up:lang', lang); } catch { /* egal */ }
@@ -251,7 +270,7 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
 
   return (
     <>
-      <LobbyBackdrop game={room.olympia ? undefined : (rolling ?? selected)} />
+      <LobbyBackdrop game={room.olympia || rolling ? undefined : selected} />
       <header style={{ height: 56, display: 'flex', alignItems: 'center', gap: 12 }}>
         <Logo />
         <span style={{ flex: 1 }} />
@@ -281,6 +300,7 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
         </div>
       </header>
 
+      {greet && <JoinGreeting key={greet.id} player={greet} text={t('lobby.joined', { name: greet.name })} />}
       {host.notice && <div className="up-error" style={{ fontSize: 18 }}>{t(`error.${host.notice}`)}</div>}
       <UpdateBanner />
       {optionsOpen && selected && (
@@ -304,20 +324,24 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
       <main style={{ flex: 1, minHeight: 0, display: 'flex', gap: 24 }}>
         <div style={{ width: 376, flex: 'none', display: 'flex', flexDirection: 'column', gap: 16 }}>
           {/* Beitreten: Zeigt man auf den QR-Code (oder tippt ihn an), wird er so breit wie die Spalte */}
-          <section className="up-card" onMouseEnter={() => setQrBig(true)} onMouseLeave={() => setQrBig(false)} onClick={() => setQrBig((x) => !x)}
-            style={{ ...glass, padding: '18px 20px', display: 'flex', flexWrap: 'wrap', gap: qrBig ? 12 : 16, alignItems: 'center', borderRadius: 24, cursor: 'zoom-in' }}>
+          <section className="up-card" onMouseEnter={() => setQrBig(true)} onMouseLeave={() => setQrBig(false)}
+            style={{ ...glass, position: 'relative', padding: '18px 20px', display: 'flex', flexWrap: 'wrap', gap: qrBig ? 12 : 16, alignItems: 'center', borderRadius: 24 }}>
             <div className="up-qr-fill" style={{ width: qrBig ? 336 : 112, height: qrBig ? 336 : 112, flex: 'none', background: '#fff', borderRadius: qrBig ? 20 : 14, padding: qrBig ? 16 : 7, transition: 'width .3s ease, height .3s ease, padding .3s ease' }}>
               <QrCode text={joinUrl} size={112} bare />
             </div>
             <div key={qrBig ? 'big' : 'small'} style={{ flex: qrBig ? '1 1 100%' : '1 1 0', minWidth: 0, display: 'flex', flexDirection: qrBig ? 'row' : 'column', alignItems: qrBig ? 'center' : 'flex-start', justifyContent: 'space-between', gap: 6, animation: 'upFade .2s ease-out .28s both' }}>
               {!qrBig && <h2 style={{ fontSize: 24, fontWeight: 800 }}>{t('join.title')}</h2>}
-              <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--muted)', wordBreak: 'break-all' }}>{room.joinUrl.replace(/^https?:\/\//, '')}</span>
+              <button type="button" title={t('lobby.copyAddress')} onClick={async () => { if (await copyText(room.joinUrl)) { setCopied(true); setTimeout(() => setCopied(false), 1800); } }}
+                style={{ border: 0, padding: '2px 0', background: 'transparent', textAlign: 'left', cursor: 'copy', fontSize: 15, fontWeight: 700, color: 'var(--muted)', wordBreak: 'break-all', textDecoration: 'underline dotted', textUnderlineOffset: 4 }}>
+                {room.joinUrl.replace(/^https?:\/\//, '')}
+              </button>
               <div aria-label={`${t('join.code')} ${room.code}`} style={{ display: 'flex', gap: 6, marginTop: qrBig ? 0 : 4, flex: 'none' }}>
                 {room.code.split('').map((ch, i) => (
                   <span key={i} className="display" style={{ width: 38, height: 46, borderRadius: 10, background: 'var(--yellow)', color: '#110D24', fontSize: 26, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 0 var(--yellow-d)' }}>{ch}</span>
                 ))}
               </div>
             </div>
+            {copied && <span role="status" className="anim-pop" style={{ position: 'absolute', left: '50%', bottom: -14, transform: 'translateX(-50%)', background: 'var(--green)', color: '#110D24', borderRadius: 999, padding: '6px 14px', fontSize: 14, fontWeight: 800, whiteSpace: 'nowrap', zIndex: 5, boxShadow: '0 6px 18px rgba(0,0,0,.4)' }}>✓ {t('lobby.addressCopied')}</span>}
           </section>
 
           <section className="up-card" style={{ ...glass, flex: 1, minHeight: 0, overflow: 'hidden', padding: qrBig ? '14px 20px' : '18px 20px', display: 'flex', flexDirection: 'column', gap: qrBig ? 8 : 14, borderRadius: 24 }}>
@@ -349,6 +373,7 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
             <HostVoteBoard vote={room.vote} games={games} room={room} t={t} player={(id) => room.players.find((p) => p.id === id)} />
           ) : (
             <SelectedGame game={rolling ?? selected} rolling={!!rolling} players={active.length} canStart={canStart && !rolling} gameCount={games.length} lang={room.lang} t={t}
+              roll={room.roll} games={games}
               hearts={(rolling ?? selected) ? room.hearts?.[(rolling ?? selected)!.id]?.length ?? 0 : 0}
               pickedBadge={pickModeOf(room) === 'vote' ? <PickedBadge room={room} t={t} vipName={vip?.name} /> : null}
               summary={selected?.options?.length ? optionsSummary(selected, room.settings.gameOptions?.[selected.id], room.lang) : ''}
@@ -361,6 +386,46 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
   );
 }
 
+/** Dezente Begrüßung oben in der Mitte: Avatar, „Lena ist dabei!“ und ein kleiner Konfetti-Plopp */
+const BURST_COLORS = ['#FFD447', '#E8336F', '#36D6F5', '#4BE3A1', '#9B7BFF', '#FF9F43'];
+function JoinGreeting({ player, text }: { player: PlayerInfo; text: string }) {
+  const bits = useRef(Array.from({ length: 18 }, (_, i) => {
+    const a = (i / 18) * Math.PI * 2 + Math.random() * 0.3;
+    const d = 70 + Math.random() * 70;
+    return { dx: Math.cos(a) * d * 1.8, dy: Math.sin(a) * d, r: Math.random() * 540 - 270, c: BURST_COLORS[i % BURST_COLORS.length], round: i % 3 === 0, delay: Math.random() * 0.08 };
+  })).current;
+  return (
+    <div aria-live="polite" style={{ position: 'absolute', left: '50%', top: 96, zIndex: 60, pointerEvents: 'none', animation: 'upGreet 2.6s ease-in-out both' }}>
+      <div style={{ position: 'relative', transform: 'translateX(-50%)', display: 'flex', alignItems: 'center', gap: 12, padding: '8px 22px 8px 8px', borderRadius: 999, background: 'rgba(28,23,56,.92)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', boxShadow: `0 0 0 3px ${player.color}, 0 12px 30px rgba(0,0,0,.5)`, whiteSpace: 'nowrap' }}>
+        <Avatar player={player} size={52} />
+        <span className="display" style={{ fontSize: 24, fontWeight: 800 }}>{text}</span>
+        {bits.map((b, i) => (
+          <span key={i} style={{ position: 'absolute', left: '50%', top: '50%', width: b.round ? 9 : 7, height: b.round ? 9 : 13, borderRadius: b.round ? '50%' : 2, background: b.c,
+            ['--dx' as string]: `${b.dx}px`, ['--dy' as string]: `${b.dy}px`, ['--r' as string]: `${b.r}deg`, animation: `upBurst .9s cubic-bezier(.2,.7,.3,1) ${(0.15 + b.delay).toFixed(2)}s both` } as React.CSSProperties} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Text in die Zwischenablage – auch dort, wo der Browser das moderne Kopieren nicht erlaubt (http mit IP-Adresse) */
+async function copyText(text: string): Promise<boolean> {
+  try {
+    if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(text); return true; }
+  } catch { /* weiter mit dem alten Weg */ }
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand('copy');
+    ta.remove();
+    return ok;
+  } catch { return false; }
+}
+
 /** Halbdurchsichtige Karten über dem Bild-Hintergrund der Lobby */
 const glass: React.CSSProperties = { background: 'rgba(28,23,56,.78)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' };
 
@@ -368,7 +433,7 @@ const glass: React.CSSProperties = { background: 'rgba(28,23,56,.78)', backdropF
  * Hintergrund der Lobby: Titelbild des gewählten Spiels, unscharf und abgedunkelt.
  * Beim Spielwechsel blendet das neue Bild weich über das alte.
  */
-function LobbyBackdrop({ game }: { game?: GameManifest }) {
+function LobbyBackdrop({ game, bright }: { game?: GameManifest; bright?: boolean }) {
   const url = game?.coverUrl ?? null;
   const color = game?.color ?? null;
   const [layers, setLayers] = useState<{ key: number; url: string | null; color: string | null }[]>([]);
@@ -385,11 +450,11 @@ function LobbyBackdrop({ game }: { game?: GameManifest }) {
       {layers.map((l) => (
         <div key={l.key} style={{ position: 'absolute', inset: 0, animation: 'upFade .8s ease-out both' }}>
           {l.url
-            ? <img src={l.url} alt="" style={{ position: 'absolute', inset: -60, width: 'calc(100% + 120px)', height: 'calc(100% + 120px)', objectFit: 'cover', filter: 'blur(30px) saturate(1.25) brightness(.55)' }} />
+            ? <img src={l.url} alt="" style={{ position: 'absolute', inset: -60, width: 'calc(100% + 120px)', height: 'calc(100% + 120px)', objectFit: 'cover', filter: `blur(30px) saturate(1.3) brightness(${bright ? 0.8 : 0.55})` }} />
             : <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse at 70% 40%, ${shade(l.color ?? '#110D24', 0.45)}, var(--bg) 75%)` }} />}
         </div>
       ))}
-      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(17,13,36,.55), rgba(17,13,36,.78))' }} />
+      <div style={{ position: 'absolute', inset: 0, background: bright ? 'linear-gradient(180deg, rgba(17,13,36,.3), rgba(17,13,36,.6))' : 'linear-gradient(180deg, rgba(17,13,36,.55), rgba(17,13,36,.78))' }} />
     </div>
   );
 }
@@ -429,8 +494,8 @@ const IconSliders = () => (
 const badge = (bg: string, color: string): React.CSSProperties => ({ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 999, background: bg, color, fontSize: 15, fontWeight: 700, whiteSpace: 'nowrap' });
 
 /** Rechts in der Lobby: das gewählte Spiel groß mit Titelbild, Infos, Einstellungen und Start */
-function SelectedGame({ game, rolling, players, canStart, gameCount, lang, t, summary, pickedBadge, onLibrary, onOptions, hearts = 0 }: {
-  hearts?: number; game?: GameManifest; rolling?: boolean; players: number; canStart: boolean; gameCount: number; lang: Lang; t: Translate; summary: string; pickedBadge: React.ReactNode; onLibrary: () => void; onOptions: () => void;
+function SelectedGame({ game, rolling, players, canStart, gameCount, lang, t, summary, pickedBadge, onLibrary, onOptions, hearts = 0, roll, games }: {
+  hearts?: number; game?: GameManifest; roll: { reel: string[]; at: number } | null; games: GameManifest[]; rolling?: boolean; players: number; canStart: boolean; gameCount: number; lang: Lang; t: Translate; summary: string; pickedBadge: React.ReactNode; onLibrary: () => void; onOptions: () => void;
 }) {
   if (!game) {
     return (
@@ -448,10 +513,11 @@ function SelectedGame({ game, rolling, players, canStart, gameCount, lang, t, su
       <div style={{ flex: 1, minHeight: 160, containerType: 'size', display: 'flex', justifyContent: 'center' } as React.CSSProperties}>
         <button key={rolling ? 'roll' : game.id} className={rolling ? undefined : 'anim-up'} onClick={onLibrary} aria-label={`${gameName(game, lang)} – ${t('lobby.changeGame')}`}
           style={{ border: 0, padding: 0, width: 'min(100cqw, 100cqh * 16 / 9)', aspectRatio: '16 / 9', alignSelf: 'flex-start', borderRadius: 24, overflow: 'hidden', position: 'relative', background: 'var(--surface)', boxShadow: `0 0 0 3px ${game.color}, 0 12px 40px rgba(0,0,0,.55)` }}>
-          <GameCover g={game} lang={lang} zoom={!rolling} showName letterSize={240} />
+          {rolling && roll ? <SlotReel roll={roll} games={games} lang={lang} /> : <GameCover g={game} lang={lang} zoom showName letterSize={240} />}
           {!rolling && pickedBadge}
           {!rolling && <HeartCount n={hearts} big style={{ right: 16, top: 16 }} />}
           {/* Spielerzahl, Dauer und Kategorien unten auf dem Bild */}
+          {!rolling && <>
           <span style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 90, background: 'linear-gradient(180deg, rgba(17,13,36,0), rgba(17,13,36,.75))', pointerEvents: 'none' }} />
           <span style={{ position: 'absolute', left: 14, right: 14, bottom: 14, display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-start' }}>
             <span style={fit === 'ok' ? badge('rgba(17,13,36,.86)', 'var(--green)') : badge('rgba(17,13,36,.86)', 'var(--yellow)')}>
@@ -460,13 +526,14 @@ function SelectedGame({ game, rolling, players, canStart, gameCount, lang, t, su
             <span style={badge('rgba(17,13,36,.86)', 'var(--text)')}><IconClock /> {t('lobby.minutes', { n: game.minutes })}</span>
             {gameTags(game).map((x) => <span key={x} style={badge('rgba(17,13,36,.86)', 'var(--muted)')}>{t(`tag.${x}`)}</span>)}
           </span>
+          </>}
           {rolling && <span className="display" style={{ position: 'absolute', left: 18, top: 18, background: 'var(--yellow)', color: '#110D24', borderRadius: 999, padding: '7px 16px', fontSize: 18, fontWeight: 800 }}>{t('pick.rolling')}</span>}
         </button>
       </div>
       {/* Infos und Start als schmale Leiste darunter */}
       <div style={{ flex: 'none', display: 'flex', gap: 20, alignItems: 'center' }}>
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <p style={{ fontSize: 17, lineHeight: 1.38, color: '#D9D5EE', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{gameDesc(game, lang)}</p>
+          <p style={{ fontSize: 17, lineHeight: 1.38, color: '#D9D5EE', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', visibility: rolling ? 'hidden' : undefined }}>{gameDesc(game, lang)}</p>
           {summary && <p className="faint" style={{ fontSize: 14, lineHeight: 1.35, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{summary}</p>}
         </div>
         <div style={{ width: 236, flex: 'none', display: 'flex', flexDirection: 'column', gap: 16 }}>

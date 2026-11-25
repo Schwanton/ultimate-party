@@ -115,7 +115,9 @@ export function GameLibrary({ games, selectedId, players, lang, t, onPick, onClo
 }) {
   const { tag, setTag, present, shown } = useTagFilter(games);
   const [onlyFit, setOnlyFit] = useState(false);
-  const list = onlyFit ? shown.filter((g) => fitOf(g, players) === 'ok') : shown;
+  const [popular, setPopular] = useState(false);
+  let list = onlyFit ? shown.filter((g) => fitOf(g, players) === 'ok') : shown;
+  if (popular) list = [...list].sort((a, b) => (hearts?.[b.id]?.length ?? 0) - (hearts?.[a.id]?.length ?? 0));
   const count = (x: string) => (x === 'all' ? games.length : games.filter((g) => gameTags(g).includes(x)).length);
   return (
     <div role="dialog" aria-modal="true" aria-label={t('lobby.pickGame')} className="anim-fade"
@@ -123,6 +125,9 @@ export function GameLibrary({ games, selectedId, players, lang, t, onPick, onClo
       <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
         <h2 style={{ fontSize: 36, fontWeight: 800 }}>{t('lobby.pickGame')} <span className="faint" style={{ fontSize: 22, fontWeight: 600 }}>{t('lobby.gamesCount', { n: games.length })}</span></h2>
         <div style={{ display: 'flex', gap: 10 }}>
+          <button className={`up-btn small${popular ? '' : ' ghost'}`} aria-pressed={popular} onClick={() => setPopular((x) => !x)}>
+            {popular ? '✓ ' : '♥ '}{t('lobby.sortPopular')}
+          </button>
           <button className={`up-btn small${onlyFit ? '' : ' ghost'}`} aria-pressed={onlyFit} onClick={() => setOnlyFit((x) => !x)}>
             {onlyFit ? '✓ ' : ''}{t('lobby.onlyFitting', { n: players })}
           </button>

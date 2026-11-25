@@ -53,6 +53,32 @@ export function useRoll(room: RoomSnapshot, games: GameManifest[]) {
   return games.find((g) => g.id === id) ?? null;
 }
 
+/**
+ * Zufall als Spielautomat: Die Titelbilder der Walze laufen von oben nach unten durch
+ * und bremsen auf dem gezogenen Spiel ab (schnell = leicht verwischt).
+ */
+export function SlotReel({ roll, games, lang }: { roll: { reel: string[]; at: number }; games: GameManifest[]; lang: string }) {
+  const now = useServerNow(16);
+  const items = roll.reel.map((id) => games.find((g) => g.id === id)).filter(Boolean) as GameManifest[];
+  const n = items.length;
+  const p = Math.min(1, Math.max(0, (now - roll.at) / ROLL_MS));
+  const eased = 1 - (1 - p) ** 3;
+  const speed = 3 * (1 - p) ** 2; // Ableitung der Bremskurve
+  const offset = (eased * (n - 1) / n) * 100;
+  return (
+    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', background: '#000' }}>
+      <div style={{ position: 'absolute', left: 0, right: 0, top: 0, height: `${n * 100}%`, transform: `translateY(-${offset}%)`, filter: speed > 0.15 ? `blur(${Math.min(6, speed * 3).toFixed(1)}px)` : undefined, willChange: 'transform' }}>
+        {items.map((g, i) => (
+          <div key={i} style={{ position: 'relative', height: `${100 / n}%`, borderBottom: '6px solid #000' }}>
+            <GameCover g={g} lang={lang} showName letterSize={200} />
+          </div>
+        ))}
+      </div>
+      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,.45), rgba(0,0,0,0) 22%, rgba(0,0,0,0) 78%, rgba(0,0,0,.45))', pointerEvents: 'none' }} />
+    </div>
+  );
+}
+
 function tally(vote: GameVote) {
   const m = new Map<string, string[]>();
   for (const [pid, gids] of Object.entries(vote.votes)) for (const gid of gids) m.set(gid, [...(m.get(gid) ?? []), pid]);

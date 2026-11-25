@@ -79,11 +79,15 @@ export function PhoneLobby({ onEditAvatar }: { onEditAvatar: () => void }) {
   const all = listGames(room.dev);
   const { tag, setTag, present, shown } = useTagFilter(all);
   const [onlyFit, setOnlyFit] = useState(false);
-  const list = onlyFit ? shown.filter((g) => fitOf(g, active) === 'ok') : shown;
+  const [onlyMine, setOnlyMine] = useState(false);
+  const [popular, setPopular] = useState(false);
   const selected = all.find((g) => g.id === room.selectedGameId);
   const mode = pickModeOf(room);
   const voting = mode === 'vote' && !!room.vote && !room.vote.result;
   const hearts = useHearts(room, me);
+  let list = onlyFit ? shown.filter((g) => fitOf(g, active) === 'ok') : shown;
+  if (onlyMine) list = list.filter((g) => hearts.mine(g.id));
+  if (popular) list = [...list].sort((a, b) => hearts.count(b.id) - hearts.count(a.id));
   const [detailId, setDetailId] = useState<string | null>(null);
   const [optionsFirst, setOptionsFirst] = useState(false);
   const detail = all.find((g) => g.id === detailId);
@@ -208,6 +212,14 @@ export function PhoneLobby({ onEditAvatar }: { onEditAvatar: () => void }) {
                 flex: 'none', border: 0, minHeight: 40, padding: '6px 14px', borderRadius: 999, fontSize: 14, fontWeight: 700, whiteSpace: 'nowrap',
                 background: onlyFit ? 'var(--green)' : 'transparent', color: onlyFit ? '#110D24' : '#fff', boxShadow: onlyFit ? 'none' : 'inset 0 0 0 2px var(--line)',
               }}>{onlyFit ? '✓ ' : ''}{t('lobby.onlyFitting', { n: active })}</button>
+              <button type="button" aria-pressed={onlyMine} onClick={() => setOnlyMine((x) => !x)} style={{
+                flex: 'none', border: 0, minHeight: 40, padding: '6px 14px', borderRadius: 999, fontSize: 14, fontWeight: 700, whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: 6,
+                background: onlyMine ? HEART_PINK : 'transparent', color: '#fff', boxShadow: onlyMine ? 'none' : 'inset 0 0 0 2px var(--line)',
+              }}><IconHeart filled={onlyMine} size={14} />{t('phone.myHeartsFilter')}{hearts.myCount ? ` ${hearts.myCount}` : ''}</button>
+              <button type="button" aria-pressed={popular} onClick={() => setPopular((x) => !x)} style={{
+                flex: 'none', border: 0, minHeight: 40, padding: '6px 14px', borderRadius: 999, fontSize: 14, fontWeight: 700, whiteSpace: 'nowrap',
+                background: popular ? '#fff' : 'transparent', color: popular ? '#110D24' : '#fff', boxShadow: popular ? 'none' : 'inset 0 0 0 2px var(--line)',
+              }}>{popular ? '✓ ' : ''}{t('lobby.sortPopular')}</button>
               {present.length > 1 && ['all', ...present].map((x) => (
                 <button key={x} type="button" aria-pressed={tag === x} onClick={() => setTag(x)} style={{
                   flex: 'none', border: 0, minHeight: 40, padding: '6px 14px', borderRadius: 999, fontSize: 14, fontWeight: 700, whiteSpace: 'nowrap',

@@ -2,6 +2,14 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.48.0
+
+- Neue Spieler werden am Fernseher kurz oben begrüßt („Lena ist dabei!“) – mit einem kleinen Konfetti-Plopp
+- Zufall als Spielautomat: Die Titelbilder rattern von oben nach unten durch und bremsen auf dem gezogenen Spiel ab
+- „Beliebt zuerst“: Spielauswahl am Fernseher und Handy nach Herzen sortieren. Am Handy zeigt der Filter „♥ Meine“ nur die Spiele, die du selbst markiert hast
+- Nach jedem Spiel liegt die Rangliste über dem unscharfen Titelbild des Spiels
+- Fernseher: Ein Klick auf die Adresse unter dem QR-Code kopiert sie in die Zwischenablage. Der Mauszeiger bleibt normal, ein Klick auf die Karte verkleinert den QR-Code nicht mehr
+
 ## 0.47.2
 
 - Fernseher: Unter dem Titelbild ist Platz für drei Zeilen Beschreibung und zwei Zeilen Spiel-Einstellungen. Passt die Spielerzahl, ist das Schild einfach grün (ohne „passt“)

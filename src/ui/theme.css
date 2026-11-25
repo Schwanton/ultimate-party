@@ -123,6 +123,9 @@ textarea.up-input { resize: none; line-height: 1.3; }
 @keyframes upIntroZoom { from { transform: scale(1.25); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 .up-intro-zoom { animation: upIntroZoom .7s cubic-bezier(.2,.8,.2,1) both; }
 .up-intro-rise { animation: upSlideUp .6s ease-out .35s both; }
+/* Begrüßung neuer Spieler (TV) */
+@keyframes upGreet { 0% { opacity: 0; transform: translateY(-16px) scale(.92); } 12% { opacity: 1; transform: none; } 82% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(-8px); } }
+@keyframes upBurst { 0% { opacity: 1; transform: translate(-50%, -50%) rotate(0); } 100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(var(--r)); } }
 /* QR-Code, der mit seinem Rahmen mitwächst */
 .up-qr-fill svg { display: block; width: 100%; height: 100%; }
 /* Spielauswahl: Kachel hebt sich beim Zeigen */
