@@ -355,10 +355,10 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
                 </>
               )}
               <span style={{ background: 'var(--surface-2)', borderRadius: 999, padding: '5px 13px', fontSize: 15, fontWeight: 700, whiteSpace: 'nowrap' }}>
-                {active.length}{selected ? ` / ${selected.maxPlayers}` : ''}
+                {active.length}{selected && !rolling ? ` / ${selected.maxPlayers}` : ''}
               </span>
             </div>
-            <PlayerGrid players={players} vipId={room.vipId} max={selected?.maxPlayers} freeLabel={t('lobby.free')} compact={qrBig} />
+            <PlayerGrid players={players} vipId={room.vipId} max={rolling ? undefined : selected?.maxPlayers} freeLabel={t('lobby.free')} compact={qrBig} />
             {!qrBig && <p className="muted" style={{ marginTop: 'auto', fontSize: 15 }}>
               {lastWinner ? t('lobby.lastWinner', { name: lastWinner.name }) + ' · ' : ''}
               {vip ? t('lobby.vipPicks', { name: vip.name }) : t('lobby.waitingForPlayers')}
@@ -540,7 +540,7 @@ function SelectedGame({ game, rolling, players, canStart, gameCount, lang, t, su
       <div style={{ flex: 'none', display: 'flex', gap: 20, alignItems: 'center' }}>
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
           <p style={{ fontSize: 17, lineHeight: 1.38, color: '#D9D5EE', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', visibility: rolling ? 'hidden' : undefined }}>{gameDesc(game, lang)}</p>
-          {summary && <p className="faint" style={{ fontSize: 14, lineHeight: 1.35, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{summary}</p>}
+          {summary && <p className="faint" style={{ fontSize: 14, lineHeight: 1.35, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', visibility: rolling ? 'hidden' : undefined }}>{summary}</p>}
         </div>
         <div style={{ width: 236, flex: 'none', display: 'flex', flexDirection: 'column', gap: 16 }}>
           <button className="up-btn big" disabled={!canStart} onClick={() => net.request('start')}>{t('lobby.start')}</button>

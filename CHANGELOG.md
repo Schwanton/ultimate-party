@@ -2,6 +2,10 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.48.2
+
+- Zufalls-Walze: Die Spiel-Einstellungen und die Spielerzahl (z. B. „4 / 10“) erscheinen erst, wenn die Walze steht – zusammen mit allem anderen
+
 ## 0.48.1
 
 - Beim Kopieren der Adresse wird der Raumcode im Link mitkopiert – wer den Link öffnet, landet direkt im richtigen Raum
