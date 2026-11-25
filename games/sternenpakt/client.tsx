@@ -371,9 +371,9 @@ function useMessageSounds(msgs: any[] | undefined, tvSide: boolean) {
 }
 
 function phaseInfo(v: any, sim: number, now: number, t: Translate) {
-  if (v.phase === 'plan') {
+  if (v.phase === 'plan' || v.phase === 'break') {
     const left = (v.deadline - now) / 1000;
-    return { label: t('phase.plan'), time: fmt(left), frac: Math.max(0, Math.min(1, left / (v.duration / 1000))), plan: true };
+    return { label: t(v.phase === 'break' ? 'phase.break' : 'phase.plan'), time: fmt(left), frac: Math.max(0, Math.min(1, left / (v.duration / 1000))), plan: true };
   }
   const yearEnd = v.year * YEAR;
   const left = Math.max(0, yearEnd - sim);
@@ -429,7 +429,7 @@ function TvPlay({ v, t }: { v: any; t: Translate }) {
         {ph.plan && (
           <div style={{ position: 'absolute', left: 0, right: 0, bottom: 24, display: 'flex', justifyContent: 'center', pointerEvents: 'none' }}>
             <span style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 30, padding: '8px 26px', borderRadius: 18, background: 'rgba(7,11,26,.85)', border: `2px solid #FFD23F`, color: '#FFD23F' }}>
-              {t('tv.plan', { time: ph.time })}
+              {v.phase === 'break' ? t('tv.break', { time: ph.time }) : t('tv.plan', { time: ph.time })}
             </span>
           </div>
         )}
@@ -661,7 +661,7 @@ function PhoneHeader({ v, t, vip }: { v: any; t: Translate; vip: boolean }) {
         {emp.p && <span style={{ fontSize: 12, fontWeight: 700, color: '#FF8A5B' }}>{t('pirate')}</span>}
       </div>
       <div style={{ display: 'flex', gap: 12, fontSize: 14, color: MUTED, whiteSpace: 'nowrap' }}>
-        <span style={{ color: ph.plan ? '#FFD23F' : MUTED }}>{ph.plan ? `${t('phase.plan')} ${ph.time}` : v.phase === 'resolve' ? `${t('phase.resolve')} ${ph.time}` : `${t('year', { n: v.year })} · ${ph.time}`}</span>
+        <span style={{ color: ph.plan ? '#FFD23F' : MUTED }}>{ph.plan ? `${ph.label} ${ph.time}` : v.phase === 'resolve' ? `${t('phase.resolve')} ${ph.time}` : `${t('year', { n: v.year })} · ${ph.time}`}</span>
         {v.money != null && <span style={{ color: '#FFD23F', fontWeight: 700 }}>{t('money', { n: v.money })}</span>}
       </div>
     </div>
@@ -943,7 +943,7 @@ function MapTab({ v, t, send }: { v: any; t: Translate; send: (a: any) => void }
           <>
             <span style={{ fontSize: 15, color: MUTED }}>{info != null ? describe(info) : v.pirate ? t('map.hintPirate') : t('map.hint')}</span>
             {!v.pirate && <GuardRow v={v} t={t} send={send} />}
-            {v.rounds && <PlanBox v={v} t={t} send={send} />}
+            {(v.rounds || v.phase === 'break') && <PlanBox v={v} t={t} send={send} />}
           </>
         )}
         {mode === 'send' && step === 2 && (
@@ -1003,9 +1003,9 @@ function PlanBox({ v, t, send }: { v: any; t: Translate; send: (a: any) => void 
           ))}
         </div>
       )}
-      {v.phase === 'plan' && (
+      {(v.phase === 'plan' || v.phase === 'break') && (
         <button type="button" onClick={() => send({ type: 'ready', off: v.ready })} style={v.ready ? { ...ghost, width: '100%' } : btn('#FFD23F', BG, { width: '100%' })}>
-          {v.ready ? t('plan.waiting') : t('plan.done')}
+          {v.ready ? t('plan.waiting') : v.phase === 'break' ? t('plan.doneBreak') : t('plan.done')}
         </button>
       )}
     </div>

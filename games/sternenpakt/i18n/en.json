@@ -179,5 +179,8 @@
   "mis.home": "Never lose your home star",
   "mis.ships": "Have the most ships at the end",
   "phone.breakdown": "{stars} stars · {heart} years Heart · {mis} from missions",
-  "route.via1": "Route with 1 stop at your star."
+  "route.via1": "Route with 1 stop at your star.",
+  "phase.break": "Time-out",
+  "tv.break": "Time-out – time stands still! {time}",
+  "plan.doneBreak": "Done – continue when everyone is"
 }

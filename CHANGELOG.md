@@ -2,6 +2,10 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.42.0
+
+- Sternenpakt: neue Einstellung „Bedenkpause“. Alle 5 Jahre steht die Zeit eine Minute lang still. In der Pause könnt ihr ausbauen, forschen, verhandeln und Flotten losschicken – sie fliegen erst los, wenn es weitergeht. Tippen alle auf „Fertig“, geht es früher weiter (nur im Echtzeit-Takt)
+
 ## 0.41.1
 
 - Sternenpakt: Nach dem Antippen deines Sterns bleibt die ganze Karte sichtbar, damit du auch weit entfernte Ziele direkt antippen kannst (der Weg über deine Sterne erscheint gestrichelt). „Näher ran“ zoomt bei Bedarf auf die Umgebung

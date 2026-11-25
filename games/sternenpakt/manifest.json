@@ -18,7 +18,7 @@
     "deceive"
   ],
   "sdkVersion": 1,
-  "version": "0.2.1",
+  "version": "0.3.0",
   "author": "UP!",
   "options": [
     {
@@ -86,6 +86,34 @@
           }
         }
       ]
+    },
+    {
+      "id": "breaks",
+      "label": {
+        "de": "Bedenkpause",
+        "en": "Time-out"
+      },
+      "default": 0,
+      "choices": [
+        {
+          "value": 0,
+          "label": {
+            "de": "Aus",
+            "en": "Off"
+          }
+        },
+        {
+          "value": 5,
+          "label": {
+            "de": "Alle 5 Jahre",
+            "en": "Every 5 years"
+          }
+        }
+      ],
+      "help": {
+        "de": "Nur bei Echtzeit: Alle 5 Jahre steht die Zeit eine Minute lang still. In der Pause kann jeder ausbauen, forschen und Flotten losschicken – sie fliegen erst danach los. Wenn alle „Fertig“ tippen, geht es früher weiter.",
+        "en": "Real time only: every 5 years time stands still for one minute. Everyone can build, research and send fleets – they only start moving afterwards. When everyone taps “Done”, it continues early."
+      }
     },
     {
       "id": "ships",

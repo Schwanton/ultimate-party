@@ -179,5 +179,8 @@
   "mis.home": "Verliere nie deinen Heimatstern",
   "mis.ships": "Habe am Ende die meisten Schiffe",
   "phone.breakdown": "{stars} Sterne · {heart} Jahre Herz · {mis} aus Aufträgen",
-  "route.via1": "Weg mit 1 Zwischenhalt auf deinem Stern."
+  "route.via1": "Weg mit 1 Zwischenhalt auf deinem Stern.",
+  "phase.break": "Bedenkpause",
+  "tv.break": "Bedenkpause – die Zeit steht! {time}",
+  "plan.doneBreak": "Fertig – weiter, wenn alle fertig sind"
 }

@@ -13,6 +13,8 @@ const PUBLISH_EVERY = 2;
 const AUTO_EVERY = 3;
 const INTRO = 60;
 const PLAN = 40;
+/** Bedenkpause (Echtzeit): so lange steht die Zeit */
+const BREAK = 60;
 const RESOLVE = 15;
 const RESOLVE_SPEED = E.YEAR / RESOLVE;
 const REPLAY = 11;
@@ -24,7 +26,7 @@ const AI_NAMES: Record<string, string[]> = {
 };
 const AI_COLORS = ['#B9C2E8', '#FF8A5B', '#A98BFF', '#6BFFE0', '#FFE66B', '#FF6B8A'];
 
-type Phase = 'intro' | 'run' | 'plan' | 'resolve' | 'replay' | 'final';
+type Phase = 'intro' | 'run' | 'break' | 'plan' | 'resolve' | 'replay' | 'final';
 interface ChatMsg { f: number; x?: string; m?: number; t?: E.Tech; l?: number; id: number }
 type TvMsg = { id: number; k: string; e?: number; star?: number; by?: number; prev?: number };
 const r2 = (n: number) => Math.round(n * 100) / 100;
@@ -52,6 +54,8 @@ export default {
     const rounds = ctx.options.takt === 'rounds';
     const rough = ctx.options.ships === 'rough';
     const announce = ctx.options.missions === 'announce';
+    /** alle so viele Jahre eine Bedenkpause (0 = aus; nur Echtzeit) */
+    const breakEvery = rounds ? 0 : Number(ctx.options.breaks) || 0;
     const s = E.createGame(seeds, years, rng);
     const empOf = new Map<string, number>(s.empires.map((e, i) => [e.id, i]));
     const map = s.stars.map((st) => [r2(st.x), r2(st.y), st.name, st.home, st.sp]);
@@ -80,6 +84,8 @@ export default {
     let result: { e: number; stars: number; ships: number; heart: number; mis: number; pts: number }[] = [];
     let introTimer: { cancel(): void } | null = null;
     let planTimer: { cancel(): void } | null = null;
+    let breakTimer: { cancel(): void } | null = null;
+    let breakDue = false;
 
     const pair = (a: number, b: number) => (a < b ? `${a}|${b}` : `${b}|${a}`);
     const show = (n: number, mine: boolean) => (mine || !rough ? n : n === 0 ? 0 : `~${Math.max(5, Math.round(n / 5) * 5)}`);
@@ -236,6 +242,7 @@ export default {
             break;
           case 'year':
             banner = { year: ev.year, at: Date.now() };
+            if (breakEvery && (ev.year - 1) % breakEvery === 0) breakDue = true;
             break;
         }
       }
@@ -270,6 +277,7 @@ export default {
         handle(E.tick(s, TICK * speed, rng));
         if (s.over) return end();
         if (phase === 'resolve' && s.sim >= resolveEnd - 1e-6) startPlan();
+        if (phase === 'run' && breakDue) startBreak();
       }
       tickNo++;
       if (dirty || tickNo % PUBLISH_EVERY === 0) publish();
@@ -288,6 +296,31 @@ export default {
         phaseDeadline = 0;
       }
       banner = { year: 1, at: Date.now() };
+      dirty = true;
+    }
+
+    /** Bedenkpause: Zeit steht, Bauen und Befehle gehen weiter */
+    function startBreak() {
+      breakDue = false;
+      phase = 'break';
+      speed = 0;
+      ready.clear();
+      const t = ctx.timer(BREAK, endBreak);
+      breakTimer = t;
+      phaseDeadline = t.deadline;
+      phaseDuration = t.duration;
+      runAuto(true);
+      dirty = true;
+    }
+
+    function endBreak() {
+      if (phase !== 'break') return;
+      breakTimer?.cancel();
+      ready.clear();
+      phase = 'run';
+      speed = 1;
+      phaseDeadline = 0;
+      banner = { year: s.year, at: Date.now() };
       dirty = true;
     }
 
@@ -339,6 +372,7 @@ export default {
     function end() {
       speed = 0;
       planTimer?.cancel();
+      breakTimer?.cancel();
       result = E.standings(s, true);
       phase = 'replay';
       publish();
@@ -357,7 +391,7 @@ export default {
 
     function planCheck() {
       const real = humans.filter((p) => !p.isBot && ctx.player(p.id)?.connected);
-      if (real.length && real.every((p) => ready.has(p.id))) ctx.after(0.8, startResolve);
+      if (real.length && real.every((p) => ready.has(p.id))) ctx.after(0.8, phase === 'break' ? endBreak : startResolve);
     }
 
     /* ---------- Chat ---------- */
@@ -404,7 +438,7 @@ export default {
         const e = empOf.get(playerId);
         if (e == null || !a || typeof a !== 'object') return;
         const emp = s.empires[e];
-        const playing = phase === 'run' || phase === 'plan' || phase === 'resolve';
+        const playing = phase === 'run' || phase === 'break' || phase === 'plan' || phase === 'resolve';
         switch (a.type) {
           case 'missions':
             if (phase !== 'intro' || !Array.isArray(a.pick) || E.chooseMissions(s, e, a.pick)) return;
@@ -414,7 +448,7 @@ export default {
               if (!emp.missions.length) E.chooseMissions(s, e, [0, 1]);
               ready.add(playerId);
               introCheck();
-            } else if (phase === 'plan') {
+            } else if (phase === 'plan' || phase === 'break') {
               if (a.off) ready.delete(playerId);
               else ready.add(playerId);
               planCheck();
