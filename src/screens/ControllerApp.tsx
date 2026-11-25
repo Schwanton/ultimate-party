@@ -160,6 +160,13 @@ function InRoom() {
         <p style={{ fontSize: 19 }}>{t('game.spectating')}</p>
       </div>
     );
+  } else if (room.intro) {
+    content = (
+      <div className="anim-pop" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, textAlign: 'center' }}>
+        <Avatar player={me} size={96} />
+        <p className="display" style={{ fontSize: 30, fontWeight: 800 }}>{t('intro.title')}</p>
+      </div>
+    );
   } else if (olympiaRunning(room)) {
     content = <OlympiaPhone room={room} me={me} games={listGames(room.dev)} t={t} />;
   } else if (picking) {

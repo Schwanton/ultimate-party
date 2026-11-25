@@ -286,6 +286,8 @@ export interface RoomSnapshot {
   vote: GameVote | null;
   /** zuletzt per Zufall gezogenes Spiel (für die Walzen-Animation auf dem TV) */
   roll: { reel: string[]; at: number } | null;
+  /** Startmoment vor dem Spiel: welches Spiel, seit wann und bis wann (Serverzeit) */
+  intro?: { gameId: string; at: number; until: number } | null;
   /** Olympia-Modus (null = aus) */
   olympia: OlympiaState | null;
   /** Spiel pausiert (null = läuft): seit wann (Serverzeit), bisherige Pausen (ms), wer ('tv' oder Spieler-ID) */

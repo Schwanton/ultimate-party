@@ -77,6 +77,9 @@ export interface ServerMessage {
   [key: string]: unknown;
 }
 
+/** Dauer des Startmoments vor jedem Spiel (ms) */
+const INTRO_MS = 3000;
+
 export class Room {
   readonly code: string;
   readonly hostToken: string;
@@ -93,6 +96,9 @@ export class Room {
   /** Abstimmung über das nächste Spiel (nur in der Lobby) */
   vote: GameVote | null = null;
   roll: { reel: string[]; at: number } | null = null;
+  /** Startmoment: das Titelbild füllt kurz den TV, dann beginnt das Spiel */
+  intro: { gameId: string; at: number; until: number } | null = null;
+  private introTimer: ReturnType<typeof setTimeout> | null = null;
   /** Olympia-Modus (null = aus) */
   olympia: OlympiaState | null = null;
   private olympiaTimer: ReturnType<typeof setTimeout> | null = null;
@@ -442,6 +448,28 @@ export class Room {
   /** Spieler, die aktuell mitspielen können (verbunden oder Bot) */
   private eligible() {
     return [...this.players.values()].filter((p) => p.info.connected || p.info.isBot).sort((a, b) => a.order - b.order);
+  }
+
+  /** Start aus der Lobby: erst 3 Sekunden Startmoment mit Titelbild, dann das Spiel */
+  requestStart(): string | null {
+    if (this.intro) return null;
+    const id = this.selectedGameId;
+    const loaded = id ? getGame(id) : undefined;
+    if (!loaded || !id) return 'no_game';
+    if (this.eligible().length < loaded.manifest.minPlayers) return 'not_enough_players';
+    const now = Date.now();
+    this.intro = { gameId: id, at: now, until: now + INTRO_MS };
+    this.clearVote();
+    this.roll = null;
+    this.introTimer = setTimeout(() => {
+      this.introTimer = null;
+      this.intro = null;
+      const error = this.startGame();
+      if (error) this.notice = error;
+      this.touch();
+    }, INTRO_MS);
+    this.touch();
+    return null;
   }
 
   startGame(): string | null {
@@ -1201,6 +1229,7 @@ export class Room {
       dev: DEV,
       vote: this.vote,
       roll: this.roll,
+      intro: this.intro,
       olympia: this.olympia,
       pause: this.game && this.game.pausedAt !== null ? { at: this.game.pausedAt, shift: this.game.shift, by: this.game.pausedBy } : null,
       clockShift: this.game ? this.game.shift : 0,

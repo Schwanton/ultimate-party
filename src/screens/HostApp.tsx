@@ -4,7 +4,7 @@ import type { GameManifest, Lang, PlayerInfo, Translate } from '@up/sdk';
 import { net, useNet, loadSession, saveSession } from '../net';
 import { guessLang, useT } from '../i18n';
 import { clientGame } from '../registry';
-import { Avatar, Crown, FullscreenButton, useKeepAwake, Logo, QrCode, Stage, isLight, sfx, shade, toggleFullscreen } from '../ui';
+import { Avatar, Crown, FullscreenButton, useKeepAwake, Logo, QrCode, Stage, isLight, sfx, shade, toggleFullscreen, useServerNow } from '../ui';
 import { HostSettings } from './HostSettings';
 import { GameOptionsForm, optionsSummary } from './GameOptions';
 import { UpdateBanner } from './Update';
@@ -96,6 +96,16 @@ export function HostApp() {
     );
   }
 
+  if (room.intro) {
+    const games = s.host.games;
+    return (
+      <Stage>
+        <StartMoment game={games.find((g) => g.id === room.intro!.gameId)} until={room.intro.until} lang={room.lang} t={t}
+          players={room.players.filter((p) => p.connected || p.isBot)} />
+      </Stage>
+    );
+  }
+
   return (
     <Stage>
       {s.status !== 'open' && <ConnectionBanner text={t('status.reconnecting')} />}
@@ -112,10 +122,19 @@ function useHostSounds() {
   const inLobby = room?.phase === 'lobby';
   const game = room?.phase === 'game' ? clientGame(room.gameId) : undefined;
   sfx.auto = game?.manifest.autoSounds !== false;
+  const intro = !!room?.intro;
   useEffect(() => {
-    if (inLobby) sfx.startMusic();
+    if (inLobby && !intro) sfx.startMusic();
     else sfx.stopMusic();
-  }, [inLobby]);
+  }, [inLobby, intro]);
+  // Startmoment: Tick pro Sekunde des Countdowns
+  const introAt = room?.intro?.at;
+  useEffect(() => {
+    if (!introAt) return;
+    sfx.play('whoosh');
+    const ids = [1000, 2000].map((ms) => setTimeout(() => sfx.play('tick'), ms));
+    return () => ids.forEach(clearTimeout);
+  }, [introAt]);
   const count = room?.players.length ?? 0;
   const lastCount = useRef(count);
   useEffect(() => {
@@ -231,19 +250,20 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
 
   return (
     <>
-      <header style={{ height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <Logo />
-          <span className="display muted" style={{ fontSize: 20, fontWeight: 500 }}>{t('app.name')}</span>
-        </div>
+      <LobbyBackdrop game={room.olympia ? undefined : (rolling ?? selected)} />
+      <header style={{ height: 56, display: 'flex', alignItems: 'center', gap: 12 }}>
+        <Logo />
+        <span style={{ flex: 1 }} />
+        {!room.olympia && (<>
+          <span className="up-label" style={{ fontSize: 13, whiteSpace: 'nowrap' }}>{t('pick.label')}</span>
+          <PickModeSwitch mode={pickModeOf(room)} t={t} big />
+          {pickModeOf(room) === 'random' && <button className="up-btn ghost small" style={{ whiteSpace: 'nowrap' }} onClick={() => net.send('random')}>{t('pick.reroll')}</button>}
+          {pickModeOf(room) === 'vote' && room.vote?.result && <button className="up-btn ghost small" style={{ whiteSpace: 'nowrap' }} onClick={() => net.send('vote:start')}>{t('pick.newVote')}</button>}
+          {pickModeOf(room) === 'vote' && !room.vote && <button className="up-btn ghost small" style={{ whiteSpace: 'nowrap' }} onClick={() => net.send('vote:start')}>{t('pick.startVote')}</button>}
+          <button className="up-btn small" style={{ whiteSpace: 'nowrap', background: 'var(--surface)', color: 'var(--yellow)', boxShadow: '0 0 0 2px var(--yellow)' }} onClick={() => net.send('olympia:open')}>{t('olympia.button')}</button>
+          <span style={{ width: 8 }} />
+        </>)}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <SoundButton label={t('sound.enable')} />
-          {room.dev && (
-            <>
-              <button className="up-btn ghost small" style={{ whiteSpace: 'nowrap' }} onClick={() => net.send('bots:add', { count: 1 })}>{t('lobby.addBots')}</button>
-              {players.some((p) => p.isBot) && <button className="up-btn ghost small" style={{ whiteSpace: 'nowrap' }} onClick={() => net.send('bots:remove')}>{t('lobby.removeBots')}</button>}
-            </>
-          )}
           <div style={{ display: 'flex', background: 'var(--surface)', borderRadius: 999, padding: 4 }}>
             {(['de', 'en'] as Lang[]).map((l) => (
               <button key={l} aria-pressed={room.lang === l} onClick={() => setLang(l)}
@@ -281,29 +301,33 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
       )}
 
       <main style={{ flex: 1, minHeight: 0, display: 'flex', gap: 24 }}>
-        <div style={{ width: 452, flex: 'none', display: 'flex', flexDirection: 'column', gap: 20 }}>
-          <section className="up-card" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 14, borderRadius: 28 }}>
-            <h2 style={{ fontSize: 30, fontWeight: 800 }}>{t('join.title')}</h2>
-            <div style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
-              <QrCode text={joinUrl} size={124} />
+        <div style={{ width: 376, flex: 'none', display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <section className="up-card" style={{ ...glass, padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 10, borderRadius: 24 }}>
+            <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+              <QrCode text={joinUrl} size={112} />
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0 }}>
-                <span className="muted" style={{ fontSize: 14, fontWeight: 500 }}>{t('join.scanOrOpen')}</span>
-                <span style={{ fontSize: 19, fontWeight: 700, wordBreak: 'break-all' }}>{room.joinUrl.replace(/^https?:\/\//, '')}</span>
-                <span className="muted" style={{ fontSize: 14, fontWeight: 500, marginTop: 6 }}>{t('join.code')}</span>
-                <div style={{ display: 'flex', gap: 7 }}>
+                <h2 style={{ fontSize: 24, fontWeight: 800 }}>{t('join.title')}</h2>
+                <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--muted)', wordBreak: 'break-all' }}>{room.joinUrl.replace(/^https?:\/\//, '')}</span>
+                <div aria-label={`${t('join.code')} ${room.code}`} style={{ display: 'flex', gap: 6, marginTop: 4 }}>
                   {room.code.split('').map((ch, i) => (
-                    <span key={i} className="display" style={{ width: 44, height: 52, borderRadius: 12, background: 'var(--yellow)', color: '#110D24', fontSize: 30, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 0 var(--yellow-d)' }}>{ch}</span>
+                    <span key={i} className="display" style={{ width: 38, height: 46, borderRadius: 10, background: 'var(--yellow)', color: '#110D24', fontSize: 26, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 0 var(--yellow-d)' }}>{ch}</span>
                   ))}
                 </div>
               </div>
             </div>
-            <p className="faint" style={{ fontSize: 14 }}>{t('join.noApp')}</p>
           </section>
 
-          <section className="up-card" style={{ flex: 1, minHeight: 0, padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 14, borderRadius: 28 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <h2 style={{ fontSize: 24, fontWeight: 700 }}>{t('lobby.players')}</h2>
-              <span style={{ background: 'var(--surface-2)', borderRadius: 999, padding: '5px 13px', fontSize: 15, fontWeight: 700 }}>
+          <section className="up-card" style={{ ...glass, flex: 1, minHeight: 0, padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 14, borderRadius: 24 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <h2 style={{ fontSize: 22, fontWeight: 700, flex: 1 }}>{t('lobby.players')}</h2>
+              <SoundButton label={t('sound.enable')} />
+              {room.dev && (
+                <>
+                  <button className="up-btn ghost small" style={{ whiteSpace: 'nowrap', padding: '6px 10px' }} onClick={() => net.send('bots:add', { count: 1 })}>{t('lobby.addBots')}</button>
+                  {players.some((p) => p.isBot) && <button className="up-btn ghost small" style={{ whiteSpace: 'nowrap', padding: '6px 10px' }} onClick={() => net.send('bots:remove')}>{t('lobby.removeBots')}</button>}
+                </>
+              )}
+              <span style={{ background: 'var(--surface-2)', borderRadius: 999, padding: '5px 13px', fontSize: 15, fontWeight: 700, whiteSpace: 'nowrap' }}>
                 {active.length}{selected ? ` / ${selected.maxPlayers}` : ''}
               </span>
             </div>
@@ -317,15 +341,6 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
 
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 14 }}>
           {room.olympia ? <OlympiaSetup room={room} games={games} t={t} /> : (<>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            <span className="up-label" style={{ fontSize: 14, whiteSpace: 'nowrap' }}>{t('pick.label')}</span>
-            <PickModeSwitch mode={pickModeOf(room)} t={t} big />
-            <span style={{ flex: 1 }} />
-            {pickModeOf(room) === 'random' && <button className="up-btn ghost small" style={{ whiteSpace: 'nowrap' }} onClick={() => net.send('random')}>{t('pick.reroll')}</button>}
-            {pickModeOf(room) === 'vote' && room.vote?.result && <button className="up-btn ghost small" style={{ whiteSpace: 'nowrap' }} onClick={() => net.send('vote:start')}>{t('pick.newVote')}</button>}
-            {pickModeOf(room) === 'vote' && !room.vote && <button className="up-btn ghost small" style={{ whiteSpace: 'nowrap' }} onClick={() => net.send('vote:start')}>{t('pick.startVote')}</button>}
-            <button className="up-btn small" style={{ whiteSpace: 'nowrap', background: 'var(--surface)', color: 'var(--yellow)', boxShadow: '0 0 0 2px var(--yellow)' }} onClick={() => net.send('olympia:open')}>{t('olympia.button')}</button>
-          </div>
           {pickModeOf(room) === 'vote' && <VoteOptions room={room} t={t} />}
           {pickModeOf(room) === 'vote' && room.vote && !room.vote.result ? (
             <HostVoteBoard vote={room.vote} games={games} room={room} t={t} player={(id) => room.players.find((p) => p.id === id)} />
@@ -339,6 +354,61 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
         </div>
       </main>
     </>
+  );
+}
+
+/** Halbdurchsichtige Karten über dem Bild-Hintergrund der Lobby */
+const glass: React.CSSProperties = { background: 'rgba(28,23,56,.78)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' };
+
+/**
+ * Hintergrund der Lobby: Titelbild des gewählten Spiels, unscharf und abgedunkelt.
+ * Beim Spielwechsel blendet das neue Bild weich über das alte.
+ */
+function LobbyBackdrop({ game }: { game?: GameManifest }) {
+  const url = game?.coverUrl ?? null;
+  const color = game?.color ?? null;
+  const [layers, setLayers] = useState<{ key: number; url: string | null; color: string | null }[]>([]);
+  const next = useRef(0);
+  useEffect(() => {
+    if (!url && !color) { setLayers([]); return; }
+    const key = ++next.current;
+    setLayers((ls) => [...ls.slice(-1), { key, url, color }]);
+    const id = setTimeout(() => setLayers((ls) => ls.filter((l) => l.key >= key)), 900);
+    return () => clearTimeout(id);
+  }, [url, color]);
+  return (
+    <div aria-hidden="true" style={{ position: 'absolute', inset: 0, zIndex: -1, overflow: 'hidden', pointerEvents: 'none' }}>
+      {layers.map((l) => (
+        <div key={l.key} style={{ position: 'absolute', inset: 0, animation: 'upFade .8s ease-out both' }}>
+          {l.url
+            ? <img src={l.url} alt="" style={{ position: 'absolute', inset: -60, width: 'calc(100% + 120px)', height: 'calc(100% + 120px)', objectFit: 'cover', filter: 'blur(30px) saturate(1.25) brightness(.55)' }} />
+            : <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse at 70% 40%, ${shade(l.color ?? '#110D24', 0.45)}, var(--bg) 75%)` }} />}
+        </div>
+      ))}
+      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(17,13,36,.55), rgba(17,13,36,.78))' }} />
+    </div>
+  );
+}
+
+/** Startmoment: Das Titelbild füllt den TV, dazu ein Countdown, dann beginnt das Spiel. */
+function StartMoment({ game, until, players, lang, t }: { game?: GameManifest; until: number; players: PlayerInfo[]; lang: Lang; t: Translate }) {
+  const now = useServerNow(100);
+  const left = Math.max(1, Math.ceil((until - now) / 1000));
+  return (
+    <div role="status" aria-label={t('intro.title')} style={{ position: 'absolute', inset: 0, zIndex: 80, background: '#000', overflow: 'hidden' }}>
+      {game && <div className="up-intro-zoom" style={{ position: 'absolute', inset: 0 }}><GameCover g={game} lang={lang} zoom showName letterSize={240} /></div>}
+      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(10,7,22,.92) 100%)' }} />
+      <div className="up-intro-rise" style={{ position: 'absolute', left: 56, right: 56, bottom: 40, display: 'flex', alignItems: 'flex-end', gap: 32 }}>
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <span className="display" style={{ fontSize: 60, fontWeight: 800, lineHeight: 1, textShadow: '0 4px 24px rgba(0,0,0,.6)' }}>{t('intro.title')}</span>
+          <span style={{ fontSize: 20, fontWeight: 500, color: '#D9D5EE' }}>{t('intro.lookAtPhones')}</span>
+          <div style={{ display: 'flex', gap: 10, marginTop: 4, flexWrap: 'wrap', maxHeight: 52, overflow: 'hidden' }}>
+            {players.slice(0, 18).map((p) => <Avatar key={p.id} player={p} size={46} />)}
+          </div>
+        </div>
+        <span key={left} className="display anim-pop" style={{ width: 120, height: 120, flex: 'none', borderRadius: '50%', background: 'var(--yellow)', color: '#110D24', fontSize: 72, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 0 var(--yellow-d), 0 0 0 8px rgba(255,212,71,.25)' }}>{left}</span>
+      </div>
+    </div>
   );
 }
 
@@ -369,29 +439,37 @@ function SelectedGame({ game, rolling, players, canStart, gameCount, lang, t, su
   const fit = fitOf(game, players);
   const fitText = fit === 'few' ? t('lobby.needPlayers', { n: game.minPlayers - players }) : fit === 'many' ? t('lobby.tooManyShort') : t('lobby.fits');
   return (
-    <section key={rolling ? 'roll' : game.id} className={rolling ? undefined : 'anim-up'} style={{ flex: 1, minWidth: 0, minHeight: 0, display: 'flex', flexDirection: 'column', borderRadius: 28, overflow: 'hidden', background: 'var(--surface)', boxShadow: `0 0 0 3px ${game.color}, 0 8px 0 ${shade(game.color)}` }}>
-      <div style={{ flex: 1, minHeight: 180, position: 'relative' }}>
-        <GameCover g={game} lang={lang} zoom letterSize={240} />
-        {!rolling && pickedBadge}
-        {rolling && <span className="display" style={{ position: 'absolute', left: 18, top: 18, background: 'var(--yellow)', color: '#110D24', borderRadius: 999, padding: '7px 16px', fontSize: 18, fontWeight: 800 }}>{t('pick.rolling')}</span>}
+    <section style={{ flex: 1, minWidth: 0, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 14 }}>
+      {/* Titelbild ganz und groß (16:9), passt sich der freien Höhe an */}
+      <div style={{ flex: 1, minHeight: 160, containerType: 'size', display: 'flex', justifyContent: 'center' } as React.CSSProperties}>
+        <button key={rolling ? 'roll' : game.id} className={rolling ? undefined : 'anim-up'} onClick={onLibrary} aria-label={`${gameName(game, lang)} – ${t('lobby.changeGame')}`}
+          style={{ border: 0, padding: 0, width: 'min(100cqw, 100cqh * 16 / 9)', aspectRatio: '16 / 9', alignSelf: 'flex-start', borderRadius: 24, overflow: 'hidden', position: 'relative', background: 'var(--surface)', boxShadow: `0 0 0 3px ${game.color}, 0 12px 40px rgba(0,0,0,.55)` }}>
+          <GameCover g={game} lang={lang} zoom={!rolling} showName letterSize={240} />
+          {!rolling && pickedBadge}
+          {rolling && <span className="display" style={{ position: 'absolute', left: 18, top: 18, background: 'var(--yellow)', color: '#110D24', borderRadius: 999, padding: '7px 16px', fontSize: 18, fontWeight: 800 }}>{t('pick.rolling')}</span>}
+        </button>
       </div>
-      <div style={{ flex: 'none', padding: '18px 26px 22px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <h1 className="display" style={{ fontSize: 44, fontWeight: 800, lineHeight: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{gameName(game, lang)}</h1>
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          <span style={fit === 'ok' ? badge('rgba(75,227,161,.16)', 'var(--green)') : badge('rgba(255,212,71,.16)', 'var(--yellow)')}>
-            <IconPlayers /> {playersLabel(game, t)} · {fitText}
-          </span>
-          <span style={badge('var(--surface-2)', 'var(--text)')}><IconClock /> {t('lobby.minutes', { n: game.minutes })}</span>
-          {gameTags(game).map((x) => <span key={x} style={badge('var(--surface-2)', 'var(--muted)')}>{t(`tag.${x}`)}</span>)}
+      {/* Infos und Start als schmale Leiste darunter */}
+      <div style={{ flex: 'none', display: 'flex', gap: 20, alignItems: 'center' }}>
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <span style={fit === 'ok' ? badge('rgba(75,227,161,.18)', 'var(--green)') : badge('rgba(255,212,71,.18)', 'var(--yellow)')}>
+              <IconPlayers /> {playersLabel(game, t)} · {fitText}
+            </span>
+            <span style={badge('rgba(38,32,72,.85)', 'var(--text)')}><IconClock /> {t('lobby.minutes', { n: game.minutes })}</span>
+            {gameTags(game).map((x) => <span key={x} style={badge('rgba(38,32,72,.85)', 'var(--muted)')}>{t(`tag.${x}`)}</span>)}
+          </div>
+          <p style={{ fontSize: 17, lineHeight: 1.38, color: '#D9D5EE', display: '-webkit-box', WebkitLineClamp: summary ? 1 : 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{gameDesc(game, lang)}</p>
+          {summary && <p className="faint" style={{ fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{summary}</p>}
         </div>
-        <p style={{ fontSize: 18, lineHeight: 1.38, color: '#D9D5EE', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{gameDesc(game, lang)}</p>
-        {summary && <p className="faint" style={{ fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{summary}</p>}
-        <div style={{ marginTop: 4, display: 'flex', gap: 12, alignItems: 'center' }}>
-          <button className="up-btn big" style={{ flex: 1 }} disabled={!canStart} onClick={() => net.request('start')}>{t('lobby.start')}</button>
-          <button className="up-btn ghost" onClick={onLibrary}>{t('lobby.changeGame')}</button>
-          {game.options?.length ? (
-            <button className="up-btn ghost" aria-label={t('lobby.gameSettings')} title={t('lobby.gameSettings')} onClick={onOptions} style={{ width: 56, padding: 0 }}><IconSliders /></button>
-          ) : null}
+        <div style={{ width: 236, flex: 'none', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <button className="up-btn big" disabled={!canStart} onClick={() => net.request('start')}>{t('lobby.start')}</button>
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button className="up-btn ghost small" style={{ flex: 1, whiteSpace: 'nowrap' }} onClick={onLibrary}>{t('lobby.changeGame')}</button>
+            {game.options?.length ? (
+              <button className="up-btn ghost small" aria-label={t('lobby.gameSettings')} title={t('lobby.gameSettings')} onClick={onOptions} style={{ width: 48, padding: 0 }}><IconSliders /></button>
+            ) : null}
+          </div>
         </div>
       </div>
     </section>

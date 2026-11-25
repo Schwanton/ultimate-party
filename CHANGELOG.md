@@ -2,6 +2,15 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.45.0
+
+Neue TV-Lobby, in der die Titelbilder richtig zur Geltung kommen:
+- Die Lobby nimmt die Farben des gewählten Spiels an: Sein Titelbild liegt unscharf im ganzen Hintergrund und blendet beim Spielwechsel weich über
+- Das gewählte Spiel ist jetzt groß und ganz zu sehen, mit Schriftzug. Infos und Start-Knopf stehen als schmale Leiste darunter
+- „Nächstes Spiel“ (VIP, Abstimmung, Zufall) und Olympia sind in die Kopfzeile gewandert, die linke Spalte mit QR-Code und Spielern ist schmaler
+- Die Spielauswahl ist eine Bilder-Wand: drei große Titelbilder pro Reihe, Spielerzahl und Dauer stehen direkt auf dem Bild. Spiele, die gerade nicht passen, sind grau. Spiele ohne Titelbild bekommen automatisch eins mit ihrem Namen
+- Neuer Startmoment: Nach „Los geht's!“ füllt das Titelbild drei Sekunden lang den Fernseher, mit Countdown, dann beginnt das Spiel
+
 ## 0.44.2
 
 - Jetzt hat jedes Spiel ein eigenes Titelbild! Neu dabei: **Der Abgrund**, **Chaotic Tower Defense**, **Figurendle**, **Hochstapler**, **Kronenduell**, **Maulwurf**, **Schätzmeister**, **Schwarmsinn**, **Sternenpakt**, **Sumo**, **Tank Trouble**, **Tick Tack Boom**, **Vernissage** und **Wer war's?** – zu sehen in der Spielauswahl, der Lobby und beim Abstimmen

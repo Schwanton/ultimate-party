@@ -4,6 +4,7 @@
  */
 
 import { useState } from 'react';
+import type { CSSProperties } from 'react';
 import type { GameManifest, Translate } from '@up/sdk';
 import { isLight, shade } from '../ui';
 
@@ -33,9 +34,10 @@ export function playersLabel(g: GameManifest, t: Translate) {
 
 /**
  * Titelbild eines Spiels. Füllt den Rahmen und wird passend zugeschnitten (jedes Bildformat geht).
- * Ohne Bild (oder wenn es nicht lädt): Spielfarbe mit Streifen und großem Anfangsbuchstaben.
+ * Ohne Bild (oder wenn es nicht lädt): Spielfarbe mit Streifen und großem Anfangsbuchstaben,
+ * mit `showName` zusätzlich der Spielname als Schriftzug in der Mitte (wie bei den echten Titelbildern).
  */
-export function GameCover({ g, lang, zoom, letterSize = 132 }: { g: GameManifest; lang: string; zoom?: boolean; letterSize?: number }) {
+export function GameCover({ g, lang, zoom, letterSize = 132, showName }: { g: GameManifest; lang: string; zoom?: boolean; letterSize?: number; showName?: boolean }) {
   const [failed, setFailed] = useState(false);
   const light = isLight(g.color);
   if (g.coverUrl && !failed) {
@@ -51,6 +53,11 @@ export function GameCover({ g, lang, zoom, letterSize = 132 }: { g: GameManifest
     <div aria-hidden="true" style={{ position: 'absolute', inset: 0, overflow: 'hidden', background: g.color }}>
       <div style={{ position: 'absolute', inset: 0, background: 'repeating-linear-gradient(-35deg, rgba(0,0,0,.10) 0 14px, rgba(0,0,0,0) 14px 28px)' }} />
       <span className="display" style={{ position: 'absolute', right: letterSize * 0.12, bottom: -letterSize * 0.17, fontSize: letterSize, fontWeight: 800, lineHeight: 1, color: light ? 'rgba(17,13,36,.28)' : 'rgba(255,255,255,.30)' }}>{letter}</span>
+      {showName && (
+        <div style={{ position: 'absolute', inset: 0, containerType: 'size', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 8%' } as CSSProperties}>
+          <span className="display" style={{ fontSize: 'min(11cqw, 30cqh)', fontWeight: 800, lineHeight: 1.05, textAlign: 'center', color: light ? '#110D24' : '#fff', textShadow: light ? 'none' : '0 4px 18px rgba(0,0,0,.35)', overflowWrap: 'anywhere' }}>{gameName(g, lang)}</span>
+        </div>
+      )}
     </div>
   );
 }
@@ -85,7 +92,7 @@ export function GameLibrary({ games, selectedId, players, lang, t, onPick, onClo
   const count = (x: string) => (x === 'all' ? games.length : games.filter((g) => gameTags(g).includes(x)).length);
   return (
     <div role="dialog" aria-modal="true" aria-label={t('lobby.pickGame')} className="anim-fade"
-      style={{ position: 'absolute', inset: 0, zIndex: 70, background: 'rgba(10,7,22,.94)', padding: '32px 40px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+      style={{ position: 'absolute', inset: 0, zIndex: 70, background: 'rgba(10,7,22,.9)', padding: '32px 40px', display: 'flex', flexDirection: 'column', gap: 18 }}>
       <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
         <h2 style={{ fontSize: 36, fontWeight: 800 }}>{t('lobby.pickGame')} <span className="faint" style={{ fontSize: 22, fontWeight: 600 }}>{t('lobby.gamesCount', { n: games.length })}</span></h2>
         <div style={{ display: 'flex', gap: 10 }}>
@@ -109,7 +116,7 @@ export function GameLibrary({ games, selectedId, players, lang, t, onPick, onClo
         })}
       </nav>
       <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', margin: '0 -8px', padding: '8px 8px 16px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '20px 18px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '22px 20px' }}>
           {list.map((g, i) => (
             <LibraryCard key={g.id} g={g} sel={g.id === selectedId} fit={fitOf(g, players)} players={players} lang={lang} t={t} delay={i * 0.03} onPick={() => onPick(g.id)} />
           ))}
@@ -120,25 +127,23 @@ export function GameLibrary({ games, selectedId, players, lang, t, onPick, onClo
   );
 }
 
+/** Kachel der Bilder-Wand: nur das Titelbild (mit Schriftzug), Spielerzahl und Dauer als Schild darauf */
 function LibraryCard({ g, sel, fit, players, lang, t, delay, onPick }: { g: GameManifest; sel: boolean; players: number; fit: 'ok' | 'few' | 'many'; lang: string; t: Translate; delay: number; onPick: () => void }) {
+  const dim = fit !== 'ok' && !sel;
+  const warn = fit === 'few' ? t('lobby.needPlayers', { n: g.minPlayers - players }) : fit === 'many' ? t('lobby.tooManyShort') : '';
   return (
-    <button onClick={onPick} aria-pressed={sel} style={{
-      border: 0, padding: 0, textAlign: 'left', borderRadius: 22, overflow: 'hidden', background: 'var(--surface)', color: '#fff',
-      display: 'flex', flexDirection: 'column', opacity: fit === 'ok' || sel ? 1 : 0.55,
-      boxShadow: `${sel ? '0 0 0 4px #fff, ' : ''}0 6px 0 #0A0716`, animation: `upPop .35s ease-out ${delay.toFixed(2)}s both`,
+    <button onClick={onPick} aria-pressed={sel} aria-label={gameName(g, lang)} title={gameName(g, lang)} className="up-tile" style={{
+      border: 0, padding: 0, aspectRatio: '16 / 9', borderRadius: 18, overflow: 'hidden', position: 'relative', background: 'var(--surface)', color: '#fff',
+      boxShadow: sel ? '0 0 0 4px #fff, 0 8px 24px rgba(0,0,0,.5)' : '0 6px 18px rgba(0,0,0,.45)', animation: `upPop .35s ease-out ${delay.toFixed(2)}s both`,
     }}>
-      <div style={{ height: 132, width: '100%', flex: 'none', position: 'relative' }}>
-        <GameCover g={g} lang={lang} />
-        {sel && <span style={{ position: 'absolute', left: 12, top: 12, background: '#fff', color: '#110D24', fontSize: 13, fontWeight: 700, padding: '4px 10px', borderRadius: 999 }}>{t('lobby.selected')}</span>}
+      <div style={{ position: 'absolute', inset: 0, filter: dim ? 'grayscale(1) brightness(.55)' : undefined }}>
+        <GameCover g={g} lang={lang} showName letterSize={110} />
       </div>
-      <div style={{ padding: '12px 16px 14px', display: 'flex', flexDirection: 'column', gap: 6, width: '100%' }}>
-        <span className="display" style={{ fontSize: 22, fontWeight: 800, lineHeight: 1.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{gameName(g, lang)}</span>
-        <span style={{ fontSize: 14, fontWeight: 700, color: fit === 'ok' ? 'var(--muted)' : 'var(--yellow)' }}>
-          {playersLabel(g, t)} · {t('lobby.minutes', { n: g.minutes })}
-          {fit === 'few' ? ` · ${t('lobby.needPlayers', { n: g.minPlayers - players })}` : fit === 'many' ? ` · ${t('lobby.tooManyShort')}` : ''}
-        </span>
-        <span style={{ fontSize: 13, color: 'var(--faint)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{gameTags(g).map((x) => t(`tag.${x}`)).join(' · ')}</span>
-      </div>
+      {sel && <span style={{ position: 'absolute', left: 12, top: 12, background: '#fff', color: '#110D24', fontSize: 14, fontWeight: 700, padding: '5px 12px', borderRadius: 999 }}>{t('lobby.selected')}</span>}
+      <span style={{ position: 'absolute', left: 10, bottom: 10, background: 'rgba(17,13,36,.82)', fontSize: 14, fontWeight: 700, padding: '5px 11px', borderRadius: 999, whiteSpace: 'nowrap' }}>
+        {playersLabel(g, t)} · {t('lobby.minutes', { n: g.minutes })}
+      </span>
+      {warn && <span style={{ position: 'absolute', right: 10, bottom: 10, background: 'var(--yellow)', color: '#110D24', fontSize: 14, fontWeight: 800, padding: '5px 11px', borderRadius: 999, whiteSpace: 'nowrap' }}>{warn}</span>}
     </button>
   );
 }

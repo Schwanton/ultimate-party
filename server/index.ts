@@ -158,6 +158,11 @@ function handle(ws: WebSocket, msg: any) {
     return reply(ws, msg, { ok: false, error: 'olympia_running' });
   }
 
+  // Während des Startmoments ändert niemand mehr das Spiel
+  if (room?.intro && ['select', 'start', 'pickMode', 'vote:options', 'vote:start', 'vote:end', 'random', 'gamevote', 'gameOption', 'olympia:open'].includes(msg.t)) {
+    return reply(ws, msg, { ok: true });
+  }
+
   switch (msg.t) {
     case 'ping':
       return reply(ws, msg, { now: Date.now() });
@@ -217,7 +222,7 @@ function handle(ws: WebSocket, msg: any) {
       return;
     case 'start': {
       if (!room || !(isHost || isVip)) return;
-      const error = room.startGame();
+      const error = room.requestStart();
       return reply(ws, msg, { ok: !error, error });
     }
     case 'gameOption':
