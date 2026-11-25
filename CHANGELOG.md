@@ -2,6 +2,10 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.41.1
+
+- Sternenpakt: Nach dem Antippen deines Sterns bleibt die ganze Karte sichtbar, damit du auch weit entfernte Ziele direkt antippen kannst (der Weg über deine Sterne erscheint gestrichelt). „Näher ran“ zoomt bei Bedarf auf die Umgebung
+
 ## 0.41.0
 
 - Sternenpakt, große Überarbeitung nach den ersten Testrunden:

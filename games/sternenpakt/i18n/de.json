@@ -161,7 +161,7 @@
   "rally.info": "Neue Schiffe fliegen nach {star}.",
   "map.zoom": "Näher ran",
   "map.empty": "Keine Schiffe hier – du kannst aber Schiffe herholen oder einen Zielstern setzen.",
-  "route.via": "Weg über {n} eigene Sterne.",
+  "route.via": "Weg mit {n} Zwischenhalten auf deinen Sternen.",
   "allGuard": "Alle (−{n})",
   "build.cheapest": "baut jeweils am günstigsten Stern",
   "build.at": "bei {star}",
@@ -178,5 +178,6 @@
   "mis.give": "Verschenke insgesamt 200 Geld",
   "mis.home": "Verliere nie deinen Heimatstern",
   "mis.ships": "Habe am Ende die meisten Schiffe",
-  "phone.breakdown": "{stars} Sterne · {heart} Jahre Herz · {mis} aus Aufträgen"
+  "phone.breakdown": "{stars} Sterne · {heart} Jahre Herz · {mis} aus Aufträgen",
+  "route.via1": "Weg mit 1 Zwischenhalt auf deinem Stern."
 }

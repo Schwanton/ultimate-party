@@ -161,7 +161,7 @@
   "rally.info": "New ships fly to {star}.",
   "map.zoom": "Zoom in",
   "map.empty": "No ships here – but you can bring ships here or set a target star.",
-  "route.via": "Route via {n} of your stars.",
+  "route.via": "Route with {n} stops at your stars.",
   "allGuard": "All (−{n})",
   "build.cheapest": "always builds at the cheapest star",
   "build.at": "at {star}",
@@ -178,5 +178,6 @@
   "mis.give": "Give away 200 money in total",
   "mis.home": "Never lose your home star",
   "mis.ships": "Have the most ships at the end",
-  "phone.breakdown": "{stars} stars · {heart} years Heart · {mis} from missions"
+  "phone.breakdown": "{stars} stars · {heart} years Heart · {mis} from missions",
+  "route.via1": "Route with 1 stop at your star."
 }

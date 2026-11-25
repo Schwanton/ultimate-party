@@ -753,7 +753,7 @@ function MapTab({ v, t, send }: { v: any; t: Translate; send: (a: any) => void }
   const [picks, setPicks] = useState<Set<number>>(new Set());
   const [n, setN] = useState(1);
   const [info, setInfo] = useState<number | null>(null);
-  const [whole, setWhole] = useState(false);
+  const [zoom, setZoom] = useState(false);
   const map: MapEntry[] = v.map;
   const st: StarDyn[] = v.st;
   const pk: ParkT[] = v.pk ?? [];
@@ -796,7 +796,7 @@ function MapTab({ v, t, send }: { v: any; t: Translate; send: (a: any) => void }
   const b = useMemo(() => boundsOf(map), [map]);
   const box = useMemo<[number, number, number, number]>(() => {
     if (!size.w || !size.h) return [0, 0, 1, 1];
-    if (origin && srcValid && !whole && mode === 'send') {
+    if (origin && srcValid && zoom && mode === 'send') {
       const r = range + 1.3;
       let x0 = origin.x - r, y0 = origin.y - r, x1 = origin.x + r, y1 = origin.y + r;
       for (const i of route ?? []) {
@@ -806,9 +806,9 @@ function MapTab({ v, t, send }: { v: any; t: Translate; send: (a: any) => void }
       return fitBox(x0, y0, x1, y1, size.w, size.h, 0);
     }
     return fitBox(b.minX, b.minY, b.maxX, b.maxY, size.w, size.h, 1);
-  }, [size.w, size.h, origin?.x, origin?.y, srcValid, range, b, whole, mode, route?.join(',')]);
+  }, [size.w, size.h, origin?.x, origin?.y, srcValid, range, b, zoom, mode, route?.join(',')]);
 
-  const reset = () => { setSrc(null); setTarget(null); setMode('send'); setPicks(new Set()); setWhole(false); };
+  const reset = () => { setSrc(null); setTarget(null); setMode('send'); setPicks(new Set()); setZoom(false); };
 
   const onTap = (x: number, y: number, u: number) => {
     const thr = 30 * u;
@@ -839,7 +839,7 @@ function MapTab({ v, t, send }: { v: any; t: Translate; send: (a: any) => void }
     if (src && srcValid) {
       if (star >= 0 && star === src.star) { reset(); return; }
       if (star >= 0 && !pkHit && avail >= 1 && routeTo(star)) { setTarget(star); setN(allN); return; }
-      if (star >= 0 && st[star][0] === me) { setSrc({ star }); setTarget(null); setWhole(false); return; }
+      if (star >= 0 && st[star][0] === me) { setSrc({ star }); setTarget(null); return; }
       if (pkHit) { setSrc({ pk: pkHit[0] }); setTarget(null); return; }
       if (star >= 0) setInfo(star);
       setTarget(null);
@@ -907,12 +907,12 @@ function MapTab({ v, t, send }: { v: any; t: Translate; send: (a: any) => void }
       {modeChip || chips}
       <div ref={ref} style={{ flex: 1, minHeight: 160, position: 'relative', background: 'radial-gradient(circle at 50% 50%, #111a3a 0%, #070b1a 75%)', overflow: 'hidden' }}>
         {size.w > 0 && (
-          <StarMap v={v} w={size.w} h={size.h} box={box} sim={sim} speed={v.clock?.speed ?? 0} now={now} me={me} names={!!origin && !whole && mode === 'send'}
+          <StarMap v={v} w={size.w} h={size.h} box={box} sim={sim} speed={v.clock?.speed ?? 0} now={now} me={me} names={!!origin && zoom && mode === 'send'}
             sel={src && srcValid ? { star: src.star, pk: srcPk } : null} target={mode === 'send' ? target : null} range={origin && mode === 'send' ? range : undefined}
             reach={mode === 'send' ? reach : undefined} route={mode === 'send' ? route : null} picks={mode === 'pull' ? picks : undefined} rallies={rallies} onTap={onTap} />
         )}
         {origin && srcValid && mode === 'send' && (
-          <button type="button" onClick={() => setWhole(!whole)} style={{ position: 'absolute', right: 10, top: 10, height: 34, padding: '0 12px', borderRadius: 17, border: `1px solid ${LINE}`, background: 'rgba(13,20,48,.85)', color: INK, fontSize: 13 }}>{whole ? t('map.zoom') : t('map.whole')}</button>
+          <button type="button" onClick={() => setZoom(!zoom)} style={{ position: 'absolute', right: 10, top: 10, height: 34, padding: '0 12px', borderRadius: 17, border: `1px solid ${LINE}`, background: 'rgba(13,20,48,.85)', color: INK, fontSize: 13 }}>{zoom ? t('map.whole') : t('map.zoom')}</button>
         )}
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '16px 16px 4px', background: PANEL, borderTop: `1px solid ${LINE}`, borderRadius: '20px 20px 0 0', marginTop: -14, position: 'relative' }}>
@@ -967,7 +967,7 @@ function MapTab({ v, t, send }: { v: any; t: Translate; send: (a: any) => void }
               <span style={{ fontSize: 14, color: MUTED, whiteSpace: 'nowrap' }}>{v.rounds ? t('arrive.rounds', { n: Math.max(1, Math.ceil(flight / YEAR)) }) : t('arrive', { time: fmt(flight) })}</span>
             </div>
             <span style={{ fontSize: 14, color: tgtOwner >= 0 && tgtOwner !== me ? v.emp[tgtOwner].c : MUTED }}>
-              {describe(target)}{route && route.length > 1 ? ` ${t('route.via', { n: route.length - 1 })}` : ''}
+              {describe(target)}{route && route.length > 1 ? ` ${route.length === 2 ? t('route.via1') : t('route.via', { n: route.length - 1 })}` : ''}
             </span>
             <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               <span style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14 }}>
