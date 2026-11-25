@@ -2,13 +2,7 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
-## 0.46.0
-
-- Aufgeräumte Spielauswahl: Jedes Spiel hat jetzt eine kurze, knackige Beschreibung
-- Neue Kategorien **💥 Action & Chaos** und **♟️ Strategie & Taktik**. Aus „Teamwork“ wird **🤝 Gemeinsam gegen das Spiel**, aus „Schnell & für viele“ wird **⚡ Kurz & knackig**. „Duell zu zweit“ fällt weg (Kronenduell steht jetzt bei Strategie)
-- Alle Spiele stehen in passenden Kategorien, z. B. Sternenpakt und Tick Tack Boom nicht mehr unter „Kennenlernen“. Chaotic Tower Defense steht nicht mehr unter „Weitere“
-
-## 0.46.0
+## 0.47.0
 
 Neue Handy-Lobby mit Titelbildern:
 - Das gewählte Spiel steht oben als großes Titelbild, darunter der Start-Knopf. Das Titelbild liegt auch unscharf im Hintergrund
@@ -20,6 +14,12 @@ Neue Handy-Lobby mit Titelbildern:
 - Abstimmung mit großen Titelbildern, die eigene Stimme ist gelb umrandet
 - Startmoment auch auf dem Handy: Titelbild, Countdown und ein kurzes Vibrieren
 - Kompaktere Profil-Karte oben
+
+## 0.46.0
+
+- Aufgeräumte Spielauswahl: Jedes Spiel hat jetzt eine kurze, knackige Beschreibung
+- Neue Kategorien **💥 Action & Chaos** und **♟️ Strategie & Taktik**. Aus „Teamwork“ wird **🤝 Gemeinsam gegen das Spiel**, aus „Schnell & für viele“ wird **⚡ Kurz & knackig**. „Duell zu zweit“ fällt weg (Kronenduell steht jetzt bei Strategie)
+- Alle Spiele stehen in passenden Kategorien, z. B. Sternenpakt und Tick Tack Boom nicht mehr unter „Kennenlernen“. Chaotic Tower Defense steht nicht mehr unter „Weitere“
 
 ## 0.45.1
 
