@@ -2,6 +2,12 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.45.1
+
+- Zeigt man in der Lobby auf den QR-Code, wird er so breit wie die Spalte – gut zum Scannen von weiter weg. Antippen geht auch. Die Spielerliste wird dabei kompakt
+- Abstimmung: Die Spiele zeigen nur noch ihr Titelbild ohne doppelten Namen, Spielerzahl und Dauer stehen am unteren Rand
+- Das Schild „… hat gewählt“ bzw. „Zufällig gezogen“ auf dem Titelbild ist weg
+
 ## 0.45.0
 
 Neue TV-Lobby, in der die Titelbilder richtig zur Geltung kommen:

@@ -242,6 +242,7 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
   const canStart = !!selected && active.length >= selected.minPlayers;
   const [optionsOpen, setOptionsOpen] = useState(false);
   const [libraryOpen, setLibraryOpen] = useState(false);
+  const [qrBig, setQrBig] = useState(false);
 
   const setLang = (lang: Lang) => {
     try { localStorage.setItem('up:lang', lang); } catch { /* egal */ }
@@ -302,22 +303,24 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
 
       <main style={{ flex: 1, minHeight: 0, display: 'flex', gap: 24 }}>
         <div style={{ width: 376, flex: 'none', display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <section className="up-card" style={{ ...glass, padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 10, borderRadius: 24 }}>
-            <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
-              <QrCode text={joinUrl} size={112} />
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0 }}>
-                <h2 style={{ fontSize: 24, fontWeight: 800 }}>{t('join.title')}</h2>
-                <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--muted)', wordBreak: 'break-all' }}>{room.joinUrl.replace(/^https?:\/\//, '')}</span>
-                <div aria-label={`${t('join.code')} ${room.code}`} style={{ display: 'flex', gap: 6, marginTop: 4 }}>
-                  {room.code.split('').map((ch, i) => (
-                    <span key={i} className="display" style={{ width: 38, height: 46, borderRadius: 10, background: 'var(--yellow)', color: '#110D24', fontSize: 26, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 0 var(--yellow-d)' }}>{ch}</span>
-                  ))}
-                </div>
+          {/* Beitreten: Zeigt man auf den QR-Code (oder tippt ihn an), wird er so breit wie die Spalte */}
+          <section className="up-card" onMouseEnter={() => setQrBig(true)} onMouseLeave={() => setQrBig(false)} onClick={() => setQrBig((x) => !x)}
+            style={{ ...glass, padding: '18px 20px', display: 'flex', flexWrap: 'wrap', gap: qrBig ? 12 : 16, alignItems: 'center', borderRadius: 24, cursor: 'zoom-in' }}>
+            <div className="up-qr-fill" style={{ width: qrBig ? 336 : 112, height: qrBig ? 336 : 112, flex: 'none', background: '#fff', borderRadius: qrBig ? 20 : 14, padding: qrBig ? 16 : 7, transition: 'width .3s ease, height .3s ease, padding .3s ease' }}>
+              <QrCode text={joinUrl} size={112} bare />
+            </div>
+            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: qrBig ? 'row' : 'column', alignItems: qrBig ? 'center' : 'flex-start', justifyContent: 'space-between', gap: 6 }}>
+              {!qrBig && <h2 style={{ fontSize: 24, fontWeight: 800 }}>{t('join.title')}</h2>}
+              <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--muted)', wordBreak: 'break-all' }}>{room.joinUrl.replace(/^https?:\/\//, '')}</span>
+              <div aria-label={`${t('join.code')} ${room.code}`} style={{ display: 'flex', gap: 6, marginTop: qrBig ? 0 : 4, flex: 'none' }}>
+                {room.code.split('').map((ch, i) => (
+                  <span key={i} className="display" style={{ width: 38, height: 46, borderRadius: 10, background: 'var(--yellow)', color: '#110D24', fontSize: 26, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 0 var(--yellow-d)' }}>{ch}</span>
+                ))}
               </div>
             </div>
           </section>
 
-          <section className="up-card" style={{ ...glass, flex: 1, minHeight: 0, padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 14, borderRadius: 24 }}>
+          <section className="up-card" style={{ ...glass, flex: 1, minHeight: 0, overflow: 'hidden', padding: qrBig ? '14px 20px' : '18px 20px', display: 'flex', flexDirection: 'column', gap: qrBig ? 8 : 14, borderRadius: 24 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <h2 style={{ fontSize: 22, fontWeight: 700, flex: 1 }}>{t('lobby.players')}</h2>
               <SoundButton label={t('sound.enable')} />
@@ -331,11 +334,11 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
                 {active.length}{selected ? ` / ${selected.maxPlayers}` : ''}
               </span>
             </div>
-            <PlayerGrid players={players} vipId={room.vipId} max={selected?.maxPlayers} freeLabel={t('lobby.free')} />
-            <p className="muted" style={{ marginTop: 'auto', fontSize: 15 }}>
+            <PlayerGrid players={players} vipId={room.vipId} max={selected?.maxPlayers} freeLabel={t('lobby.free')} compact={qrBig} />
+            {!qrBig && <p className="muted" style={{ marginTop: 'auto', fontSize: 15 }}>
               {lastWinner ? t('lobby.lastWinner', { name: lastWinner.name }) + ' · ' : ''}
               {vip ? t('lobby.vipPicks', { name: vip.name }) : t('lobby.waitingForPlayers')}
-            </p>
+            </p>}
           </section>
         </div>
 
@@ -346,7 +349,7 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
             <HostVoteBoard vote={room.vote} games={games} room={room} t={t} player={(id) => room.players.find((p) => p.id === id)} />
           ) : (
             <SelectedGame game={rolling ?? selected} rolling={!!rolling} players={active.length} canStart={canStart && !rolling} gameCount={games.length} lang={room.lang} t={t}
-              pickedBadge={<PickedBadge room={room} t={t} vipName={vip?.name} />}
+              pickedBadge={pickModeOf(room) === 'vote' ? <PickedBadge room={room} t={t} vipName={vip?.name} /> : null}
               summary={selected?.options?.length ? optionsSummary(selected, room.settings.gameOptions?.[selected.id], room.lang) : ''}
               onLibrary={() => setLibraryOpen(true)} onOptions={() => setOptionsOpen(true)} />
           )}
@@ -476,7 +479,22 @@ function SelectedGame({ game, rolling, players, canStart, gameCount, lang, t, su
   );
 }
 
-function PlayerGrid({ players, vipId, max, freeLabel }: { players: PlayerInfo[]; vipId: string | null; max?: number; freeLabel: string }) {
+function PlayerGrid({ players, vipId, max, freeLabel, compact }: { players: PlayerInfo[]; vipId: string | null; max?: number; freeLabel: string; compact?: boolean }) {
+  if (compact) {
+    // Kompakt (wenn der QR-Code groß ist): nur kleine Avatare in zwei Reihen, ohne Namen
+    const shown = players.slice(0, players.length > 18 ? 17 : 18);
+    return (
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(9, minmax(0, 1fr))', gap: '6px 4px', justifyItems: 'center' }}>
+        {shown.map((p) => (
+          <div key={p.id} title={p.name} style={{ position: 'relative', opacity: p.connected || p.isBot ? 1 : 0.5 }}>
+            <Avatar player={p} size={32} />
+            {p.id === vipId && <Crown size={14} style={{ position: 'absolute', top: -7, left: 9 }} />}
+          </div>
+        ))}
+        {players.length > shown.length && <div className="faint display" style={{ fontSize: 16, alignSelf: 'center' }}>+{players.length - shown.length}</div>}
+      </div>
+    );
+  }
   const many = players.length > 8;
   const crowd = players.length > 18;
   const size = crowd ? 34 : many ? 44 : 56;

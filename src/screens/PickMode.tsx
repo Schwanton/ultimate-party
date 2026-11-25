@@ -129,16 +129,15 @@ export function HostVoteBoard({ vote, games, room, t, player }: { vote: GameVote
           const who = (byGame.get(g.id) ?? []).map(player).filter(Boolean) as PlayerInfo[];
           return (
             <div key={g.id} style={{ position: 'relative', borderRadius: 20, overflow: 'hidden', boxShadow: `0 0 0 3px ${g.color}`, animation: `upPop .35s ease-out ${(0.08 * i).toFixed(2)}s both`, minHeight: 0 }}>
-              <GameCover g={g} lang={room.lang} letterSize={150} />
-              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(17,13,36,0) 30%, rgba(17,13,36,.92) 100%)' }} />
+              <GameCover g={g} lang={room.lang} letterSize={150} showName />
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(17,13,36,0) 55%, rgba(17,13,36,.85) 100%)' }} />
               <span className="display" style={{ position: 'absolute', right: 12, top: 10, minWidth: 46, height: 46, borderRadius: 23, background: '#fff', color: '#110D24', fontSize: 26, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 10px' }}>{who.length}</span>
-              <div style={{ position: 'absolute', left: 14, right: 14, bottom: 10, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <span className="display" style={{ fontSize: 24, fontWeight: 800, lineHeight: 1.05 }}>{gameName(g, room.lang)}</span>
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#D9D5EE' }}>{playersLabel(g, t)} · {t('lobby.minutes', { n: g.minutes })}</span>
+              <div aria-label={gameName(g, room.lang)} style={{ position: 'absolute', left: 12, right: 12, bottom: 10, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 6 }}>
                 <div style={{ display: 'flex', minHeight: 30 }}>
                   {who.slice(0, 12).map((p, j) => <span key={p.id} style={{ marginLeft: j ? -8 : 0, animation: 'upPop .3s ease-out both' }}><Avatar player={p} size={30} /></span>)}
                   {who.length > 12 && <b style={{ marginLeft: 6, fontSize: 14, alignSelf: 'center' }}>+{who.length - 12}</b>}
                 </div>
+                <span style={{ background: 'rgba(17,13,36,.82)', fontSize: 13, fontWeight: 700, padding: '4px 10px', borderRadius: 999, whiteSpace: 'nowrap' }}>{playersLabel(g, t)} · {t('lobby.minutes', { n: g.minutes })}</span>
               </div>
             </div>
           );

@@ -123,6 +123,8 @@ textarea.up-input { resize: none; line-height: 1.3; }
 @keyframes upIntroZoom { from { transform: scale(1.25); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 .up-intro-zoom { animation: upIntroZoom .7s cubic-bezier(.2,.8,.2,1) both; }
 .up-intro-rise { animation: upSlideUp .6s ease-out .35s both; }
+/* QR-Code, der mit seinem Rahmen mitwächst */
+.up-qr-fill svg { display: block; width: 100%; height: 100%; }
 /* Spielauswahl: Kachel hebt sich beim Zeigen */
 .up-tile { transition: transform .15s ease-out; }
 .up-tile:hover, .up-tile:focus-visible { transform: translateY(-4px); }
