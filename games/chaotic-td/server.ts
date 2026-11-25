@@ -127,7 +127,8 @@ export default {
       const b = p.board;
       return {
         idx: ids.indexOf(p.id),
-        bs: [...b.buildings.values()].map((x) => [x.id, x.kind === 'wall' ? 0 : x.kind === 'tower' ? 1 : 2, x.x, x.y, x.type, x.level, x.dmgN, x.spdN]),
+        bs: [...b.buildings.values()].map((x) => [x.id, x.kind === 'wall' ? 0 : x.kind === 'tower' ? 1 : 2, x.x, x.y, x.type, x.level, x.dmgN, x.spdN, x.hits, Math.round(x.dmgDone)]),
+        cu: [...b.coinsUsed],
         rocks: b.rocks,
         legs: legsOut(b.route),
       };

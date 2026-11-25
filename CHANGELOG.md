@@ -2,6 +2,19 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.44.1
+
+Chaotic Tower Defense:
+- Bodenfelder zeigen oben links, was sie tun (z. B. „+20% ATK“, „−50% SPD“). Bauverbot liegt über allen anderen Feldern und bleibt auch sichtbar, wenn ihr die Bodenfelder ausblendet. Im Bauverbot wirken keine anderen Felder
+- Bodenfelder kommen seltener vor
+- Credit-Felder lassen sich nach jedem erreichten Checkpoint erneut nutzen: benutzt = grau, wieder frei = gelb
+- Neues Statistik-Zeichen oben rechts auf der Karte: zeigt auf jedem Turm Treffer und Gesamtschaden der aktuellen (bzw. letzten) Welle
+- Teleporter-Eingänge sind grün, Ausgänge rot. Türme sind jetzt quadratisch
+- Auf Checkpoints darf man bauen, solange eins der 4 Felder frei bleibt
+- Rote und gelbe Linie sind gestrichelt, die gelbe ist dezenter
+- Im Baumodus wählt ein Tippen auf ein bestehendes Gebäude oder einen Asteroiden diesen aus, statt einen Entwurf zu setzen
+- Fernseher: Die Beschreibung jedes Gegners steht jetzt in einer eigenen Zeile unter dem Namen
+
 ## 0.44.0
 
 Chaotic Tower Defense – großes Update nach dem ersten Test:

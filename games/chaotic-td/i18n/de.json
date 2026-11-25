@@ -168,5 +168,8 @@
  "p.cancelPending": "Vormerkung zurücknehmen",
  "p.cancelSell": "Verkauf zurücknehmen",
  "p.pendingTitle": "Vorgemerkt",
- "p.pendingInfo": "Wird gebaut, sobald deine Welle vorbei ist. Das Geld ist schon zurückgelegt."
+ "p.pendingInfo": "Wird gebaut, sobald deine Welle vorbei ist. Das Geld ist schon zurückgelegt.",
+ "z.nobuild": "Bauverbot",
+ "err.checkpoint": "Mindestens ein Feld des Checkpoints muss frei bleiben.",
+ "p.stats": "Turm-Statistik (Treffer und Schaden)"
 }

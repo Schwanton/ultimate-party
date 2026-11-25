@@ -134,7 +134,9 @@ export function generateMap(seed: number): MapDef {
   const zones: Zone[] = [];
   const kinds: ZoneKind[] = ['slow', 'fast', 'dmg', 'range', 'nobuild'];
   for (const k of kinds) {
-    const n = ri(0, k === 'nobuild' ? 2 : 3);
+    // Bodenfelder eher selten: meist keins oder eins je Art
+    const q = r();
+    const n = k === 'nobuild' ? (q < 0.6 ? 0 : 1) : q < 0.5 ? 0 : q < 0.85 ? 1 : 2;
     for (let j = 0; j < n; j++) {
       const zw = ri(3, Math.max(4, Math.floor(w / 3))), zh = ri(3, Math.max(4, Math.floor(h / 3)));
       const s = k === 'slow' ? 0.4 + r() * 0.4 : k === 'fast' ? 1.2 + r() * 0.6 : k === 'dmg' ? 1.2 + r() * 0.8 : k === 'range' ? 1.2 + r() * 0.6 : 1;
@@ -321,18 +323,20 @@ export function fullRoute(map: MapDef, leg: (a: Pt, b: Pt) => Pt[] | null): Leg[
 export const legsLength = (legs: Leg[]) => legs.reduce((s, l) => s + (l.jump ? 0 : l.pts.reduce((a, p, i) => (i ? a + Math.hypot(p[0] - l.pts[i - 1][0], p[1] - l.pts[i - 1][1]) : 0), 0)), 0);
 
 /** Weg als Folge von Punkten mit Gesamtlänge bis dorthin (Sprünge haben Länge 0) */
-export interface Track { x: Float64Array; y: Float64Array; s: Float64Array; len: number }
+export interface Track { x: Float64Array; y: Float64Array; s: Float64Array; len: number; /** Weglänge bei jedem Checkpoint */ stops: number[] }
 export function toTrack(legs: Leg[]): Track {
   const xs: number[] = [], ys: number[] = [], ss: number[] = [];
   let s = 0;
+  const ends: number[] = [];
   for (const l of legs) {
     l.pts.forEach((p, i) => {
       if (xs.length && i === 0) return;
       if (xs.length && !l.jump) s += Math.hypot(p[0] - xs[xs.length - 1], p[1] - ys[ys.length - 1]);
       xs.push(p[0]); ys.push(p[1]); ss.push(s);
     });
+    ends[l.leg] = s;
   }
-  return { x: Float64Array.from(xs), y: Float64Array.from(ys), s: Float64Array.from(ss), len: s };
+  return { x: Float64Array.from(xs), y: Float64Array.from(ys), s: Float64Array.from(ss), len: s, stops: ends.slice(0, -1) };
 }
 export function trackAt(t: Track, s: number): Pt {
   if (s <= 0) return [t.x[0], t.y[0]];
@@ -353,7 +357,7 @@ export function flyRoute(map: MapDef): Leg[] {
 
 export type Kind = 'wall' | 'tower' | 'depot';
 export type Pending = ({ k: 'build'; kind: Kind; x: number; y: number } | { k: 'sell'; id: number } | { k: 'blast'; x: number; y: number }) & { cost: number };
-export interface Building { id: number; kind: Kind; x: number; y: number; type: TowerType; level: number; spent: number; builtAt: number; cd: number; dmgN: number; spdN: number }
+export interface Building { id: number; kind: Kind; x: number; y: number; type: TowerType; level: number; spent: number; builtAt: number; cd: number; dmgN: number; spdN: number; hits: number; dmgDone: number }
 
 /** eigene Verbesserungen je Turm: Schaden unbegrenzt (+25 % je Stufe), Tempo höchstens 5× (−12 % Abklingzeit je Stufe) */
 export const DMG_STEP = 0.25;
@@ -363,7 +367,7 @@ export const SPD_MAX = 5;
 export const BOOST_FROM = 120;
 export const WAVE_MAX = 600;
 export const boostAt = (t: number) => (t < BOOST_FROM ? 1 : Math.pow(2, Math.floor((t - BOOST_FROM) / 60) + 1));
-export interface Monster { id: number; type: string; s: number; hp: number; max: number; shield: number; slowUntil: number; slow: number; poisonUntil: number; poison: number; armorDown: number; jumpAt: number; split: boolean; x: number; y: number }
+export interface Monster { id: number; type: string; s: number; hp: number; max: number; shield: number; slowUntil: number; slow: number; poisonUntil: number; poison: number; armorDown: number; jumpAt: number; split: boolean; x: number; y: number; poisonBy: number }
 
 export const sizeOf = (k: Kind) => (k === 'wall' ? 1 : 2);
 
@@ -446,8 +450,18 @@ export class Board {
     const n = sizeOf(kind);
     if (x < 0 || y < 0 || x + n > w || y + n > h) return 'edge';
     for (let dy = 0; dy < n; dy++) for (let dx = 0; dx < n; dx++) if (this.occ[(y + dy) * w + x + dx] !== 0) return 'occupied';
-    const special: Pt[] = [this.map.start, this.map.core, ...this.map.cps, ...this.map.tps.map((t) => t.o), ...this.map.coins.map((c) => [c.x, c.y] as Pt)];
+    const special: Pt[] = [this.map.start, this.map.core, ...this.map.tps.map((t) => t.o), ...this.map.coins.map((c) => [c.x, c.y] as Pt)];
     for (const p of special) if (x < p[0] + 2 && x + n > p[0] && y < p[1] + 2 && y + n > p[1]) return 'special';
+    // Checkpoints: mindestens eins der 4 Felder muss frei bleiben
+    for (const [cx, cy] of this.map.cps) {
+      let free = 0;
+      for (let dy = 0; dy < 2; dy++) for (let dx = 0; dx < 2; dx++) {
+        const X = cx + dx, Y = cy + dy;
+        const mine = X >= x && X < x + n && Y >= y && Y < y + n;
+        if (!mine && this.occ[Y * w + X] === 0) free++;
+      }
+      if (free === 0) return 'checkpoint';
+    }
     for (const z of this.map.zones) if (z.k === 'nobuild' && x < z.x + z.w && x + n > z.x && y < z.y + z.h && y + n > z.y) return 'nobuild';
     return null;
   }
@@ -460,7 +474,7 @@ export class Board {
     if (this.money < cost) return 'money';
     if (kind === 'depot' && this.limitMax >= this.map.maxLimit) return 'maxlimit';
     if (kind !== 'depot' && this.used >= this.limitMax) return 'limit';
-    const b: Building = { id: this.nextId++, kind, x, y, type: 'T', level: 1, spent: cost, builtAt: now, cd: 0, dmgN: 0, spdN: 0 };
+    const b: Building = { id: this.nextId++, kind, x, y, type: 'T', level: 1, spent: cost, builtAt: now, cd: 0, dmgN: 0, spdN: 0, hits: 0, dmgDone: 0 };
     this.buildings.set(b.id, b);
     this.rebuild();
     if (!this.route) { this.buildings.delete(b.id); this.rebuild(); return 'blocks'; }
@@ -473,7 +487,7 @@ export class Board {
   tryLength(kind: Kind, x: number, y: number): number {
     if (this.canPlace(kind, x, y)) return -1;
     const id = -999;
-    this.buildings.set(id, { id, kind, x, y, type: 'T', level: 1, spent: 0, builtAt: 0, cd: 0, dmgN: 0, spdN: 0 });
+    this.buildings.set(id, { id, kind, x, y, type: 'T', level: 1, spent: 0, builtAt: 0, cd: 0, dmgN: 0, spdN: 0, hits: 0, dmgDone: 0 });
     this.rebuild();
     const len = this.ground ? this.ground.len : -1;
     this.buildings.delete(id);
@@ -638,6 +652,7 @@ export class Board {
     this.wave = wave;
     this.waveKills = 0;
     this.coinsUsed = new Set();
+    for (const b of this.buildings.values()) { b.hits = 0; b.dmgDone = 0; }
     this.coinGain = 0;
     this.spawnQueue = [...w.order];
     this.spawnIn = 0;
@@ -648,11 +663,12 @@ export class Board {
   }
   hpMul = 1;
   private mid = 1;
+  private dealt = 0;
 
   private spawn(type: string, s = 0) {
     const t = MONSTERS[type];
     const max = Math.round(t.hp * this.hpMul);
-    const m: Monster = { id: this.mid++, type, s, hp: max, max, shield: t.shield ?? 0, slowUntil: 0, slow: 1, poisonUntil: 0, poison: 0, armorDown: 0, jumpAt: 4, split: false, x: 0, y: 0 };
+    const m: Monster = { id: this.mid++, type, s, hp: max, max, shield: t.shield ?? 0, slowUntil: 0, slow: 1, poisonUntil: 0, poison: 0, armorDown: 0, jumpAt: 4, split: false, x: 0, y: 0, poisonBy: 0 };
     this.place(m);
     this.monsters.push(m);
   }
@@ -663,6 +679,8 @@ export class Board {
 
   zoneAt(k: ZoneKind, x: number, y: number) {
     let f = 1;
+    // im Bauverbot wirken keine anderen Bodenfelder
+    if (k !== 'nobuild' && this.map.zones.some((z) => z.k === 'nobuild' && x >= z.x && x <= z.x + z.w && y >= z.y && y <= z.y + z.h)) return 1;
     for (const z of this.map.zones) if (z.k === k && x >= z.x && x <= z.x + z.w && y >= z.y && y <= z.y + z.h) f = k === 'slow' ? Math.min(f, z.s) : Math.max(f, z.s);
     return f;
   }
@@ -681,9 +699,13 @@ export class Board {
     for (const m of this.monsters) {
       const mt = MONSTERS[m.type];
       let v = mt.speed * boostAt(t) * (t < m.slowUntil ? m.slow : 1) * this.zoneAt('slow', m.x, m.y) * this.zoneAt('fast', m.x, m.y);
+      const before = m.s;
       m.s += v * dt;
       if (mt.jump && t >= m.jumpAt) { m.s += 2.5; m.jumpAt = t + 4; }
-      if (t < m.poisonUntil) this.hurt(m, m.poison * dt, true);
+      // Checkpoint betreten: Credit-Felder werden wieder frei
+      const stops = (mt.air ? this.air! : this.ground).stops;
+      if (this.coinsUsed.size && stops.some((cs) => before < cs && m.s >= cs)) this.coinsUsed.clear();
+      if (t < m.poisonUntil) { kills += this.hurt(m, m.poison * dt, true); const pb = this.buildings.get(m.poisonBy); if (pb) pb.dmgDone += this.dealt; }
       this.place(m);
     }
     for (const m of this.monsters) if (MONSTERS[m.type].heal) for (const o of this.monsters) if (o !== m && Math.hypot(o.x - m.x, o.y - m.y) < 2) o.hp = Math.min(o.max, o.hp + 3 * dt);
@@ -709,7 +731,7 @@ export class Board {
       for (const o of this.buildings.values()) if (o.kind === 'tower' && o.type === 'V' && Math.hypot(o.x - b.x, o.y - b.y) <= TOWER.V.range) buff += BUFF[o.level - 1];
       const dmg = (spec.dmg * LEVEL_DMG[b.level - 1] * (1 + DMG_STEP * b.dmgN) + dmgBonus) * buff * this.zoneAt('dmg', cx, cy);
       this.shots.push([b.id, Math.round(target.x * 10), Math.round(target.y * 10), 0, 0]);
-      const hit = (m: Monster, d: number) => { kills += this.hurt(m, d, false); };
+      const hit = (m: Monster, d: number) => { kills += this.hurt(m, d, false); b.hits++; b.dmgDone += this.dealt; };
       if (spec.splash) {
         for (const m of this.monsters) if (Math.hypot(m.x - target.x, m.y - target.y) <= spec.splash) {
           hit(m, dmg);
@@ -726,7 +748,7 @@ export class Board {
         }
       } else {
         hit(target, dmg);
-        if (spec.poison) { target.poison = spec.poison * LEVEL_DMG[b.level - 1]; target.poisonUntil = t + 3; target.armorDown = 2; }
+        if (spec.poison) { target.poisonBy = b.id; target.poison = spec.poison * LEVEL_DMG[b.level - 1]; target.poisonUntil = t + 3; target.armorDown = 2; }
       }
     }
     // angekommen
@@ -757,6 +779,7 @@ export class Board {
     const mt = MONSTERS[m.type];
     if (!poison) d = Math.max(1, d - Math.max(0, (mt.armor ?? 0) - m.armorDown));
     if (m.shield > 0 && !poison) { const a = Math.min(m.shield, d); m.shield -= a; d -= a; }
+    this.dealt = Math.max(0, Math.min(d, m.hp));
     m.hp -= d;
     if (m.hp > 0) return 0;
     // Wiedergeburt am selben Ort
@@ -798,8 +821,17 @@ export function placeProblem(map: Pick<MapDef, 'w' | 'h' | 'start' | 'core' | 'c
   if (x < 0 || y < 0 || x + n > map.w || y + n > map.h) return 'edge';
   const hit = (ax: number, ay: number, aw: number, ah: number) => x < ax + aw && x + n > ax && y < ay + ah && y + n > ay;
   if (rects.some(([ax, ay, aw, ah]) => hit(ax, ay, aw, ah))) return 'occupied';
-  const special: Pt[] = [map.start, map.core, ...map.cps, ...map.tps.map((t) => t.o), ...map.coins.map((c) => [c.x, c.y] as Pt)];
+  const special: Pt[] = [map.start, map.core, ...map.tps.map((t) => t.o), ...map.coins.map((c) => [c.x, c.y] as Pt)];
   if (special.some((p) => hit(p[0], p[1], 2, 2))) return 'special';
+  for (const [cx, cy] of map.cps) {
+    let free = 0;
+    for (let dy = 0; dy < 2; dy++) for (let dx = 0; dx < 2; dx++) {
+      const X = cx + dx, Y = cy + dy;
+      const taken = (X >= x && X < x + n && Y >= y && Y < y + n) || rects.some(([ax, ay, aw, ah]) => X >= ax && X < ax + aw && Y >= ay && Y < ay + ah);
+      if (!taken) free++;
+    }
+    if (free === 0) return 'checkpoint';
+  }
   if (map.zones.some((z) => z.k === 'nobuild' && hit(z.x, z.y, z.w, z.h))) return 'nobuild';
   return null;
 }

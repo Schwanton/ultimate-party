@@ -32,8 +32,8 @@ interface Zone { k: ZoneKind; x: number; y: number; w: number; h: number; s: num
 interface Coin { x: number; y: number; m: number }
 interface MapInfo { w: number; h: number; start: Pt; core: Pt; cps: Pt[]; tps: { i: Pt; o: Pt }[]; zones: Zone[]; coins: Coin[]; maxLimit: number }
 interface LegOut { l: number; j: number; p: Pt[] }
-type Bld = [number, number, number, number, string, number, number, number];
-interface BoardOut { idx: number; bs: Bld[]; rocks: Rock[]; legs: LegOut[] }
+type Bld = [number, number, number, number, string, number, number, number, number?, number?];
+interface BoardOut { idx: number; bs: Bld[]; rocks: Rock[]; legs: LegOut[]; cu?: number[] }
 interface Draft { kind: Kind; x: number; y: number }
 type PendingOut = { k: 'build'; kind: Kind; x: number; y: number } | { k: 'sell'; id: number } | { k: 'blast'; x: number; y: number };
 
@@ -47,7 +47,9 @@ const zoneAlpha = (z: Zone) => {
   return 0.16 + 0.32 * Math.max(0, Math.min(1, k));
 };
 const legColor = (l: number, n: number) => `rgba(255,70,70,${(0.35 + 0.65 * (n > 1 ? l / (n - 1) : 1)).toFixed(2)})`;
-const planColor = (l: number, n: number) => `rgba(255,212,59,${(0.45 + 0.55 * (n > 1 ? l / (n - 1) : 1)).toFixed(2)})`;
+const planColor = (l: number, n: number) => `rgba(255,212,59,${(0.25 + 0.3 * (n > 1 ? l / (n - 1) : 1)).toFixed(2)})`;
+const zoneText = (z: Zone, nobuild: string) => { const p = Math.round(Math.abs(z.s - 1) * 100); return z.k === 'slow' ? `−${p}% SPD` : z.k === 'fast' ? `+${p}% SPD` : z.k === 'dmg' ? `+${p}% ATK` : z.k === 'range' ? `+${p}% RNG` : nobuild; };
+const fmtK = (n: number) => (n >= 10000 ? Math.round(n / 1000) + 'k' : n >= 1000 ? (n / 1000).toFixed(1).replace('.', ',') + 'k' : String(n));
 const fmtTime = (s: number) => (s > 0 ? `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}` : '–');
 const sizeOf = (k: Kind) => (k === 'wall' ? 1 : 2);
 const legsToOut = (legs: { pts: Pt[]; leg: number; jump?: boolean }[] | null): LegOut[] | null => legs && legs.map((l) => ({ l: l.leg, j: l.jump ? 1 : 0, p: l.pts }));
@@ -71,19 +73,19 @@ function arrowsOf(legs: LegOut[], color: (l: number) => string) {
   return out;
 }
 
-function Route({ legs, color, width }: { legs: LegOut[]; color: (l: number) => string; width: number }) {
+function Route({ legs, color, width, dash }: { legs: LegOut[]; color: (l: number) => string; width: number; dash: string }) {
   const arrows = useMemo(() => arrowsOf(legs, color), [legs, color]);
   return (
     <g pointerEvents="none">
       {legs.map((g, i) => (
-        <polyline key={'l' + i} points={g.p.map((p) => p.join(',')).join(' ')} fill="none" stroke={g.j ? 'rgba(46,242,200,.6)' : color(g.l)} strokeWidth={g.j ? 0.12 : width} strokeDasharray={g.j ? '0.3 0.35' : undefined} strokeLinejoin="round" strokeLinecap="round" />
+        <polyline key={'l' + i} points={g.p.map((p) => p.join(',')).join(' ')} fill="none" stroke={g.j ? 'rgba(46,242,200,.6)' : color(g.l)} strokeWidth={g.j ? 0.12 : width} strokeDasharray={g.j ? '0.3 0.35' : dash} strokeLinejoin="round" strokeLinecap="round" />
       ))}
       {arrows.map((a, i) => <path key={'a' + i} d="M-0.3,-0.33 L0.38,0 L-0.3,0.33 Z" fill={a.c} transform={`translate(${a.x},${a.y}) rotate(${a.a})`} />)}
     </g>
   );
 }
 
-function Building({ b, sel, labels, ghost }: { b: Bld; sel?: boolean; labels: boolean; ghost?: string }) {
+function Building({ b, sel, labels, ghost, stats }: { b: Bld; sel?: boolean; labels: boolean; ghost?: string; stats?: boolean }) {
   const [id, kind, x, y, type, level] = b;
   const op = ghost ? 0.55 : 1;
   if (kind === 0) return <rect key={id} x={x + 0.03} y={y + 0.03} width={0.94} height={0.94} rx={0.12} fill="#3B4470" opacity={op} stroke={ghost ?? (sel ? CYAN : '#6A76B0')} strokeWidth={sel || ghost ? 0.16 : 0.07} strokeDasharray={ghost ? '0.25 0.15' : undefined} />;
@@ -96,10 +98,17 @@ function Building({ b, sel, labels, ghost }: { b: Bld; sel?: boolean; labels: bo
   const c = TOWER_COLOR[type] ?? TEXT;
   return (
     <g opacity={op}>
-      {sel && <circle cx={x + 1} cy={y + 1} r={1.05} fill="none" stroke={CYAN} strokeWidth={0.18} />}
-      <circle cx={x + 1} cy={y + 1} r={0.82} fill="#0A0F28" stroke={ghost ?? c} strokeWidth={0.14} strokeDasharray={ghost ? '0.3 0.2' : undefined} />
-      {type === 'T' ? <circle cx={x + 1} cy={y + 1} r={0.22} fill={c} /> : labels && <text x={x + 1} y={y + 1.32} fontSize={0.9} textAnchor="middle" fill={c} fontWeight={800}>{type}</text>}
+      {sel && <rect x={x - 0.05} y={y - 0.05} width={2.1} height={2.1} rx={0.35} fill="none" stroke={CYAN} strokeWidth={0.18} />}
+      <rect x={x + 0.16} y={y + 0.16} width={1.68} height={1.68} rx={0.28} fill="#0A0F28" stroke={ghost ?? c} strokeWidth={0.14} strokeDasharray={ghost ? '0.3 0.2' : undefined} />
+      {type === 'T' ? <rect x={x + 0.78} y={y + 0.78} width={0.44} height={0.44} rx={0.08} fill={c} /> : labels && <text x={x + 1} y={y + 1.32} fontSize={0.9} textAnchor="middle" fill={c} fontWeight={800}>{type}</text>}
       {level > 1 && <text x={x + 1.75} y={y + 0.55} fontSize={0.55} textAnchor="middle" fill={YELLOW} fontWeight={800}>{'•'.repeat(level - 1)}</text>}
+      {stats && !ghost && type !== 'V' && (
+        <g pointerEvents="none">
+          <rect x={x + 0.05} y={y + 0.2} width={1.9} height={1.6} rx={0.2} fill="rgba(6,9,24,.85)" />
+          <text x={x + 1} y={y + 0.9} fontSize={0.55} textAnchor="middle" fill={TEXT} fontWeight={700}>{fmtK(b[8] ?? 0)}</text>
+          <text x={x + 1} y={y + 1.55} fontSize={0.55} textAnchor="middle" fill={YELLOW} fontWeight={700}>{fmtK(b[9] ?? 0)}</text>
+        </g>
+      )}
     </g>
   );
 }
@@ -110,10 +119,10 @@ const Cross = ({ x, y, w, h }: { x: number; y: number; w: number; h: number }) =
 
 interface LayerProps {
   map: MapInfo; rocks: Rock[]; legs: LegOut[]; plan?: LegOut[] | null; bs?: Bld[]; selected?: number | string | null; monsters?: number[];
-  labels?: boolean; zones?: boolean; pending?: PendingOut[]; draft?: (Draft & { bad: boolean }) | null;
+  labels?: boolean; zones?: boolean; pending?: PendingOut[]; draft?: (Draft & { bad: boolean }) | null; stats?: boolean; coinsUsed?: number[]; nobuild?: string;
 }
 
-function MapLayer({ map, rocks, legs, plan, bs, selected, monsters, labels = true, zones = true, pending, draft }: LayerProps) {
+function MapLayer({ map, rocks, legs, plan, bs, selected, monsters, labels = true, zones = true, pending, draft, stats, coinsUsed, nobuild = '' }: LayerProps) {
   const n = map.cps.length + 1;
   const red = useMemo(() => (l: number) => legColor(l, n), [n]);
   const yel = useMemo(() => (l: number) => planColor(l, n), [n]);
@@ -121,28 +130,37 @@ function MapLayer({ map, rocks, legs, plan, bs, selected, monsters, labels = tru
   return (
     <g>
       <rect x={0} y={0} width={map.w} height={map.h} fill="#121839" />
-      {zones && map.zones.map((z, i) => (
-        <rect key={i} x={z.x} y={z.y} width={z.w} height={z.h} rx={0.6} fill={`rgba(${ZONE_COLOR[z.k]},${zoneAlpha(z).toFixed(2)})`} stroke={`rgba(${ZONE_COLOR[z.k]},.6)`} strokeWidth={0.06} />
+      {zones && map.zones.filter((z) => z.k !== 'nobuild').map((z, i) => (
+        <g key={'z' + i}>
+          <rect x={z.x} y={z.y} width={z.w} height={z.h} rx={0.6} fill={`rgba(${ZONE_COLOR[z.k]},${zoneAlpha(z).toFixed(2)})`} stroke={`rgba(${ZONE_COLOR[z.k]},.6)`} strokeWidth={0.06} />
+          {labels && <text x={z.x + 0.3} y={z.y + 0.8} fontSize={0.6} fill={`rgb(${ZONE_COLOR[z.k]})`} fontWeight={800}>{zoneText(z, nobuild)}</text>}
+        </g>
+      ))}
+      {map.zones.filter((z) => z.k === 'nobuild').map((z, i) => (
+        <g key={'nb' + i}>
+          <rect x={z.x} y={z.y} width={z.w} height={z.h} rx={0.6} fill="#2B2E42" stroke="rgba(160,165,190,.7)" strokeWidth={0.08} />
+          {labels && <text x={z.x + 0.3} y={z.y + 0.8} fontSize={0.6} fill="#B9BED6" fontWeight={800}>{nobuild}</text>}
+        </g>
       ))}
       {rocks.map(([x, y, w, h], i) => <rect key={'r' + i} x={x + 0.05} y={y + 0.05} width={w - 0.1} height={h - 0.1} rx={0.7} fill="#4A4658" stroke={selected === `rock:${x},${y}` ? CYAN : '#5E5A70'} strokeWidth={selected === `rock:${x},${y}` ? 0.18 : 0.06} />)}
       {map.coins.map((c, i) => (
         <g key={'c' + i}>
-          <circle cx={c.x + 1} cy={c.y + 1} r={0.85} fill="rgba(255,212,59,.18)" stroke={YELLOW} strokeWidth={0.12} />
+          <circle cx={c.x + 1} cy={c.y + 1} r={0.85} fill={coinsUsed?.includes(i) ? 'rgba(140,145,170,.15)' : 'rgba(255,212,59,.18)'} stroke={coinsUsed?.includes(i) ? '#7C8199' : YELLOW} strokeWidth={0.12} />
           {labels && <>
-            <text x={c.x + 1} y={c.y + 1.38} fontSize={1} textAnchor="middle" fill={YELLOW} fontWeight={800}>{CR}</text>
-            <text x={c.x + 1} y={c.y - 0.15} fontSize={0.6} textAnchor="middle" fill={YELLOW} fontWeight={800}>×{String(c.m).replace('.', ',')}</text>
+            <text x={c.x + 1} y={c.y + 1.38} fontSize={1} textAnchor="middle" fill={coinsUsed?.includes(i) ? '#7C8199' : YELLOW} fontWeight={800}>{CR}</text>
+            <text x={c.x + 1} y={c.y - 0.15} fontSize={0.6} textAnchor="middle" fill={coinsUsed?.includes(i) ? '#7C8199' : YELLOW} fontWeight={800}>×{String(c.m).replace('.', ',')}</text>
           </>}
         </g>
       ))}
       {map.tps.map((t, i) => (
         <g key={'tp' + i}>
-          <circle cx={t.i[0] + 1} cy={t.i[1] + 1} r={0.9} fill="rgba(10,15,40,.7)" stroke={TP} strokeWidth={0.12} />
-          <circle cx={t.o[0] + 1} cy={t.o[1] + 1} r={0.9} fill="rgba(10,15,40,.7)" stroke={TP} strokeWidth={0.12} strokeDasharray="0.3 0.2" />
+          <circle cx={t.i[0] + 1} cy={t.i[1] + 1} r={0.9} fill="rgba(10,15,40,.7)" stroke={GREEN} strokeWidth={0.14} />
+          <circle cx={t.o[0] + 1} cy={t.o[1] + 1} r={0.9} fill="rgba(10,15,40,.7)" stroke={RED} strokeWidth={0.14} strokeDasharray="0.3 0.2" />
           {labels && <>
-            <text x={t.i[0] + 1} y={t.i[1] + 0.95} fontSize={0.42} textAnchor="middle" fill={TP} fontWeight={800}>TP{i + 1}</text>
-            <text x={t.i[0] + 1} y={t.i[1] + 1.45} fontSize={0.42} textAnchor="middle" fill={TP} fontWeight={800}>IN</text>
-            <text x={t.o[0] + 1} y={t.o[1] + 0.95} fontSize={0.42} textAnchor="middle" fill={TP} fontWeight={800}>TP{i + 1}</text>
-            <text x={t.o[0] + 1} y={t.o[1] + 1.45} fontSize={0.42} textAnchor="middle" fill={TP} fontWeight={800}>OUT</text>
+            <text x={t.i[0] + 1} y={t.i[1] + 0.95} fontSize={0.42} textAnchor="middle" fill={GREEN} fontWeight={800}>TP{i + 1}</text>
+            <text x={t.i[0] + 1} y={t.i[1] + 1.45} fontSize={0.42} textAnchor="middle" fill={GREEN} fontWeight={800}>IN</text>
+            <text x={t.o[0] + 1} y={t.o[1] + 0.95} fontSize={0.42} textAnchor="middle" fill={RED} fontWeight={800}>TP{i + 1}</text>
+            <text x={t.o[0] + 1} y={t.o[1] + 1.45} fontSize={0.42} textAnchor="middle" fill={RED} fontWeight={800}>OUT</text>
           </>}
         </g>
       ))}
@@ -157,7 +175,7 @@ function MapLayer({ map, rocks, legs, plan, bs, selected, monsters, labels = tru
       ))}
       {bs?.map((b) => (
         <g key={b[0]}>
-          <Building b={b} sel={selected === b[0]} labels={labels} />
+          <Building b={b} sel={selected === b[0]} labels={labels} stats={stats} />
           {sells.has(b[0]) && <Cross x={b[2]} y={b[3]} w={sizeOf(b[1] === 0 ? 'wall' : 'tower')} h={sizeOf(b[1] === 0 ? 'wall' : 'tower')} />}
         </g>
       ))}
@@ -166,8 +184,8 @@ function MapLayer({ map, rocks, legs, plan, bs, selected, monsters, labels = tru
         if (p.k === 'blast') { const r = rocks.find((q) => q[0] === p.x && q[1] === p.y); return r ? <Cross key={'p' + i} x={r[0]} y={r[1]} w={r[2]} h={r[3]} /> : null; }
         return null;
       })}
-      <Route legs={legs} color={red} width={0.2} />
-      {plan && <Route legs={plan} color={yel} width={0.16} />}
+      <Route legs={legs} color={red} width={0.2} dash="0.55 0.3" />
+      {plan && <Route legs={plan} color={yel} width={0.13} dash="0.4 0.35" />}
       {draft && <Building b={[-999, draft.kind === 'wall' ? 0 : draft.kind === 'tower' ? 1 : 2, draft.x, draft.y, 'T', 1, 0, 0]} labels={labels} ghost={draft.bad ? RED : CYAN} />}
       {monsters && Array.from({ length: Math.floor(monsters.length / 4) }, (_, k) => {
         const x = monsters[k * 4] / 10, y = monsters[k * 4 + 1] / 10, ti = monsters[k * 4 + 2], hp = monsters[k * 4 + 3];
@@ -208,8 +226,8 @@ function MapPreview({ m, width, height, labels = false }: { m: MapInfo & { rocks
 }
 
 /** Karte am Handy: zoomen mit zwei Fingern, schieben, antippen, Entwurf ziehen */
-function MapView(props: LayerProps & { height: number; onTap: (x: number, y: number) => void; onDrag?: (x: number, y: number) => void; fitLabel: string }) {
-  const { map, height, onTap, onDrag, fitLabel, draft } = props;
+function MapView(props: LayerProps & { height: number; onTap: (x: number, y: number) => void; onDrag?: (x: number, y: number) => void; fitLabel: string; corner?: ReactNode }) {
+  const { map, height, onTap, onDrag, fitLabel, draft, corner } = props;
   const box = useRef<HTMLDivElement>(null);
   const [wd, setWd] = useState(360);
   useLayoutEffect(() => {
@@ -291,6 +309,7 @@ function MapView(props: LayerProps & { height: number; onTap: (x: number, y: num
           <rect x={0} y={0} width={map.w} height={map.h} fill="url(#ctdGrid)" pointerEvents="none" />
         </g>
       </svg>
+      {corner && <div style={{ position: 'absolute', right: 6, top: 6 }} onPointerDown={(e) => e.stopPropagation()} onPointerUp={(e) => e.stopPropagation()}>{corner}</div>}
       {tf && tf.s > fit * 1.01 && (
         <button aria-label={fitLabel} onClick={() => setTf(null)} onPointerDown={(e) => e.stopPropagation()} style={{ position: 'absolute', right: 8, bottom: 8, width: 44, height: 44, borderRadius: 10, background: 'rgba(6,9,24,.85)', border: `1px solid ${LINE}`, color: TEXT, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" /></svg>
@@ -449,13 +468,15 @@ function HostGame({ view, t, player }: HostViewProps) {
             const isNext = view.stage === 'wave' ? k === 1 : k === 0;
             const c = isCur ? CYAN : isNext ? YELLOW : LINE;
             return (
-              <div key={w.n} style={{ ...panel, flex: 1, minHeight: 0, maxHeight: 96, border: `${isCur || isNext ? 2 : 1}px solid ${c}`, boxShadow: isCur ? '0 0 16px rgba(62,240,255,.3)' : 'none', padding: '6px 12px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 2, opacity: isCur || isNext ? 1 : 0.85 }}>
+              <div key={w.n} style={{ ...panel, flex: 1, minHeight: 0, maxHeight: 120, border: `${isCur || isNext ? 2 : 1}px solid ${c}`, boxShadow: isCur ? '0 0 16px rgba(62,240,255,.3)' : 'none', padding: '6px 12px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 2, opacity: isCur || isNext ? 1 : 0.85 }}>
                 <div style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 15, color: isCur ? CYAN : isNext ? YELLOW : MUTED }}>{t('game.wave', { n: w.n })}{isCur ? ` · ${t('game.now')}` : isNext ? ` · ${t('game.nextShort')}` : ''}</div>
                 {w.types.map((x: any) => (
-                  <div key={x.t} style={{ display: 'flex', alignItems: 'baseline', gap: 8, whiteSpace: 'nowrap', overflow: 'hidden' }}>
-                    <span style={{ fontSize: 16, fontWeight: 700, color: mColor(x.t) }}>{x.n}× {t('m.' + x.t)}</span>
-                    <span style={{ fontSize: 14, fontWeight: 700, color: '#FF6B8A' }}>♥ {x.hp}</span>
-                    <span style={{ fontSize: 12, color: MUTED, overflow: 'hidden', textOverflow: 'ellipsis' }}>{t('m.' + x.t + '.d')}</span>
+                  <div key={x.t} style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, whiteSpace: 'nowrap' }}>
+                      <span style={{ fontSize: 16, fontWeight: 700, color: mColor(x.t) }}>{x.n}× {t('m.' + x.t)}</span>
+                      <span style={{ fontSize: 14, fontWeight: 700, color: '#FF6B8A' }}>♥ {x.hp}</span>
+                    </div>
+                    <span style={{ fontSize: 12, color: MUTED, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t('m.' + x.t + '.d')}</span>
                   </div>
                 ))}
               </div>
@@ -689,6 +710,7 @@ function PlayScreen({ view, t, send, player }: ControllerViewProps) {
   const [draft, setDraft] = useState<Draft | null>(null);
   const [sel, setSel] = useState<number | string | null>(null);
   const [menu, setMenu] = useState(false);
+  const [stats, setStats] = useState(false);
   const [zones, setZones] = useZonesSetting();
   const canAct = !view.out;
   const live = view.stage === 'wave';
@@ -736,8 +758,13 @@ function PlayScreen({ view, t, send, player }: ControllerViewProps) {
   };
   const onTap = (x: number, y: number) => {
     if (!ownView || !canAct) return;
-    if (tool) { placeAt(x, y, tool); return; }
     const cx = Math.floor(x), cy = Math.floor(y);
+    // im Baumodus: tippt man auf etwas Bestehendes, wird es ganz normal ausgewählt
+    const hitsSomething = pending.some((p) => p.k === 'build' && cx >= p.x && cx < p.x + sizeOf(p.kind) && cy >= p.y && cy < p.y + sizeOf(p.kind))
+      || me.bs.some(([, kind, bx, by]) => { const n = kind === 0 ? 1 : 2; return cx >= bx && cx < bx + n && cy >= by && cy < by + n; })
+      || me.rocks.some(([rx, ry, rw, rh]) => cx >= rx && cx < rx + rw && cy >= ry && cy < ry + rh);
+    if (tool && !hitsSomething) { placeAt(x, y, tool); return; }
+    if (tool) { setTool(null); setDraft(null); }
     const pi = pending.findIndex((p) => p.k === 'build' && cx >= p.x && cx < p.x + sizeOf(p.kind) && cy >= p.y && cy < p.y + sizeOf(p.kind));
     if (pi >= 0) return setSel(-1 - pi);
     const b = me.bs.find(([, kind, bx, by]) => { const n = kind === 0 ? 1 : 2; return cx >= bx && cx < bx + n && cy >= by && cy < by + n; });
@@ -808,6 +835,8 @@ function PlayScreen({ view, t, send, player }: ControllerViewProps) {
       )}
       <MapView map={map} rocks={watching.rocks} legs={redLegs} plan={yellow} bs={watching.bs} monsters={monsters} selected={ownView ? sel : null} zones={zones}
         pending={ownView ? pending : undefined} draft={ownView && draft ? { ...draft, bad: !!draftInfo?.problem } : null}
+        stats={stats} coinsUsed={watching.cu} nobuild={t('z.nobuild')}
+        corner={<button aria-label={t('p.stats')} aria-pressed={stats} onClick={() => setStats(!stats)} style={{ ...btn, width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', background: stats ? CYAN : 'rgba(6,9,24,.85)', color: stats ? BG : TEXT }}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" /></svg></button>}
         height={view.out ? 500 : 470} onTap={onTap} onDrag={(x, y) => draft && placeAt(x, y, draft.kind)} fitLabel={t('p.fit')} />
       {err && <div role="status" style={{ background: 'rgba(255,77,77,.15)', border: `1px solid ${RED}`, borderRadius: 10, padding: '6px 10px', fontSize: 13, color: '#FF9A9A' }}>{err}</div>}
       {!view.out && (

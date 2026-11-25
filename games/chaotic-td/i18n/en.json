@@ -168,5 +168,8 @@
  "p.cancelPending": "Undo queued action",
  "p.cancelSell": "Undo sale",
  "p.pendingTitle": "Queued",
- "p.pendingInfo": "Will be built once your wave is over. The money is already set aside."
+ "p.pendingInfo": "Will be built once your wave is over. The money is already set aside.",
+ "z.nobuild": "No building",
+ "err.checkpoint": "At least one tile of the checkpoint must stay free.",
+ "p.stats": "Tower stats (hits and damage)"
 }
