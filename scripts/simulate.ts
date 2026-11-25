@@ -90,6 +90,9 @@ const scenarios: { game: string; players: number; options?: Record<string, numbe
   { game: 'tick-tack-boom', players: 5, options: { mode: 'b', bombs: 5, mix: 'on' } },
   { game: 'tick-tack-boom', players: 8, options: { mode: 'b', bombs: 3 } },
   { game: 'tick-tack-boom', players: 3, options: { bombs: 5, mix: 'on' } },
+  { game: 'chaotic-td', players: 2 },
+  { game: 'chaotic-td', players: 5 },
+  { game: 'chaotic-td', players: 16 },
   // mit Spiel-Einstellungen
   { game: 'mic-drop', players: 4, options: { rounds: 5, answerTime: 0.75 } },
   { game: 'flunkerfakt', players: 4, options: { questions: 3 } },

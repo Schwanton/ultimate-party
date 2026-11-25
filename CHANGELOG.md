@@ -2,6 +2,12 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.43.0
+
+- Neues Spiel: **Chaotic Tower Defense** (2–16 Spieler, jeder gegen jeden, nach dem Vorbild Entropy TD). Am Anfang stimmt ihr über 6 Zufallskarten ab – die Vorschau zeigt Weg, Checkpoints, Teleporter und die günstigsten und teuersten Türme. Alle bauen auf derselben Karte ihr eigenes Labyrinth: Mauern (1 × 1), Türme (2 × 2) und Baulager (+10 Baulimit). Einen Turm tippt ihr an, um ihn zu Laser, Plasma, Frost, Blitz, Railgun, Flak, Säure oder Verstärker zu verbessern
+- Erledigte Monster stehen sofort wieder auf und laufen weiter. Leben = 100 − Abstand zum Besten bei den Kills; wer 100 zurückliegt, ist raus. Der Letzte gewinnt (spätestens nach Welle 40 gewinnt, wer die meisten Kills hat)
+- Welle und Bauphase wechseln sich ab. Wer mit seiner Welle früher fertig ist, darf früher bauen. Die rote Linie zeigt immer den Weg der Monster, Preise sind je Karte zufällig (grün günstig, rot teuer). Die Karte lässt sich am Handy mit zwei Fingern zoomen und verschieben, und mit „Sicht teilen“ dürfen andere dein Labyrinth live ansehen
+
 ## 0.42.0
 
 - Sternenpakt: neue Einstellung „Bedenkpause“. Alle 5 Jahre steht die Zeit eine Minute lang still. In der Pause könnt ihr ausbauen, forschen, verhandeln und Flotten losschicken – sie fliegen erst los, wenn es weitergeht. Tippen alle auf „Fertig“, geht es früher weiter (nur im Echtzeit-Takt)

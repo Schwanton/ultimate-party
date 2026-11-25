@@ -1,0 +1,18 @@
+{
+  "id": "chaotic-td",
+  "name": { "de": "Chaotic Tower Defense", "en": "Chaotic Tower Defense" },
+  "description": {
+    "de": "Tower Defense jeder gegen jeden nach dem Vorbild Entropy TD: Alle bauen auf derselben Zufallskarte ihr eigenes Labyrinth. Erledigte Monster stehen sofort wieder auf – wer 100 Kills hinter dem Besten liegt, ist raus.",
+    "en": "Free-for-all tower defense inspired by Entropy TD: everyone builds their own maze on the same random map. Killed monsters get right back up – fall 100 kills behind the leader and you're out."
+  },
+  "minPlayers": 2,
+  "maxPlayers": 16,
+  "audience": false,
+  "minutes": 30,
+  "color": "#3EF0FF",
+  "tags": [],
+  "sdkVersion": 1,
+  "version": "0.1.0",
+  "author": "UP!",
+  "olympia": false
+}
