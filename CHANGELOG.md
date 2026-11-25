@@ -2,6 +2,13 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.43.2
+
+- Chaotic Tower Defense: Jede Karte hat jetzt ihre eigene **Wellenfolge** aus 4–6 Wellen, die sich immer wiederholt – mit jeder Welle haben die Monster etwas mehr Leben. Eine Welle besteht aus 1–3 Gegnertypen, bunt gemischt. Bosse sind ein ganz normaler Gegnertyp und kommen zu 1–4 Stück
+- Der Fernseher zeigt rechts die ganze Wellenfolge: die laufende Welle oben (türkis), die nächste darunter (gelb). Ist eine Welle vorbei, wandert sie nach ganz unten
+- Schon bei der Kartenabstimmung seht ihr die Wellenfolge jeder Karte
+- Die ersten Wellen sind etwas zäher, dafür steigen die Leben danach gleichmäßiger – mit wachsendem Labyrinth wird es leichter
+
 ## 0.43.1
 
 - Chaotic Tower Defense: Tippt einen Turm an, um ihn gezielt zu verbessern – **Schaden +25 %** (beliebig oft) und **Angriffstempo** (bis zu 5-mal). Jede Verbesserung wird teurer

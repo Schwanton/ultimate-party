@@ -139,5 +139,10 @@
  "p.spd": "Attack speed",
  "p.spdInfo": "{n} of 5",
  "p.boost": "Speed ×{n}",
- "game.boostRule": "From minute 2 of a wave, monster speed doubles every minute."
+ "game.boostRule": "From minute 2 of a wave, monster speed doubles every minute.",
+ "game.now": "running",
+ "game.nextShort": "up next",
+ "game.lifeMul": "Health ×{m}",
+ "game.dec": ".",
+ "vote.waves": "Waves:"
 }

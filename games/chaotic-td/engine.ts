@@ -25,6 +25,8 @@ export interface MapDef {
   maxLimit: number;
   money: number;
   moneyF: number;
+  /** Wellenfolge (4–6 Wellen), wiederholt sich mit mehr Leben */
+  rotation: Slot[];
   /** Preise mit Zufallsfaktor: wall, tower, depot, blast, income, dmgUp, up_<Typ>, lv2_<Typ>, lv3_<Typ> */
   price: Record<string, Price>;
 }
@@ -60,11 +62,13 @@ export const MONSTERS: Record<string, MonsterType> = {
   spalter: { hp: 28, speed: 2.0, count: 10, split: true },
   springer: { hp: 22, speed: 2.1, count: 10, jump: true },
   schild: { hp: 21, speed: 2.0, count: 10, shield: 20 },
-  boss: { hp: 315, speed: 1.3, count: 1, armor: 4, boss: true },
+  boss: { hp: 315, speed: 1.3, count: 3, armor: 4, boss: true },
   splitter: { hp: 8, speed: 2.6, count: 0 },
 };
 export const MONSTER_KEYS = Object.keys(MONSTERS);
-const CYCLE = ['laeufer', 'flitzer', 'schwarm', 'panzer', 'heiler', 'flieger', 'spalter', 'springer', 'schild'];
+/** Typen, aus denen die Wellenfolge einer Karte gewürfelt wird (Splitter entstehen nur aus Spaltern) */
+export const POOL = ['laeufer', 'flitzer', 'panzer', 'schwarm', 'flieger', 'heiler', 'spalter', 'springer', 'schild', 'boss'];
+export interface Slot { types: { t: string; n: number }[]; order: string[] }
 
 /* ================= Zufall ================= */
 
@@ -131,8 +135,26 @@ export function generateMap(seed: number): MapDef {
   };
   for (const key of ['wall', 'tower', 'depot', 'blast', 'income', 'dmgUp']) add(key, BASE_PRICE[key]);
   for (const t of TYPES) { add('up_' + t, BASE_PRICE[t]); add('lv2_' + t, BASE_PRICE[t] * 1.2); add('lv3_' + t, BASE_PRICE[t] * 2.2); }
+  const rotation: Slot[] = [];
+  const nSlots = ri(4, 6);
+  for (let k = 0; k < nSlots; k++) {
+    const pool = [...POOL];
+    const nt = ri(1, 3);
+    const picked: string[] = [];
+    for (let j = 0; j < nt; j++) picked.push(pool.splice(Math.floor(r() * pool.length), 1)[0]);
+    const wts = picked.map(() => 0.4 + r());
+    const sum = wts.reduce((a, b) => a + b, 0);
+    const types = picked.map((t, j) => {
+      if (t === 'boss') return { t, n: nt === 1 ? ri(2, 4) : ri(1, 3) };
+      return { t, n: Math.max(2, Math.round((MONSTERS[t].count * wts[j]) / sum)) };
+    });
+    const order: string[] = [];
+    for (const { t, n } of types) for (let j = 0; j < n; j++) order.push(t);
+    for (let j = order.length - 1; j > 0; j--) { const q = Math.floor(r() * (j + 1)); [order[j], order[q]] = [order[q], order[j]]; }
+    rotation.push({ types, order });
+  }
   const moneyF = logFactor(r, 0.5, 2);
-  const map: MapDef = { w, h, start, core, cps, rocks, tps, zones, maxLimit: ri(16, 64), money: Math.round(90 * moneyF), moneyF: Math.round(moneyF * 100) / 100, price };
+  const map: MapDef = { w, h, start, core, cps, rocks, tps, zones, maxLimit: ri(16, 64), money: Math.round(90 * moneyF), moneyF: Math.round(moneyF * 100) / 100, price, rotation };
   // Felsen dürfen den Weg nicht ganz versperren
   const b = new Board(map);
   while (!b.route && map.rocks.length) { map.rocks.pop(); b.reset(); }
@@ -506,9 +528,8 @@ export class Board {
   /* ---------- Welle ---------- */
 
   startWave(wave: number) {
-    const w = waveInfo(wave);
-    this.spawnQueue = Array.from({ length: w.count }, () => w.type);
-    if (w.type === 'boss') for (let k = 0; k < 8; k++) this.spawnQueue.push('laeufer');
+    const w = waveInfo(this.map, wave);
+    this.spawnQueue = [...w.order];
     this.spawnIn = 0;
     this.waveTime = 0;
     this.waveDone = false;
@@ -627,9 +648,13 @@ export class Board {
   private spawnAt(type: string, s: number) { this.spawn(type, s); }
 }
 
-export function waveInfo(wave: number) {
-  const boss = wave % 10 === 0;
-  const type = boss ? 'boss' : CYCLE[(wave - 1) % CYCLE.length];
-  const hpMul = (1 + 0.18 * (wave - 1)) * Math.pow(1.05, wave - 1);
-  return { type, count: MONSTERS[type].count + Math.floor(wave / 6) * 2, hpMul: Math.round(hpMul * 100) / 100 };
+/** Welle n (ab 1): Platz in der Folge, Runde, Typen und Lebens-Faktor.
+ *  Leben steigen gleichmäßig (ohne Zinseszins) und starten etwas höher – am Anfang schwer, später holen die Türme auf. */
+export function waveInfo(map: MapDef, wave: number) {
+  const n = Math.max(1, wave);
+  const len = map.rotation.length;
+  const slot = (n - 1) % len;
+  const s = map.rotation[slot];
+  const hpMul = 1.3 + 0.16 * (n - 1);
+  return { slot, round: Math.floor((n - 1) / len) + 1, types: s.types, order: s.order, count: s.order.length, hpMul: Math.round(hpMul * 100) / 100 };
 }

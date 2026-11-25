@@ -42,6 +42,7 @@ function preview(m: MapDef) {
     ...mapOut(m), rocks: m.rocks, legs: legsOut(b.route),
     money: m.money, moneyF: m.moneyF, blast: m.price.blast, depot: m.price.depot,
     cheap: towers.slice(0, 3), dear: towers.slice(-3).reverse(),
+    rot: m.rotation.map((x) => x.types.map((y) => y.t)),
   };
 }
 
@@ -98,12 +99,12 @@ export default {
         for (const [id, k] of votes) (counts[k] ??= []).push(id);
         v = { screen: 'vote', maps: maps.map(preview), votes: counts, deadline, duration };
       } else if (phase === 'play') {
-        const info = waveInfo(Math.max(1, stage === 'wave' ? wave : wave + 1));
-        const next = [1, 2, 3].map((k) => waveInfo((stage === 'wave' ? wave : wave + 1) + k).type);
+        const cur = Math.max(1, stage === 'wave' ? wave : wave + 1);
+        const rot = map.rotation.map((_, k) => { const w = waveInfo(map, cur + k); return { n: cur + k, round: w.round, hpMul: w.hpMul, types: w.types }; });
         const rs = rows();
         const longest = rs.filter((r) => !r.out && r.run > 0).sort((a, b) => b.run - a.run)[0] ?? null;
         v = {
-          screen: 'game', stage, wave: stage === 'wave' ? wave : wave + 1, type: info.type, count: info.count, hpMul: info.hpMul, next,
+          screen: 'game', stage, wave: cur, rot,
           rows: rs, deadline: stage === 'build' ? deadline : 0, duration, elapsed: Math.round(elapsed),
           map: { w: map.w, h: map.h, cps: map.cps.length, maxLimit: map.maxLimit }, longest: longest ? { id: longest.id, run: longest.run } : null,
           ready: active().filter((id) => ps.get(id)!.ready).length, active: active().length,
@@ -165,8 +166,8 @@ export default {
       const rs = rows();
       return {
         screen: 'play', out: p.out, stage: p.out ? 'out' : b.waveDone ? 'build' : 'wave', globalStage: stage,
-        wave: stage === 'wave' ? wave : wave + 1, type: waveInfo(Math.max(1, stage === 'wave' ? wave : wave + 1)).type,
-        nextType: waveInfo(stage === 'wave' ? wave + 1 : wave + 2).type,
+        wave: stage === 'wave' ? wave : wave + 1, types: waveInfo(map, stage === 'wave' ? wave : wave + 1).types.map((x) => x.t),
+        nextTypes: waveInfo(map, stage === 'wave' ? wave + 1 : wave + 2).types.map((x) => x.t),
         deadline: stage === 'build' ? deadline : 0, duration, ready: p.ready,
         money: b.money, lives: p.out ? 0 : lv.get(id) ?? 0, kills: b.kills, rank: rs.findIndex((r) => r.id === id) + 1, of: ids.length, place: p.place,
         used: b.used, limit: b.limitMax, maxLimit: map.maxLimit, incomeLv: b.incomeLv, dmgLv: b.dmgLv, income: b.income(), run: b.lastRun,

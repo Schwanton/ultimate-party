@@ -279,8 +279,8 @@ function HostVote({ view, t, player }: HostViewProps) {
                 <div style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 18 }}>{t('vote.map', { l: 'ABCDEF'[i] })} <span style={{ fontFamily: 'inherit', fontWeight: 600, fontSize: 13, color: MUTED }}>{t('vote.size', { w: m.w, h: m.h })}</span></div>
                 <div style={{ display: 'flex', gap: 3 }}>{vs.map((id) => <span key={id} style={{ width: 12, height: 12, borderRadius: 3, background: player(id)?.color ?? CYAN }} />)}</div>
               </div>
-              <div style={{ height: 104, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0A0F28', borderRadius: 8 }}>
-                <MapPreview m={m} width={360} height={98} />
+              <div style={{ height: 88, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0A0F28', borderRadius: 8 }}>
+                <MapPreview m={m} width={360} height={82} />
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '3px 8px', fontSize: 12, color: MUTED }}>
                 <div>{t('vote.cps')} <b style={{ color: TEXT }}>{m.cps.length}</b></div>
@@ -288,6 +288,10 @@ function HostVote({ view, t, player }: HostViewProps) {
                 <div>{t('vote.money')} <b style={{ color: priceColor(1 / m.moneyF) }}>{m.money}</b></div>
                 <div>{t('vote.blast')} <b style={{ color: priceColor(m.blast.f) }}>{m.blast.p}</b></div>
                 <div style={{ gridColumn: 'span 2' }}>{t('vote.depot')} <b style={{ color: priceColor(m.depot.f) }}>{m.depot.p}</b></div>
+              </div>
+              <div style={{ fontSize: 11, color: MUTED, lineHeight: 1.3 }}>
+                <span style={{ color: DIM }}>{t('vote.waves')} </span>
+                {m.rot.map((sl: string[], k: number) => <span key={k}>{k > 0 && <span style={{ color: DIM }}> › </span>}{sl.map((x, j) => <span key={x}>{j > 0 && '+'}<b style={{ color: x === 'boss' ? '#FF4D4D' : MONSTER_COLOR[MONSTER_KEYS.indexOf(x)], fontWeight: 600 }}>{t('m.' + x)}</b></span>)}</span>)}
               </div>
               <div style={{ display: 'flex', gap: 5, alignItems: 'center', flexWrap: 'wrap' }}>
                 <span style={{ color: DIM, fontSize: 12, width: 46 }}>{t('vote.cheap')}</span>
@@ -347,36 +351,38 @@ function HostGame({ view, t, player }: HostViewProps) {
           })}
           <div style={{ marginTop: 'auto', paddingTop: 8, fontSize: 13, color: DIM }}>{t('game.rule')} {t('game.boostRule')}</div>
         </div>
-        <div style={{ width: 370, display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <div style={{ ...panel, border: `1px solid ${view.stage === 'wave' ? CYAN : YELLOW}`, padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <div style={{ ...label, color: view.stage === 'wave' ? CYAN : YELLOW }}>{view.stage === 'wave' ? t('game.current') : t('game.build')}</div>
-            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-              <div style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 34 }}>{view.stage === 'wave' ? t('game.wave', { n: view.wave }) : t('game.next', { n: view.wave })}</div>
-              {view.stage === 'build' && view.deadline > 0 && <div style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 28, color: YELLOW }}>{fmtTime(Math.max(0, Math.ceil((view.deadline - now) / 1000)))}</div>}
+        <div style={{ width: 370, display: 'flex', flexDirection: 'column', gap: 10, minHeight: 0 }}>
+          <div style={{ ...panel, border: `1px solid ${view.stage === 'wave' ? CYAN : YELLOW}`, padding: '10px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div>
+              <div style={{ ...label, color: view.stage === 'wave' ? CYAN : YELLOW }}>{view.stage === 'wave' ? t('game.current') : t('game.build')}</div>
+              <div style={{ fontSize: 15, fontWeight: 600, color: MUTED }}>{view.stage === 'wave' ? t('game.running', { n: view.doneCount, m: view.active }) : t('game.ready', { n: view.ready, m: view.active })}</div>
             </div>
-            <div style={{ fontSize: 22, fontWeight: 700, color: view.type === 'boss' ? '#FF4D4D' : PINK }}>{t('m.' + view.type)}</div>
-            <div style={{ fontSize: 14, color: MUTED }}>{t('m.' + view.type + '.d')}</div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8, fontSize: 13, color: MUTED }}>
-              <div><div style={{ fontSize: 20, fontWeight: 700, color: TEXT }}>{view.count}</div>{t('game.count')}</div>
-              <div><div style={{ fontSize: 20, fontWeight: 700, color: TEXT }}>×{view.hpMul}</div>{t('game.hp')}</div>
-            </div>
-            <div style={{ fontSize: 15, fontWeight: 600, color: view.stage === 'wave' ? CYAN : YELLOW }}>
-              {view.stage === 'wave' ? t('game.running', { n: view.doneCount, m: view.active }) : t('game.ready', { n: view.ready, m: view.active })}
-            </div>
+            {view.stage === 'build' && view.deadline > 0 && <div style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 28, color: YELLOW }}>{fmtTime(Math.max(0, Math.ceil((view.deadline - now) / 1000)))}</div>}
           </div>
-          <div style={{ ...panel, padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 6, fontSize: 15, color: MUTED }}>
-            {view.next.map((ty: string, k: number) => (
-              <div key={k} style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>{t('game.then', { n: view.wave + k + 1 })}</span>
-                <span style={{ color: ty === 'boss' ? '#FF4D4D' : TEXT, fontWeight: 700 }}>{ty === 'boss' ? t('game.boss') : t('m.' + ty)}</span>
-              </div>
-            ))}
-            {view.longest && (
-              <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: `1px solid ${LINE}`, paddingTop: 8, marginTop: 4 }}>
-                <span>{t('game.longest')}</span><span style={{ color: CYAN, fontWeight: 700 }}>{player(view.longest.id)?.name} · {fmtTime(view.longest.run)}</span>
-              </div>
-            )}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, flex: 1, minHeight: 0 }}>
+            {view.rot.map((w: any, k: number) => {
+              const isCur = view.stage === 'wave' && k === 0;
+              const isNext = view.stage === 'wave' ? k === 1 : k === 0;
+              const c = isCur ? CYAN : isNext ? YELLOW : LINE;
+              return (
+                <div key={w.n} style={{ ...panel, flex: 1, minHeight: 0, maxHeight: 110, border: `${isCur || isNext ? 2 : 1}px solid ${c}`, boxShadow: isCur ? '0 0 16px rgba(62,240,255,.3)' : 'none', padding: '8px 14px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 3, opacity: isCur || isNext ? 1 : 0.8 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                    <span style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 18, color: isCur ? CYAN : isNext ? YELLOW : TEXT }}>{t('game.wave', { n: w.n })}{isCur ? ` · ${t('game.now')}` : isNext ? ` · ${t('game.nextShort')}` : ''}</span>
+                    <span style={{ fontSize: 13, color: MUTED }}>{t('game.lifeMul', { m: String(w.hpMul).replace('.', t('game.dec')) })}</span>
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2px 10px', fontSize: 15, fontWeight: 600 }}>
+                    {w.types.map((x: any) => <span key={x.t} style={{ color: x.t === 'boss' ? '#FF4D4D' : MONSTER_COLOR[MONSTER_KEYS.indexOf(x.t)] }}>{x.n}× {t('m.' + x.t)}</span>)}
+                  </div>
+                  {isCur && <div style={{ fontSize: 12, color: MUTED }}>{w.types.map((x: any) => t('m.' + x.t + '.d')).join(' ')}</div>}
+                </div>
+              );
+            })}
           </div>
+          {view.longest && (
+            <div style={{ ...panel, padding: '8px 16px', display: 'flex', justifyContent: 'space-between', fontSize: 14, color: MUTED }}>
+              <span>{t('game.longest')}</span><span style={{ color: CYAN, fontWeight: 700 }}>{player(view.longest.id)?.name} · {fmtTime(view.longest.run)}</span>
+            </div>
+          )}
         </div>
       </div>
     </Stage>
@@ -589,8 +595,8 @@ function PlayScreen({ view, t, send, player, me }: ControllerViewProps) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8, color: TEXT, paddingBottom: 8 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, paddingLeft: 40 }}>
         <div style={{ minWidth: 0 }}>
-          <div style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 18 }}>{t('game.wave', { n: view.wave })} · <span style={{ color: view.type === 'boss' ? '#FF4D4D' : PINK }}>{t('m.' + view.type)}</span></div>
-          <div style={{ fontSize: 12, color: MUTED }}>{view.boost > 1 && <b style={{ color: '#FF4D4D' }}>{t('p.boost', { n: view.boost })} · </b>}{t('p.nextType', { m: t('m.' + view.nextType) })}{view.run > 0 ? ` · ${t('p.lastRun', { t: fmtTime(view.run) })}` : ''}</div>
+          <div style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 18 }}>{t('game.wave', { n: view.wave })} · <span style={{ color: PINK }}>{view.types.map((x: string) => t('m.' + x)).join(' + ')}</span></div>
+          <div style={{ fontSize: 12, color: MUTED }}>{view.boost > 1 && <b style={{ color: '#FF4D4D' }}>{t('p.boost', { n: view.boost })} · </b>}{t('p.nextType', { m: view.nextTypes.map((x: string) => t('m.' + x)).join(' + ') })}{view.run > 0 ? ` · ${t('p.lastRun', { t: fmtTime(view.run) })}` : ''}</div>
         </div>
         {!view.out && (
           <button onClick={() => setShare(true)} style={{ ...btn, height: 40, padding: '0 10px', border: `1px solid ${CYAN}`, color: CYAN, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6, flex: 'none' }}>
