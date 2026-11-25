@@ -133,5 +133,11 @@
  "err.none": "Not found.",
  "final.won": "You won!",
  "final.place": "Place {p} of {n}",
- "final.kills": "{k} kills"
+ "final.kills": "{k} kills",
+ "p.dmg": "Damage +25 %",
+ "p.dmgInfo": "so far {n}× (+{p} %), no limit",
+ "p.spd": "Attack speed",
+ "p.spdInfo": "{n} of 5",
+ "p.boost": "Speed ×{n}",
+ "game.boostRule": "From minute 2 of a wave, monster speed doubles every minute."
 }

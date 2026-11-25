@@ -311,7 +311,16 @@ export function flyRoute(map: MapDef): Leg[] {
 /* ================= Spielfeld eines Spielers ================= */
 
 export type Kind = 'wall' | 'tower' | 'depot';
-export interface Building { id: number; kind: Kind; x: number; y: number; type: TowerType; level: number; spent: number; builtAt: number; cd: number }
+export interface Building { id: number; kind: Kind; x: number; y: number; type: TowerType; level: number; spent: number; builtAt: number; cd: number; dmgN: number; spdN: number }
+
+/** eigene Verbesserungen je Turm: Schaden unbegrenzt (+25 % je Stufe), Tempo höchstens 5× (−12 % Abklingzeit je Stufe) */
+export const DMG_STEP = 0.25;
+export const SPD_STEP = 0.88;
+export const SPD_MAX = 5;
+/** ab der 2. Minute einer Welle verdoppelt sich das Tempo der Monster jede Minute */
+export const BOOST_FROM = 120;
+export const WAVE_MAX = 600;
+export const boostAt = (t: number) => (t < BOOST_FROM ? 1 : Math.pow(2, Math.floor((t - BOOST_FROM) / 60) + 1));
 export interface Monster { id: number; type: string; s: number; hp: number; max: number; shield: number; slowUntil: number; slow: number; poisonUntil: number; poison: number; armorDown: number; jumpAt: number; split: boolean; x: number; y: number }
 
 export const sizeOf = (k: Kind) => (k === 'wall' ? 1 : 2);
@@ -403,7 +412,7 @@ export class Board {
     if (this.money < cost) return 'money';
     if (kind === 'depot' && this.limitMax >= this.map.maxLimit) return 'maxlimit';
     if (kind !== 'depot' && this.used >= this.limitMax) return 'limit';
-    const b: Building = { id: this.nextId++, kind, x, y, type: 'T', level: 1, spent: cost, builtAt: now, cd: 0 };
+    const b: Building = { id: this.nextId++, kind, x, y, type: 'T', level: 1, spent: cost, builtAt: now, cd: 0, dmgN: 0, spdN: 0 };
     this.buildings.set(b.id, b);
     this.rebuild();
     if (!this.route) { this.buildings.delete(b.id); this.rebuild(); return 'blocks'; }
@@ -416,7 +425,7 @@ export class Board {
   tryLength(kind: Kind, x: number, y: number): number {
     if (this.canPlace(kind, x, y)) return -1;
     const id = -999;
-    this.buildings.set(id, { id, kind, x, y, type: 'T', level: 1, spent: 0, builtAt: 0, cd: 0 });
+    this.buildings.set(id, { id, kind, x, y, type: 'T', level: 1, spent: 0, builtAt: 0, cd: 0, dmgN: 0, spdN: 0 });
     this.rebuild();
     const len = this.ground ? this.ground.len : -1;
     this.buildings.delete(id);
@@ -436,6 +445,27 @@ export class Board {
     this.money -= cost;
     b.spent += cost;
     if (b.type === 'T') b.type = to!; else b.level++;
+    return null;
+  }
+
+  /** Preis der eigenen Turm-Verbesserung (null = nicht möglich) */
+  towerUpPrice(b: Building, what: 'dmg' | 'spd'): { p: number; f: number } | null {
+    if (b.kind !== 'tower' || b.type === 'V') return null;
+    const base = b.type === 'T' ? this.map.price.tower : this.map.price['up_' + b.type];
+    if (what === 'dmg') return { p: Math.max(1, Math.round(base.p * 0.6 * (b.dmgN + 1))), f: base.f };
+    if (b.spdN >= SPD_MAX) return null;
+    return { p: Math.max(1, Math.round(base.p * 0.8 * Math.pow(1.5, b.spdN))), f: base.f };
+  }
+
+  towerUp(id: number, what: 'dmg' | 'spd'): string | null {
+    const b = this.buildings.get(id);
+    if (!b) return 'none';
+    const pr = this.towerUpPrice(b, what);
+    if (!pr) return 'max';
+    if (this.money < pr.p) return 'money';
+    this.money -= pr.p;
+    b.spent += pr.p;
+    if (what === 'dmg') b.dmgN++; else b.spdN++;
     return null;
   }
 
@@ -519,7 +549,7 @@ export class Board {
     const t = this.waveTime;
     for (const m of this.monsters) {
       const mt = MONSTERS[m.type];
-      let v = mt.speed * (t < m.slowUntil ? m.slow : 1) * this.zoneAt('slow', m.x, m.y) * this.zoneAt('fast', m.x, m.y);
+      let v = mt.speed * boostAt(t) * (t < m.slowUntil ? m.slow : 1) * this.zoneAt('slow', m.x, m.y) * this.zoneAt('fast', m.x, m.y);
       m.s += v * dt;
       if (mt.jump && t >= m.jumpAt) { m.s += 2.5; m.jumpAt = t + 4; }
       if (t < m.poisonUntil) this.hurt(m, m.poison * dt, true);
@@ -543,10 +573,10 @@ export class Board {
         if (!target || m.s > target.s) target = m;
       }
       if (!target) continue;
-      b.cd = spec.cd;
+      b.cd = spec.cd * Math.pow(SPD_STEP, b.spdN);
       let buff = 1;
       for (const o of this.buildings.values()) if (o.kind === 'tower' && o.type === 'V' && Math.hypot(o.x - b.x, o.y - b.y) <= TOWER.V.range) buff += BUFF[o.level - 1];
-      const dmg = (spec.dmg * LEVEL_DMG[b.level - 1] + dmgBonus) * buff * this.zoneAt('dmg', cx, cy);
+      const dmg = (spec.dmg * LEVEL_DMG[b.level - 1] * (1 + DMG_STEP * b.dmgN) + dmgBonus) * buff * this.zoneAt('dmg', cx, cy);
       this.shots.push([b.id, Math.round(target.x * 10), Math.round(target.y * 10), 0, 0]);
       const hit = (m: Monster, d: number) => { kills += this.hurt(m, d, false); };
       if (spec.splash) {
@@ -571,7 +601,7 @@ export class Board {
     // angekommen
     const len = this.ground.len, alen = this.air!.len;
     this.monsters = this.monsters.filter((m) => m.s < (MONSTERS[m.type].air ? alen : len));
-    if ((!this.spawnQueue.length && !this.monsters.length) || this.waveTime >= 180) {
+    if ((!this.spawnQueue.length && !this.monsters.length) || this.waveTime >= WAVE_MAX) {
       this.waveDone = true;
       this.lastRun = Math.round(this.waveTime * 10) / 10;
       this.monsters = [];

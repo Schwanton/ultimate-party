@@ -6,7 +6,7 @@
  */
 
 import { type GameContext, type GameServerModule } from '@up/sdk';
-import { Board, MONSTER_KEYS, TYPES, generateMap, waveInfo, type Kind, type Leg, type MapDef, type TowerType } from './engine';
+import { Board, MONSTER_KEYS, TYPES, boostAt, generateMap, waveInfo, type Kind, type Leg, type MapDef, type TowerType } from './engine';
 
 const TICK = 0.1;
 const T = { vote: 25, firstBuild: 45, build: 30, final: 0 };
@@ -122,7 +122,7 @@ export default {
       const b = p.board;
       return {
         idx: ids.indexOf(p.id),
-        bs: [...b.buildings.values()].map((x) => [x.id, x.kind === 'wall' ? 0 : x.kind === 'tower' ? 1 : 2, x.x, x.y, x.type, x.level]),
+        bs: [...b.buildings.values()].map((x) => [x.id, x.kind === 'wall' ? 0 : x.kind === 'tower' ? 1 : 2, x.x, x.y, x.type, x.level, x.dmgN, x.spdN]),
         rocks: b.rocks,
         legs: legsOut(b.route),
       };
@@ -155,6 +155,11 @@ export default {
       for (const t of TYPES) for (const pre of ['up_', 'lv2_', 'lv3_']) prices[pre + t] = [map.price[pre + t].p, map.price[pre + t].f];
       const refunds: Record<number, [number, number]> = {};
       for (const x of b.buildings.values()) refunds[x.id] = [b.refund(x, now / 1000), Math.max(0, Math.round(x.builtAt * 1000 + 10000))];
+      const ups: Record<number, [number, number, number | null, number | null]> = {};
+      for (const x of b.buildings.values()) {
+        const d = b.towerUpPrice(x, 'dmg'), sp = b.towerUpPrice(x, 'spd');
+        if (d) ups[x.id] = [d.p, d.f, sp ? sp.p : null, sp ? sp.f : null];
+      }
       const watchable = ids.filter((o) => o !== id && canWatch(id, o));
       const watchId = p.watch && watchable.includes(p.watch) ? p.watch : null;
       const rs = rows();
@@ -165,7 +170,7 @@ export default {
         deadline: stage === 'build' ? deadline : 0, duration, ready: p.ready,
         money: b.money, lives: p.out ? 0 : lv.get(id) ?? 0, kills: b.kills, rank: rs.findIndex((r) => r.id === id) + 1, of: ids.length, place: p.place,
         used: b.used, limit: b.limitMax, maxLimit: map.maxLimit, incomeLv: b.incomeLv, dmgLv: b.dmgLv, income: b.income(), run: b.lastRun,
-        prices, refunds, map: mapOut(map), me: boardOut(p),
+        prices, refunds, ups, boost: b.waveDone ? 1 : boostAt(b.waveTime), map: mapOut(map), me: boardOut(p),
         watch: watchId ? { id: watchId, ...boardOut(ps.get(watchId)!) } : null, watchable,
         shareTo: [...p.shareTo], others: ids.filter((o) => o !== id).map((o) => ({ id: o, out: ps.get(o)!.out })),
         err: now - p.errAt < 4000 ? p.err : '',
@@ -359,6 +364,11 @@ export default {
           if (b.money >= map.price['up_' + to].p * 1.2) b.upgrade(t.id, to);
         } else if (t.level < 3 && b.money >= map.price['lv' + (t.level + 1) + '_' + t.type].p * 1.5 && Math.random() < p.skill) b.upgrade(t.id);
       }
+      for (const t of towers) {
+        const what = Math.random() < 0.6 ? 'dmg' : 'spd';
+        const pr = b.towerUpPrice(t, what);
+        if (pr && b.money >= pr.p * 2 && Math.random() < p.skill) b.towerUp(t.id, what);
+      }
       if (b.money > b.priceOf('dmgUp') * 1.5 && Math.random() < p.skill * 0.5) b.buy('dmgUp');
     }
 
@@ -402,6 +412,7 @@ export default {
         let err: string | null = null;
         if (a.type === 'build' && (a.kind === 'wall' || a.kind === 'tower' || a.kind === 'depot') && Number.isFinite(xi) && Number.isFinite(yi)) err = b.build(a.kind, xi, yi, now);
         else if (a.type === 'upgrade') err = b.upgrade(Number(a.id), a.to);
+        else if (a.type === 'towerUp' && (a.what === 'dmg' || a.what === 'spd')) err = b.towerUp(Number(a.id), a.what);
         else if (a.type === 'sell') err = b.sell(Number(a.id), now);
         else if (a.type === 'blast') err = b.blast(xi, yi);
         else if (a.type === 'buy' && (a.key === 'income' || a.key === 'dmgUp')) err = b.buy(a.key);

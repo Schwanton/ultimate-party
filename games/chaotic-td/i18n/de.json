@@ -133,5 +133,11 @@
  "err.none": "Nicht gefunden.",
  "final.won": "Du hast gewonnen!",
  "final.place": "Platz {p} von {n}",
- "final.kills": "{k} Kills"
+ "final.kills": "{k} Kills",
+ "p.dmg": "Schaden +25 %",
+ "p.dmgInfo": "bisher {n}× (+{p} %), unbegrenzt",
+ "p.spd": "Angriffstempo",
+ "p.spdInfo": "{n} von 5",
+ "p.boost": "Tempo ×{n}",
+ "game.boostRule": "Ab Minute 2 einer Welle verdoppelt sich jede Minute das Tempo der Monster."
 }

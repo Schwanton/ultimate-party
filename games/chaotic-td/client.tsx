@@ -26,7 +26,7 @@ type Pt = [number, number];
 interface Zone { k: string; x: number; y: number; w: number; h: number; s: number }
 interface MapInfo { w: number; h: number; start: Pt; core: Pt; cps: Pt[]; tps: { i: Pt; o: Pt }[]; zones: Zone[]; maxLimit: number }
 interface LegOut { l: number; j: number; p: Pt[] }
-interface BoardOut { idx: number; bs: [number, number, number, number, string, number][]; rocks: Pt[]; legs: LegOut[] }
+interface BoardOut { idx: number; bs: [number, number, number, number, string, number, number, number][]; rocks: Pt[]; legs: LegOut[] }
 
 function priceColor(f: number) {
   const t = Math.max(-1, Math.min(1, Math.log(f) / Math.log(4)));
@@ -345,7 +345,7 @@ function HostGame({ view, t, player }: HostViewProps) {
               </div>
             );
           })}
-          <div style={{ marginTop: 'auto', paddingTop: 8, fontSize: 13, color: DIM }}>{t('game.rule')}</div>
+          <div style={{ marginTop: 'auto', paddingTop: 8, fontSize: 13, color: DIM }}>{t('game.rule')} {t('game.boostRule')}</div>
         </div>
         <div style={{ width: 370, display: 'flex', flexDirection: 'column', gap: 14 }}>
           <div style={{ ...panel, border: `1px solid ${view.stage === 'wave' ? CYAN : YELLOW}`, padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -462,7 +462,8 @@ function BuildingSheet({ view, t, send, sel, onClose, canEdit }: { view: any; t:
   }
   const b = (view.me as BoardOut).bs.find((x) => x[0] === sel);
   if (!b) return null;
-  const [id, kind, , , type, level] = b;
+  const [id, kind, , , type, level, dmgN, spdN] = b;
+  const up = view.ups?.[id] as [number, number, number | null, number | null] | undefined;
   const refund = view.refunds[id] as [number, number] | undefined;
   const fullLeft = refund ? Math.max(0, Math.ceil((refund[1] - now) / 1000)) : 0;
   const name = kind === 0 ? t('k.wall') : kind === 2 ? t('k.depot') : t('t.' + type);
@@ -500,6 +501,18 @@ function BuildingSheet({ view, t, send, sel, onClose, canEdit }: { view: any; t:
           </button>
         );
       })() : <div style={{ fontSize: 13, color: MUTED }}>{t('p.maxLevel')}</div>)}
+      {up && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0,1fr))', gap: 6 }}>
+          <button disabled={!canEdit} onClick={() => send({ type: 'towerUp', id, what: 'dmg' })} style={{ ...btn, minHeight: 52, background: '#0E1430', fontSize: 13, opacity: canEdit ? 1 : 0.5 }}>
+            <b>{t('p.dmg')}</b> · <b style={{ color: priceColor(up[1]) }}>{up[0]}</b>
+            <div style={{ fontSize: 10, color: DIM }}>{t('p.dmgInfo', { n: dmgN, p: Math.round(dmgN * 25) })}</div>
+          </button>
+          <button disabled={!canEdit || up[2] === null} onClick={() => send({ type: 'towerUp', id, what: 'spd' })} style={{ ...btn, minHeight: 52, background: '#0E1430', fontSize: 13, opacity: canEdit && up[2] !== null ? 1 : 0.5 }}>
+            <b>{t('p.spd')}</b>{up[2] !== null && <> · <b style={{ color: priceColor(up[3]!) }}>{up[2]}</b></>}
+            <div style={{ fontSize: 10, color: DIM }}>{t('p.spdInfo', { n: spdN })}</div>
+          </button>
+        </div>
+      )}
       {refund && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
           <button disabled={!canEdit} onClick={() => { send({ type: 'sell', id }); onClose(); }} style={{ ...btn, height: 46, background: 'transparent', border: '1px solid #FF4D4D', color: '#FF8080', fontSize: 14, fontWeight: 700, opacity: canEdit ? 1 : 0.5 }}>{t('p.sell', { n: refund[0] })}</button>
@@ -577,7 +590,7 @@ function PlayScreen({ view, t, send, player, me }: ControllerViewProps) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, paddingLeft: 40 }}>
         <div style={{ minWidth: 0 }}>
           <div style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 18 }}>{t('game.wave', { n: view.wave })} · <span style={{ color: view.type === 'boss' ? '#FF4D4D' : PINK }}>{t('m.' + view.type)}</span></div>
-          <div style={{ fontSize: 12, color: MUTED }}>{t('p.nextType', { m: t('m.' + view.nextType) })}{view.run > 0 ? ` · ${t('p.lastRun', { t: fmtTime(view.run) })}` : ''}</div>
+          <div style={{ fontSize: 12, color: MUTED }}>{view.boost > 1 && <b style={{ color: '#FF4D4D' }}>{t('p.boost', { n: view.boost })} · </b>}{t('p.nextType', { m: t('m.' + view.nextType) })}{view.run > 0 ? ` · ${t('p.lastRun', { t: fmtTime(view.run) })}` : ''}</div>
         </div>
         {!view.out && (
           <button onClick={() => setShare(true)} style={{ ...btn, height: 40, padding: '0 10px', border: `1px solid ${CYAN}`, color: CYAN, fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6, flex: 'none' }}>

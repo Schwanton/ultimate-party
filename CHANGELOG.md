@@ -2,6 +2,11 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.43.1
+
+- Chaotic Tower Defense: Tippt einen Turm an, um ihn gezielt zu verbessern – **Schaden +25 %** (beliebig oft) und **Angriffstempo** (bis zu 5-mal). Jede Verbesserung wird teurer
+- Chaotic Tower Defense: Dauert eine Welle länger als 2 Minuten, verdoppelt sich ab dann jede Minute das Tempo der Monster. Lange Wellen enden so von selbst, statt nach 3 Minuten abgebrochen zu werden
+
 ## 0.43.0
 
 - Neues Spiel: **Chaotic Tower Defense** (2–16 Spieler, jeder gegen jeden, nach dem Vorbild Entropy TD). Am Anfang stimmt ihr über 6 Zufallskarten ab – die Vorschau zeigt Weg, Checkpoints, Teleporter und die günstigsten und teuersten Türme. Alle bauen auf derselben Karte ihr eigenes Labyrinth: Mauern (1 × 1), Türme (2 × 2) und Baulager (+10 Baulimit). Einen Turm tippt ihr an, um ihn zu Laser, Plasma, Frost, Blitz, Railgun, Flak, Säure oder Verstärker zu verbessern
