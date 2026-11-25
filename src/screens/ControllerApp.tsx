@@ -2,12 +2,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { ANIMALS, type Animal, type Avatar as AvatarData } from '@up/sdk';
 import { net, useNet, loadSession, saveSession } from '../net';
 import { guessLang, useT } from '../i18n';
-import registry, { clientGame } from '../registry';
-import { Avatar, Crown, FullscreenButton, Logo, useKeepAwake, isLight, shade, vibrate } from '../ui';
-import { GameOptionsForm, optionsSummary } from './GameOptions';
-import { fitOf, gameDesc, useTagFilter } from './GameLibrary';
-import { PhoneVote, PickModeSwitch, VoteOptions, pickModeOf, votesFor } from './PickMode';
-import { OlympiaPhone, OlympiaPhoneSetup, olympiaRunning } from './Olympia';
+import { clientGame } from '../registry';
+import { Avatar, Logo, useKeepAwake, vibrate } from '../ui';
+import { OlympiaPhone, olympiaRunning } from './Olympia';
+import { PhoneIntro, PhoneLobby, listGames } from './PhoneLobby';
 import { PauseIcon, PhonePause, PlayIcon } from './Pause';
 
 const params = new URLSearchParams(location.search);
@@ -161,12 +159,7 @@ function InRoom() {
       </div>
     );
   } else if (room.intro) {
-    content = (
-      <div className="anim-pop" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, textAlign: 'center' }}>
-        <Avatar player={me} size={96} />
-        <p className="display" style={{ fontSize: 30, fontWeight: 800 }}>{t('intro.title')}</p>
-      </div>
-    );
+    content = <PhoneIntro room={room} me={me} t={t} />;
   } else if (olympiaRunning(room)) {
     content = <OlympiaPhone room={room} me={me} games={listGames(room.dev)} t={t} />;
   } else if (picking) {
@@ -240,149 +233,6 @@ function EndGameButton({ t, paused }: { t: (k: string, v?: Record<string, string
       )}
     </>
   );
-}
-
-function PhoneLobby({ onEditAvatar }: { onEditAvatar: () => void }) {
-  const s = useNet();
-  const room = s.room!;
-  const me = s.me!;
-  const t = useT(room.lang);
-  const isVip = room.vipId === me.id;
-  const vip = room.players.find((p) => p.id === room.vipId);
-  const [error, setError] = useState<string | null>(null);
-  const active = room.players.filter((p) => p.connected || p.isBot).length;
-  const all = useGames();
-  const { tag, setTag, present, shown: list } = useTagFilter(all);
-  const selected = all.find((g) => g.id === room.selectedGameId);
-  const mode = pickModeOf(room);
-  const voting = mode === 'vote' && !!room.vote && !room.vote.result;
-
-  const start = async () => {
-    setError(null);
-    const res = await net.request('start');
-    if (!res.ok) setError(t(`error.${res.error}`));
-  };
-
-  return (
-    <>
-      <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Logo size={24} />
-        <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span className="up-chip">{t('lobby.room')} <b>{room.code}</b></span>
-          <FullscreenButton enter={t('fullscreen.enter')} exit={t('fullscreen.exit')} size={44} />
-        </span>
-      </header>
-
-      <section style={{ background: me.color, borderRadius: 24, padding: 20, display: 'flex', alignItems: 'center', gap: 16, boxShadow: `0 6px 0 ${shade(me.color)}`, color: isLight(me.color) ? '#110D24' : '#fff' }}>
-        <div style={{ position: 'relative' }}>
-          <Avatar player={me} size={72} color="#FFFFFF" />
-          {isVip && <Crown size={28} style={{ position: 'absolute', top: -14, left: 22 }} />}
-        </div>
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
-          <span className="display" style={{ fontSize: 28, fontWeight: 800, overflow: 'hidden', textOverflow: 'ellipsis' }}>{me.name}</span>
-          <span style={{ fontSize: 15, fontWeight: 500 }}>{isVip ? t('lobby.youAreVip') : vip ? t('lobby.waitForVip', { name: vip.name }) : ''}</span>
-        </div>
-        <button aria-label={t('lobby.changeAvatar')} onClick={onEditAvatar} style={{ width: 44, height: 44, flex: 'none', border: 0, borderRadius: 14, background: '#fff', color: '#A81B4B', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" /></svg>
-        </button>
-      </section>
-
-      {room.olympia && <OlympiaPhoneSetup room={room} me={me} games={all} t={t} />}
-      {!room.olympia && (<>
-      {isVip && (
-        <section style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <span className="up-label">{t('pick.label')}</span>
-          <PickModeSwitch mode={mode} t={t} />
-          {mode === 'vote' && <VoteOptions room={room} t={t} />}
-          <button className="up-btn ghost full" style={{ color: 'var(--yellow)' }} onClick={() => net.send('olympia:open')}>{t('olympia.button')}</button>
-        </section>
-      )}
-      {voting && room.vote && <PhoneVote vote={room.vote} games={all} room={room} me={me} t={t} isVip={isVip} />}
-
-      {/* Für den VIP: Start und Einstellungen ganz oben, darunter die Spielsammlung */}
-      {isVip && selected && !voting && (
-        <>
-          {mode === 'random' && <button className="up-btn ghost full" onClick={() => net.send('random')}>{t('pick.reroll')}</button>}
-          {mode === 'vote' && <button className="up-btn ghost full" onClick={() => net.send('vote:start')}>{room.vote ? t('pick.newVote') : t('pick.startVote')}</button>}
-        </>
-      )}
-      {!isVip && !voting && mode !== 'vip' && selected && (
-        <p className="up-card" style={{ padding: '12px 16px', fontSize: 16 }}>
-          <b>{selected.name[room.lang] ?? selected.name.en}</b> · <span className="muted">{mode === 'random' ? t('pick.byRandom') : t('pick.byVote', { n: votesFor(room.vote, selected.id) })}</span>
-        </p>
-      )}
-      {isVip && selected && !voting && (
-        <>
-          <button className="up-btn big full" disabled={active < selected.minPlayers} onClick={start}>{t('lobby.start')}</button>
-          <p className="muted" style={{ textAlign: 'center', fontSize: 14, marginTop: -4 }}>
-            {active < selected.minPlayers ? t('lobby.needPlayers', { n: selected.minPlayers - active })
-              : active > selected.maxPlayers ? t('lobby.tooMany', { n: selected.maxPlayers })
-              : t('lobby.startsOnTv', { game: selected.name[room.lang] ?? selected.name.en })}
-          </p>
-        </>
-      )}
-      {selected?.options?.length ? (
-        isVip ? (
-          <details className="up-card" style={{ padding: '14px 16px' }}>
-            <summary style={{ fontWeight: 700, cursor: 'pointer', fontSize: 16 }}>{t('lobby.gameSettings')}
-              <span className="faint" style={{ display: 'block', fontWeight: 500, fontSize: 13, marginTop: 4 }}>{optionsSummary(selected, room.settings.gameOptions?.[selected.id], room.lang)}</span>
-            </summary>
-            <div style={{ marginTop: 14 }}>
-              <GameOptionsForm game={selected} values={room.settings.gameOptions?.[selected.id]} lang={room.lang} compact />
-            </div>
-          </details>
-        ) : (
-          <p className="faint" style={{ fontSize: 13 }}>{optionsSummary(selected, room.settings.gameOptions?.[selected.id], room.lang)}</p>
-        )
-      ) : null}
-      {error && <p className="up-error">{error}</p>}
-
-      {mode === 'vip' && (<>
-      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-        <h2 style={{ fontSize: 22, fontWeight: 700 }}>{t('lobby.pickGame')}</h2>
-        <span className="muted" style={{ fontSize: 14 }}>{t('lobby.playersReady', { n: active })}</span>
-      </div>
-
-      {present.length > 1 && (
-        <div style={{ display: 'flex', gap: 6, overflowX: 'auto', margin: '0 -16px', padding: '2px 16px 4px', scrollbarWidth: 'none' }}>
-          {['all', ...present].map((x) => (
-            <button key={x} type="button" aria-pressed={tag === x} onClick={() => setTag(x)} style={{
-              flex: 'none', border: 0, minHeight: 40, padding: '6px 14px', borderRadius: 999, fontSize: 14, fontWeight: 700,
-              background: tag === x ? '#fff' : 'var(--surface)', color: tag === x ? '#110D24' : 'var(--muted)',
-            }}>{t(`tag.${x}`)}</button>
-          ))}
-        </div>
-      )}
-
-      <div role="radiogroup" aria-label={t('lobby.pickGame')} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {list.map((g) => {
-          const sel = g.id === room.selectedGameId;
-          return (
-            <button key={g.id} type="button" role="radio" aria-checked={sel} disabled={!isVip} onClick={() => net.send('select', { gameId: g.id })}
-              style={{ minHeight: 72, width: '100%', display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px', borderRadius: 20, textAlign: 'left', background: sel ? 'var(--surface-2)' : 'var(--surface)', border: `3px solid ${sel ? g.color : 'transparent'}`, opacity: !isVip && !sel ? 0.6 : 1 }}>
-              <span style={{ width: 12, alignSelf: 'stretch', flex: 'none', borderRadius: 6, background: g.color }} />
-              <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0 }}>
-                <span className="display" style={{ fontSize: 19, fontWeight: 700 }}>{g.name[room.lang] ?? g.name.en}</span>
-                <span style={{ fontSize: 14, lineHeight: 1.3, color: 'var(--muted)', display: '-webkit-box', WebkitLineClamp: sel ? 4 : 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{gameDesc(g, room.lang)}</span>
-                <span style={{ fontSize: 13, fontWeight: 700, color: fitOf(g, active) === 'ok' ? 'var(--faint)' : 'var(--yellow)' }}>{t('lobby.playersRange', { min: g.minPlayers, max: g.maxPlayers })} · {t('lobby.minutes', { n: g.minutes })}</span>
-              </span>
-            </button>
-          );
-        })}
-      </div>
-      </>)}
-      </>)}
-    </>
-  );
-}
-
-function useGames() {
-  const room = useNet().room!;
-  return listGames(room.dev);
-}
-
-function listGames(dev: boolean) {
-  return registry.map((g) => g.manifest).filter((m) => !m.hidden || dev);
 }
 
 /* ---------------- Avatar wählen ---------------- */

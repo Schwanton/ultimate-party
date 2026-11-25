@@ -40,7 +40,13 @@ interface PlayerState {
   lastSeen: number;
   order: number;
   lastSent?: string;
+  /** Spiele, auf die der Spieler Lust hat („Herzen“), gespeichert unter seinem Namen */
+  hearts: string[];
 }
+
+/** Herzen bleiben pro Spielername auf dem UP!-Rechner gespeichert (auch nach Wochen, bei neuer IP oder neuem Handy) */
+const heartKey = (name: string) => `hearts:${name.toLowerCase().replace(/\s*\(bot\)$/, '').trim()}`;
+const MAX_HEARTS = 60;
 
 interface RunningGame {
   id: string;
@@ -153,7 +159,13 @@ export class Room {
       connected: !!ws || isBot,
       isBot,
     };
-    const state: PlayerState = { info, token: randomUUID(), sockets: new Set(), view: null, viewVersion: 0, lastSeen: Date.now(), order: this.order++ };
+    const saved = isBot ? [] : storeGet<string[]>('_lobby', heartKey(info.name)) ?? [];
+    const state: PlayerState = { info, token: randomUUID(), sockets: new Set(), view: null, viewVersion: 0, lastSeen: Date.now(), order: this.order++, hearts: Array.isArray(saved) ? saved.filter((x) => typeof x === 'string') : [] };
+    if (isBot && DEV) {
+      // Testhilfe: Bots haben auf ein, zwei Spiele Lust
+      const ids = allGames().map((g) => g.manifest.id);
+      state.hearts = shuffle(ids).slice(0, 1 + Math.floor(Math.random() * 2));
+    }
     if (ws) state.sockets.add(ws);
     this.players.set(id, state);
     this.updateVip();
@@ -197,6 +209,7 @@ export class Room {
     if (!p) return;
     if (typeof patch.name === 'string' && patch.name.trim()) {
       p.info.name = this.uniqueName(patch.name.replace(/\s+/g, ' ').trim().slice(0, 16), id);
+      this.saveHearts(p);
     }
     if (patch.avatar) {
       const a = patch.avatar as Avatar;
@@ -207,6 +220,48 @@ export class Room {
       }
     }
     this.touch();
+  }
+
+  /* ---------- Herzen: „Hab Lust drauf“ ---------- */
+
+  private saveHearts(p: PlayerState) {
+    if (!p.info.isBot) storeSet('_lobby', heartKey(p.info.name), p.hearts.length ? p.hearts : null);
+  }
+
+  setHeart(id: string, gameId: string, on: boolean) {
+    const p = this.players.get(id);
+    if (!p || !getGame(gameId)) return;
+    const has = p.hearts.includes(gameId);
+    if (on === has) return;
+    p.hearts = on ? [...p.hearts, gameId].slice(-MAX_HEARTS) : p.hearts.filter((x) => x !== gameId);
+    this.saveHearts(p);
+    this.touch();
+  }
+
+  clearHearts(id: string) {
+    const p = this.players.get(id);
+    if (!p || !p.hearts.length) return;
+    p.hearts = [];
+    this.saveHearts(p);
+    this.touch();
+  }
+
+  /** Das Handy bringt seine gemerkten Herzen mit: zusammenführen */
+  syncHearts(id: string, list: unknown) {
+    const p = this.players.get(id);
+    if (!p || !Array.isArray(list)) return;
+    const add = list.filter((x): x is string => typeof x === 'string' && !p.hearts.includes(x) && !!getGame(x));
+    if (!add.length) return;
+    p.hearts = [...p.hearts, ...add].slice(-MAX_HEARTS);
+    this.saveHearts(p);
+    this.touch();
+  }
+
+  /** Herzen aller Spieler im Raum: Spiel → Spieler-IDs */
+  private heartsByGame() {
+    const out: Record<string, string[]> = {};
+    for (const p of this.players.values()) for (const g of p.hearts) (out[g] ??= []).push(p.info.id);
+    return out;
   }
 
   setPhoto(id: string, dataUrl: unknown): string | null {
@@ -1230,6 +1285,7 @@ export class Room {
       vote: this.vote,
       roll: this.roll,
       intro: this.intro,
+      hearts: this.heartsByGame(),
       olympia: this.olympia,
       pause: this.game && this.game.pausedAt !== null ? { at: this.game.pausedAt, shift: this.game.shift, by: this.game.pausedBy } : null,
       clockShift: this.game ? this.game.shift : 0,

@@ -38,7 +38,7 @@ function gamesPlugin(): esbuild.Plugin {
             }
           }
           // Herkunft mitgeben (im Manifest auf der Platte steht sie nicht)
-          entries.push(`{ manifest: { ...m${i}, source: ${JSON.stringify(g.source)} }, client: c${i}, i18n: { ${i18n.join(', ')} } }`);
+          entries.push(`{ manifest: { ...m${i}, source: ${JSON.stringify(g.source)}, coverUrl: ${JSON.stringify(g.manifest.coverUrl ?? null)} ?? undefined }, client: c${i}, i18n: { ${i18n.join(', ')} } }`);
         });
         lines.push(`export default [${entries.join(',\n')}];`);
         return { contents: lines.join('\n'), loader: 'ts', resolveDir: ROOT, watchDirs };

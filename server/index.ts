@@ -207,6 +207,15 @@ function handle(ws: WebSocket, msg: any) {
     case 'profile':
       if (room && s.playerId) room.setProfile(s.playerId, msg);
       return reply(ws, msg, { ok: true });
+    case 'heart':
+      if (room && s.playerId) room.setHeart(s.playerId, String(msg.gameId), !!msg.on);
+      return;
+    case 'hearts:clear':
+      if (room && s.playerId) room.clearHearts(s.playerId);
+      return;
+    case 'hearts:sync':
+      if (room && s.playerId) room.syncHearts(s.playerId, msg.list);
+      return;
     case 'photo': {
       if (!room || !s.playerId) return;
       const error = room.setPhoto(s.playerId, msg.dataUrl);

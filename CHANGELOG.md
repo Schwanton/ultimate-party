@@ -8,6 +8,19 @@ Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick 
 - Neue Kategorien **💥 Action & Chaos** und **♟️ Strategie & Taktik**. Aus „Teamwork“ wird **🤝 Gemeinsam gegen das Spiel**, aus „Schnell & für viele“ wird **⚡ Kurz & knackig**. „Duell zu zweit“ fällt weg (Kronenduell steht jetzt bei Strategie)
 - Alle Spiele stehen in passenden Kategorien, z. B. Sternenpakt und Tick Tack Boom nicht mehr unter „Kennenlernen“. Chaotic Tower Defense steht nicht mehr unter „Weitere“
 
+## 0.46.0
+
+Neue Handy-Lobby mit Titelbildern:
+- Das gewählte Spiel steht oben als großes Titelbild, darunter der Start-Knopf. Das Titelbild liegt auch unscharf im Hintergrund
+- Die Spielauswahl zeigt Titelbilder – wahlweise als Kacheln (zwei pro Reihe) oder als große Bilder mit Beschreibung. Umschalten oben rechts, jedes Handy merkt sich die Wahl
+- Neuer Filter „Nur passende für … Spieler“. Spiele, die gerade nicht passen, sind grau und zeigen, wie viele fehlen
+- Antippen eines Spiels öffnet die Detail-Ansicht mit Beschreibung, Einstellungen und „Dieses Spiel wählen“ – so wählt niemand beim Scrollen aus Versehen
+- Neu: Herzen! Alle können Spiele mit ♥ markieren, auf die sie Lust haben. Die Anzahl steht auf den Bildern – auch am Fernseher. Herzen bleiben gespeichert (unter deinem Namen), „Alle entfernen“ löscht sie
+- Neben dem Raumcode gibt es einen QR-Knopf: Er zeigt den QR-Code groß auf dem Handy, zum Weiterzeigen oder Link-Teilen
+- Abstimmung mit großen Titelbildern, die eigene Stimme ist gelb umrandet
+- Startmoment auch auf dem Handy: Titelbild, Countdown und ein kurzes Vibrieren
+- Kompaktere Profil-Karte oben
+
 ## 0.45.1
 
 - Zeigt man in der Lobby auf den QR-Code, wird er so breit wie die Spalte – gut zum Scannen von weiter weg. Antippen geht auch. Die Spielerliste wird dabei kompakt

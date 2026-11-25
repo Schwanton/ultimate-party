@@ -82,8 +82,8 @@ export function useTagFilter(games: GameManifest[]) {
 
 /* ---------------- TV: Bibliothek ---------------- */
 
-export function GameLibrary({ games, selectedId, players, lang, t, onPick, onClose }: {
-  games: GameManifest[]; selectedId: string | null; players: number; lang: string; t: Translate;
+export function GameLibrary({ games, selectedId, players, lang, t, onPick, onClose, hearts }: {
+  games: GameManifest[]; selectedId: string | null; players: number; lang: string; t: Translate; hearts?: Record<string, string[]>;
   onPick: (id: string) => void; onClose: () => void;
 }) {
   const { tag, setTag, present, shown } = useTagFilter(games);
@@ -118,7 +118,7 @@ export function GameLibrary({ games, selectedId, players, lang, t, onPick, onClo
       <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', margin: '0 -8px', padding: '8px 8px 16px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '22px 20px' }}>
           {list.map((g, i) => (
-            <LibraryCard key={g.id} g={g} sel={g.id === selectedId} fit={fitOf(g, players)} players={players} lang={lang} t={t} delay={i * 0.03} onPick={() => onPick(g.id)} />
+            <LibraryCard key={g.id} g={g} hearts={hearts?.[g.id]?.length ?? 0} sel={g.id === selectedId} fit={fitOf(g, players)} players={players} lang={lang} t={t} delay={i * 0.03} onPick={() => onPick(g.id)} />
           ))}
         </div>
         {list.length === 0 && <p className="muted" style={{ fontSize: 20, textAlign: 'center', marginTop: 60 }}>{t('lobby.noFitting')}</p>}
@@ -128,7 +128,7 @@ export function GameLibrary({ games, selectedId, players, lang, t, onPick, onClo
 }
 
 /** Kachel der Bilder-Wand: nur das Titelbild (mit Schriftzug), Spielerzahl und Dauer als Schild darauf */
-function LibraryCard({ g, sel, fit, players, lang, t, delay, onPick }: { g: GameManifest; sel: boolean; players: number; fit: 'ok' | 'few' | 'many'; lang: string; t: Translate; delay: number; onPick: () => void }) {
+function LibraryCard({ g, sel, fit, players, lang, t, delay, onPick, hearts }: { g: GameManifest; hearts: number; sel: boolean; players: number; fit: 'ok' | 'few' | 'many'; lang: string; t: Translate; delay: number; onPick: () => void }) {
   const dim = fit !== 'ok' && !sel;
   const warn = fit === 'few' ? t('lobby.needPlayers', { n: g.minPlayers - players }) : fit === 'many' ? t('lobby.tooManyShort') : '';
   return (
@@ -143,7 +143,18 @@ function LibraryCard({ g, sel, fit, players, lang, t, delay, onPick }: { g: Game
       <span style={{ position: 'absolute', left: 10, bottom: 10, background: 'rgba(17,13,36,.82)', fontSize: 14, fontWeight: 700, padding: '5px 11px', borderRadius: 999, whiteSpace: 'nowrap' }}>
         {playersLabel(g, t)} · {t('lobby.minutes', { n: g.minutes })}
       </span>
+      <HeartCount n={hearts} style={{ right: 10, top: 10 }} />
       {warn && <span style={{ position: 'absolute', right: 10, bottom: 10, background: 'var(--yellow)', color: '#110D24', fontSize: 14, fontWeight: 800, padding: '5px 11px', borderRadius: 999, whiteSpace: 'nowrap' }}>{warn}</span>}
     </button>
+  );
+}
+
+/** „Hab Lust drauf“: Herz mit Anzahl auf einem Titelbild */
+export function HeartCount({ n, style, big }: { n: number; style: CSSProperties; big?: boolean }) {
+  if (!n) return null;
+  return (
+    <span aria-label={`♥ ${n}`} style={{ position: 'absolute', display: 'inline-flex', alignItems: 'center', gap: 5, background: '#E8336F', color: '#fff', borderRadius: 999, padding: big ? '7px 14px' : '5px 11px', fontSize: big ? 17 : 14, fontWeight: 800, boxShadow: '0 4px 12px rgba(0,0,0,.35)', ...style }}>
+      <svg width={big ? 17 : 14} height={big ? 17 : 14} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.3-9.2C1.4 7.9 3.6 4.5 7 4.5c2.1 0 3.6 1.2 5 3 1.4-1.8 2.9-3 5-3 3.4 0 5.6 3.4 4.3 6.8-1.8 4.6-9.3 9.2-9.3 9.2z" /></svg>{n}
+    </span>
   );
 }

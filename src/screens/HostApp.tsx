@@ -8,7 +8,7 @@ import { Avatar, Crown, FullscreenButton, useKeepAwake, Logo, QrCode, Stage, isL
 import { HostSettings } from './HostSettings';
 import { GameOptionsForm, optionsSummary } from './GameOptions';
 import { UpdateBanner } from './Update';
-import { GameCover, GameLibrary, fitOf, gameDesc, gameName, gameTags, playersLabel } from './GameLibrary';
+import { GameCover, GameLibrary, HeartCount, fitOf, gameDesc, gameName, gameTags, playersLabel } from './GameLibrary';
 import { HostVoteBoard, PickModeSwitch, PickedBadge, VoteOptions, pickModeOf, useRoll } from './PickMode';
 import { OlympiaGameBadge, OlympiaHost, OlympiaSetup, olympiaRunning } from './Olympia';
 import { HostPause, PauseIcon, PlayIcon } from './Pause';
@@ -297,7 +297,7 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
       )}
 
       {libraryOpen && (
-        <GameLibrary games={games} selectedId={room.selectedGameId} players={active.length} lang={room.lang} t={t}
+        <GameLibrary games={games} selectedId={room.selectedGameId} players={active.length} lang={room.lang} t={t} hearts={room.hearts}
           onPick={(id) => { net.send('select', { gameId: id }); setLibraryOpen(false); }} onClose={() => setLibraryOpen(false)} />
       )}
 
@@ -349,6 +349,7 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
             <HostVoteBoard vote={room.vote} games={games} room={room} t={t} player={(id) => room.players.find((p) => p.id === id)} />
           ) : (
             <SelectedGame game={rolling ?? selected} rolling={!!rolling} players={active.length} canStart={canStart && !rolling} gameCount={games.length} lang={room.lang} t={t}
+              hearts={(rolling ?? selected) ? room.hearts?.[(rolling ?? selected)!.id]?.length ?? 0 : 0}
               pickedBadge={pickModeOf(room) === 'vote' ? <PickedBadge room={room} t={t} vipName={vip?.name} /> : null}
               summary={selected?.options?.length ? optionsSummary(selected, room.settings.gameOptions?.[selected.id], room.lang) : ''}
               onLibrary={() => setLibraryOpen(true)} onOptions={() => setOptionsOpen(true)} />
@@ -428,8 +429,8 @@ const IconSliders = () => (
 const badge = (bg: string, color: string): React.CSSProperties => ({ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 999, background: bg, color, fontSize: 15, fontWeight: 700, whiteSpace: 'nowrap' });
 
 /** Rechts in der Lobby: das gewählte Spiel groß mit Titelbild, Infos, Einstellungen und Start */
-function SelectedGame({ game, rolling, players, canStart, gameCount, lang, t, summary, pickedBadge, onLibrary, onOptions }: {
-  game?: GameManifest; rolling?: boolean; players: number; canStart: boolean; gameCount: number; lang: Lang; t: Translate; summary: string; pickedBadge: React.ReactNode; onLibrary: () => void; onOptions: () => void;
+function SelectedGame({ game, rolling, players, canStart, gameCount, lang, t, summary, pickedBadge, onLibrary, onOptions, hearts = 0 }: {
+  hearts?: number; game?: GameManifest; rolling?: boolean; players: number; canStart: boolean; gameCount: number; lang: Lang; t: Translate; summary: string; pickedBadge: React.ReactNode; onLibrary: () => void; onOptions: () => void;
 }) {
   if (!game) {
     return (
@@ -449,6 +450,7 @@ function SelectedGame({ game, rolling, players, canStart, gameCount, lang, t, su
           style={{ border: 0, padding: 0, width: 'min(100cqw, 100cqh * 16 / 9)', aspectRatio: '16 / 9', alignSelf: 'flex-start', borderRadius: 24, overflow: 'hidden', position: 'relative', background: 'var(--surface)', boxShadow: `0 0 0 3px ${game.color}, 0 12px 40px rgba(0,0,0,.55)` }}>
           <GameCover g={game} lang={lang} zoom={!rolling} showName letterSize={240} />
           {!rolling && pickedBadge}
+          {!rolling && <HeartCount n={hearts} big style={{ right: 16, top: 16 }} />}
           {rolling && <span className="display" style={{ position: 'absolute', left: 18, top: 18, background: 'var(--yellow)', color: '#110D24', borderRadius: 999, padding: '7px 16px', fontSize: 18, fontWeight: 800 }}>{t('pick.rolling')}</span>}
         </button>
       </div>

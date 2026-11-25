@@ -170,16 +170,15 @@ export function PhoneVote({ vote, games, room, me, t, isVip }: { vote: GameVote;
           const on = mine.includes(g.id);
           const n = (byGame.get(g.id) ?? []).length;
           return (
-            <button key={g.id} type="button" role={vote.maxVotes > 1 ? 'checkbox' : 'radio'} aria-checked={on} onClick={() => net.send('gamevote', { gameId: g.id })} style={{
-              minHeight: vote.candidates.length > 4 ? 60 : 76, border: `3px solid ${on ? g.color : 'transparent'}`, borderRadius: 20, padding: 0, overflow: 'hidden', display: 'flex', alignItems: 'stretch', textAlign: 'left',
-              background: on ? 'var(--surface-2)' : 'var(--surface)', color: '#fff',
+            <button key={g.id} type="button" role={vote.maxVotes > 1 ? 'checkbox' : 'radio'} aria-checked={on} aria-label={gameName(g, room.lang)} onClick={() => net.send('gamevote', { gameId: g.id })} style={{
+              height: cands.length > 4 ? 104 : 132, flex: 'none', border: 0, borderRadius: 18, padding: 0, overflow: 'hidden', position: 'relative', color: '#fff', background: 'var(--surface)',
+              boxShadow: on ? '0 0 0 4px var(--yellow)' : `0 0 0 2px ${g.color}`,
             }}>
-              <span style={{ width: 92, flex: 'none', position: 'relative' }}><GameCover g={g} lang={room.lang} letterSize={64} /></span>
-              <span style={{ flex: 1, minWidth: 0, padding: '10px 12px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 3 }}>
-                <span className="display" style={{ fontSize: 19, fontWeight: 800 }}>{gameName(g, room.lang)}</span>
-                <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--muted)' }}>{playersLabel(g, t)} · {t('lobby.minutes', { n: g.minutes })}</span>
-              </span>
-              <span className="display" style={{ alignSelf: 'center', marginRight: 14, fontSize: 22, fontWeight: 800, color: on ? 'var(--yellow)' : 'var(--muted)' }}>{n}</span>
+              <GameCover g={g} lang={room.lang} letterSize={90} showName />
+              <span style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(17,13,36,0) 55%, rgba(17,13,36,.8))' }} />
+              <span className="display" style={{ position: 'absolute', right: 10, top: 10, minWidth: 40, height: 40, borderRadius: 20, background: '#fff', color: '#110D24', fontSize: 22, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 8px' }}>{n}</span>
+              {on && <span style={{ position: 'absolute', left: 10, top: 10, background: 'var(--yellow)', color: '#110D24', borderRadius: 999, padding: '5px 11px', fontSize: 13, fontWeight: 800 }}>✓ {t('pick.yourVote')}</span>}
+              <span style={{ position: 'absolute', left: 10, bottom: 9, background: 'rgba(17,13,36,.84)', borderRadius: 999, padding: '4px 10px', fontSize: 12, fontWeight: 700 }}>{playersLabel(g, t)} · {t('lobby.minutes', { n: g.minutes })}</span>
             </button>
           );
         })}
