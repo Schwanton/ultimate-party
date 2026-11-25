@@ -2,6 +2,18 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.44.0
+
+Chaotic Tower Defense – großes Update nach dem ersten Test:
+- **Bauen mit Entwurf:** Ein Gebäude erscheint erst als Entwurf. Ihr könnt es über die Karte ziehen und seht dabei sofort, wie sich die rote Linie ändert. Erst „Bauen“ setzt es wirklich
+- **Bauen während der Welle:** Bauen, Verkaufen und Sprengen werden vorgemerkt (gelbe Linie) und nach eurer Welle ausgeführt. Turm-Verbesserungen und Upgrades wirken sofort
+- **Kartenwahl:** 3 Karten plus „Zufällige der 3“, deutlich mehr Zeit. Am Handy öffnet ihr eine Karte erst groß und stimmt dann ab. Auf dem Fernseher sind die Karten viel größer
+- **Wellen:** höchstens 2 Gegnertypen pro Welle, meist nur einer; Flieger kommen nur unter sich. Der Fernseher zeigt für jede Welle Gegner, Leben (♥) und eine Kurzbeschreibung
+- **Karten:** viel mehr Asteroiden, jetzt 2 × 4 oder 4 × 2 Felder groß. Neu: **Credit-Felder** – läuft der erste Gegner einer Welle darüber, gibt es das Grundeinkommen × Faktor (×0,1 bis ×2)
+- **Einkommen** steigt jetzt mit jeder Welle von selbst. Wer in einer Welle die meisten Kills hat, bekommt +20 % seines Rundeneinkommens als Bonus. Der Fernseher zeigt die Kills jeder Welle
+- **Handy aufgeräumt:** Credits (₡) mit Einkommen pro Runde, Leben und Baulimit in einer Zeile, „Sicht teilen“ und „Bodenfelder anzeigen“ im Zahnrad-Menü. Zu teure Optionen sind ausgegraut
+- Erste Bauphase dauert jetzt 2 Minuten
+
 ## 0.43.2
 
 - Chaotic Tower Defense: Jede Karte hat jetzt ihre eigene **Wellenfolge** aus 4–6 Wellen, die sich immer wiederholt – mit jeder Welle haben die Monster etwas mehr Leben. Eine Welle besteht aus 1–3 Gegnertypen, bunt gemischt. Bosse sind ein ganz normaler Gegnertyp und kommen zu 1–4 Stück

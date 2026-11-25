@@ -8,6 +8,10 @@ export type ZoneKind = 'slow' | 'fast' | 'dmg' | 'range' | 'nobuild';
 export interface Zone { k: ZoneKind; x: number; y: number; w: number; h: number; s: number }
 export type Pt = [number, number];
 export interface Teleporter { i: Pt; o: Pt }
+/** Asteroid: x, y, Breite, Höhe (2 × 4 oder 4 × 2) */
+export type Rock = [number, number, number, number];
+/** Credit-Feld (2 × 2): der erste Gegner einer Welle, der darüberläuft, bringt das Grundeinkommen × m */
+export interface Coin { x: number; y: number; m: number }
 export interface Price { p: number; f: number }
 
 export const TYPES = ['L', 'P', 'F', 'K', 'R', 'A', 'Q', 'V'] as const;
@@ -19,7 +23,8 @@ export interface MapDef {
   start: Pt;
   core: Pt;
   cps: Pt[];
-  rocks: Pt[];
+  rocks: Rock[];
+  coins: Coin[];
   tps: Teleporter[];
   zones: Zone[];
   maxLimit: number;
@@ -112,11 +117,19 @@ export function generateMap(seed: number): MapDef {
   const tps: Teleporter[] = [];
   const nTp = ri(0, 3);
   for (let k = 0; k < nTp; k++) { const i = spot(), o = spot(); if (i && o) tps.push({ i, o }); }
-  const rocks: Pt[] = [];
-  const nRock = ri(3, 12);
-  for (let k = 0; k < nRock; k++) {
-    const p = spot(60);
-    if (p) { rocks.push(p); placed.pop(); placed.push(p); }
+  const coins: Coin[] = [];
+  const nCoin = ri(0, 2);
+  for (let k = 0; k < nCoin; k++) { const p = spot(); if (p) coins.push({ x: p[0], y: p[1], m: Math.round((0.1 + r() * 1.9) * 10) / 10 }); }
+  const rocks: Rock[] = [];
+  const area = w * h;
+  const nRock = ri(Math.round(area / 90), Math.round(area / 45));
+  const hits = (a: Rock, x: number, y: number, ww: number, hh: number, gap: number) => x < a[0] + a[2] + gap && x + ww + gap > a[0] && y < a[1] + a[3] + gap && y + hh + gap > a[1];
+  for (let k = 0; k < nRock * 4 && rocks.length < nRock; k++) {
+    const vert = r() < 0.5, rw = vert ? 2 : 4, rh = vert ? 4 : 2;
+    const x = ri(0, w - rw), y = ri(0, h - rh);
+    if (placed.some((q) => hits([q[0], q[1], 2, 2], x, y, rw, rh, 1))) continue;
+    if (rocks.some((q) => hits(q, x, y, rw, rh, 0))) continue;
+    rocks.push([x, y, rw, rh]);
   }
   const zones: Zone[] = [];
   const kinds: ZoneKind[] = ['slow', 'fast', 'dmg', 'range', 'nobuild'];
@@ -139,9 +152,11 @@ export function generateMap(seed: number): MapDef {
   const nSlots = ri(4, 6);
   for (let k = 0; k < nSlots; k++) {
     const pool = [...POOL];
-    const nt = ri(1, 3);
+    let nt = r() < 0.7 ? 1 : 2;
     const picked: string[] = [];
     for (let j = 0; j < nt; j++) picked.push(pool.splice(Math.floor(r() * pool.length), 1)[0]);
+    // Flieger kommen nur unter sich
+    if (picked.includes('flieger')) { picked.splice(0, picked.length, 'flieger'); nt = 1; }
     const wts = picked.map(() => 0.4 + r());
     const sum = wts.reduce((a, b) => a + b, 0);
     const types = picked.map((t, j) => {
@@ -154,10 +169,14 @@ export function generateMap(seed: number): MapDef {
     rotation.push({ types, order });
   }
   const moneyF = logFactor(r, 0.5, 2);
-  const map: MapDef = { w, h, start, core, cps, rocks, tps, zones, maxLimit: ri(16, 64), money: Math.round(90 * moneyF), moneyF: Math.round(moneyF * 100) / 100, price, rotation };
-  // Felsen dürfen den Weg nicht ganz versperren
-  const b = new Board(map);
-  while (!b.route && map.rocks.length) { map.rocks.pop(); b.reset(); }
+  const map: MapDef = { w, h, start, core, cps, rocks, coins, tps, zones, maxLimit: ri(16, 64), money: Math.round(90 * moneyF), moneyF: Math.round(moneyF * 100) / 100, price, rotation };
+  // Asteroiden dürfen den Weg nicht ganz versperren
+  const all = map.rocks;
+  map.rocks = [];
+  for (const rk of all) {
+    map.rocks.push(rk);
+    if (!new Board(map).route) map.rocks.pop();
+  }
   return map;
 }
 
@@ -333,6 +352,7 @@ export function flyRoute(map: MapDef): Leg[] {
 /* ================= Spielfeld eines Spielers ================= */
 
 export type Kind = 'wall' | 'tower' | 'depot';
+export type Pending = ({ k: 'build'; kind: Kind; x: number; y: number } | { k: 'sell'; id: number } | { k: 'blast'; x: number; y: number }) & { cost: number };
 export interface Building { id: number; kind: Kind; x: number; y: number; type: TowerType; level: number; spent: number; builtAt: number; cd: number; dmgN: number; spdN: number }
 
 /** eigene Verbesserungen je Turm: Schaden unbegrenzt (+25 % je Stufe), Tempo höchstens 5× (−12 % Abklingzeit je Stufe) */
@@ -352,8 +372,14 @@ export class Board {
   occ: Int32Array;
   blocked: Uint8Array;
   buildings = new Map<number, Building>();
-  rocks: Pt[];
+  rocks: Rock[];
   nextId = 1;
+  /** vorgemerkte Änderungen (während der eigenen Welle), werden am Ende übernommen */
+  pending: Pending[] = [];
+  wave = 0;
+  waveKills = 0;
+  coinsUsed = new Set<number>();
+  coinGain = 0;
   route: Leg[] | null = null;
   ground: Track | null = null;
   air: Track | null = null;
@@ -375,13 +401,13 @@ export class Board {
     this.map = map;
     this.occ = new Int32Array(map.w * map.h);
     this.blocked = new Uint8Array(map.w * map.h);
-    this.rocks = map.rocks.map((p) => [p[0], p[1]] as Pt);
+    this.rocks = map.rocks.map((p) => [...p] as Rock);
     this.money = map.money;
     this.reset();
   }
 
   reset() {
-    this.rocks = this.map.rocks.map((p) => [p[0], p[1]] as Pt);
+    this.rocks = this.map.rocks.map((p) => [...p] as Rock);
     this.rebuild();
   }
 
@@ -389,7 +415,7 @@ export class Board {
     const { w } = this.map;
     this.occ.fill(0);
     this.blocked.fill(0);
-    for (const [x, y] of this.rocks) for (let dy = 0; dy < 2; dy++) for (let dx = 0; dx < 2; dx++) { this.blocked[(y + dy) * w + x + dx] = 1; this.occ[(y + dy) * w + x + dx] = -1; }
+    for (const [x, y, rw, rh] of this.rocks) for (let dy = 0; dy < rh; dy++) for (let dx = 0; dx < rw; dx++) { this.blocked[(y + dy) * w + x + dx] = 1; this.occ[(y + dy) * w + x + dx] = -1; }
     for (const b of this.buildings.values()) {
       const n = sizeOf(b.kind);
       for (let dy = 0; dy < n; dy++) for (let dx = 0; dx < n; dx++) { this.blocked[(b.y + dy) * w + b.x + dx] = 1; this.occ[(b.y + dy) * w + b.x + dx] = b.id; }
@@ -420,7 +446,7 @@ export class Board {
     const n = sizeOf(kind);
     if (x < 0 || y < 0 || x + n > w || y + n > h) return 'edge';
     for (let dy = 0; dy < n; dy++) for (let dx = 0; dx < n; dx++) if (this.occ[(y + dy) * w + x + dx] !== 0) return 'occupied';
-    const special: Pt[] = [this.map.start, this.map.core, ...this.map.cps, ...this.map.tps.map((t) => t.o)];
+    const special: Pt[] = [this.map.start, this.map.core, ...this.map.cps, ...this.map.tps.map((t) => t.o), ...this.map.coins.map((c) => [c.x, c.y] as Pt)];
     for (const p of special) if (x < p[0] + 2 && x + n > p[0] && y < p[1] + 2 && y + n > p[1]) return 'special';
     for (const z of this.map.zones) if (z.k === 'nobuild' && x < z.x + z.w && x + n > z.x && y < z.y + z.h && y + n > z.y) return 'nobuild';
     return null;
@@ -523,12 +549,96 @@ export class Board {
     return null;
   }
 
-  income() { return 15 + 5 * this.incomeLv; }
+  /** Grundeinkommen steigt von selbst mit jeder Welle; Einkommen-Upgrades kommen oben drauf */
+  baseIncome() { return 15 + 3 * Math.max(0, this.wave - 1); }
+  income() { return this.baseIncome() + 5 * this.incomeLv; }
+
+  /* ---------- Vormerken ---------- */
+
+  clone(): Board {
+    const c = new Board({ ...this.map, rocks: this.rocks.map((r) => [...r] as Rock) });
+    for (const [id, b] of this.buildings) c.buildings.set(id, { ...b });
+    c.nextId = this.nextId;
+    c.depots = this.depots;
+    c.limitMax = this.limitMax;
+    c.rebuild();
+    return c;
+  }
+
+  /** Spielfeld mit allen vorgemerkten Änderungen (Geld spielt keine Rolle) */
+  planned(): Board {
+    const c = this.clone();
+    c.money = 1e12;
+    for (const op of this.pending) {
+      if (op.k === 'build') c.build(op.kind, op.x, op.y);
+      else if (op.k === 'sell') c.sell(op.id, 1e12);
+      else c.blast(op.x, op.y);
+    }
+    return c;
+  }
+
+  /** Bauen / Verkaufen / Sprengen vormerken; Kosten werden sofort zurückgelegt */
+  queue(op: { k: 'build'; kind: Kind; x: number; y: number } | { k: 'sell'; id: number } | { k: 'blast'; x: number; y: number }): string | null {
+    const pl = this.planned();
+    if (op.k === 'build') {
+      const key = op.kind === 'wall' ? 'wall' : op.kind === 'tower' ? 'tower' : 'depot';
+      const cost = op.kind === 'depot' ? this.map.price.depot.p * (pl.depots + 1) : this.priceOf(key);
+      if (this.money < cost) return 'money';
+      const err = pl.build(op.kind, op.x, op.y);
+      if (err) return err;
+      this.money -= cost;
+      this.pending.push({ ...op, cost });
+    } else if (op.k === 'sell') {
+      if (!this.buildings.has(op.id) || this.pending.some((p) => p.k === 'sell' && p.id === op.id)) return 'none';
+      const err = pl.sell(op.id, 1e12);
+      if (err) return err;
+      this.pending.push({ ...op, cost: 0 });
+    } else {
+      const cost = this.priceOf('blast');
+      if (this.money < cost) return 'money';
+      if (!pl.rocks.some((r) => r[0] === op.x && r[1] === op.y)) return 'none';
+      this.money -= cost;
+      this.pending.push({ ...op, cost });
+    }
+    return null;
+  }
+
+  /** eine Vormerkung zurücknehmen */
+  unqueue(i: number): string | null {
+    const op = this.pending[i];
+    if (!op) return 'none';
+    const rest = this.pending.filter((_, k) => k !== i);
+    this.pending = [];
+    this.money += op.cost;
+    // übrige neu prüfen (z. B. hing eine Mauer an diesem Verkauf)
+    for (const o of rest) {
+      this.money += o.cost;
+      const { cost: _c, ...plain } = o;
+      if (this.queue(plain as any)) { /* fällt weg, Geld ist schon zurück */ }
+    }
+    return null;
+  }
+
+  /** am Ende der Welle alles Vorgemerkte wirklich ausführen */
+  applyPending(now: number) {
+    const ops = this.pending;
+    this.pending = [];
+    for (const op of ops) {
+      this.money += op.cost;
+      if (op.k === 'build') this.build(op.kind, op.x, op.y, now);
+      else if (op.k === 'sell') this.sell(op.id, now);
+      else this.blast(op.x, op.y);
+    }
+  }
 
   /* ---------- Welle ---------- */
 
   startWave(wave: number) {
     const w = waveInfo(this.map, wave);
+    this.wave = wave;
+    this.waveKills = 0;
+    this.coinsUsed = new Set();
+    this.coinGain = 0;
     this.spawnQueue = [...w.order];
     this.spawnIn = 0;
     this.waveTime = 0;
@@ -620,6 +730,16 @@ export class Board {
       }
     }
     // angekommen
+    // Credit-Felder: der erste Gegner, der darüberläuft, bringt Grundeinkommen × Faktor
+    this.map.coins.forEach((c, i) => {
+      if (this.coinsUsed.has(i)) return;
+      if (this.monsters.some((m) => m.x > c.x && m.x < c.x + 2 && m.y > c.y && m.y < c.y + 2)) {
+        this.coinsUsed.add(i);
+        const g = Math.round(this.baseIncome() * c.m);
+        this.money += g;
+        this.coinGain += g;
+      }
+    });
     const len = this.ground.len, alen = this.air!.len;
     this.monsters = this.monsters.filter((m) => m.s < (MONSTERS[m.type].air ? alen : len));
     if ((!this.spawnQueue.length && !this.monsters.length) || this.waveTime >= WAVE_MAX) {
@@ -628,6 +748,7 @@ export class Board {
       this.monsters = [];
     }
     this.kills += kills;
+    this.waveKills += kills;
     return kills;
   }
 
@@ -657,4 +778,28 @@ export function waveInfo(map: MapDef, wave: number) {
   const s = map.rotation[slot];
   const hpMul = 1.3 + 0.16 * (n - 1);
   return { slot, round: Math.floor((n - 1) / len) + 1, types: s.types, order: s.order, count: s.order.length, hpMul: Math.round(hpMul * 100) / 100 };
+}
+
+/* ================= Hilfen für die Handy-Vorschau ================= */
+
+/** Weg für eine Liste belegter Rechtecke (Gebäude, Asteroiden, Entwürfe) */
+export function routeFor(map: Pick<MapDef, 'w' | 'h' | 'start' | 'core' | 'cps' | 'tps'>, rects: Rock[]): Leg[] | null {
+  const bl = new Uint8Array(map.w * map.h);
+  for (const [x, y, w, h] of rects) for (let dy = 0; dy < h; dy++) for (let dx = 0; dx < w; dx++) {
+    const cx = x + dx, cy = y + dy;
+    if (cx >= 0 && cy >= 0 && cx < map.w && cy < map.h) bl[cy * map.w + cx] = 1;
+  }
+  return fullRoute(map as MapDef, makeRouter(map.w, map.h, bl).path);
+}
+
+/** Warum man hier nicht bauen kann (ohne Weg, Geld und Baulimit); null = Platz frei */
+export function placeProblem(map: Pick<MapDef, 'w' | 'h' | 'start' | 'core' | 'cps' | 'tps' | 'coins' | 'zones'>, rects: Rock[], kind: Kind, x: number, y: number): string | null {
+  const n = sizeOf(kind);
+  if (x < 0 || y < 0 || x + n > map.w || y + n > map.h) return 'edge';
+  const hit = (ax: number, ay: number, aw: number, ah: number) => x < ax + aw && x + n > ax && y < ay + ah && y + n > ay;
+  if (rects.some(([ax, ay, aw, ah]) => hit(ax, ay, aw, ah))) return 'occupied';
+  const special: Pt[] = [map.start, map.core, ...map.cps, ...map.tps.map((t) => t.o), ...map.coins.map((c) => [c.x, c.y] as Pt)];
+  if (special.some((p) => hit(p[0], p[1], 2, 2))) return 'special';
+  if (map.zones.some((z) => z.k === 'nobuild' && hit(z.x, z.y, z.w, z.h))) return 'nobuild';
+  return null;
 }

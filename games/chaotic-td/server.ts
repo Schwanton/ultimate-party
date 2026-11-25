@@ -6,12 +6,15 @@
  */
 
 import { type GameContext, type GameServerModule } from '@up/sdk';
-import { Board, MONSTER_KEYS, TYPES, boostAt, generateMap, waveInfo, type Kind, type Leg, type MapDef, type TowerType } from './engine';
+import { Board, MONSTERS, MONSTER_KEYS, TYPES, boostAt, generateMap, waveInfo, type Kind, type Leg, type MapDef, type TowerType } from './engine';
 
 const TICK = 0.1;
-const T = { vote: 25, firstBuild: 45, build: 30, final: 0 };
+const T = { vote: 75, firstBuild: 120, build: 30, final: 0 };
+const NMAPS = 3;
+/** Rundenbonus für die meisten Kills einer Welle: Anteil am eigenen Rundeneinkommen */
+const TOP_BONUS = 0.2;
 const MAX_WAVES = 40;
-const LETTERS = 'ABCDEF';
+const LETTERS = 'ABC';
 
 type Phase = 'vote' | 'play' | 'final';
 
@@ -26,13 +29,14 @@ interface PState {
   err: string;
   errAt: number;
   skill: number;
+  bonus: number;
 }
 
 const r2 = (n: number) => Math.round(n * 100) / 100;
 const legsOut = (legs: Leg[] | null) => (legs ?? []).map((l) => ({ l: l.leg, j: l.jump ? 1 : 0, p: l.pts.map(([x, y]) => [r2(x), r2(y)]) }));
 
 function mapOut(m: MapDef) {
-  return { w: m.w, h: m.h, start: m.start, core: m.core, cps: m.cps, tps: m.tps, zones: m.zones, maxLimit: m.maxLimit };
+  return { w: m.w, h: m.h, start: m.start, core: m.core, cps: m.cps, tps: m.tps, zones: m.zones, coins: m.coins, maxLimit: m.maxLimit };
 }
 
 function preview(m: MapDef) {
@@ -41,8 +45,7 @@ function preview(m: MapDef) {
   return {
     ...mapOut(m), rocks: m.rocks, legs: legsOut(b.route),
     money: m.money, moneyF: m.moneyF, blast: m.price.blast, depot: m.price.depot,
-    cheap: towers.slice(0, 3), dear: towers.slice(-3).reverse(),
-    rot: m.rotation.map((x) => x.types.map((y) => y.t)),
+    cheap: towers.slice(0, 3), limit: m.maxLimit, rot: m.rotation.map((x) => x.types.map((y) => y.t)),
   };
 }
 
@@ -50,7 +53,7 @@ export default {
   create(ctx: GameContext) {
     const ids = ctx.players.map((p) => p.id);
     const isBot = (id: string) => !!ctx.player(id)?.isBot;
-    const seeds = Array.from({ length: 6 }, () => Math.floor(Math.random() * 1e9));
+    const seeds = Array.from({ length: NMAPS }, () => Math.floor(Math.random() * 1e9));
     const maps = seeds.map(generateMap);
     const votes = new Map<string, number>();
     let phase: Phase = 'vote';
@@ -84,10 +87,11 @@ export default {
       const lv = lives();
       const list = ids.map((id) => {
         const p = ps.get(id)!;
-        return { id, kills: p.board.kills, lives: p.out ? 0 : lv.get(id) ?? 0, out: p.out, place: p.place, run: p.board.lastRun, done: p.board.waveDone, ready: p.ready };
+        return { id, kills: p.board.kills, wk: p.board.waveKills, lives: p.out ? 0 : lv.get(id) ?? 0, out: p.out, place: p.place, run: p.board.lastRun, done: p.board.waveDone, ready: p.ready };
       });
       list.sort((a, b) => (a.out !== b.out ? (a.out ? 1 : -1) : a.out ? a.place - b.place : b.kills - a.kills));
-      return list;
+      const topWk = Math.max(0, ...list.filter((r) => !r.out).map((r) => r.wk));
+      return list.map((r) => ({ ...r, top: topWk > 0 && !r.out && r.wk === topWk }));
     }
 
     /* ---------- Ansichten ---------- */
@@ -100,7 +104,7 @@ export default {
         v = { screen: 'vote', maps: maps.map(preview), votes: counts, deadline, duration };
       } else if (phase === 'play') {
         const cur = Math.max(1, stage === 'wave' ? wave : wave + 1);
-        const rot = map.rotation.map((_, k) => { const w = waveInfo(map, cur + k); return { n: cur + k, round: w.round, hpMul: w.hpMul, types: w.types }; });
+        const rot = map.rotation.map((_, k) => { const w = waveInfo(map, cur + k); return { n: cur + k, round: w.round, hpMul: w.hpMul, types: w.types.map((x) => ({ ...x, hp: Math.round(MONSTERS[x.t].hp * w.hpMul) })) }; });
         const rs = rows();
         const longest = rs.filter((r) => !r.out && r.run > 0).sort((a, b) => b.run - a.run)[0] ?? null;
         v = {
@@ -139,7 +143,8 @@ export default {
       if (phase === 'vote') {
         return {
           screen: 'vote', deadline, duration, mine: votes.get(id) ?? null,
-          maps: maps.map((m, i) => ({ letter: LETTERS[i], w: m.w, h: m.h, cps: m.cps.length, votes: [...votes.values()].filter((k) => k === i).length })),
+          maps: maps.map((m, i) => ({ letter: LETTERS[i], ...preview(m), votes: [...votes.values()].filter((k) => k === i).length })),
+          random: [...votes.values()].filter((k) => k === NMAPS).length,
         };
       }
       const p = ps.get(id)!;
@@ -170,7 +175,9 @@ export default {
         nextTypes: waveInfo(map, stage === 'wave' ? wave + 1 : wave + 2).types.map((x) => x.t),
         deadline: stage === 'build' ? deadline : 0, duration, ready: p.ready,
         money: b.money, lives: p.out ? 0 : lv.get(id) ?? 0, kills: b.kills, rank: rs.findIndex((r) => r.id === id) + 1, of: ids.length, place: p.place,
-        used: b.used, limit: b.limitMax, maxLimit: map.maxLimit, incomeLv: b.incomeLv, dmgLv: b.dmgLv, income: b.income(), run: b.lastRun,
+        used: b.used, limit: b.limitMax, maxLimit: map.maxLimit, incomeLv: b.incomeLv, dmgLv: b.dmgLv, income: 15 + 3 * Math.max(0, (stage === 'wave' ? wave : wave + 1) - 1) + 5 * b.incomeLv, run: b.lastRun, coinGain: b.coinGain, bonus: p.bonus,
+        pending: b.pending.map((o) => (o.k === 'build' ? { k: o.k, kind: o.kind, x: o.x, y: o.y } : o.k === 'sell' ? { k: o.k, id: o.id } : { k: o.k, x: o.x, y: o.y })),
+        plan: b.pending.length ? legsOut(b.planned().route) : null,
         prices, refunds, ups, boost: b.waveDone ? 1 : boostAt(b.waveTime), map: mapOut(map), me: boardOut(p),
         watch: watchId ? { id: watchId, ...boardOut(ps.get(watchId)!) } : null, watchable,
         shareTo: [...p.shareTo], others: ids.filter((o) => o !== id).map((o) => ({ id: o, out: ps.get(o)!.out })),
@@ -208,7 +215,7 @@ export default {
       deadline = t.deadline; duration = t.duration;
       hostView(true);
       sendPhones(true);
-      for (const id of ids) if (isBot(id)) ctx.after(1 + Math.random() * 4, () => { if (phase === 'vote') { votes.set(id, Math.floor(Math.random() * 6)); afterVote(); } });
+      for (const id of ids) if (isBot(id)) ctx.after(1 + Math.random() * 4, () => { if (phase === 'vote') { votes.set(id, Math.floor(Math.random() * (NMAPS + 1))); afterVote(); } });
     }
 
     function afterVote() {
@@ -220,13 +227,15 @@ export default {
     function endVote() {
       if (phase !== 'vote') return;
       ctx.clearTimers();
-      const count = new Array(6).fill(0);
+      const count = new Array(NMAPS + 1).fill(0);
       for (const k of votes.values()) count[k]++;
       const most = Math.max(...count);
       const best = count.map((c, i) => (c === most ? i : -1)).filter((i) => i >= 0);
       chosen = best[Math.floor(Math.random() * best.length)];
+      // "Zufall" gewinnt: eine der Karten auslosen
+      if (chosen === NMAPS) chosen = Math.floor(Math.random() * NMAPS);
       map = maps[chosen];
-      for (const id of ids) ps.set(id, { id, board: new Board(map), ready: false, out: false, place: 0, shareTo: new Set(), watch: null, err: '', errAt: 0, skill: 0.3 + Math.random() * 0.7 });
+      for (const id of ids) ps.set(id, { id, board: new Board(map), ready: false, out: false, place: 0, shareTo: new Set(), watch: null, err: '', errAt: 0, skill: 0.3 + Math.random() * 0.7, bonus: 0 });
       phase = 'play';
       beginBuild(T.firstBuild);
     }
@@ -266,7 +275,7 @@ export default {
       wave++;
       if (wave > MAX_WAVES) return final();
       stage = 'wave';
-      for (const id of active()) { const p = ps.get(id)!; p.ready = false; p.board.startWave(wave); }
+      for (const id of active()) { const p = ps.get(id)!; p.ready = false; p.bonus = 0; p.board.startWave(wave); }
       hostView(true);
       sendPhones(true);
       const my = ++loop;
@@ -287,6 +296,7 @@ export default {
         if (b.waveDone) continue;
         b.step(TICK);
         if (b.waveDone) {
+          b.applyPending(Date.now() / 1000);
           b.money += b.income();
           changed = true;
           if (isBot(id)) scheduleBot(id);
@@ -311,6 +321,13 @@ export default {
       if (changed || tickN % 10 === 0) { hostView(); sendPhones(); }
       if (active().every((id) => ps.get(id)!.board.waveDone)) {
         stream();
+        // Rundenbonus: wer in dieser Welle die meisten Kills hatte
+        const top = Math.max(0, ...active().map((id) => ps.get(id)!.board.waveKills));
+        for (const id of active()) {
+          const p = ps.get(id)!;
+          p.bonus = 0;
+          if (top > 0 && p.board.waveKills === top) { p.bonus = Math.round(p.board.income() * TOP_BONUS); p.board.money += p.bonus; }
+        }
         beginBuild(T.build);
         if (active().every((id) => ps.get(id)!.ready)) startWave();
       }
@@ -385,7 +402,7 @@ export default {
       onAction(id, a) {
         if (!a || typeof a !== 'object') return;
         if (phase === 'vote') {
-          if (a.type === 'vote' && Number.isInteger(a.map) && a.map >= 0 && a.map < 6) { votes.set(id, a.map); afterVote(); }
+          if (a.type === 'vote' && Number.isInteger(a.map) && a.map >= 0 && a.map <= NMAPS) { votes.set(id, a.map); afterVote(); }
           return;
         }
         if (phase !== 'play') return;
@@ -407,15 +424,16 @@ export default {
           p.ready = !p.ready;
           return checkReady();
         }
-        if (!b.waveDone) return fail(p, 'wave'), sendPhones();
         const now = Date.now() / 1000;
         const xi = Math.floor(Number(a.x)), yi = Math.floor(Number(a.y));
+        const live = !b.waveDone;
         let err: string | null = null;
-        if (a.type === 'build' && (a.kind === 'wall' || a.kind === 'tower' || a.kind === 'depot') && Number.isFinite(xi) && Number.isFinite(yi)) err = b.build(a.kind, xi, yi, now);
+        if (a.type === 'build' && (a.kind === 'wall' || a.kind === 'tower' || a.kind === 'depot') && Number.isFinite(xi) && Number.isFinite(yi)) err = live ? b.queue({ k: 'build', kind: a.kind, x: xi, y: yi }) : b.build(a.kind, xi, yi, now);
+        else if (a.type === 'cancel') err = b.unqueue(Number(a.i));
         else if (a.type === 'upgrade') err = b.upgrade(Number(a.id), a.to);
         else if (a.type === 'towerUp' && (a.what === 'dmg' || a.what === 'spd')) err = b.towerUp(Number(a.id), a.what);
-        else if (a.type === 'sell') err = b.sell(Number(a.id), now);
-        else if (a.type === 'blast') err = b.blast(xi, yi);
+        else if (a.type === 'sell') err = live ? b.queue({ k: 'sell', id: Number(a.id) }) : b.sell(Number(a.id), now);
+        else if (a.type === 'blast') err = live ? b.queue({ k: 'blast', x: xi, y: yi }) : b.blast(xi, yi);
         else if (a.type === 'buy' && (a.key === 'income' || a.key === 'dmgUp')) err = b.buy(a.key);
         else return;
         if (err) fail(p, err); else p.err = '';
