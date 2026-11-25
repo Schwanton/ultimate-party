@@ -150,15 +150,17 @@ export function PhoneLobby({ onEditAvatar }: { onEditAvatar: () => void }) {
         {!voting && selected && (
           <>
             {/* Gewähltes Spiel groß oben */}
+            <div style={{ width: '100%', aspectRatio: '16 / 9', flex: 'none', borderRadius: 20, overflow: 'hidden', position: 'relative', background: 'var(--surface)', boxShadow: `0 0 0 3px ${selected.color}, 0 10px 30px rgba(0,0,0,.5)` }}>
             <button onClick={() => setDetailId(selected.id)} aria-label={gameName(selected, room.lang)}
-              style={{ border: 0, padding: 0, width: '100%', aspectRatio: '16 / 9', flex: 'none', borderRadius: 20, overflow: 'hidden', position: 'relative', background: 'var(--surface)', boxShadow: `0 0 0 3px ${selected.color}, 0 10px 30px rgba(0,0,0,.5)` }}>
+              style={{ position: 'absolute', inset: 0, border: 0, padding: 0, background: 'transparent', color: '#fff' }}>
               <GameCover g={selected} lang={room.lang} showName letterSize={150} />
               <span style={{ position: 'absolute', left: 10, top: 10, background: 'rgba(17,13,36,.84)', borderRadius: 999, padding: '5px 11px', fontSize: 12, fontWeight: 800, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--yellow)' }}>
                 {mode === 'random' ? t('pick.byRandom') : mode === 'vote' ? t('pick.byVote', { n: votesFor(room.vote, selected.id) }) : t('lobby.selected')}
               </span>
               <span style={{ position: 'absolute', left: 10, bottom: 10 }}><InfoChip g={selected} /></span>
-              <HeartBadge n={hearts.count(selected.id)} mine={hearts.mine(selected.id)} style={{ right: 10, bottom: 10 }} />
             </button>
+            <HeartButton n={hearts.count(selected.id)} mine={hearts.mine(selected.id)} big t={t} onToggle={() => hearts.toggle(selected.id)} />
+            </div>
 
             {isVip ? (
               <>
@@ -253,12 +255,15 @@ function PhoneBackdrop({ game }: { game?: GameManifest }) {
   );
 }
 
-function HeartBadge({ n, mine, style }: { n: number; mine: boolean; style: React.CSSProperties }) {
-  if (!n) return null;
+/** Herz oben rechts auf einem Titelbild: antippen = „Hab Lust drauf“ an/aus, Zahl = alle Herzen */
+function HeartButton({ n, mine, big, t, onToggle }: { n: number; mine: boolean; big: boolean; t: Translate; onToggle: () => void }) {
   return (
-    <span style={{ position: 'absolute', display: 'inline-flex', alignItems: 'center', gap: 4, background: mine ? HEART_PINK : 'rgba(17,13,36,.84)', color: '#fff', borderRadius: 999, padding: '5px 10px', fontSize: 13, fontWeight: 800, ...style }}>
-      <IconHeart filled size={13} />{n}
-    </span>
+    <button onClick={onToggle} aria-pressed={mine} aria-label={t(mine ? 'phone.heartOn' : 'phone.heartOff')}
+      style={{ position: 'absolute', right: big ? 6 : 2, top: big ? 6 : 2, border: 0, minWidth: 44, height: 44, padding: 0, background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <span key={mine ? 'on' : 'off'} className={mine ? 'anim-pop' : undefined} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, minWidth: big ? 38 : 28, height: big ? 34 : 26, justifyContent: 'center', padding: '0 8px', borderRadius: 999, background: mine ? HEART_PINK : 'rgba(17,13,36,.78)', color: '#fff', fontSize: big ? 14 : 12, fontWeight: 800, opacity: n || big || mine ? 1 : 0.8 }}>
+        <IconHeart filled={mine} size={big ? 16 : 13} />{n ? n : null}
+      </span>
+    </button>
   );
 }
 
@@ -283,12 +288,7 @@ function GameTile({ g, big, sel, fit, players, lang, t, hearts, onOpen }: {
           {sel && <span style={{ ...chip, left: pad, top: pad, background: '#fff', color: '#110D24' }}>{t('lobby.selected')}</span>}
           {warn && <span style={{ ...chip, left: pad, top: pad, background: 'var(--yellow)', color: '#110D24' }}>{warn}</span>}
         </button>
-        <button onClick={() => hearts.toggle(g.id)} aria-pressed={mine} aria-label={t(mine ? 'phone.heartOn' : 'phone.heartOff')}
-          style={{ position: 'absolute', right: big ? 6 : 2, top: big ? 6 : 2, border: 0, minWidth: 44, height: 44, padding: 0, background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, minWidth: big ? 38 : 28, height: big ? 34 : 26, justifyContent: 'center', padding: '0 8px', borderRadius: 999, background: mine ? HEART_PINK : 'rgba(17,13,36,.78)', color: '#fff', fontSize: big ? 14 : 12, fontWeight: 800, opacity: n || big || mine ? 1 : 0.8 }}>
-            <IconHeart filled={mine} size={big ? 16 : 13} />{n ? n : null}
-          </span>
-        </button>
+        <HeartButton n={n} mine={mine} big={big} t={t} onToggle={() => { hearts.toggle(g.id); if (!mine) vibrate(15); }} />
       </div>
       {big && <p style={{ fontSize: 14, lineHeight: 1.4, color: 'var(--muted)', padding: '0 4px' }}>{gameDesc(g, lang)}</p>}
     </div>
@@ -303,7 +303,7 @@ function GameSheet({ g, room, t, players, hearts, isVip, canChoose, onClose, ope
   const isSel = g.id === room.selectedGameId;
   const mine = hearts.mine(g.id);
   const n = hearts.count(g.id);
-  const fitText = fit === 'few' ? t('lobby.needPlayers', { n: g.minPlayers - players }) : fit === 'many' ? t('lobby.tooManyShort') : t('lobby.fits');
+  const fitText = fit === 'few' ? t('lobby.needPlayers', { n: g.minPlayers - players }) : fit === 'many' ? t('lobby.tooManyShort') : '';
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
@@ -349,7 +349,7 @@ function GameSheet({ g, room, t, players, hearts, isVip, canChoose, onClose, ope
         </div>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '5px 11px', borderRadius: 999, background: fit === 'ok' ? 'rgba(75,227,161,.18)' : 'rgba(255,212,71,.18)', color: fit === 'ok' ? 'var(--green)' : 'var(--yellow)', fontSize: 13, fontWeight: 700 }}>
-            <IconPerson />{playersShort(g)} · {fitText}
+            <IconPerson />{playersShort(g)}{fitText ? ` · ${fitText}` : ''}
           </span>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '5px 11px', borderRadius: 999, background: 'var(--surface-2)', fontSize: 13, fontWeight: 700 }}><IconClock />{t('lobby.minutes', { n: g.minutes })}</span>
           {gameTags(g).map((x) => <span key={x} style={{ padding: '5px 11px', borderRadius: 999, background: 'var(--surface-2)', color: 'var(--muted)', fontSize: 13, fontWeight: 700 }}>{t(`tag.${x}`)}</span>)}

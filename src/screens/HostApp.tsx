@@ -309,7 +309,7 @@ function HostLobby({ onSettings }: { onSettings: () => void }) {
             <div className="up-qr-fill" style={{ width: qrBig ? 336 : 112, height: qrBig ? 336 : 112, flex: 'none', background: '#fff', borderRadius: qrBig ? 20 : 14, padding: qrBig ? 16 : 7, transition: 'width .3s ease, height .3s ease, padding .3s ease' }}>
               <QrCode text={joinUrl} size={112} bare />
             </div>
-            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: qrBig ? 'row' : 'column', alignItems: qrBig ? 'center' : 'flex-start', justifyContent: 'space-between', gap: 6 }}>
+            <div key={qrBig ? 'big' : 'small'} style={{ flex: qrBig ? '1 1 100%' : '1 1 0', minWidth: 0, display: 'flex', flexDirection: qrBig ? 'row' : 'column', alignItems: qrBig ? 'center' : 'flex-start', justifyContent: 'space-between', gap: 6, animation: 'upFade .2s ease-out .28s both' }}>
               {!qrBig && <h2 style={{ fontSize: 24, fontWeight: 800 }}>{t('join.title')}</h2>}
               <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--muted)', wordBreak: 'break-all' }}>{room.joinUrl.replace(/^https?:\/\//, '')}</span>
               <div aria-label={`${t('join.code')} ${room.code}`} style={{ display: 'flex', gap: 6, marginTop: qrBig ? 0 : 4, flex: 'none' }}>
@@ -441,7 +441,7 @@ function SelectedGame({ game, rolling, players, canStart, gameCount, lang, t, su
     );
   }
   const fit = fitOf(game, players);
-  const fitText = fit === 'few' ? t('lobby.needPlayers', { n: game.minPlayers - players }) : fit === 'many' ? t('lobby.tooManyShort') : t('lobby.fits');
+  const fitText = fit === 'few' ? t('lobby.needPlayers', { n: game.minPlayers - players }) : fit === 'many' ? t('lobby.tooManyShort') : '';
   return (
     <section style={{ flex: 1, minWidth: 0, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 14 }}>
       {/* Titelbild ganz und groß (16:9), passt sich der freien Höhe an */}
@@ -455,7 +455,7 @@ function SelectedGame({ game, rolling, players, canStart, gameCount, lang, t, su
           <span style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 90, background: 'linear-gradient(180deg, rgba(17,13,36,0), rgba(17,13,36,.75))', pointerEvents: 'none' }} />
           <span style={{ position: 'absolute', left: 14, right: 14, bottom: 14, display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-start' }}>
             <span style={fit === 'ok' ? badge('rgba(17,13,36,.86)', 'var(--green)') : badge('rgba(17,13,36,.86)', 'var(--yellow)')}>
-              <IconPlayers /> {playersLabel(game, t)} · {fitText}
+              <IconPlayers /> {playersLabel(game, t)}{fitText ? ` · ${fitText}` : ''}
             </span>
             <span style={badge('rgba(17,13,36,.86)', 'var(--text)')}><IconClock /> {t('lobby.minutes', { n: game.minutes })}</span>
             {gameTags(game).map((x) => <span key={x} style={badge('rgba(17,13,36,.86)', 'var(--muted)')}>{t(`tag.${x}`)}</span>)}
@@ -466,8 +466,8 @@ function SelectedGame({ game, rolling, players, canStart, gameCount, lang, t, su
       {/* Infos und Start als schmale Leiste darunter */}
       <div style={{ flex: 'none', display: 'flex', gap: 20, alignItems: 'center' }}>
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <p style={{ fontSize: 17, lineHeight: 1.38, color: '#D9D5EE', display: '-webkit-box', WebkitLineClamp: summary ? 2 : 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{gameDesc(game, lang)}</p>
-          {summary && <p className="faint" style={{ fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{summary}</p>}
+          <p style={{ fontSize: 17, lineHeight: 1.38, color: '#D9D5EE', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{gameDesc(game, lang)}</p>
+          {summary && <p className="faint" style={{ fontSize: 14, lineHeight: 1.35, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{summary}</p>}
         </div>
         <div style={{ width: 236, flex: 'none', display: 'flex', flexDirection: 'column', gap: 16 }}>
           <button className="up-btn big" disabled={!canStart} onClick={() => net.request('start')}>{t('lobby.start')}</button>

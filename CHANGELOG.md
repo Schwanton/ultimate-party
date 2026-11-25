@@ -2,6 +2,12 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.47.2
+
+- Fernseher: Unter dem Titelbild ist Platz für drei Zeilen Beschreibung und zwei Zeilen Spiel-Einstellungen. Passt die Spielerzahl, ist das Schild einfach grün (ohne „passt“)
+- Fernseher: Der QR-Code wächst jetzt sauber – Adresse und Code blenden erst danach darunter ein
+- Handy: Das Herz sitzt überall oben rechts, auch beim gewählten Spiel, und lässt sich dort direkt antippen
+
 ## 0.47.1
 
 - Fernseher: Spielerzahl, Dauer und Kategorien stehen jetzt unten auf dem Titelbild – dadurch ist mehr Platz für die Beschreibung. Etwas mehr Abstand unter „Los geht's!“
