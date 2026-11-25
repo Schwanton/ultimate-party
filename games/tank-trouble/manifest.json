@@ -2,17 +2,17 @@
   "id": "tank-trouble",
   "name": { "de": "Tank Trouble", "en": "Tank Trouble" },
   "description": {
-    "de": "Panzer von oben wie bei Wii Play: Kugeln prallen einmal von der Wand ab, Minen sprengen Klötze weg, ein Treffer reicht. Kampagne: alle zusammen gegen farbige Computer-Panzer durch 10 Missionen. Duell: jeder gegen jeden mit Powerups.",
-    "en": "Top-down tanks like in Wii Play: bullets bounce off walls once, mines blow up blocks, one hit is enough. Campaign: everyone together against coloured computer tanks through 10 missions. Duel: free-for-all with power-ups."
+    "de": "Panzer von oben wie bei Wii Play: Kugeln prallen ab, ein Treffer reicht. Gemeinsam durch 10 Missionen oder jeder gegen jeden.",
+    "en": "Top-down tanks like in Wii Play: bullets bounce, one hit is enough. Team up for 10 missions or go free-for-all."
   },
   "minPlayers": 1,
   "maxPlayers": 8,
   "audience": false,
   "minutes": 15,
   "color": "#38E1FF",
-  "tags": ["quick"],
+  "tags": ["action", "team"],
   "sdkVersion": 1,
-  "version": "0.2.1",
+  "version": "0.2.2",
   "author": "UP!",
   "options": [
     {

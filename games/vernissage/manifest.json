@@ -13,14 +13,12 @@
   "audience": true,
   "minutes": 20,
   "color": "#FFD447",
-  "tags": [
-    "draw"
-  ],
+  "tags": ["draw", "deceive"],
   "sdkVersion": 1,
   "contentFields": [
     "word"
   ],
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": "UP!",
   "options": [
     {

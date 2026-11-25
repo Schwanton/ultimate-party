@@ -5,8 +5,8 @@
     "en": "Cash Out or Crash Out!"
   },
   "description": {
-    "de": "Der Kurs schwankt wie eine Aktie und steigt meist – bis er abstürzt. Steig rechtzeitig aus! Wer zu gierig ist, verliert alles.",
-    "en": "The price swings like a stock and mostly climbs – until it crashes. Cash out in time! Get greedy and lose it all."
+    "de": "Der Kurs steigt und steigt – bis er abstürzt. Steig rechtzeitig aus! Wer zu gierig ist, verliert alles.",
+    "en": "The price climbs and climbs – until it crashes. Cash out in time! Get greedy and lose it all."
   },
   "minPlayers": 1,
   "maxPlayers": 100,
@@ -17,7 +17,7 @@
     "quick"
   ],
   "sdkVersion": 1,
-  "version": "1.2.1",
+  "version": "1.2.2",
   "author": "UP!",
   "options": [
     {

@@ -2,18 +2,18 @@
   "id": "abgrund",
   "name": { "de": "Der Abgrund", "en": "Der Abgrund" },
   "description": {
-    "de": "Kooperatives Deckbuilding in einer düsteren Papiertheater-Welt: Alle planen gleichzeitig ihre Karten, dann wird gemeinsam gekämpft. Prototyp mit 3 Klassen und 3 Kämpfen.",
-    "en": "Co-op deckbuilding in a dark paper-theatre world: everyone plans cards at the same time, then you fight together. Prototype with 3 classes and 3 fights."
+    "de": "Kooperatives Kartenspiel in einer düsteren Papiertheater-Welt: Alle planen gleichzeitig, dann kämpft ihr gemeinsam gegen die Monster.",
+    "en": "Co-op card game in a dark paper-theatre world: everyone plans at the same time, then you fight the monsters together."
   },
   "minPlayers": 1,
   "maxPlayers": 12,
   "audience": true,
   "minutes": 30,
   "color": "#8E1A17",
-  "tags": ["team"],
+  "tags": ["team", "strategy"],
   "sdkVersion": 1,
   "autoSounds": false,
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": "UP!",
   "options": [
     {

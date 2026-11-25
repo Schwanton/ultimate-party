@@ -10,11 +10,11 @@
   "audience": true,
   "minutes": 20,
   "color": "#D9472B",
-  "tags": ["social"],
+  "tags": ["team"],
   "sdkVersion": 1,
   "autoSounds": false,
   "noDeck": true,
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": "UP!",
   "options": [
     {

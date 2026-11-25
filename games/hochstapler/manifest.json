@@ -5,8 +5,8 @@
     "en": "Undercover"
   },
   "description": {
-    "de": "Alle bekommen eine Aufgabe – nur einer nicht. Der Hochstapler muss die ganze Partie über mitmachen, ohne aufzufliegen.",
-    "en": "Everyone gets a task – except one. The undercover player must blend in without getting caught."
+    "de": "Alle bekommen eine Aufgabe – nur einer nicht. Der Hochstapler muss mitmachen, ohne aufzufliegen.",
+    "en": "Everyone gets a task – except one. The impostor has to play along without getting caught."
   },
   "minPlayers": 3,
   "maxPlayers": 10,
@@ -21,7 +21,7 @@
     "category",
     "task"
   ],
-  "version": "2.0.1",
+  "version": "2.0.2",
   "author": "UP!",
   "options": [
     {

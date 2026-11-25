@@ -5,20 +5,17 @@
     "en": "Star Pact"
   },
   "description": {
-    "de": "Weltraum-Strategie im Zeitraffer: Sterne erobern, ausbauen, Pakte schmieden – und im richtigen Moment verraten. Mit Nebelfeldern, Wurmlöchern, besonderen Sternen, dem Herz der Galaxie und geheimen Aufträgen.",
-    "en": "Space strategy in fast-forward: conquer stars, build them up, forge pacts – and betray them at the right moment. With nebulae, wormholes, special stars, the Heart of the Galaxy and secret missions."
+    "de": "Weltraum-Strategie im Zeitraffer: Erobert Sterne, schmiedet Pakte – und verratet sie im richtigen Moment.",
+    "en": "Space strategy in fast-forward: conquer stars, forge pacts – and betray them at the right moment."
   },
   "minPlayers": 1,
   "maxPlayers": 12,
   "audience": true,
   "minutes": 20,
   "color": "#3DF5FF",
-  "tags": [
-    "social",
-    "deceive"
-  ],
+  "tags": ["strategy", "deceive"],
   "sdkVersion": 1,
-  "version": "0.3.1",
+  "version": "0.3.2",
   "author": "UP!",
   "options": [
     {

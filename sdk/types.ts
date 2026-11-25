@@ -58,7 +58,7 @@ export interface GameManifest {
   contentFields?: string[];
   /** false = keine automatischen Plattform-Sounds (Timer-Ticken, Übergänge, Jubel); das Spiel spielt selbst Sounds ab */
   autoSounds?: boolean;
-  /** Kategorien für das Spielmenü: words, draw, guess, deceive, social, quick (andere landen unter „Weitere“) */
+  /** Kategorien für das Spielmenü: words, draw, guess, deceive, social, team, action, strategy, quick (andere landen unter „Weitere“) */
   tags?: string[];
   /** Inhalte werden nicht als Kartenstapel gezogen (in den Einstellungen nicht als Stapel anzeigen) */
   noDeck?: boolean;

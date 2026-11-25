@@ -5,8 +5,8 @@
     "en": "Figurendle"
   },
   "description": {
-    "de": "Wer ist die geheime Figur? Tippe Figuren und lies die Hinweise: grün stimmt, orange teilweise, rot falsch. Erstes Pack: One Piece.",
-    "en": "Who is the secret character? Guess characters and read the clues: green is right, orange partly, red wrong. First pack: One Piece."
+    "de": "Errate die geheime Figur, zum Beispiel aus One Piece. Jeder Tipp zeigt dir in Grün, Orange und Rot, wie nah du dran bist.",
+    "en": "Guess the secret character, for example from One Piece. Every guess shows in green, orange and red how close you are."
   },
   "minPlayers": 1,
   "maxPlayers": 12,
@@ -20,7 +20,7 @@
   "contentFields": [
     "thema"
   ],
-  "version": "1.2.1",
+  "version": "1.2.2",
   "author": "UP!",
   "options": [
     {

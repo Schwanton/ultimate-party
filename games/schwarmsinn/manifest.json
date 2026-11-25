@@ -13,12 +13,9 @@
   "audience": false,
   "minutes": 20,
   "color": "#B6F23C",
-  "tags": [
-    "team",
-    "quick"
-  ],
+  "tags": ["team", "action"],
   "sdkVersion": 1,
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": "UP!",
   "options": [
     {

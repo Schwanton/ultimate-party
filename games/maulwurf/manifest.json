@@ -10,9 +10,9 @@
   "audience": false,
   "minutes": 15,
   "color": "#6C8CFF",
-  "tags": ["deceive", "social"],
+  "tags": ["deceive"],
   "sdkVersion": 1,
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": "UP!",
   "options": [
     {

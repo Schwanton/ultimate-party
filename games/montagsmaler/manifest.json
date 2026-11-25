@@ -2,8 +2,8 @@
   "id": "montagsmaler",
   "name": { "de": "Montagsmaler", "en": "Sketch & Guess" },
   "description": {
-    "de": "Eine Person malt live aufs Handy, alle anderen raten um die Wette. Mit Team-Modus und Klau-Versuch.",
-    "en": "One player draws live on their phone, everyone else races to guess. With a team mode and steal attempts."
+    "de": "Einer malt live aufs Handy, alle anderen raten um die Wette – auch in zwei Teams.",
+    "en": "One player draws live on their phone, everyone else races to guess – in two teams, too."
   },
   "minPlayers": 2,
   "maxPlayers": 100,
@@ -13,7 +13,7 @@
   "tags": ["draw", "guess"],
   "sdkVersion": 1,
   "contentFields": ["word"],
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": "UP!",
   "options": [
     {
