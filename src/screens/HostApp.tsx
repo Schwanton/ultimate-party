@@ -451,23 +451,25 @@ function SelectedGame({ game, rolling, players, canStart, gameCount, lang, t, su
           <GameCover g={game} lang={lang} zoom={!rolling} showName letterSize={240} />
           {!rolling && pickedBadge}
           {!rolling && <HeartCount n={hearts} big style={{ right: 16, top: 16 }} />}
+          {/* Spielerzahl, Dauer und Kategorien unten auf dem Bild */}
+          <span style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 90, background: 'linear-gradient(180deg, rgba(17,13,36,0), rgba(17,13,36,.75))', pointerEvents: 'none' }} />
+          <span style={{ position: 'absolute', left: 14, right: 14, bottom: 14, display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-start' }}>
+            <span style={fit === 'ok' ? badge('rgba(17,13,36,.86)', 'var(--green)') : badge('rgba(17,13,36,.86)', 'var(--yellow)')}>
+              <IconPlayers /> {playersLabel(game, t)} · {fitText}
+            </span>
+            <span style={badge('rgba(17,13,36,.86)', 'var(--text)')}><IconClock /> {t('lobby.minutes', { n: game.minutes })}</span>
+            {gameTags(game).map((x) => <span key={x} style={badge('rgba(17,13,36,.86)', 'var(--muted)')}>{t(`tag.${x}`)}</span>)}
+          </span>
           {rolling && <span className="display" style={{ position: 'absolute', left: 18, top: 18, background: 'var(--yellow)', color: '#110D24', borderRadius: 999, padding: '7px 16px', fontSize: 18, fontWeight: 800 }}>{t('pick.rolling')}</span>}
         </button>
       </div>
       {/* Infos und Start als schmale Leiste darunter */}
       <div style={{ flex: 'none', display: 'flex', gap: 20, alignItems: 'center' }}>
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            <span style={fit === 'ok' ? badge('rgba(75,227,161,.18)', 'var(--green)') : badge('rgba(255,212,71,.18)', 'var(--yellow)')}>
-              <IconPlayers /> {playersLabel(game, t)} · {fitText}
-            </span>
-            <span style={badge('rgba(38,32,72,.85)', 'var(--text)')}><IconClock /> {t('lobby.minutes', { n: game.minutes })}</span>
-            {gameTags(game).map((x) => <span key={x} style={badge('rgba(38,32,72,.85)', 'var(--muted)')}>{t(`tag.${x}`)}</span>)}
-          </div>
-          <p style={{ fontSize: 17, lineHeight: 1.38, color: '#D9D5EE', display: '-webkit-box', WebkitLineClamp: summary ? 1 : 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{gameDesc(game, lang)}</p>
+          <p style={{ fontSize: 17, lineHeight: 1.38, color: '#D9D5EE', display: '-webkit-box', WebkitLineClamp: summary ? 2 : 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{gameDesc(game, lang)}</p>
           {summary && <p className="faint" style={{ fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{summary}</p>}
         </div>
-        <div style={{ width: 236, flex: 'none', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={{ width: 236, flex: 'none', display: 'flex', flexDirection: 'column', gap: 16 }}>
           <button className="up-btn big" disabled={!canStart} onClick={() => net.request('start')}>{t('lobby.start')}</button>
           <div style={{ display: 'flex', gap: 10 }}>
             <button className="up-btn ghost small" style={{ flex: 1, whiteSpace: 'nowrap' }} onClick={onLibrary}>{t('lobby.changeGame')}</button>

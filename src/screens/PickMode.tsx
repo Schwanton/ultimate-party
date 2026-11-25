@@ -6,7 +6,7 @@ import type React from 'react';
 import type { GameManifest, GameVote, PickMode, PlayerInfo, RoomSnapshot, Translate } from '@up/sdk';
 import { Avatar, Crown, HostTimer, PhoneTimer, useServerNow } from '../ui';
 import { net } from '../net';
-import { GameCover, gameName, playersLabel } from './GameLibrary';
+import { GameCover, InfoChip, gameName } from './GameLibrary';
 
 export const ROLL_MS = 2600;
 
@@ -137,7 +137,7 @@ export function HostVoteBoard({ vote, games, room, t, player }: { vote: GameVote
                   {who.slice(0, 12).map((p, j) => <span key={p.id} style={{ marginLeft: j ? -8 : 0, animation: 'upPop .3s ease-out both' }}><Avatar player={p} size={30} /></span>)}
                   {who.length > 12 && <b style={{ marginLeft: 6, fontSize: 14, alignSelf: 'center' }}>+{who.length - 12}</b>}
                 </div>
-                <span style={{ background: 'rgba(17,13,36,.82)', fontSize: 13, fontWeight: 700, padding: '4px 10px', borderRadius: 999, whiteSpace: 'nowrap' }}>{playersLabel(g, t)} · {t('lobby.minutes', { n: g.minutes })}</span>
+                <InfoChip g={g} />
               </div>
             </div>
           );
@@ -178,7 +178,7 @@ export function PhoneVote({ vote, games, room, me, t, isVip }: { vote: GameVote;
               <span style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(17,13,36,0) 55%, rgba(17,13,36,.8))' }} />
               <span className="display" style={{ position: 'absolute', right: 10, top: 10, minWidth: 40, height: 40, borderRadius: 20, background: '#fff', color: '#110D24', fontSize: 22, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 8px' }}>{n}</span>
               {on && <span style={{ position: 'absolute', left: 10, top: 10, background: 'var(--yellow)', color: '#110D24', borderRadius: 999, padding: '5px 11px', fontSize: 13, fontWeight: 800 }}>✓ {t('pick.yourVote')}</span>}
-              <span style={{ position: 'absolute', left: 10, bottom: 9, background: 'rgba(17,13,36,.84)', borderRadius: 999, padding: '4px 10px', fontSize: 12, fontWeight: 700 }}>{playersLabel(g, t)} · {t('lobby.minutes', { n: g.minutes })}</span>
+              <InfoChip g={g} style={{ position: 'absolute', left: 10, bottom: 9 }} />
             </button>
           );
         })}

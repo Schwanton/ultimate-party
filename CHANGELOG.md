@@ -2,6 +2,12 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.47.1
+
+- Fernseher: Spielerzahl, Dauer und Kategorien stehen jetzt unten auf dem Titelbild – dadurch ist mehr Platz für die Beschreibung. Etwas mehr Abstand unter „Los geht's!“
+- Handy: Die Detail-Ansicht eines Spiels lässt sich durch Herunterwischen schließen. Der VIP hat dort neben „Dieses Spiel wählen“ einen Knopf für die Spiel-Einstellungen
+- Spielerzahl überall einheitlich mit Personen- und Uhr-Symbol, auch bei der Abstimmung. Statt „2–100+“ steht jetzt „2+“ bzw. „ab 2 Spieler“
+
 ## 0.47.0
 
 Neue Handy-Lobby mit Titelbildern:

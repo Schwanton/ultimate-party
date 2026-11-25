@@ -26,10 +26,37 @@ export function fitOf(g: GameManifest, players: number): 'ok' | 'few' | 'many' {
   return 'ok';
 }
 
-/** „3–12 Spieler“ bzw. „2 Spieler“ (+ bei Publikum) */
+/** Ab dieser Höchstzahl gilt ein Spiel als „beliebig viele“ (Anzeige „ab 2“) */
+const OPEN_END = 100;
+
+/** „3–12 Spieler“, „2 Spieler“ oder „ab 2 Spieler“ (bei bis zu 100) */
 export function playersLabel(g: GameManifest, t: Translate) {
-  const base = g.minPlayers === g.maxPlayers ? t('lobby.playersExact', { n: g.minPlayers }) : t('lobby.playersRange', { min: g.minPlayers, max: g.maxPlayers });
-  return g.audience && g.minPlayers !== g.maxPlayers ? base.replace(/(\d+)(\D*)$/, '$1+$2') : base;
+  if (g.minPlayers === g.maxPlayers) return t('lobby.playersExact', { n: g.minPlayers });
+  if (g.maxPlayers >= OPEN_END) return t('lobby.playersFrom', { n: g.minPlayers });
+  return t('lobby.playersRange', { min: g.minPlayers, max: g.maxPlayers });
+}
+
+/** Kurz für Schilder: „3–12“, „2“ oder „2+“ */
+export function playersShort(g: GameManifest) {
+  if (g.minPlayers === g.maxPlayers) return `${g.minPlayers}`;
+  return g.maxPlayers >= OPEN_END ? `${g.minPlayers}+` : `${g.minPlayers}–${g.maxPlayers}`;
+}
+
+export const IconPerson = ({ size = 13 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" aria-hidden="true" style={{ flex: 'none' }}><circle cx="12" cy="7.5" r="4" /><path d="M4 21c.8-4.4 3.9-6.8 8-6.8s7.2 2.4 8 6.8" /></svg>
+);
+export const IconClock = ({ size = 13 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" aria-hidden="true" style={{ flex: 'none' }}><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>
+);
+
+/** Schild auf einem Titelbild: Personen-Symbol + Spielerzahl, Uhr + Minuten */
+export function InfoChip({ g, size = 'm', style }: { g: GameManifest; size?: 's' | 'm' | 'l'; style?: CSSProperties }) {
+  const fs = size === 's' ? 11 : size === 'l' ? 15 : 13;
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: size === 's' ? 4 : 6, background: 'rgba(17,13,36,.84)', color: '#fff', borderRadius: 999, padding: size === 's' ? '3px 8px' : size === 'l' ? '6px 13px' : '5px 11px', fontSize: fs, fontWeight: 700, whiteSpace: 'nowrap', ...style }}>
+      <IconPerson size={fs} />{playersShort(g)}<span style={{ opacity: 0.5 }}>·</span><IconClock size={fs} />{g.minutes}′
+    </span>
+  );
 }
 
 /**
@@ -140,9 +167,7 @@ function LibraryCard({ g, sel, fit, players, lang, t, delay, onPick, hearts }: {
         <GameCover g={g} lang={lang} showName letterSize={110} />
       </div>
       {sel && <span style={{ position: 'absolute', left: 12, top: 12, background: '#fff', color: '#110D24', fontSize: 14, fontWeight: 700, padding: '5px 12px', borderRadius: 999 }}>{t('lobby.selected')}</span>}
-      <span style={{ position: 'absolute', left: 10, bottom: 10, background: 'rgba(17,13,36,.82)', fontSize: 14, fontWeight: 700, padding: '5px 11px', borderRadius: 999, whiteSpace: 'nowrap' }}>
-        {playersLabel(g, t)} · {t('lobby.minutes', { n: g.minutes })}
-      </span>
+      <InfoChip g={g} size="l" style={{ position: 'absolute', left: 10, bottom: 10 }} />
       <HeartCount n={hearts} style={{ right: 10, top: 10 }} />
       {warn && <span style={{ position: 'absolute', right: 10, bottom: 10, background: 'var(--yellow)', color: '#110D24', fontSize: 14, fontWeight: 800, padding: '5px 11px', borderRadius: 999, whiteSpace: 'nowrap' }}>{warn}</span>}
     </button>

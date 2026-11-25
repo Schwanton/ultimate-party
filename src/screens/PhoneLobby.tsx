@@ -3,7 +3,7 @@
  * Filter „Nur passende“, Detail-Blatt, Herzen („Hab Lust drauf“), großer QR-Code zum Teilen und Startmoment.
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type React from 'react';
 import type { GameManifest, PlayerInfo, RoomSnapshot, Translate } from '@up/sdk';
 import { net, useNet } from '../net';
@@ -11,7 +11,7 @@ import { useT } from '../i18n';
 import registry from '../registry';
 import { Avatar, Crown, FullscreenButton, Logo, QrCode, useServerNow, vibrate } from '../ui';
 import { GameOptionsForm, optionsSummary } from './GameOptions';
-import { GameCover, fitOf, gameDesc, gameName, gameTags, useTagFilter } from './GameLibrary';
+import { GameCover, IconClock, IconPerson, InfoChip, fitOf, gameDesc, gameName, gameTags, playersShort, useTagFilter } from './GameLibrary';
 import { PhoneVote, PickModeSwitch, VoteOptions, pickModeOf, votesFor } from './PickMode';
 import { OlympiaPhoneSetup } from './Olympia';
 
@@ -21,12 +21,6 @@ export function listGames(dev: boolean) {
 
 /* ---------------- kleine Bausteine ---------------- */
 
-export const IconPerson = ({ size = 13 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" aria-hidden="true" style={{ flex: 'none' }}><circle cx="12" cy="7.5" r="4" /><path d="M4 21c.8-4.4 3.9-6.8 8-6.8s7.2 2.4 8 6.8" /></svg>
-);
-export const IconClock = ({ size = 13 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" aria-hidden="true" style={{ flex: 'none' }}><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>
-);
 const IconQr = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
     <path d="M3 3h7v7H3zm2 2v3h3V5zM14 3h7v7h-7zm2 2v3h3V5zM3 14h7v7H3zm2 2v3h3v-3zM14 14h3v3h-3zM18 14h3v3h-3zM14 18h3v3h-3zM18 18h3v3h-3z" />
@@ -37,16 +31,6 @@ const IconHeart = ({ filled, size = 16 }: { filled: boolean; size?: number }) =>
     <path d="M12 20.5s-7.5-4.6-9.3-9.2C1.4 7.9 3.6 4.5 7 4.5c2.1 0 3.6 1.2 5 3 1.4-1.8 2.9-3 5-3 3.4 0 5.6 3.4 4.3 6.8-1.8 4.6-9.3 9.2-9.3 9.2z" />
   </svg>
 );
-
-/** Kurzes Schild „👤 2–12 · 🕑 10′“ */
-function InfoChip({ g, small }: { g: GameManifest; small?: boolean }) {
-  const players = g.minPlayers === g.maxPlayers ? `${g.minPlayers}` : `${g.minPlayers}–${g.maxPlayers}${g.audience ? '+' : ''}`;
-  return (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: small ? 4 : 5, background: 'rgba(17,13,36,.84)', color: '#fff', borderRadius: 999, padding: small ? '3px 8px' : '5px 11px', fontSize: small ? 11 : 13, fontWeight: 700, whiteSpace: 'nowrap' }}>
-      <IconPerson size={small ? 11 : 13} />{players}<span style={{ opacity: 0.5 }}>·</span><IconClock size={small ? 11 : 13} />{g.minutes}′
-    </span>
-  );
-}
 
 const HEART_PINK = '#E8336F';
 
@@ -101,6 +85,7 @@ export function PhoneLobby({ onEditAvatar }: { onEditAvatar: () => void }) {
   const voting = mode === 'vote' && !!room.vote && !room.vote.result;
   const hearts = useHearts(room, me);
   const [detailId, setDetailId] = useState<string | null>(null);
+  const [optionsFirst, setOptionsFirst] = useState(false);
   const detail = all.find((g) => g.id === detailId);
   const [qrOpen, setQrOpen] = useState(false);
   const [view, setView] = useState<'grid' | 'list'>(() => {
@@ -180,7 +165,7 @@ export function PhoneLobby({ onEditAvatar }: { onEditAvatar: () => void }) {
                 <div style={{ display: 'flex', gap: 10 }}>
                   <button className="up-btn big" style={{ flex: 1 }} disabled={active < selected.minPlayers} onClick={start}>{t('lobby.start')}</button>
                   {selected.options?.length ? (
-                    <button className="up-btn ghost big" aria-label={t('lobby.gameSettings')} onClick={() => setDetailId(selected.id)} style={{ width: 62, padding: 0, flex: 'none' }}>
+                    <button className="up-btn ghost big" aria-label={t('lobby.gameSettings')} onClick={() => { setOptionsFirst(true); setDetailId(selected.id); }} style={{ width: 62, padding: 0, flex: 'none' }}>
                       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" /><circle cx="16" cy="7" r="2.2" /><circle cx="10" cy="17" r="2.2" /></svg>
                     </button>
                   ) : null}
@@ -250,7 +235,7 @@ export function PhoneLobby({ onEditAvatar }: { onEditAvatar: () => void }) {
 
       {detail && (
         <GameSheet g={detail} room={room} t={t} players={active} hearts={hearts} isVip={isVip} canChoose={isVip && mode === 'vip' && !room.olympia}
-          onClose={() => setDetailId(null)} />
+          openOptions={optionsFirst} onClose={() => { setDetailId(null); setOptionsFirst(false); }} />
       )}
       {qrOpen && <QrSheet room={room} t={t} onClose={() => setQrOpen(false)} />}
     </>
@@ -294,7 +279,7 @@ function GameTile({ g, big, sel, fit, players, lang, t, hearts, onOpen }: {
           <span style={{ position: 'absolute', inset: 0, filter: dim ? 'grayscale(1) brightness(.55)' : undefined }}>
             <GameCover g={g} lang={lang} showName letterSize={big ? 120 : 64} />
           </span>
-          <span style={{ position: 'absolute', left: pad, bottom: pad }}><InfoChip g={g} small={!big} /></span>
+          <span style={{ position: 'absolute', left: pad, bottom: pad }}><InfoChip g={g} size={big ? 'm' : 's'} /></span>
           {sel && <span style={{ ...chip, left: pad, top: pad, background: '#fff', color: '#110D24' }}>{t('lobby.selected')}</span>}
           {warn && <span style={{ ...chip, left: pad, top: pad, background: 'var(--yellow)', color: '#110D24' }}>{warn}</span>}
         </button>
@@ -311,8 +296,8 @@ function GameTile({ g, big, sel, fit, players, lang, t, hearts, onOpen }: {
 }
 
 /** Detail-Blatt: großes Bild, Infos, Beschreibung, Herz, Einstellungen und „Dieses Spiel wählen“ */
-function GameSheet({ g, room, t, players, hearts, isVip, canChoose, onClose }: {
-  g: GameManifest; room: RoomSnapshot; t: Translate; players: number; hearts: Hearts; isVip: boolean; canChoose: boolean; onClose: () => void;
+function GameSheet({ g, room, t, players, hearts, isVip, canChoose, onClose, openOptions }: {
+  g: GameManifest; room: RoomSnapshot; t: Translate; players: number; hearts: Hearts; isVip: boolean; canChoose: boolean; onClose: () => void; openOptions?: boolean;
 }) {
   const fit = fitOf(g, players);
   const isSel = g.id === room.selectedGameId;
@@ -324,11 +309,30 @@ function GameSheet({ g, room, t, players, hearts, isVip, canChoose, onClose }: {
     document.body.style.overflow = 'hidden';
     return () => { document.body.style.overflow = prev; };
   }, []);
+  const [showOptions, setShowOptions] = useState(!!openOptions);
+  // Nach unten wischen schließt das Blatt (nur wenn es ganz oben ist)
+  const [drag, setDrag] = useState(0);
+  const touch = useRef<{ y: number; top: boolean } | null>(null);
+  const sheet = useRef<HTMLDivElement>(null);
+  const onTouchStart = (e: React.TouchEvent) => { touch.current = { y: e.touches[0].clientY, top: (sheet.current?.scrollTop ?? 0) <= 0 }; };
+  const onTouchMove = (e: React.TouchEvent) => {
+    const tc = touch.current;
+    if (!tc?.top) return;
+    const dy = e.touches[0].clientY - tc.y;
+    setDrag(dy > 0 ? dy : 0);
+  };
+  const onTouchEnd = () => {
+    if (drag > 90) onClose();
+    else setDrag(0);
+    touch.current = null;
+  };
+  const hasOptions = isVip && !!g.options?.length;
   return (
     <div role="dialog" aria-modal="true" aria-label={gameName(g, room.lang)} onClick={onClose} className="anim-fade"
       style={{ position: 'fixed', inset: 0, zIndex: 60, background: 'rgba(10,7,22,.72)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
-      <div onClick={(e) => e.stopPropagation()} className="anim-up" style={{
-        width: '100%', maxWidth: 520, maxHeight: '90dvh', overflowY: 'auto', background: 'var(--surface)', borderRadius: '28px 28px 0 0',
+      <div ref={sheet} onClick={(e) => e.stopPropagation()} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} className="anim-up" style={{
+        transform: drag ? `translateY(${drag}px)` : undefined, transition: drag ? 'none' : 'transform .2s ease-out', overscrollBehavior: 'contain',
+        width: '100%', maxWidth: 520, maxHeight: '90dvh', overflowY: drag ? 'hidden' : 'auto', background: 'var(--surface)', borderRadius: '28px 28px 0 0',
         padding: '12px 18px max(22px, env(safe-area-inset-bottom))', display: 'flex', flexDirection: 'column', gap: 14,
       }}>
         <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -345,7 +349,7 @@ function GameSheet({ g, room, t, players, hearts, isVip, canChoose, onClose }: {
         </div>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '5px 11px', borderRadius: 999, background: fit === 'ok' ? 'rgba(75,227,161,.18)' : 'rgba(255,212,71,.18)', color: fit === 'ok' ? 'var(--green)' : 'var(--yellow)', fontSize: 13, fontWeight: 700 }}>
-            <IconPerson />{g.minPlayers === g.maxPlayers ? g.minPlayers : `${g.minPlayers}–${g.maxPlayers}`} · {fitText}
+            <IconPerson />{playersShort(g)} · {fitText}
           </span>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '5px 11px', borderRadius: 999, background: 'var(--surface-2)', fontSize: 13, fontWeight: 700 }}><IconClock />{t('lobby.minutes', { n: g.minutes })}</span>
           {gameTags(g).map((x) => <span key={x} style={{ padding: '5px 11px', borderRadius: 999, background: 'var(--surface-2)', color: 'var(--muted)', fontSize: 13, fontWeight: 700 }}>{t(`tag.${x}`)}</span>)}
@@ -357,16 +361,27 @@ function GameSheet({ g, room, t, players, hearts, isVip, canChoose, onClose }: {
         }}>
           <IconHeart filled={mine} size={18} />{t(mine ? 'phone.heartOn' : 'phone.heartOff')}{n ? ` · ${n}` : ''}
         </button>
-        {isVip && isSel && g.options?.length ? (
-          <div className="up-card" style={{ padding: '14px 16px', background: 'var(--surface-2)' }}>
+        {hasOptions && showOptions && (
+          <div className="up-card anim-up" style={{ padding: '14px 16px', background: 'var(--surface-2)' }}>
             <p style={{ fontWeight: 700, fontSize: 16, marginBottom: 12 }}>{t('lobby.gameSettings')}</p>
             <GameOptionsForm game={g} values={room.settings.gameOptions?.[g.id]} lang={room.lang} compact />
           </div>
-        ) : null}
-        {canChoose && (
-          <button className="up-btn big full" disabled={isSel} onClick={() => { net.send('select', { gameId: g.id }); vibrate(20); onClose(); }}>
-            {isSel ? `✓ ${t('phone.chosen')}` : t('phone.choose')}
-          </button>
+        )}
+        {(canChoose || hasOptions) && (
+          <div style={{ display: 'flex', gap: 10 }}>
+            {canChoose && (
+              <button className="up-btn big" style={{ flex: 1 }} disabled={isSel} onClick={() => { net.send('select', { gameId: g.id }); vibrate(20); onClose(); }}>
+                {isSel ? `✓ ${t('phone.chosen')}` : t('phone.choose')}
+              </button>
+            )}
+            {hasOptions && (
+              <button className={`up-btn big${showOptions ? '' : ' ghost'}`} aria-pressed={showOptions} aria-label={t('lobby.gameSettings')} title={t('lobby.gameSettings')}
+                onClick={() => setShowOptions((x) => !x)} style={canChoose ? { width: 62, padding: 0, flex: 'none' } : { flex: 1 }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" /><circle cx="16" cy="7" r="2.2" /><circle cx="10" cy="17" r="2.2" /></svg>
+                {!canChoose && <span style={{ marginLeft: 8 }}>{t('lobby.gameSettings')}</span>}
+              </button>
+            )}
+          </div>
         )}
       </div>
     </div>
