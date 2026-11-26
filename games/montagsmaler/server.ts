@@ -31,7 +31,7 @@ const MAX_STROKES = 500;
 const MAX_POINTS = 40000;
 const LEVEL_POINTS: Record<number, number> = { 1: 600, 2: 800, 3: 1000 };
 const FIRST_BONUS = 100;
-const T = { intro: 8, pick: 12, steal: 15, reveal: 7, scores: 7, gallery: 12 };
+const T = { intro: 8, pick: 12, steal: 15, reveal: 7, scores: 7 };
 const FEED_MAX = 8;
 const SCORES_EVERY = 3;
 const TEAM_COLORS = ['#FF9F43', '#36D6F5'];
@@ -55,7 +55,10 @@ export default {
   create(ctx: GameContext) {
     const teamMode = ctx.options.mode === 'team' && ctx.players.length >= 4;
     const drawTime = Number(ctx.options.drawTime) || 80;
-    const roundsOpt = Number(ctx.options.rounds) || 0;
+    // Runden: „Jeder malt 1×/2×/3×“ (turns) oder feste Anzahl (turns = 0 → rounds)
+    const turnsRaw = Number(ctx.options.turns ?? 1);
+    const fixedRounds = turnsRaw === 0 ? Math.max(1, Number(ctx.options.rounds) || 8) : 0;
+    const perPlayer = Math.max(1, Math.min(3, turnsRaw || 1));
 
     // Mitspieler: alle vom Start + alle, die später dazukommen (machen voll mit)
     const members: string[] = ctx.players.map((p) => p.id);
@@ -113,9 +116,9 @@ export default {
 
     function autoRounds() {
       const n = members.length;
-      if (roundsOpt) return roundsOpt;
-      if (teamMode) return Math.min(10, n + (n % 2));
-      return Math.max(2, Math.min(10, n));
+      if (fixedRounds) return fixedRounds;
+      if (teamMode) return Math.min(10, n + (n % 2)) * perPlayer;
+      return Math.max(2, Math.min(10, n)) * perPlayer;
     }
 
     /** Wer darf in dieser Phase raten? */
@@ -170,7 +173,7 @@ export default {
     }
 
     function nextRound() {
-      if (!roundsOpt) totalRounds = Math.max(totalRounds, Math.min(autoRounds(), 10));
+      if (!fixedRounds) totalRounds = Math.max(totalRounds, autoRounds());
       if (round >= totalRounds) return showGallery();
       if (round > 0 && round - lastScoresRound >= SCORES_EVERY && round < totalRounds) {
         lastScoresRound = round;
@@ -281,11 +284,9 @@ export default {
       else ctx.after(T.scores, nextRound);
     }
 
+    /** Ende: Endstand und Galerie zusammen auf einem Bildschirm (die Galerie bleibt stehen) */
     function showGallery() {
-      if (!gallery.length) return showScores(true);
-      phase = 'gallery';
-      broadcast();
-      ctx.after(Math.min(20, T.gallery + gallery.length * 0.5), () => showScores(true));
+      showScores(true);
     }
 
     /* ---------------- Raten ---------------- */
@@ -382,7 +383,7 @@ export default {
         case 'gallery':
           return { screen: 'gallery', ...common(), pics: gallery, hearts: heartCounts() };
         case 'final':
-          return { screen: 'final', ...common(), ranking: scores.ranking() };
+          return { screen: 'final', ...common(), ranking: scores.ranking(), pics: gallery, hearts: heartCounts() };
       }
     }
 
@@ -489,7 +490,7 @@ export default {
       drawCount.set(id, 0);
       const sizes = [0, 1].map((t) => teamMembers(t).length);
       team.set(id, sizes[0] <= sizes[1] ? 0 : 1);
-      if (!roundsOpt && round < totalRounds + 1) totalRounds = Math.max(totalRounds, autoRounds());
+      if (!fixedRounds && round < totalRounds + 1) totalRounds = Math.max(totalRounds, autoRounds());
       broadcast();
     }
 

@@ -104,5 +104,7 @@
  "emote.3": "Applaus",
  "emote.4": "Ab in den Müll",
  "gallery.heart": "Herz geben",
- "gallery.shareAll": "Alle teilen"
+ "gallery.shareAll": "Alle teilen",
+ "final.withGallery": "Endstand · {n} Bilder",
+ "final.heartsHint": "Herzen gibt's am Handy"
 }

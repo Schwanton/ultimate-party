@@ -6,7 +6,7 @@
 import { useEffect, useState } from 'react';
 import type React from 'react';
 import {
-  OLYMPIA_MAX, OLYMPIA_MIN, cleanOlympiaSettings, olympiaAllowed, olympiaOptions,
+  OLYMPIA_MAX, OLYMPIA_MIN, cleanOlympiaSettings, olympiaAllowed, olympiaOptions, optionVisible,
   type GameManifest, type Lang, type OlympiaSettings, type OlympiaState, type OlympiaTeam, type PlayerInfo, type RoomSnapshot, type Translate,
 } from '@up/sdk';
 import { net } from '../net';
@@ -83,7 +83,7 @@ function Pills<T extends string | number | boolean>({ label, value, items, onPic
 function shortText(g: GameManifest, s: OlympiaSettings, normal: Record<string, number | string> | undefined, lang: Lang, t: Translate) {
   const now = olympiaOptions(g, s, normal);
   const base = olympiaOptions(g, { ...s, short: false, options: {} }, normal);
-  const parts = (g.options ?? []).filter((d) => now[d.id] !== base[d.id]).map((d) => {
+  const parts = (g.options ?? []).filter((d) => now[d.id] !== base[d.id] && optionVisible(d, now)).map((d) => {
     const show = (v: number | string) => (d.choices ? (d.choices.find((c) => c.value === v)?.label[lang] ?? String(v)) : String(v));
     return t('olympia.instead', { label: d.label[lang] ?? d.label.en, now: show(now[d.id]), before: show(base[d.id]) });
   });

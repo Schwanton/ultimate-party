@@ -104,5 +104,7 @@
  "emote.3": "Applause",
  "emote.4": "Straight to the bin",
  "gallery.heart": "Give a heart",
- "gallery.shareAll": "Share all"
+ "gallery.shareAll": "Share all",
+ "final.withGallery": "Final scores · {n} drawings",
+ "final.heartsHint": "give hearts on your phone"
 }

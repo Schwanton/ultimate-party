@@ -2,8 +2,8 @@
   "id": "heisse-kartoffel",
   "name": { "de": "Heiße Kartoffel", "en": "Hot Potato" },
   "description": {
-    "de": "Eine tickende Bombe wandert von Handy zu Handy. Weitergeben darf nur, wer eine Mini-Aufgabe löst – wer sie beim Knall hat, fliegt raus.",
-    "en": "A ticking bomb jumps from phone to phone. You can only pass it after solving a mini task – whoever holds it when it blows is out."
+    "de": "Eine tickende Kartoffel wandert von Handy zu Handy. Weitergeben darf nur, wer eine Mini-Aufgabe löst – wer sie beim Knall hat, fliegt raus.",
+    "en": "A ticking potato jumps from phone to phone. You can only pass it after solving a mini task – whoever holds it when it blows is out."
   },
   "minPlayers": 3,
   "maxPlayers": 20,
@@ -12,7 +12,7 @@
   "color": "#FF8A3D",
   "tags": ["action", "quick"],
   "sdkVersion": 1,
-  "version": "1.0.2",
+  "version": "1.1.0",
   "author": "UP!",
   "options": [
     {

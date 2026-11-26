@@ -103,6 +103,13 @@ export interface GameOption {
   min?: number;
   max?: number;
   step?: number;
+  /** Nur anzeigen, wenn eine andere Einstellung diesen Wert hat (z. B. Rundenzahl nur bei „Feste Anzahl“) */
+  showIf?: { id: string; value: number | string };
+}
+
+/** Ist die Einstellung bei diesen Werten sichtbar? */
+export function optionVisible(d: GameOption, values: GameOptionValues): boolean {
+  return !d.showIf || values[d.showIf.id] === d.showIf.value;
 }
 
 export type GameOptionValues = Record<string, number | string>;

@@ -62,7 +62,7 @@ games/mein-spiel/
 ]
 ```
 
-  Im Spiel: `ctx.options.rounds` (immer gültig, sonst Standardwert).
+  Im Spiel: `ctx.options.rounds` (immer gültig, sonst Standardwert). Mit `"showIf": { "id": "turns", "value": 0 }` erscheint eine Einstellung nur, wenn eine andere einen bestimmten Wert hat (z. B. Rundenzahl nur bei „Feste Anzahl“).
 - `olympia` – (optional) Verhalten im Olympia-Modus. `false` = das Spiel taugt nicht als Disziplin (z. B. kooperativ, alle gewinnen gemeinsam). Mit `options` legst du kürzere Einstellungen fest, z. B. `"olympia": { "options": { "rounds": 2 } }`. Ohne Angabe kürzt UP! eine Zahl-Einstellung `rounds` auf etwa 60 %. Medaillen gibt es nach der Rangliste aus `ctx.finish()`.
 
 ## Grundidee: Ansichten statt Spielzustand

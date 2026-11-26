@@ -13,7 +13,7 @@
   "tags": ["draw", "guess"],
   "sdkVersion": 1,
   "contentFields": ["word"],
-  "version": "1.0.2",
+  "version": "1.1.0",
   "author": "UP!",
   "options": [
     {
@@ -30,20 +30,27 @@
       }
     },
     {
-      "id": "rounds",
+      "id": "turns",
       "label": { "de": "Runden", "en": "Rounds" },
-      "default": 0,
+      "default": 1,
       "choices": [
-        { "value": 0, "label": { "de": "Jeder malt einmal", "en": "Everyone draws once" } },
-        { "value": 4, "label": { "de": "4", "en": "4" } },
-        { "value": 6, "label": { "de": "6", "en": "6" } },
-        { "value": 8, "label": { "de": "8", "en": "8" } },
-        { "value": 12, "label": { "de": "12", "en": "12" } }
+        { "value": 1, "label": { "de": "Jeder malt einmal", "en": "Everyone draws once" } },
+        { "value": 2, "label": { "de": "Jeder malt zweimal", "en": "Everyone draws twice" } },
+        { "value": 3, "label": { "de": "Jeder malt dreimal", "en": "Everyone draws three times" } },
+        { "value": 0, "label": { "de": "Feste Anzahl", "en": "Fixed number" } }
       ],
       "help": {
-        "de": "„Jeder malt einmal“ geht bis höchstens 10 Runden.",
-        "en": "“Everyone draws once” stops at 10 rounds at most."
+        "de": "Bei mehr als 10 Spielern geht ein Durchgang höchstens 10 Runden. „Feste Anzahl“: Rundenzahl mit Plus und Minus wählen.",
+        "en": "With more than 10 players a pass stops at 10 rounds. “Fixed number”: pick the rounds with plus and minus."
       }
+    },
+    {
+      "id": "rounds",
+      "label": { "de": "Anzahl Runden", "en": "Number of rounds" },
+      "default": 8,
+      "min": 2,
+      "max": 30,
+      "showIf": { "id": "turns", "value": 0 }
     },
     {
       "id": "drawTime",

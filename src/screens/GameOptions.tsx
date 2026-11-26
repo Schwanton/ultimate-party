@@ -1,4 +1,4 @@
-import { resolveOptions, type GameManifest, type Lang } from '@up/sdk';
+import { optionVisible, resolveOptions, type GameManifest, type Lang } from '@up/sdk';
 import { net } from '../net';
 
 /** Einstellungen eines Spiels (Rundenanzahl usw.) – auf dem TV und auf dem Handy des VIP */
@@ -13,7 +13,7 @@ export function GameOptionsForm({ game, values, lang, compact = false, disabled 
   if (!defs.length) return null;
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: compact ? 12 : 18 }}>
-      {defs.map((d) => {
+      {defs.filter((d) => optionVisible(d, current)).map((d) => {
         const label = d.label[lang] ?? d.label.en;
         const help = d.help?.[lang] ?? d.help?.en;
         const v = current[d.id];
@@ -50,7 +50,7 @@ export function GameOptionsForm({ game, values, lang, compact = false, disabled 
 export function optionsSummary(game: GameManifest, values: Record<string, unknown> | undefined, lang: Lang): string {
   const defs = game.options ?? [];
   const current = resolveOptions(defs, values);
-  return defs.map((d) => {
+  return defs.filter((d) => optionVisible(d, current)).map((d) => {
     const v = current[d.id];
     const shown = d.choices ? (d.choices.find((c) => c.value === v)?.label[lang] ?? String(v)) : String(v);
     return `${d.label[lang] ?? d.label.en}: ${shown}`;

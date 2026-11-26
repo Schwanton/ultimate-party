@@ -154,12 +154,7 @@ function Host(props: HostViewProps) {
     case 'gallery':
       return <HostGallery {...props} />;
     case 'final':
-      return (
-        <>
-          <HostHeader title={t('title')} color={PINK} info={t('final.title')} />
-          {view.team ? <TeamScores {...props} final /> : <Podium ranking={view.ranking} player={props.player} pointsLabel={t('common.points')} />}
-        </>
-      );
+      return <HostFinal {...props} />;
   }
   return null;
 }
@@ -428,39 +423,131 @@ function HostReveal({ view, t, player, roundInfo }: HostViewProps & { roundInfo?
   );
 }
 
-function HostGallery({ view, t, player }: HostViewProps) {
-  const raw = view.pics as { word: string; strokes: Stroke[]; drawerId: string; firstId: string | null; firstMs: number | null; stolen: number | null }[];
+type WallPic = { word: string; strokes: Stroke[]; drawerId: string; firstId: string | null; firstMs: number | null; stolen: number | null };
+
+/** Bilder-Wand auf dem TV, nach Herzen sortiert; passt sich in die Fläche width × height ein */
+function GalleryWall({ view, t, player, width, height }: HostViewProps & { width: number; height: number }) {
+  const raw = (view.pics ?? []) as WallPic[];
   const live = useStream<{ g?: string; h?: number[] }>();
   const counts: number[] = live?.g === 'hearts' && live.h?.length === raw.length ? live.h : (view.hearts ?? raw.map(() => 0));
   const pics = raw.map((p, i) => ({ ...p, i, hearts: counts[i] ?? 0 })).sort((a, b) => b.hearts - a.hearts || a.i - b.i);
-  const cols = pics.length <= 4 ? pics.length : pics.length <= 8 ? 4 : 5;
-  const rowsN = Math.ceil(pics.length / cols);
-  const size = Math.min(rowsN > 2 ? 120 : rowsN === 2 ? 190 : 300, Math.floor((1180 - (cols - 1) * 20) / cols) - 24);
+  // größte Bildgröße finden, bei der alle Bilder in die Fläche passen
+  let cols = 1, size = 60;
+  for (let c = 1; c <= Math.max(1, pics.length); c++) {
+    const rows = Math.ceil(pics.length / c);
+    const s = Math.floor(Math.min((width - (c - 1) * 22) / c - 24, (height - (rows - 1) * 16) / rows - 62));
+    if (s > size) { size = s; cols = c; }
+  }
+  size = Math.min(size, 300);
+  const small = size < 130;
+  return (
+    <div style={{ width, height, display: 'grid', gridTemplateColumns: `repeat(${cols}, ${size + 24}px)`, gap: '16px 22px', alignContent: 'center', justifyContent: 'center' }}>
+      {pics.map((p, i) => {
+        const d = player(p.drawerId);
+        const f = p.firstId ? player(p.firstId) : null;
+        const meta = p.stolen != null ? t('gallery.stolen', { team: teamName(t, p.stolen) }) : f && p.firstMs != null ? t('gallery.first', { name: f.name, time: fmtTime(p.firstMs) }) : t('gallery.nobody');
+        return (
+          <figure key={p.i} style={{ position: 'relative',
+            margin: 0, background: '#FFFDF7', borderRadius: 14, padding: '8px 8px 10px', boxShadow: '0 6px 0 #0A0716', display: 'flex', flexDirection: 'column', gap: 4, color: '#110D24',
+            transform: `rotate(${((i * 37) % 5) - 2}deg)`, animation: `upPop .5s ease-out ${(0.6 + i * 0.12).toFixed(2)}s both`,
+          }}>
+            <Drawing strokes={p.strokes} size={size} style={{ alignSelf: 'center', borderRadius: 10, background: '#fff' }} />
+            {p.hearts > 0 && (
+              <span className="display" style={{ position: 'absolute', top: -12, right: -10, background: PINK, color: '#fff', fontWeight: 800, fontSize: small ? 16 : 20, padding: '3px 11px', borderRadius: 999, boxShadow: `0 4px 0 ${PINK_D}`, animation: 'upPop .4s ease-out both' }}>♥ {p.hearts}</span>
+            )}
+            <figcaption style={{ display: 'flex', flexDirection: 'column', gap: 1, minWidth: 0 }}>
+              <span className="display" style={{ fontWeight: 800, fontSize: small ? 16 : 20, lineHeight: 1.05, overflowWrap: 'anywhere' }}>{p.word}</span>
+              <span style={{ fontSize: small ? 11 : 13, fontWeight: 700, color: '#4A4378', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{d?.name ?? '?'}{small ? '' : ` · ${meta}`}</span>
+            </figcaption>
+          </figure>
+        );
+      })}
+    </div>
+  );
+}
+
+function HostGallery(props: HostViewProps) {
+  const { view, t } = props;
   return (
     <>
-      <HostHeader title={t('title')} color={PINK} info={t('gallery.sub', { n: pics.length })} />
+      <HostHeader title={t('title')} color={PINK} info={t('gallery.sub', { n: view.pics?.length ?? 0 })} />
       <h1 style={{ fontSize: 34 }}>{t('gallery.title')}</h1>
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: `repeat(${cols}, minmax(0, ${size + 40}px))`, gap: '18px 24px', alignContent: 'center', justifyContent: 'center' }}>
-        {pics.map((p, i) => {
-          const d = player(p.drawerId);
-          const f = p.firstId ? player(p.firstId) : null;
-          const meta = p.stolen != null ? t('gallery.stolen', { team: teamName(t, p.stolen) }) : f && p.firstMs != null ? t('gallery.first', { name: f.name, time: fmtTime(p.firstMs) }) : t('gallery.nobody');
-          return (
-            <figure key={p.i} style={{ position: 'relative',
-              margin: 0, background: '#FFFDF7', borderRadius: 16, padding: '10px 10px 12px', boxShadow: '0 7px 0 #0A0716', display: 'flex', flexDirection: 'column', gap: 6, color: '#110D24',
-              transform: `rotate(${((i * 37) % 5) - 2}deg)`, animation: `upPop .5s ease-out ${(i * 0.18).toFixed(2)}s both`,
-            }}>
-              <Drawing strokes={p.strokes} size={size} style={{ alignSelf: 'center', borderRadius: 10, background: '#fff' }} />
-              {p.hearts > 0 && (
-                <span className="display" style={{ position: 'absolute', top: -12, right: -10, background: PINK, color: '#fff', fontWeight: 800, fontSize: 20, padding: '4px 12px', borderRadius: 999, boxShadow: `0 4px 0 ${PINK_D}`, animation: 'upPop .4s ease-out both' }}>♥ {p.hearts}</span>
-              )}
-              <figcaption style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <span className="display" style={{ fontWeight: 800, fontSize: 22, lineHeight: 1.05 }}>{p.word}</span>
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#4A4378' }}>{d?.name ?? '?'} · {meta}</span>
-              </figcaption>
-            </figure>
-          );
-        })}
+      <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <GalleryWall {...props} width={1180} height={520} />
+      </div>
+    </>
+  );
+}
+
+/** Ende: Endstand links, Galerie rechts – beides bleibt stehen */
+function HostFinal(props: HostViewProps) {
+  const { view, t, player } = props;
+  const ranking = (view.ranking ?? []) as { playerId: string; score: number }[];
+  const hasPics = (view.pics?.length ?? 0) > 0;
+  if (!hasPics) {
+    return (
+      <>
+        <HostHeader title={t('title')} color={PINK} info={t('final.title')} />
+        {view.team ? <TeamScores {...props} final /> : <Podium ranking={ranking} player={player} pointsLabel={t('common.points')} />}
+      </>
+    );
+  }
+  const teams = view.teams as { score: number; members: string[] }[];
+  const winner = view.team ? (teams[0].score === teams[1].score ? -1 : teams[0].score > teams[1].score ? 0 : 1) : -1;
+  const rows = ranking.slice(0, 10);
+  const rowH = rows.length > 7 ? 46 : 56;
+  return (
+    <>
+      <HostHeader title={t('title')} color={PINK} info={t('final.withGallery', { n: view.pics.length })} />
+      <Confetti pieces={36} />
+      <div style={{ flex: 1, minHeight: 0, display: 'flex', gap: 28, alignItems: 'stretch' }}>
+        <div style={{ width: 360, flex: 'none', display: 'flex', flexDirection: 'column', gap: 10, justifyContent: 'center' }}>
+          <h1 className="anim-pop" style={{ fontSize: 36 }}>{t('final.title')}</h1>
+          {view.team ? (
+            <>
+              {winner >= 0
+                ? <span className="display anim-pop" style={{ fontSize: 30, fontWeight: 800, color: TEAM[winner].color }}>{t('final.teamWins', { team: teamName(t, winner) })}</span>
+                : <span className="display anim-pop" style={{ fontSize: 30, fontWeight: 800 }}>{t('final.draw')}</span>}
+              {[0, 1].map((n) => (
+                <div key={n} className="anim-up" style={{ borderRadius: 20, padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 8,
+                  background: n === winner ? TEAM[n].color : 'var(--surface)', color: n === winner ? '#110D24' : '#fff',
+                  boxShadow: n === winner ? `0 6px 0 ${TEAM[n].dark}` : `inset 0 0 0 3px ${TEAM[n].color}`, animationDelay: `${0.2 + n * 0.15}s` }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
+                    <span style={{ flex: 1, fontSize: 20, fontWeight: 800, color: n === winner ? '#110D24' : TEAM[n].color }}>{teamName(t, n)}</span>
+                    <span className="display" style={{ fontSize: 40, fontWeight: 800, lineHeight: 1 }}>{teams[n].score}</span>
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                    {teams[n].members.map((id) => {
+                      const p = player(id);
+                      return p ? <Avatar key={id} player={p} size={34} /> : null;
+                    })}
+                  </div>
+                </div>
+              ))}
+            </>
+          ) : rows.map((r, i) => {
+            const p = player(r.playerId);
+            if (!p) return null;
+            const medal = ['var(--yellow)', '#D9DEE8', '#E39B5B'][i];
+            return (
+              <div key={r.playerId} className="anim-up" style={{ height: rowH, display: 'flex', alignItems: 'center', gap: 12, padding: '0 14px', borderRadius: 16,
+                background: i === 0 ? 'var(--yellow)' : 'var(--surface)', color: i === 0 ? '#110D24' : '#fff',
+                boxShadow: i === 0 ? '0 5px 0 var(--yellow-d)' : undefined, animationDelay: `${0.15 + i * 0.08}s` }}>
+                <span className="display" style={{ width: 30, fontSize: 22, fontWeight: 800, color: i === 0 ? '#110D24' : medal ?? 'var(--muted)' }}>{i + 1}.</span>
+                <Avatar player={p} size={rowH - 14} />
+                <span style={{ flex: 1, minWidth: 0, fontSize: 19, fontWeight: 800, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</span>
+                <span className="display" style={{ fontSize: 22, fontWeight: 800 }}>{r.score}</span>
+              </div>
+            );
+          })}
+          {!view.team && ranking.length > rows.length && <span className="faint" style={{ fontSize: 15, fontWeight: 700 }}>+ {ranking.length - rows.length}</span>}
+        </div>
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <span style={{ fontSize: 22, fontWeight: 800 }}>{t('gallery.title')} <span className="muted" style={{ fontSize: 17, fontWeight: 700 }}>· {t('final.heartsHint')}</span></span>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <GalleryWall {...props} width={790} height={540} />
+          </div>
+        </div>
       </div>
     </>
   );
@@ -807,7 +894,7 @@ function SolvedScreen({ view, t, player, send }: ControllerViewProps) {
   }, []);
   const headline = view.stolenBy != null && view.team
     ? t('solved.stolen', { team: teamName(t, view.stolenBy) })
-    : view.byTeam ? t('solved.team') : `${view.word}!`;
+    : view.byTeam ? t('solved.team') : t('result.found');
   const good = !(view.team && view.stolenBy != null && view.stolenBy !== view.myTeam);
   return (
     <div ref={boxRef} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -819,7 +906,8 @@ function SolvedScreen({ view, t, player, send }: ControllerViewProps) {
         <span style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
           <span className="display" style={{ fontWeight: 800, fontSize: 28, lineHeight: 1.05, overflowWrap: 'anywhere' }}>{headline}</span>
           {view.place > 0 && <span style={{ fontSize: 16, fontWeight: 700 }}>{t('solved.place', { n: view.place })} · + {view.points}</span>}
-          {view.place === 0 && view.word && <span style={{ fontSize: 16, fontWeight: 700 }}>{view.word}</span>}
+          {/* Das Wort nur ganz klein, damit niemand vom Nachbarn abliest */}
+          {view.word && <span style={{ fontSize: 11, fontWeight: 600, opacity: 0.55, overflowWrap: 'anywhere' }}>{view.word}</span>}
         </span>
       </div>
       <LiveDrawing strokes={view.strokes} round={view.round} size={size} style={{ alignSelf: 'center', borderRadius: 22 }} />

@@ -38,7 +38,7 @@ const BUILTIN: Record<string, false | GameOptionValues> = {
   mainstream: { rounds: 5 },
   maulwurf: { discussTime: 60 },
   'mic-drop': { rounds: 2 },
-  montagsmaler: { rounds: 4 },
+  montagsmaler: { turns: 0, rounds: 4 },
   'murmel-mayhem': { rounds: 3 },
   schaetzmeister: { rounds: 5 },
   sternenpakt: { years: 10 },

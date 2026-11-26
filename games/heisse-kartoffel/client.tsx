@@ -15,17 +15,14 @@ const SHAPES = [
 /** Ticken wird mit der Zeit schneller (ohne die geheime Zündschnur zu verraten) */
 const tickInterval = (elapsed: number) => Math.max(0.18, 0.9 - elapsed * 0.025);
 
-function Bomb({ size = 80, elapsed }: { size?: number; elapsed: number }) {
+/** Die Kartoffel vom Titelbild (ausgeschnitten), pocht im Takt des Tickens */
+function Potato({ size = 80, elapsed }: { size?: number; elapsed: number }) {
   const beat = tickInterval(elapsed);
   return (
-    <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden="true" style={{ animation: `upBeat ${beat}s ease-in-out infinite`, filter: 'drop-shadow(0 0 14px rgba(255,138,61,.8))' }}>
-      <circle cx="28" cy="38" r="22" fill="#262048" stroke="#4A4378" strokeWidth="3" />
-      <circle cx="20" cy="30" r="6" fill="#4A4378" />
-      <rect x="34" y="12" width="10" height="10" rx="2" transform="rotate(35 39 17)" fill="#4A4378" />
-      <path d="M42 12 C 48 4, 54 8, 56 4" fill="none" stroke="#B8B2D9" strokeWidth="3" strokeLinecap="round" />
-      <circle cx="57" cy="4" r="5" fill="#FFD447" style={{ animation: 'upPulse .25s linear infinite' }} />
-      <circle cx="57" cy="4" r="2.5" fill="#FF5A1F" />
-    </svg>
+    <div aria-hidden="true" style={{ width: size, height: size, display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none', animation: `upBeat ${beat}s ease-in-out infinite` }}>
+      <img src="/game/heisse-kartoffel/bilder/kartoffel.webp" alt="" draggable={false}
+        style={{ width: size * 1.15, height: 'auto', maxWidth: 'none', pointerEvents: 'none', userSelect: 'none', filter: 'drop-shadow(0 0 14px rgba(255,138,61,.8))' }} />
+    </div>
   );
 }
 
@@ -43,7 +40,7 @@ function Host(props: HostViewProps) {
       return (
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 26, textAlign: 'center' }}>
           <span className="up-tag anim-pop" style={{ background: ORANGE, color: '#110D24', boxShadow: `0 8px 0 ${ORANGE_D}`, fontSize: 76, padding: '12px 40px', borderRadius: 26, transform: 'rotate(-3deg)' }}>{t('title')}</span>
-          <Bomb size={130} elapsed={10} />
+          <Potato size={130} elapsed={10} />
           <p className="anim-up" style={{ fontSize: 28, maxWidth: 920, lineHeight: 1.35, animationDelay: '.4s' }}>{t('intro.text')}</p>
           <p className="muted anim-up" style={{ fontSize: 22, animationDelay: '.8s' }}>{t('intro.rules')}</p>
         </div>
@@ -123,10 +120,10 @@ function HostCircle({ view, t, player }: HostViewProps) {
           );
         })}
 
-        {/* Bombe fliegt zum Halter */}
+        {/* Kartoffel fliegt zum Halter */}
         {!boom && started && (
           <div style={{ position: 'absolute', left: hx + size * 0.55, top: hy - size * 0.55, transform: 'translate(-50%, -50%)', transition: 'left .45s cubic-bezier(.3,1.4,.5,1), top .45s cubic-bezier(.3,1.4,.5,1)', zIndex: 3 }}>
-            <Bomb size={size * 0.9} elapsed={elapsed} />
+            <Potato size={size * 0.9} elapsed={elapsed} />
           </div>
         )}
         {boom && (
@@ -173,12 +170,12 @@ function TaskView({ view, t, send }: ControllerViewProps) {
   const now = useServerNow(150);
   useEffect(() => setProgress(0), [view.taskId]);
   const elapsed = Math.max(0, (now - view.roundStart) / 1000);
-  // Handy vibriert im Takt der Bombe
+  // Handy vibriert im Takt der Kartoffel
   useEffect(() => {
     const id = setInterval(() => vibrate(40), tickInterval(elapsed) * 1000);
     return () => clearInterval(id);
   }, [Math.round(elapsed / 3)]); // eslint-disable-line react-hooks/exhaustive-deps
-  if (now < view.roundStart) return <PhoneWait title={t('phone.youStart')} text={t('phone.getReady')} emoji={<Bomb size={110} elapsed={0} />} />;
+  if (now < view.roundStart) return <PhoneWait title={t('phone.youStart')} text={t('phone.getReady')} emoji={<Potato size={110} elapsed={0} />} />;
   const locked = Date.now() < lockedUntil;
   const wrong = () => {
     vibrate([80, 40, 80]);
@@ -247,7 +244,7 @@ function TaskView({ view, t, send }: ControllerViewProps) {
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14, margin: -16, padding: 16, background: 'radial-gradient(circle at 50% 0%, #5A1220, #110D24 70%)', animation: `upVignette ${tickInterval(elapsed)}s ease-in-out infinite` }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <Bomb size={64} elapsed={elapsed} />
+        <Potato size={64} elapsed={elapsed} />
         <div>
           <h1 style={{ fontSize: 26, color: ORANGE }}>{t('phone.youHaveIt')}</h1>
           <p style={{ fontSize: 15 }}>{t('phone.solveFirst')}</p>
@@ -272,7 +269,7 @@ function Controller(props: ControllerViewProps) {
       return (
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12, margin: -16, padding: 16, background: 'radial-gradient(circle at 50% 0%, #5A1220, #110D24 70%)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <Bomb size={60} elapsed={Math.max(0, (now - view.roundStart) / 1000)} />
+            <Potato size={60} elapsed={Math.max(0, (now - view.roundStart) / 1000)} />
             <h1 style={{ fontSize: 28, color: ORANGE }}>{t('phone.throw')}</h1>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 }}>

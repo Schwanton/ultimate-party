@@ -2,6 +2,13 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.53.0
+
+- Montagsmaler: Wer richtig geraten hat, sieht am Handy nur noch „Richtig!“ – das Wort steht ganz klein darunter, damit niemand beim Nachbarn abgucken kann
+- Montagsmaler: Am Ende stehen Endstand und Galerie zusammen auf dem Fernseher – die Bilder verschwinden nicht mehr. Herzen am Handy sortieren die Galerie weiter live
+- Montagsmaler: Neue Rundenauswahl – „Jeder malt einmal“, „zweimal“, „dreimal“ oder „Feste Anzahl“, dann mit Plus und Minus 2 bis 30 Runden
+- Heiße Kartoffel: Statt der gezeichneten Bombe wandert jetzt die Kartoffel vom Titelbild herum – auf dem Fernseher und am Handy
+
 ## 0.52.0
 
 - Schätzmeister: 44 neue Schätzfragen – jetzt 146 insgesamt. Viele Alltagsfragen (Wie viele Apotheken gibt es in Deutschland? Wie viele Zimmer hat der Buckingham Palace?) und ein paar neue Spaß-Einheiten (Wie viele 1-Cent-Münzen übereinander sind so hoch wie die Zugspitze?)
