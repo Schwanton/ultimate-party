@@ -6,6 +6,9 @@
  * 3) Schritt für Schritt wird ausgegraut und entfernt, wer am weitesten weg liegt – danach schrumpft
  *    die Skala jeweils auf die übrigen Tipps. Bei vielen Spielern fliegen mehrere auf einmal raus.
  * 4) Sind nur noch 2 übrig: Trommelwirbel, dann erscheint die echte Zahl (die Skala wächst bei Bedarf mit).
+ * 5) Optional (showAll): Danach kommen alle Tipps zurück auf den Strahl – mit ihren Punkten.
+ *
+ * Entfernung: absolut (Standard) oder als Faktor (log: doppelt so viel = halb so viel daneben).
  *
  * Die echte Zahl bleibt bis zum Schluss verborgen; die Reihenfolge der Tipps verrät nichts,
  * weil der Server sie gemischt schickt.
@@ -27,8 +30,19 @@ export interface RevealPlan {
   drumAt: number | null;
   /** ab wann die echte Zahl zu sehen ist */
   answerAt: number;
-  /** Ende der Auflösung (Gewinner sichtbar) */
+  /** Gewinner sichtbar */
   doneAt: number;
+  /** ab wann alle Tipps mit Punkten zurückkommen (null = nie) */
+  allAt: number | null;
+  /** Ende der Auflösung */
+  endAt: number;
+}
+
+export interface PlanOptions {
+  /** Entfernung als Faktor messen statt als Differenz */
+  log?: boolean;
+  /** am Ende alle Tipps zurückholen (mit Punkten) */
+  showAll?: boolean;
 }
 
 export const START_DELAY = 0.8;
@@ -42,8 +56,13 @@ const OUT_STEP = 1.9;
 const MAX_OUT_STEPS = 8;
 const DRUM = 2.6;
 const AFTER_ANSWER = 1.8;
+const BEFORE_ALL = 1.6;
+const AFTER_ALL = 2.4;
 
 export const lg = (v: number) => Math.log10(Math.max(0, v) + 1);
+/** Zehnerpotenzen daneben (Faktor-Entfernung): doppelt so viel = halb so viel. 0 zählt wie 1. */
+export const logDist = (guess: number, answer: number) =>
+  Math.round(Math.abs(Math.log10(Math.max(1, guess)) - Math.log10(Math.max(1, answer))) * 1e9) / 1e9;
 
 /** Bereich mit etwas Luft links und rechts – linear oder logarithmisch, je nach Spannweite */
 export function padRange(values: number[]): { lo: number; hi: number; log: boolean } {
@@ -73,7 +92,8 @@ export function useLog(values: number[]) {
   return Math.max(...pos) / Math.max(1, Math.min(...values)) > 40;
 }
 
-export function buildPlan(answer: number, entries: RevealEntry[]): RevealPlan {
+export function buildPlan(answer: number, entries: RevealEntry[], opts: PlanOptions = {}): RevealPlan {
+  const distance = (g: number) => (opts.log ? logDist(g, answer) : Math.abs(g - answer));
   const n = entries.length;
   const step = n ? Math.min(0.55, 5 / n) : 0;
   const placeAt: Record<string, number> = {};
@@ -94,7 +114,7 @@ export function buildPlan(answer: number, entries: RevealEntry[]): RevealPlan {
     ranges.push({ at: t, ...padRange(guesses) });
     t += CROP;
     // 3) Weitester raus, bis 2 übrig sind
-    let left = entries.map((e) => ({ ...e, diff: Math.abs(e.guess - answer) }));
+    let left = entries.map((e) => ({ ...e, diff: distance(e.guess) }));
     const batch = Math.max(1, Math.ceil((n - 2) / MAX_OUT_STEPS));
     while (left.length > 2) {
       const sorted = [...left].sort((a, b) => b.diff - a.diff);
@@ -118,7 +138,15 @@ export function buildPlan(answer: number, entries: RevealEntry[]): RevealPlan {
   const answerAt = t;
   const finalValues = n >= 2 ? entriesLeft(entries, outs).map((e) => e.guess) : guesses;
   ranges.push({ at: answerAt, ...padRange([...finalValues, answer]) });
-  return { placeAt, ranges, outs, drumAt, answerAt, doneAt: answerAt + AFTER_ANSWER };
+  const doneAt = answerAt + AFTER_ANSWER;
+  let allAt: number | null = null;
+  let endAt = doneAt;
+  if (opts.showAll && outs.length) {
+    allAt = doneAt + BEFORE_ALL;
+    ranges.push({ at: allAt, ...padRange([...guesses, answer]) });
+    endAt = allAt + AFTER_ALL;
+  }
+  return { placeAt, ranges, outs, drumAt, answerAt, doneAt, allAt, endAt };
 }
 
 function entriesLeft(entries: RevealEntry[], outs: RevealPlan['outs']) {
@@ -132,7 +160,8 @@ export function stateAt(plan: RevealPlan, t: number) {
   for (const r of plan.ranges) if (r.at <= t) range = r;
   const greyed = new Set<string>();
   const removed = new Set<string>();
-  for (const o of plan.outs) {
+  const all = plan.allAt !== null && t >= plan.allAt;
+  if (!all) for (const o of plan.outs) {
     if (t >= o.at + GREY) o.ids.forEach((id) => removed.add(id));
     else if (t >= o.at) o.ids.forEach((id) => greyed.add(id));
   }
@@ -144,15 +173,16 @@ export function stateAt(plan: RevealPlan, t: number) {
     drum: plan.drumAt !== null && t >= plan.drumAt && t < plan.answerAt,
     answer: t >= plan.answerAt,
     done: t >= plan.doneAt,
+    all,
   };
 }
 
 /** Gesamtdauer inkl. Start-Verzögerung (für den Server) */
-export function revealSeconds(answer: number, entries: RevealEntry[]) {
-  return START_DELAY + buildPlan(answer, entries).doneAt;
+export function revealSeconds(answer: number, entries: RevealEntry[], opts: PlanOptions = {}) {
+  return START_DELAY + buildPlan(answer, entries, opts).endAt;
 }
 
 /** Sekunden ab Start, bis die echte Zahl zu sehen ist (für die Handys) */
-export function answerSeconds(answer: number, entries: RevealEntry[]) {
-  return START_DELAY + buildPlan(answer, entries).answerAt;
+export function answerSeconds(answer: number, entries: RevealEntry[], opts: PlanOptions = {}) {
+  return START_DELAY + buildPlan(answer, entries, opts).answerAt;
 }

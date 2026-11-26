@@ -1,11 +1,12 @@
 /**
  * Guess the Clicks! – Aufrufe eines zufälligen YouTube-Videos schätzen.
- * Wer am nächsten dran ist (absolute Differenz), bekommt 1 Punkt; bei Gleichstand alle Gleichnahen.
+ * Punkte je nach Einstellung „Wertung“ (siehe scoring.ts); Entfernung immer als Faktor daneben.
  */
 
 import { INPUT_GRACE, Scores, shuffle, type GameContext, type GameServerModule } from '@up/sdk';
 import { YouTubeError, checkKey, fakeVideo, randomVideo, type Video } from './youtube';
-import { answerSeconds, revealSeconds } from './reveal';
+import { answerSeconds, revealSeconds, type PlanOptions } from './reveal';
+import { MODES, factor, scoreRound, type ScoringMode } from './scoring';
 
 const LAST_CHANCE = 5;
 const MAX_GUESS = 100_000_000_000;
@@ -14,6 +15,10 @@ export default {
   create(ctx: GameContext) {
     const ROUNDS = Number(ctx.options.videos) || 8;
     const GUESS_TIME = Number(ctx.options.guessTime) || 40;
+    const MODE: ScoringMode = MODES.includes(ctx.options.scoring as ScoringMode) ? (ctx.options.scoring as ScoringMode) : 'rank';
+    const LOOSE = ctx.options.strictness === 'loose';
+    /** Bei „Nur der Nächste“ reicht das Finale wie bisher; sonst kommen am Ende alle mit Punkten zurück. */
+    const PLAN: PlanOptions = { log: true, showAll: MODE !== 'best' };
     const ids = ctx.players.map((p) => p.id);
     const scores = new Scores(ids);
     const videos: Video[] = [];
@@ -90,7 +95,7 @@ export default {
         return;
       }
       if (disposed) return;
-      ctx.setHostView({ screen: 'intro' });
+      ctx.setHostView({ screen: 'intro', mode: MODE, loose: LOOSE });
       ctx.after(6, next);
     }
 
@@ -155,27 +160,31 @@ export default {
       for (const [id, n] of drafts) guesses.set(id, n);
       phase = 'reveal';
       const v = videos[round];
-      const entries = [...guesses.entries()].map(([playerId, guess]) => ({ playerId, guess, diff: Math.abs(guess - v.views), player: isPlayer(playerId) }));
-      entries.sort((a, b) => a.diff - b.diff);
-      const best = entries.find((e) => e.player)?.diff;
-      const winners = best === undefined ? [] : entries.filter((e) => e.player && e.diff === best).map((e) => e.playerId);
-      winners.forEach((w) => scores.add(w, 1));
-      // Zahlenstrahl: startet gleich, Handys zeigen ihr Ergebnis erst, wenn die Säule angekommen ist
+      const all = [...guesses.entries()].map(([playerId, guess]) => ({ playerId, guess }));
+      const scored = scoreRound(all.filter((e) => isPlayer(e.playerId)), v.views, MODE, LOOSE);
+      scored.forEach((e) => { if (e.points) scores.add(e.playerId, e.points); });
+      const winners = scored.filter((e) => e.closest).map((e) => e.playerId);
+      // Zahlenstrahl: startet gleich, Handys zeigen ihr Ergebnis erst, wenn die echte Zahl zu sehen ist
       // Auf dem Strahl stehen nur die Spieler, gemischt – die Reihenfolge darf nichts verraten
-      const shown = shuffle(entries.filter((e) => e.player));
+      const shown = shuffle(scored.map(({ playerId, guess, points, place }) => ({ playerId, guess, points, place })));
       const startAt = Date.now() + 300;
-      const rideSeconds = revealSeconds(v.views, shown);
-      const doneAt = startAt + answerSeconds(v.views, shown) * 1000;
-      ctx.setHostView({ screen: 'reveal', n: round + 1, total: ROUNDS, video: { id: v.id, title: v.title, channel: v.channel }, views: v.views, entries: shown, winners, crowd: members().length, startAt });
-      const ranked = entries.filter((e) => e.player);
+      const rideSeconds = revealSeconds(v.views, shown, PLAN);
+      const doneAt = startAt + answerSeconds(v.views, shown, PLAN) * 1000;
+      ctx.setHostView({
+        screen: 'reveal', n: round + 1, total: ROUNDS, video: { id: v.id, title: v.title, channel: v.channel }, views: v.views,
+        entries: shown, winners, mode: MODE, plan: PLAN, crowd: members().length, startAt,
+      });
       for (const id of members()) {
-        const mine = entries.find((e) => e.playerId === id);
+        const mine = scored.find((e) => e.playerId === id);
+        const guess = guesses.get(id) ?? null;
         ctx.setPlayerView(id, {
-          screen: 'result', views: v.views, guess: mine?.guess ?? null, won: winners.includes(id),
-          place: mine?.player ? ranked.findIndex((e) => e.playerId === id) + 1 : null, of: ranked.length, total: scores.get(id), doneAt,
+          screen: 'result', views: v.views, guess, won: winners.includes(id), mode: MODE,
+          points: mine?.points ?? null, exact: mine?.exact ?? false,
+          factor: guess == null ? null : factor(guess, v.views), high: guess != null && guess > v.views,
+          place: mine ? mine.place : null, of: scored.length, total: scores.get(id), doneAt,
         });
       }
-      ctx.after(rideSeconds + 7, next);
+      ctx.after(rideSeconds + (PLAN.showAll ? 5 : 7), next);
     }
 
     function showScores(final: boolean) {

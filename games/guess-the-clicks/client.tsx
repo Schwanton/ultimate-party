@@ -51,6 +51,9 @@ function Host(props: HostViewProps) {
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 28, textAlign: 'center' }}>
           <span className="up-tag anim-pop" style={{ background: RED, color: '#fff', boxShadow: '0 8px 0 #C22E24', fontSize: 72, padding: '12px 36px', borderRadius: 26, transform: 'rotate(-3deg)' }}>{t('title')}</span>
           <p className="anim-up" style={{ fontSize: 28, maxWidth: 900, lineHeight: 1.35, animationDelay: '.4s' }}>{t('intro.text')}</p>
+          <p className="anim-up up-chip" style={{ fontSize: 22, maxWidth: 1000, lineHeight: 1.35, animationDelay: '.9s', padding: '10px 20px' }}>
+            {t(`mode.${view.mode ?? 'best'}.intro`)}{view.loose && (view.mode === 'distance' || view.mode === 'bonus') ? ` ${t('mode.loose')}` : ''}
+          </p>
         </div>
       );
     case 'guess': {
@@ -250,38 +253,50 @@ function VideoPlayer({ id, t }: { id: string; t: Translate }) {
   );
 }
 
-interface Entry { playerId: string; guess: number; diff: number; player: boolean }
+interface Entry { playerId: string; guess: number; points: number; place: number }
+
+/** „+820“ bzw. „+1“ */
+const plus = (n: number) => `+${n}`;
 
 /**
- * Auflösung als Zahlenstrahl: Eine Säule fährt auf einer logarithmischen Skala hoch – schnell, solange sie weit
- * von Tipps und Ziel entfernt ist, langsam in deren Nähe. Erreicht sie einen Tipp, erscheint das Bild des Spielers.
- * Die Skala wächst mit (verrät also nichts). Nach der echten Zahl fährt sie weiter bis zu den höheren Tipps.
+ * Auflösung als Zahlenstrahl (siehe reveal.ts). Entfernung als Faktor; bei allen Modi außer „Nur der Nächste“
+ * kommen am Ende alle Tipps mit ihren Punkten zurück auf den Strahl.
  */
 function HostReveal({ view, t, player, room }: HostViewProps) {
   const lang = room.lang;
   const entries = (view.entries as Entry[]).filter((e) => player(e.playerId));
   const winners = new Set<string>(view.winners);
-  const winnerNames = entries.filter((e) => winners.has(e.playerId)).map((e) => player(e.playerId)!.name);
+  const mode: string = view.mode ?? 'best';
+  const winnerEntries = entries.filter((e) => winners.has(e.playerId));
+  const winnerNames = winnerEntries.map((e) => player(e.playerId)!.name);
+  const top = winnerEntries[0]?.points ?? 0;
   return (
     <>
       <HostHeader title={t('title')} color={RED} info={t('video', { n: view.n, total: view.total })} />
       <Strahl
-        answer={view.views} startAt={view.startAt} player={player} color={RED}
-        entries={entries.map((e) => ({ playerId: e.playerId, guess: e.guess, win: winners.has(e.playerId), badge: winners.has(e.playerId) ? '+1' : undefined }))}
+        answer={view.views} startAt={view.startAt} player={player} color={RED} planOptions={view.plan ?? { log: true }}
+        entries={entries.map((e) => ({ playerId: e.playerId, guess: e.guess, win: winners.has(e.playerId), badge: e.points > 0 ? plus(e.points) : undefined }))}
         short={(n) => short(n, lang, t)}
         answerText={fmt(view.views, lang)}
-        labels={{ placing: t('reveal.placing'), zoom: t('reveal.zoom'), out: (names) => t('reveal.out', { names }), drum: t('reveal.drum'), answer: t('reveal.real') }}
+        labels={{ placing: t('reveal.placing'), zoom: t('reveal.zoom'), out: (names) => t('reveal.out', { names }), drum: t('reveal.drum'), answer: t('reveal.real'), all: t(`mode.${mode}.all`) }}
       >
         {(phase) => (
           <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start', width: 600 }}>
             <img src={`https://i.ytimg.com/vi/${view.video.id}/mqdefault.jpg`} alt="" width={224} height={126} style={{ borderRadius: 14, objectFit: 'cover', flex: 'none' }} />
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minWidth: 0 }}>
               <p className="muted" style={{ fontSize: 17, lineHeight: 1.25, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{view.video.title}</p>
-              {phase === 'done' && (
+              {(phase === 'done' || phase === 'all') && (
                 <div className="anim-pop" style={{ background: RED, borderRadius: 16, padding: '8px 14px', boxShadow: '0 5px 0 #C22E24' }}>
                   <span style={{ fontSize: 14, fontWeight: 700 }}>{winnerNames.length ? t('reveal.closest') : t('reveal.noGuess')}</span>
-                  {winnerNames.length > 0 && <p className="display" style={{ fontSize: 22, fontWeight: 800 }}>{winnerNames.join(' & ')} <span style={{ color: 'var(--yellow)' }}>+1</span></p>}
+                  {winnerNames.length > 0 && (
+                    <p className="display" style={{ fontSize: 22, fontWeight: 800, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {winnerNames.join(' & ')} <span style={{ color: 'var(--yellow)' }}>{plus(top)}</span>
+                    </p>
+                  )}
                 </div>
+              )}
+              {(phase === 'done' || phase === 'all') && mode !== 'best' && (
+                <span className="muted anim-fade" style={{ fontSize: 14 }}>{t(`mode.${mode}.short`)}</span>
               )}
             </div>
           </div>
@@ -289,6 +304,11 @@ function HostReveal({ view, t, player, room }: HostViewProps) {
       </Strahl>
     </>
   );
+}
+
+/** „2,3“ – Faktor mit höchstens einer Nachkommastelle, ab 10 ganz */
+function factorText(f: number, lang: string) {
+  return new Intl.NumberFormat(lang === 'de' ? 'de-DE' : 'en-US', { maximumFractionDigits: f >= 10 ? 0 : 1 }).format(f);
 }
 
 /* ================= Handy ================= */
@@ -376,11 +396,21 @@ function Controller({ view, t, send, me, room }: ControllerViewProps) {
             <Avatar player={me} size={104} />
             {view.won && <Crown size={44} style={{ position: 'absolute', top: -24, left: 30 }} />}
           </div>
-          <h1 style={{ fontSize: 28 }}>{view.guess == null ? t('lookAtTv') : view.won ? t('result.won') : t('result.lost')}</h1>
+          <h1 style={{ fontSize: 28 }}>{view.guess == null ? t('lookAtTv') : view.won ? t('result.won') : view.mode === 'best' || view.mode == null ? t('result.lost') : t('result.place', { n: view.place, of: view.of })}</h1>
+          {view.points != null && (
+            <p className="display anim-pop" style={{ fontSize: 34, fontWeight: 800, color: view.points > 0 ? 'var(--green)' : 'var(--muted, #8F88B8)' }}>
+              {view.points > 0 ? `+${view.points}` : '0'} {view.points === 1 ? t('point') : t('points')}
+            </p>
+          )}
           <p className="muted" style={{ fontSize: 16 }}>{t('reveal.views')}</p>
           <p className="display" style={{ fontSize: 40, fontWeight: 800, color: 'var(--yellow)' }}>{fmt(view.views, lang)}</p>
           {view.guess != null && <p style={{ fontSize: 18 }}>{t('guess.yours')}: <b>{fmt(view.guess, lang)}</b></p>}
-          {view.place && <p className="muted">{t('result.place', { n: view.place, of: view.of })}</p>}
+          {view.factor != null && (
+            <p className="muted" style={{ fontSize: 16 }}>
+              {view.exact ? t('result.exact') : t(view.high ? 'result.high' : 'result.low', { f: factorText(view.factor, lang) })}
+            </p>
+          )}
+          {view.place && (view.won || view.mode === 'best' || view.mode == null) && <p className="muted">{t('result.place', { n: view.place, of: view.of })}</p>}
         </div>
       );
     case 'audienceWait':

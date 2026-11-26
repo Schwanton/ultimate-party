@@ -5,8 +5,8 @@
     "en": "Guess the Clicks!"
   },
   "description": {
-    "de": "Ein zufälliges YouTube-Video – wie oft wurde es angeschaut? Wer am nächsten dran ist, holt den Punkt.",
-    "en": "A random YouTube video – how many views does it have? Closest guess takes the point."
+    "de": "Ein zufälliges YouTube-Video – wie oft wurde es angeschaut? Je näher dein Tipp, desto mehr Punkte.",
+    "en": "A random YouTube video – how many views does it have? The closer your guess, the more points."
   },
   "minPlayers": 2,
   "maxPlayers": 100,
@@ -23,7 +23,7 @@
   "contentFields": [
     "query"
   ],
-  "version": "1.1.1",
+  "version": "1.2.0",
   "author": "UP!",
   "secrets": [
     {
@@ -84,6 +84,76 @@
           "label": {
             "de": "90 s",
             "en": "90 s"
+          }
+        }
+      ]
+    },
+    {
+      "id": "scoring",
+      "label": {
+        "de": "Wertung",
+        "en": "Scoring"
+      },
+      "default": "rank",
+      "help": {
+        "de": "Nach Platz: Nächster 1000, Letzter 0, dazwischen gleichmäßig. Nur der Nächste: 1 Punkt für den besten Tipp. Nach Entfernung: genau 1000, doppelt/halb so viel 700, 10-mal daneben 0. Entfernung + Bonus: dazu +250 für den Nächsten, +500 für höchstens 5 % daneben.",
+        "en": "By rank: closest 1000, last 0, evenly in between. Closest only: 1 point for the best guess. By distance: spot on 1000, double/half 700, 10× off 0. Distance + bonus: plus +250 for the closest, +500 for within 5 %."
+      },
+      "choices": [
+        {
+          "value": "rank",
+          "label": {
+            "de": "Nach Platz",
+            "en": "By rank"
+          }
+        },
+        {
+          "value": "best",
+          "label": {
+            "de": "Nur der Nächste",
+            "en": "Closest only"
+          }
+        },
+        {
+          "value": "distance",
+          "label": {
+            "de": "Nach Entfernung",
+            "en": "By distance"
+          }
+        },
+        {
+          "value": "bonus",
+          "label": {
+            "de": "Entfernung + Bonus",
+            "en": "Distance + bonus"
+          }
+        }
+      ]
+    },
+    {
+      "id": "strictness",
+      "label": {
+        "de": "Strenge",
+        "en": "Strictness"
+      },
+      "default": "normal",
+      "help": {
+        "de": "Nur für „Nach Entfernung“ und „Entfernung + Bonus“: Ab wann gibt es 0 Punkte?",
+        "en": "Only for “By distance” and “Distance + bonus”: when do you get 0 points?"
+      },
+      "choices": [
+        {
+          "value": "normal",
+          "label": {
+            "de": "Normal (10-mal daneben = 0)",
+            "en": "Normal (10× off = 0)"
+          }
+        },
+        {
+          "value": "loose",
+          "label": {
+            "de": "Locker (100-mal daneben = 0)",
+            "en": "Relaxed (100× off = 0)"
           }
         }
       ]

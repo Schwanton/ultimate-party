@@ -2,6 +2,14 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.49.0
+
+- Guess the Clicks!: Neue Einstellung „Wertung“ – Nach Platz (neu Standard: der Nächste bekommt 1000, der Letzte 0, alle dazwischen gleichmäßig), Nur der Nächste (1 Punkt wie bisher), Nach Entfernung (genau richtig 1000, doppelt oder halb so viel 700, 10-mal daneben 0) und Entfernung + Bonus (+250 für den Nächsten, +500 für fast genau)
+- Guess the Clicks!: Neue Einstellung „Strenge“ für die Entfernungs-Wertungen – Locker gibt erst bei 100-mal daneben 0 Punkte
+- Guess the Clicks!: Wer am nächsten dran ist, zählt jetzt nach dem Faktor – doppelt so viel ist genauso weit weg wie halb so viel
+- Guess the Clicks!: Am Ende der Auflösung kommen alle Tipps mit ihren Punkten zurück auf den Strahl. Das Handy zeigt Platz, Punkte und wie viel-mal du daneben lagst
+- Schätzmeister: Die Punkte stehen bei der Auflösung jetzt neben dem Bild
+
 ## 0.48.2
 
 - Zufalls-Walze: Die Spiel-Einstellungen und die Spielerzahl (z. B. „4 / 10“) erscheinen erst, wenn die Walze steht – zusammen mit allem anderen

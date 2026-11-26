@@ -5,14 +5,14 @@
 import { useEffect, useMemo, type ReactNode } from 'react';
 import type { PlayerInfo } from '@up/sdk';
 import { Avatar, Confetti, Crown, sfx, useServerNow } from '@up/ui';
-import { START_DELAY, buildPlan, lg, stateAt } from './reveal';
+import { START_DELAY, buildPlan, lg, stateAt, type PlanOptions } from './reveal';
 
 export interface StrahlEntry {
   playerId: string;
   guess: number;
   /** am nächsten dran (am Ende hervorgehoben) */
   win?: boolean;
-  /** z. B. „+1000“ – erscheint am Ende neben dem Tipp */
+  /** z. B. „+1000“ – erscheint am Ende beim Tipp */
   badge?: string;
 }
 
@@ -22,9 +22,11 @@ export interface StrahlLabels {
   out: (names: string) => string;
   drum: string;
   answer: string;
+  /** Text, wenn am Ende alle Tipps zurückkommen (planOptions.showAll) */
+  all?: string;
 }
 
-export type StrahlPhase = 'placing' | 'zoom' | 'out' | 'drum' | 'answer' | 'done';
+export type StrahlPhase = 'placing' | 'zoom' | 'out' | 'drum' | 'answer' | 'done' | 'all';
 
 const W = 1168;
 const LINE_Y = 456;
@@ -57,7 +59,7 @@ function ticksFor(lo: number, hi: number, log: boolean): number[] {
   return out;
 }
 
-export function Strahl({ answer, entries, startAt, player, color, short, answerText, labels, children }: {
+export function Strahl({ answer, entries, startAt, player, color, short, answerText, labels, planOptions, children }: {
   answer: number;
   entries: StrahlEntry[];
   startAt: number;
@@ -67,10 +69,12 @@ export function Strahl({ answer, entries, startAt, player, color, short, answerT
   /** große Anzeige der echten Zahl */
   answerText: string;
   labels: StrahlLabels;
+  /** Entfernung als Faktor, alle Tipps am Ende zurückholen (muss zum Server passen) */
+  planOptions?: PlanOptions;
   /** Bereich oben links (Frage, Video …); bekommt die aktuelle Phase */
   children?: (phase: StrahlPhase) => ReactNode;
 }) {
-  const plan = useMemo(() => buildPlan(answer, entries), [startAt]); // eslint-disable-line react-hooks/exhaustive-deps
+  const plan = useMemo(() => buildPlan(answer, entries, planOptions), [startAt]); // eslint-disable-line react-hooks/exhaustive-deps
   const now = useServerNow(50);
   const t = (now - startAt) / 1000 - START_DELAY;
   const st = stateAt(plan, t);
@@ -100,7 +104,7 @@ export function Strahl({ answer, entries, startAt, player, color, short, answerT
   }
 
   const lastOut = [...plan.outs].reverse().find((o) => t >= o.at);
-  const phase: StrahlPhase = st.done ? 'done' : st.answer ? 'answer' : st.drum ? 'drum' : lastOut && t < lastOut.at + 1.9 ? 'out'
+  const phase: StrahlPhase = st.all ? 'all' : st.done ? 'done' : st.answer ? 'answer' : st.drum ? 'drum' : lastOut && t < lastOut.at + 1.9 ? 'out'
     : plan.ranges[1] && t >= plan.ranges[1].at ? 'zoom' : 'placing';
   const placedCount = entries.filter((e) => st.placed(e.playerId)).length;
   const outCount = plan.outs.filter((o) => t >= o.at).length;
@@ -112,10 +116,11 @@ export function Strahl({ answer, entries, startAt, player, color, short, answerT
   useEffect(() => { if (st.drum) sfx.play('drumroll'); }, [st.drum]);
   useEffect(() => { if (st.answer) sfx.play('ding'); }, [st.answer]);
   useEffect(() => { if (st.done && winners.length) sfx.play('fanfare'); }, [st.done]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (st.all) sfx.play('whoosh'); }, [st.all]);
 
   const status = phase === 'placing' ? labels.placing : phase === 'zoom' ? labels.zoom
     : phase === 'out' ? labels.out(lastOut!.ids.map((id) => player(id)?.name ?? '?').join(', '))
-      : phase === 'drum' ? labels.drum : labels.answer;
+      : phase === 'drum' ? labels.drum : phase === 'all' && labels.all ? labels.all : labels.answer;
   const ticks = ticksFor(lo, hi, log);
   const ax = x(answer);
 
@@ -128,7 +133,7 @@ export function Strahl({ answer, entries, startAt, player, color, short, answerT
           {st.answer ? (
             <>
               <span className="display anim-pop" style={{ fontSize: 58, fontWeight: 800, lineHeight: 1, color: 'var(--yellow)', fontVariantNumeric: 'tabular-nums' }}>{answerText}</span>
-              <span className="muted" style={{ fontSize: 18 }}>{labels.answer}</span>
+              <span key={phase === 'all' ? 'all' : 'answer'} className={phase === 'all' ? 'anim-pop' : 'muted'} style={{ fontSize: 18, fontWeight: phase === 'all' ? 700 : undefined }}>{phase === 'all' && labels.all ? labels.all : labels.answer}</span>
             </>
           ) : (
             <p key={status} className="display anim-pop" style={{ fontSize: phase === 'drum' ? 40 : 28, fontWeight: 800, color: phase === 'out' ? 'var(--red)' : phase === 'drum' ? 'var(--yellow)' : '#fff', maxWidth: 520, animation: phase === 'drum' ? 'upTick .5s ease-in-out infinite' : undefined }}>{status}</p>
@@ -158,6 +163,7 @@ export function Strahl({ answer, entries, startAt, player, color, short, answerT
         const grey = st.greyed.has(e.playerId);
         const win = st.done && !!e.win;
         const top = LINE_Y - 40 - (l + 1) * laneH + (crowd ? 4 : 0);
+        const badge = st.done && e.badge ? e.badge : null;
         const markerBottom = top + (crowd ? avatar : laneH - 8);
         const stroke = grey ? '#4A4378' : win ? 'var(--yellow)' : color;
         const move = `left .9s ${EASE}, top .5s ${EASE}, height .5s ${EASE}, opacity .4s`;
@@ -169,13 +175,24 @@ export function Strahl({ answer, entries, startAt, player, color, short, answerT
               <span style={{ position: 'relative' }}>
                 <Avatar player={p} size={avatar} />
                 {win && <Crown size={crowd ? 20 : 28} style={{ position: 'absolute', top: crowd ? -13 : -18, left: crowd ? 6 : 9 }} />}
+                {badge && (
+                  // Punkte: bei vielen Spielern als Aufkleber unten auf dem Bild, sonst rechts daneben
+                  <span style={{ position: 'absolute', display: 'flex', ...(crowd ? { left: -20, right: -20, bottom: -6, justifyContent: 'center' } : { left: avatar - 4, top: avatar / 2 - 10 }) }}>
+                    <span className="anim-pop" style={{
+                      whiteSpace: 'nowrap', fontWeight: 800, lineHeight: 1, fontVariantNumeric: 'tabular-nums', borderRadius: 8,
+                      background: win ? 'var(--yellow)' : '#110D24', color: win ? '#110D24' : '#fff', boxShadow: '0 2px 0 rgba(0,0,0,.35)',
+                      fontSize: crowd ? 10 : 14, padding: crowd ? '2px 3px' : '3px 6px',
+                    }}>{badge}</span>
+                  </span>
+                )}
               </span>
               {!crowd && (
                 <span style={{ background: win ? color : 'var(--surface)', color: win ? '#110D24' : '#fff', borderRadius: 10, padding: '2px 8px', textAlign: 'center', maxWidth: boxW, boxShadow: win ? '0 0 0 3px var(--yellow)' : undefined }}>
                   <b style={{ display: 'block', fontSize: 13, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</b>
-                  <span className="display" style={{ display: 'block', fontSize: 15, fontWeight: 800, whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>{short(e.guess)}{st.done && e.badge ? ` · ${e.badge}` : ''}</span>
+                  <span className="display" style={{ display: 'block', fontSize: 15, fontWeight: 800, whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>{short(e.guess)}</span>
                 </span>
               )}
+
             </div>
           </div>
         );
