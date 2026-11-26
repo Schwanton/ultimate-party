@@ -1,7 +1,7 @@
 {
  "name": "Basis",
  "author": "UP!",
- "version": "2.0.0",
+ "version": "2.1.0",
  "description": "Schätzfragen mit belegten Zahlen – auch in Badewannen, Fußballfeldern und Giraffen.",
  "items": [
   {
@@ -769,6 +769,339 @@
    "unit": "Gießkannen",
    "note": "1 Gießkanne = 10 Liter · Grundlage: 2.400 Liter „virtuelles Wasser“",
    "source": "WWF"
+  },
+  {
+   "id": "n81",
+   "question": "Wie viele Kilometer lang ist das deutsche Autobahnnetz?",
+   "answer": 13200,
+   "unit": "km",
+   "note": "Rund 120 Autobahnen (Stand 2025)",
+   "source": "Bundesverkehrsministerium"
+  },
+  {
+   "id": "n82",
+   "question": "Wie viele Gemeinden gibt es in Deutschland?",
+   "answer": 10775,
+   "unit": "Gemeinden",
+   "note": "Stand Ende 2023",
+   "source": "Destatis"
+  },
+  {
+   "id": "n83",
+   "question": "Wie viele Einwohner hat Arnis, die kleinste Stadt Deutschlands?",
+   "answer": 270,
+   "unit": "Einwohner",
+   "note": "Die Angaben schwanken zwischen 251 und 300",
+   "source": "Gemeinde Arnis / Statistikamt Nord"
+  },
+  {
+   "id": "n84",
+   "question": "Wie viele Apotheken gibt es in Deutschland?",
+   "answer": 16488,
+   "unit": "Apotheken",
+   "note": "Stand Ende Juni 2026 – Tendenz sinkend",
+   "source": "ABDA"
+  },
+  {
+   "id": "n85",
+   "question": "Wie viele Hunde leben in deutschen Haushalten?",
+   "answer": 10000000,
+   "unit": "Hunde",
+   "note": "Rund 10 Millionen (2025)",
+   "source": "IVH / ZZF"
+  },
+  {
+   "id": "n86",
+   "question": "Wie viele Stunden scheint in Deutschland in einem Jahr die Sonne?",
+   "answer": 1665,
+   "unit": "Stunden",
+   "note": "Durchschnitt 1991–2020 · Rekord 2022: 2.024 Stunden",
+   "source": "Deutscher Wetterdienst"
+  },
+  {
+   "id": "n87",
+   "question": "Wie viele neue Bücher sind 2025 in Deutschland erschienen?",
+   "answer": 52644,
+   "unit": "Bücher",
+   "note": "Nur Erstauflagen",
+   "source": "Börsenverein des Deutschen Buchhandels"
+  },
+  {
+   "id": "n88",
+   "question": "Wie viele Kilogramm Lebensmittel wirft jeder Deutsche zu Hause im Jahr weg?",
+   "answer": 75,
+   "unit": "kg",
+   "note": "Genau: 74,5 kg pro Kopf (2022)",
+   "source": "Umweltbundesamt"
+  },
+  {
+   "id": "n89",
+   "question": "Wie viele Eier isst ein Deutscher im Jahr?",
+   "answer": 252,
+   "unit": "Eier",
+   "note": "Inklusive Eier in Nudeln, Kuchen und Co. (2025)",
+   "source": "BZL"
+  },
+  {
+   "id": "n90",
+   "question": "Wie viele Eier legt eine Henne in Deutschland im Jahr?",
+   "answer": 299,
+   "unit": "Eier",
+   "note": "Durchschnitt 2025",
+   "source": "BZL"
+  },
+  {
+   "id": "n91",
+   "question": "Wie viele Passagiere nutzten 2025 den Flughafen Frankfurt?",
+   "answer": 63200000,
+   "unit": "Passagiere",
+   "note": "Deutschlands größter Flughafen",
+   "source": "Fraport"
+  },
+  {
+   "id": "n92",
+   "question": "Wie tief ist der Bodensee an der tiefsten Stelle?",
+   "answer": 251,
+   "unit": "m",
+   "note": "Zwischen Fischbach und Uttwil",
+   "source": "Internationale Gewässerschutzkommission"
+  },
+  {
+   "id": "n93",
+   "question": "Wie viele Einwohner hat Island?",
+   "answer": 396500,
+   "unit": "Einwohner",
+   "note": "Stand Mitte 2026",
+   "source": "Statistics Iceland"
+  },
+  {
+   "id": "n94",
+   "question": "Wie viele Einwohner hat Liechtenstein?",
+   "answer": 41722,
+   "unit": "Einwohner",
+   "note": "Stand Ende 2025",
+   "source": "Amt für Statistik Liechtenstein"
+  },
+  {
+   "id": "n95",
+   "question": "Wie hoch ist der Kilimandscharo?",
+   "answer": 5895,
+   "unit": "m",
+   "note": "Höchster Berg Afrikas"
+  },
+  {
+   "id": "n96",
+   "question": "Wie tief ist der Baikalsee?",
+   "answer": 1642,
+   "unit": "m",
+   "note": "Tiefster See der Welt"
+  },
+  {
+   "id": "n98",
+   "question": "Wie alt ist die Kiefer „Methusalem“ in Kalifornien?",
+   "answer": 4850,
+   "unit": "Jahre",
+   "note": "Gekeimt um 2833 v. Chr."
+  },
+  {
+   "id": "n99",
+   "question": "Wie lang ist die Grenze zwischen Kanada und den USA?",
+   "answer": 8891,
+   "unit": "km",
+   "note": "Längste Landgrenze der Welt",
+   "source": "International Boundary Commission"
+  },
+  {
+   "id": "n100",
+   "question": "Wie lang ist die Strecke der Transsibirischen Eisenbahn von Moskau nach Wladiwostok?",
+   "answer": 9288,
+   "unit": "km",
+   "note": "Die Fahrt dauert rund 7 Tage"
+  },
+  {
+   "id": "n101",
+   "question": "Wie oft pro Minute kann das Herz eines Kolibris schlagen?",
+   "answer": 1200,
+   "unit": "Schläge",
+   "note": "Beim Menschen: rund 70"
+  },
+  {
+   "id": "n102",
+   "question": "Wie hoch ist die Elbphilharmonie in Hamburg?",
+   "answer": 110,
+   "unit": "m",
+   "note": "Höchstes bewohntes Gebäude Hamburgs"
+  },
+  {
+   "id": "n104",
+   "question": "Wie viele Fenster hat das Empire State Building?",
+   "answer": 6514,
+   "unit": "Fenster",
+   "note": "102 Stockwerke",
+   "source": "Empire State Building"
+  },
+  {
+   "id": "n105",
+   "question": "Wie viele Aufzüge hat das Empire State Building?",
+   "answer": 73,
+   "unit": "Aufzüge",
+   "note": "Davon 6 Lastenaufzüge",
+   "source": "Empire State Building"
+  },
+  {
+   "id": "n106",
+   "question": "Wie viele Zimmer hat der Buckingham Palace?",
+   "answer": 775,
+   "unit": "Zimmer",
+   "note": "Darunter 78 Badezimmer",
+   "source": "Royal Collection Trust"
+  },
+  {
+   "id": "n107",
+   "question": "Wie viele Zimmer hat das Weiße Haus?",
+   "answer": 132,
+   "unit": "Zimmer",
+   "note": "Dazu 35 Badezimmer",
+   "source": "White House Historical Association"
+  },
+  {
+   "id": "n108",
+   "question": "Wie viele Stockwerke hat der Burj Khalifa?",
+   "answer": 163,
+   "unit": "Stockwerke",
+   "note": "828 m hoch – höchstes Gebäude der Welt"
+  },
+  {
+   "id": "n110",
+   "question": "Wie alt wurde der älteste Mensch, dessen Alter sicher belegt ist?",
+   "answer": 122,
+   "unit": "Jahre",
+   "note": "Jeanne Calment aus Frankreich (1875–1997)",
+   "source": "Guinness World Records"
+  },
+  {
+   "id": "n111",
+   "question": "Wie viele Tage am Stück dauerte der längste Aufenthalt eines Menschen im All?",
+   "answer": 437,
+   "unit": "Tage",
+   "note": "Waleri Poljakow auf der Raumstation Mir, 1994–95"
+  },
+  {
+   "id": "n112",
+   "question": "Wie viele Minuten dauerte das längste Tennismatch der Geschichte?",
+   "answer": 665,
+   "unit": "Minuten",
+   "note": "Isner gegen Mahut, Wimbledon 2010 – über drei Tage verteilt"
+  },
+  {
+   "id": "n113",
+   "question": "Wie viele Kilometer lang war die Tour de France 2025?",
+   "answer": 3338,
+   "unit": "km",
+   "note": "21 Etappen"
+  },
+  {
+   "id": "n114",
+   "question": "Wie schnell fliegt die Raumstation ISS?",
+   "answer": 28000,
+   "unit": "km/h",
+   "note": "Einmal um die Erde in rund 90 Minuten",
+   "source": "NASA"
+  },
+  {
+   "id": "n115",
+   "question": "Wie viele Gäste kamen 2026 aufs Oktoberfest?",
+   "answer": 7400000,
+   "unit": "Gäste",
+   "note": "Neuer Besucherrekord",
+   "source": "Stadt München, Wiesn-Bilanz 2026"
+  },
+  {
+   "id": "n116",
+   "question": "Wie viele Besucher hatte der Louvre in Paris 2025?",
+   "answer": 9046000,
+   "unit": "Besucher",
+   "note": "Meistbesuchtes Kunstmuseum der Welt",
+   "source": "The Art Newspaper"
+  },
+  {
+   "id": "n117",
+   "question": "Wie viele Haare hat ein Mensch auf dem Kopf?",
+   "answer": 100000,
+   "unit": "Haare",
+   "note": "Durchschnitt – Blonde haben meist mehr, Rothaarige weniger"
+  },
+  {
+   "id": "n118",
+   "question": "Wie viele Kalorien hat eine Maß Wiesnbier?",
+   "answer": 470,
+   "unit": "kcal",
+   "note": "Rund 47 kcal pro 100 ml"
+  },
+  {
+   "id": "n120",
+   "question": "Wie viele 1-Cent-Münzen übereinander wären so hoch wie die Zugspitze?",
+   "answer": 1774000,
+   "unit": "Münzen",
+   "note": "1 Cent = 1,67 mm dick · Zugspitze: 2.962 m"
+  },
+  {
+   "id": "n122",
+   "question": "Wie viele Elefanten wiegt ein voll beladener Airbus A380 beim Start?",
+   "answer": 96,
+   "unit": "Elefanten",
+   "note": "1 Elefant = 6 t · Höchstes Startgewicht: 575 t",
+   "source": "Airbus"
+  },
+  {
+   "id": "n123",
+   "question": "Wie oft passt Deutschland in Brasilien?",
+   "answer": 24,
+   "unit": "Mal",
+   "note": "Brasilien: 8,5 Millionen km² · Deutschland: 357.596 km²"
+  },
+  {
+   "id": "n124",
+   "question": "Wie viele Marathons lang ist der Rhein?",
+   "answer": 29,
+   "unit": "Marathons",
+   "note": "1 Marathon = 42,195 km · Rhein: 1.233 km"
+  },
+  {
+   "id": "n125",
+   "question": "Wie viele Kölner Dome tief ist das tiefste Bohrloch der Welt?",
+   "answer": 78,
+   "unit": "Kölner Dome",
+   "note": "1 Kölner Dom = 157 m · Kola-Bohrung (Russland): 12.262 m"
+  },
+  {
+   "id": "n126",
+   "question": "Wie viele Jahre bräuchte ein Auto mit 100 km/h bis zur Sonne?",
+   "answer": 171,
+   "unit": "Jahre",
+   "note": "Ohne Pause · Entfernung: 149,6 Millionen km"
+  },
+  {
+   "id": "n127",
+   "question": "Wie viele Tage bräuchte man zu Fuß einmal um die Erde – ohne Pause?",
+   "answer": 334,
+   "unit": "Tage",
+   "note": "Mit 5 km/h · Äquator: 40.075 km"
+  },
+  {
+   "id": "n128",
+   "question": "Wie viele Fußballfelder groß ist der Flughafen Frankfurt?",
+   "answer": 3220,
+   "unit": "Fußballfelder",
+   "note": "1 Fußballfeld = 105 × 68 m (7.140 m²) · Flughafen: rund 2.300 Hektar",
+   "source": "Fraport"
+  },
+  {
+   "id": "n130",
+   "question": "Wie viele Giraffen übereinander sind so hoch wie der höchste Wasserfall der Welt?",
+   "answer": 196,
+   "unit": "Giraffen",
+   "note": "1 Giraffe = 5 m · Salto Ángel (Venezuela): 979 m"
   }
  ]
 }

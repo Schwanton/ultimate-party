@@ -2,6 +2,10 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.52.0
+
+- Schätzmeister: 44 neue Schätzfragen – jetzt 146 insgesamt. Viele Alltagsfragen (Wie viele Apotheken gibt es in Deutschland? Wie viele Zimmer hat der Buckingham Palace?) und ein paar neue Spaß-Einheiten (Wie viele 1-Cent-Münzen übereinander sind so hoch wie die Zugspitze?)
+
 ## 0.51.0
 
 - Schätzmeister: 80 neue Schätzfragen – viele mit verrückten Einheiten: Wie viele Badewannen Bier fließen auf der Wiesn? Wie viele Elefanten wiegt der Eiffelturm? Wie viele Giraffen passen übereinander in den Marianengraben?

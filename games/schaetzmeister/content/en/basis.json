@@ -1,7 +1,7 @@
 {
  "name": "Basics",
  "author": "UP!",
- "version": "2.0.0",
+ "version": "2.1.0",
  "description": "Estimation questions with sourced numbers – also in bathtubs, football pitches and giraffes.",
  "items": [
   {
@@ -769,6 +769,339 @@
    "unit": "watering cans",
    "note": "1 watering can = 10 litres · Based on 2,400 litres of “virtual water”",
    "source": "WWF"
+  },
+  {
+   "id": "n81",
+   "question": "How many kilometres long is the German Autobahn network?",
+   "answer": 13200,
+   "unit": "km",
+   "note": "About 120 motorways (as of 2025)",
+   "source": "Bundesverkehrsministerium"
+  },
+  {
+   "id": "n82",
+   "question": "How many municipalities are there in Germany?",
+   "answer": 10775,
+   "unit": "municipalities",
+   "note": "As of end of 2023",
+   "source": "Destatis"
+  },
+  {
+   "id": "n83",
+   "question": "How many inhabitants does Arnis, the smallest town in Germany, have?",
+   "answer": 270,
+   "unit": "inhabitants",
+   "note": "Figures vary between 251 and 300",
+   "source": "Gemeinde Arnis / Statistikamt Nord"
+  },
+  {
+   "id": "n84",
+   "question": "How many pharmacies are there in Germany?",
+   "answer": 16488,
+   "unit": "pharmacies",
+   "note": "As of end of June 2026 – and falling",
+   "source": "ABDA"
+  },
+  {
+   "id": "n85",
+   "question": "How many dogs live in German households?",
+   "answer": 10000000,
+   "unit": "dogs",
+   "note": "About 10 million (2025)",
+   "source": "IVH / ZZF"
+  },
+  {
+   "id": "n86",
+   "question": "How many hours of sunshine does Germany get in a year?",
+   "answer": 1665,
+   "unit": "hours",
+   "note": "Average 1991–2020 · Record in 2022: 2,024 hours",
+   "source": "Deutscher Wetterdienst"
+  },
+  {
+   "id": "n87",
+   "question": "How many new books were published in Germany in 2025?",
+   "answer": 52644,
+   "unit": "books",
+   "note": "First editions only",
+   "source": "Börsenverein des Deutschen Buchhandels"
+  },
+  {
+   "id": "n88",
+   "question": "How many kilograms of food does every German throw away at home per year?",
+   "answer": 75,
+   "unit": "kg",
+   "note": "Exactly: 74.5 kg per person (2022)",
+   "source": "Umweltbundesamt"
+  },
+  {
+   "id": "n89",
+   "question": "How many eggs does the average German eat per year?",
+   "answer": 252,
+   "unit": "eggs",
+   "note": "Including eggs in pasta, cakes and so on (2025)",
+   "source": "BZL"
+  },
+  {
+   "id": "n90",
+   "question": "How many eggs does a hen in Germany lay per year?",
+   "answer": 299,
+   "unit": "eggs",
+   "note": "Average in 2025",
+   "source": "BZL"
+  },
+  {
+   "id": "n91",
+   "question": "How many passengers used Frankfurt Airport (Germany) in 2025?",
+   "answer": 63200000,
+   "unit": "passengers",
+   "note": "Germany’s largest airport",
+   "source": "Fraport"
+  },
+  {
+   "id": "n92",
+   "question": "How deep is Lake Constance (Germany/Austria/Switzerland) at its deepest point?",
+   "answer": 251,
+   "unit": "m",
+   "note": "Between Fischbach and Uttwil",
+   "source": "Internationale Gewässerschutzkommission"
+  },
+  {
+   "id": "n93",
+   "question": "How many inhabitants does Iceland have?",
+   "answer": 396500,
+   "unit": "inhabitants",
+   "note": "As of mid-2026",
+   "source": "Statistics Iceland"
+  },
+  {
+   "id": "n94",
+   "question": "How many inhabitants does Liechtenstein have?",
+   "answer": 41722,
+   "unit": "inhabitants",
+   "note": "As of end of 2025",
+   "source": "Amt für Statistik Liechtenstein"
+  },
+  {
+   "id": "n95",
+   "question": "How high is Mount Kilimanjaro (Tanzania)?",
+   "answer": 5895,
+   "unit": "m",
+   "note": "Highest mountain in Africa"
+  },
+  {
+   "id": "n96",
+   "question": "How deep is Lake Baikal (Russia)?",
+   "answer": 1642,
+   "unit": "m",
+   "note": "Deepest lake in the world"
+  },
+  {
+   "id": "n98",
+   "question": "How old is the “Methuselah” pine tree (California, USA)?",
+   "answer": 4850,
+   "unit": "years",
+   "note": "Germinated around 2833 BC"
+  },
+  {
+   "id": "n99",
+   "question": "How long is the border between Canada and the USA?",
+   "answer": 8891,
+   "unit": "km",
+   "note": "Longest land border in the world",
+   "source": "International Boundary Commission"
+  },
+  {
+   "id": "n100",
+   "question": "How long is the Trans-Siberian Railway from Moscow to Vladivostok (Russia)?",
+   "answer": 9288,
+   "unit": "km",
+   "note": "The journey takes about 7 days"
+  },
+  {
+   "id": "n101",
+   "question": "How many times per minute can a hummingbird’s heart beat?",
+   "answer": 1200,
+   "unit": "beats",
+   "note": "In humans: about 70"
+  },
+  {
+   "id": "n102",
+   "question": "How tall is the Elbphilharmonie concert hall (Hamburg, Germany)?",
+   "answer": 110,
+   "unit": "m",
+   "note": "Tallest inhabited building in Hamburg"
+  },
+  {
+   "id": "n104",
+   "question": "How many windows does the Empire State Building (New York, USA) have?",
+   "answer": 6514,
+   "unit": "windows",
+   "note": "102 floors",
+   "source": "Empire State Building"
+  },
+  {
+   "id": "n105",
+   "question": "How many elevators does the Empire State Building (New York, USA) have?",
+   "answer": 73,
+   "unit": "elevators",
+   "note": "6 of them are freight elevators",
+   "source": "Empire State Building"
+  },
+  {
+   "id": "n106",
+   "question": "How many rooms does Buckingham Palace (London, UK) have?",
+   "answer": 775,
+   "unit": "rooms",
+   "note": "Including 78 bathrooms",
+   "source": "Royal Collection Trust"
+  },
+  {
+   "id": "n107",
+   "question": "How many rooms does the White House (Washington, USA) have?",
+   "answer": 132,
+   "unit": "rooms",
+   "note": "Plus 35 bathrooms",
+   "source": "White House Historical Association"
+  },
+  {
+   "id": "n108",
+   "question": "How many floors does the Burj Khalifa (Dubai, UAE) have?",
+   "answer": 163,
+   "unit": "floors",
+   "note": "828 m tall – tallest building in the world"
+  },
+  {
+   "id": "n110",
+   "question": "How old was the oldest person whose age is reliably documented?",
+   "answer": 122,
+   "unit": "years",
+   "note": "Jeanne Calment from France (1875–1997)",
+   "source": "Guinness World Records"
+  },
+  {
+   "id": "n111",
+   "question": "How many days in a row did the longest single stay in space last?",
+   "answer": 437,
+   "unit": "days",
+   "note": "Valeri Polyakov on the Mir space station, 1994–95"
+  },
+  {
+   "id": "n112",
+   "question": "How many minutes did the longest tennis match in history last?",
+   "answer": 665,
+   "unit": "minutes",
+   "note": "Isner vs Mahut, Wimbledon 2010 – spread over three days"
+  },
+  {
+   "id": "n113",
+   "question": "How many kilometres long was the 2025 Tour de France?",
+   "answer": 3338,
+   "unit": "km",
+   "note": "21 stages"
+  },
+  {
+   "id": "n114",
+   "question": "How fast does the International Space Station fly?",
+   "answer": 28000,
+   "unit": "km/h",
+   "note": "Once around the Earth in about 90 minutes",
+   "source": "NASA"
+  },
+  {
+   "id": "n115",
+   "question": "How many visitors came to Oktoberfest 2026 (Munich, Germany)?",
+   "answer": 7400000,
+   "unit": "visitors",
+   "note": "A new visitor record",
+   "source": "Stadt München, Wiesn-Bilanz 2026"
+  },
+  {
+   "id": "n116",
+   "question": "How many visitors did the Louvre (Paris, France) have in 2025?",
+   "answer": 9046000,
+   "unit": "visitors",
+   "note": "Most visited art museum in the world",
+   "source": "The Art Newspaper"
+  },
+  {
+   "id": "n117",
+   "question": "How many hairs does a person have on their head?",
+   "answer": 100000,
+   "unit": "hairs",
+   "note": "Average – blondes usually have more, redheads fewer"
+  },
+  {
+   "id": "n118",
+   "question": "How many calories are in a one-litre stein of Oktoberfest beer?",
+   "answer": 470,
+   "unit": "kcal",
+   "note": "About 47 kcal per 100 ml"
+  },
+  {
+   "id": "n120",
+   "question": "How many 1-cent coins stacked on top of each other would be as high as the Zugspitze (Germany)?",
+   "answer": 1774000,
+   "unit": "coins",
+   "note": "1 cent = 1.67 mm thick · Zugspitze: 2,962 m"
+  },
+  {
+   "id": "n122",
+   "question": "How many elephants does a fully loaded Airbus A380 weigh at take-off?",
+   "answer": 96,
+   "unit": "elephants",
+   "note": "1 elephant = 6 t · Maximum take-off weight: 575 t",
+   "source": "Airbus"
+  },
+  {
+   "id": "n123",
+   "question": "How many times does Germany fit into Brazil?",
+   "answer": 24,
+   "unit": "times",
+   "note": "Brazil: 8.5 million km² · Germany: 357,596 km²"
+  },
+  {
+   "id": "n124",
+   "question": "How many marathons long is the river Rhine?",
+   "answer": 29,
+   "unit": "marathons",
+   "note": "1 marathon = 42.195 km · Rhine: 1,233 km"
+  },
+  {
+   "id": "n125",
+   "question": "How many Cologne Cathedrals (Germany) deep is the deepest borehole in the world?",
+   "answer": 78,
+   "unit": "Cologne Cathedrals",
+   "note": "1 Cologne Cathedral = 157 m · Kola borehole (Russia): 12,262 m"
+  },
+  {
+   "id": "n126",
+   "question": "How many years would a car driving at 100 km/h take to reach the Sun?",
+   "answer": 171,
+   "unit": "years",
+   "note": "Non-stop · Distance: 149.6 million km"
+  },
+  {
+   "id": "n127",
+   "question": "How many days would it take to walk once around the Earth – without a break?",
+   "answer": 334,
+   "unit": "days",
+   "note": "At 5 km/h · Equator: 40,075 km"
+  },
+  {
+   "id": "n128",
+   "question": "How many football pitches is Frankfurt Airport (Germany) in size?",
+   "answer": 3220,
+   "unit": "football pitches",
+   "note": "1 football pitch = 105 × 68 m (7,140 m²) · Airport: about 2,300 hectares",
+   "source": "Fraport"
+  },
+  {
+   "id": "n130",
+   "question": "How many giraffes stacked on top of each other are as tall as the highest waterfall in the world?",
+   "answer": 196,
+   "unit": "giraffes",
+   "note": "1 giraffe = 5 m · Angel Falls (Venezuela): 979 m"
   }
  ]
 }
