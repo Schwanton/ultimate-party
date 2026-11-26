@@ -1,21 +1,9 @@
 {
  "name": "Basis",
  "author": "UP!",
- "version": "1.0.0",
- "description": "Schätzfragen mit belegten Zahlen.",
+ "version": "2.0.0",
+ "description": "Schätzfragen mit belegten Zahlen – auch in Badewannen, Fußballfeldern und Giraffen.",
  "items": [
-  {
-   "id": "s1",
-   "question": "Wie viele Tasten hat ein klassisches Klavier?",
-   "answer": 88,
-   "source": "Wikipedia: Klavier"
-  },
-  {
-   "id": "s2",
-   "question": "Wie viele Knochen hat ein erwachsener Mensch?",
-   "answer": 206,
-   "source": "Wikipedia: Skelett des Menschen"
-  },
   {
    "id": "s3",
    "question": "Wie hoch ist der Eiffelturm (mit Antennen)?",
@@ -29,13 +17,6 @@
    "answer": 2962,
    "unit": "m",
    "source": "Wikipedia: Zugspitze"
-  },
-  {
-   "id": "s5",
-   "question": "Wie hoch ist der Mount Everest?",
-   "answer": 8849,
-   "unit": "m",
-   "source": "Wikipedia: Mount Everest"
   },
   {
    "id": "s6",
@@ -66,65 +47,10 @@
    "source": "Wikipedia: Mond"
   },
   {
-   "id": "s10",
-   "question": "Wie lang ist der Äquator?",
-   "answer": 40075,
-   "unit": "km",
-   "source": "Wikipedia: Äquator"
-  },
-  {
-   "id": "s11",
-   "question": "In welchem Jahr landeten zum ersten Mal Menschen auf dem Mond?",
-   "answer": 1969,
-   "source": "Wikipedia: Apollo 11"
-  },
-  {
-   "id": "s12",
-   "question": "In welchem Jahr fiel die Berliner Mauer?",
-   "answer": 1989,
-   "source": "Wikipedia: Berliner Mauer"
-  },
-  {
-   "id": "s13",
-   "question": "In welchem Jahr sank die Titanic?",
-   "answer": 1912,
-   "source": "Wikipedia: Titanic"
-  },
-  {
-   "id": "s14",
-   "question": "In welchem Jahr kam das erste iPhone auf den Markt?",
-   "answer": 2007,
-   "source": "Wikipedia: iPhone"
-  },
-  {
-   "id": "s15",
-   "question": "In welchem Jahr wurde Google gegründet?",
-   "answer": 1998,
-   "source": "Wikipedia: Google LLC"
-  },
-  {
    "id": "s16",
    "question": "In welchem Jahr fand die erste Fußball-Weltmeisterschaft statt?",
    "answer": 1930,
    "source": "Wikipedia: Fußball-Weltmeisterschaft 1930"
-  },
-  {
-   "id": "s17",
-   "question": "Wie viele Sekunden hat ein Tag?",
-   "answer": 86400,
-   "source": "24 × 60 × 60"
-  },
-  {
-   "id": "s18",
-   "question": "Wie viele Minuten hat eine Woche?",
-   "answer": 10080,
-   "source": "7 × 24 × 60"
-  },
-  {
-   "id": "s19",
-   "question": "Wie viele Länder gehören zur Europäischen Union?",
-   "answer": 27,
-   "source": "Wikipedia: Europäische Union"
   },
   {
    "id": "s20",
@@ -139,60 +65,16 @@
    "source": "Wikipedia: Afrika"
   },
   {
-   "id": "s22",
-   "question": "Wie viele chemische Elemente kennt das Periodensystem heute?",
-   "answer": 118,
-   "source": "Wikipedia: Periodensystem"
-  },
-  {
-   "id": "s23",
-   "question": "Wie viele Felder hat ein Schachbrett?",
-   "answer": 64,
-   "source": "Wikipedia: Schachbrett"
-  },
-  {
    "id": "s24",
    "question": "Wie viele Felder hat ein klassisches Monopoly-Spielbrett?",
    "answer": 40,
    "source": "Wikipedia: Monopoly"
   },
   {
-   "id": "s25",
-   "question": "Wie viele Zähne hat ein Erwachsener (mit Weisheitszähnen)?",
-   "answer": 32,
-   "source": "Wikipedia: Gebiss des Menschen"
-  },
-  {
-   "id": "s26",
-   "question": "Wie viele Herzen hat ein Oktopus?",
-   "answer": 3,
-   "source": "Wikipedia: Kraken"
-  },
-  {
-   "id": "s27",
-   "question": "Wie viele Sinfonien hat Beethoven vollendet?",
-   "answer": 9,
-   "source": "Wikipedia: Ludwig van Beethoven"
-  },
-  {
    "id": "s28",
    "question": "Wie viele Zeitzonen hat Russland?",
    "answer": 11,
    "source": "Wikipedia: Zeitzonen in Russland"
-  },
-  {
-   "id": "s29",
-   "question": "Wie lang ist ein Marathon?",
-   "answer": 42195,
-   "unit": "m",
-   "source": "Wikipedia: Marathonlauf"
-  },
-  {
-   "id": "s30",
-   "question": "Bei wie viel Grad Fahrenheit kocht Wasser (auf Meereshöhe)?",
-   "answer": 212,
-   "unit": "°F",
-   "source": "Wikipedia: Grad Fahrenheit"
   },
   {
    "id": "s31",
@@ -228,13 +110,6 @@
    "source": "Wikipedia: Schallgeschwindigkeit"
   },
   {
-   "id": "s36",
-   "question": "Wie schnell ist das Licht im Vakuum?",
-   "answer": 299792,
-   "unit": "km/s",
-   "source": "Wikipedia: Lichtgeschwindigkeit"
-  },
-  {
    "id": "s37",
    "question": "Wie viele Folgen hat die Serie „Friends“?",
    "answer": 236,
@@ -246,12 +121,6 @@
    "answer": 35,
    "unit": "Jahre",
    "source": "Wikipedia: Wolfgang Amadeus Mozart"
-  },
-  {
-   "id": "s39",
-   "question": "Wie viele Augen hat ein normaler Spielwürfel insgesamt?",
-   "answer": 21,
-   "source": "1 + 2 + 3 + 4 + 5 + 6"
   },
   {
    "id": "s40",
@@ -281,10 +150,625 @@
    "source": "Wikipedia: Afrikanischer Elefant"
   },
   {
-   "id": "s44",
-   "question": "Wie viele Karten hat ein Skatblatt?",
+   "id": "n1",
+   "question": "Wie viele Badewannen Leitungswasser verbraucht ein Deutscher im Jahr?",
+   "answer": 297,
+   "unit": "Badewannen",
+   "note": "1 Badewanne = 150 Liter · Grundlage: 122 Liter pro Kopf und Tag",
+   "source": "BDEW 2024"
+  },
+  {
+   "id": "n2",
+   "question": "Wie viele Badewannen Bier wurden auf dem Oktoberfest 2026 getrunken?",
+   "answer": 44700,
+   "unit": "Badewannen",
+   "note": "1 Badewanne = 150 Liter · Grundlage: 6,7 Millionen Maß",
+   "source": "Stadt München, Wiesn-Bilanz 2026"
+  },
+  {
+   "id": "n3",
+   "question": "Wie viele Badewannen Wasser braucht die Herstellung einer Jeans?",
+   "answer": 53,
+   "unit": "Badewannen",
+   "note": "1 Badewanne = 150 Liter · Grundlage: 8.000 Liter im weltweiten Schnitt",
+   "source": "Wasserfußabdruck, Öko-Test"
+  },
+  {
+   "id": "n4",
+   "question": "Wie viele Badewannen Blut pumpt ein menschliches Herz an einem Tag?",
+   "answer": 47,
+   "unit": "Badewannen",
+   "note": "1 Badewanne = 150 Liter · Grundlage: rund 7.000 Liter pro Tag",
+   "source": "Planet Wissen"
+  },
+  {
+   "id": "n5",
+   "question": "Wie viele Badewannen Wasser passen in ein olympisches Schwimmbecken?",
+   "answer": 16700,
+   "unit": "Badewannen",
+   "note": "1 Badewanne = 150 Liter · Becken 50 × 25 × 2 m = 2,5 Millionen Liter",
+   "source": "World Aquatics (Mindesttiefe 2 m)"
+  },
+  {
+   "id": "n6",
+   "question": "Wie viele Fußballfelder groß ist die Theresienwiese, auf der das Oktoberfest stattfindet?",
+   "answer": 59,
+   "unit": "Fußballfelder",
+   "note": "1 Fußballfeld = 105 × 68 m (7.140 m²) · Theresienwiese: 42 Hektar",
+   "source": "muenchen.de"
+  },
+  {
+   "id": "n7",
+   "question": "Wie viele Fußballfelder groß ist der Vatikan?",
+   "answer": 62,
+   "unit": "Fußballfelder",
+   "note": "1 Fußballfeld = 105 × 68 m (7.140 m²) · Vatikan: 0,44 km²",
+   "source": "Statista"
+  },
+  {
+   "id": "n8",
+   "question": "Wie viele Fußballfelder groß ist Monaco?",
+   "answer": 283,
+   "unit": "Fußballfelder",
+   "note": "1 Fußballfeld = 105 × 68 m (7.140 m²) · Monaco: 2,02 km²",
+   "source": "Wikipedia: Monaco"
+  },
+  {
+   "id": "n9",
+   "question": "Wie viele Fußballfelder groß ist der Central Park in New York?",
+   "answer": 478,
+   "unit": "Fußballfelder",
+   "note": "1 Fußballfeld = 105 × 68 m (7.140 m²) · Central Park: 341 Hektar",
+   "source": "Wikipedia: Central Park"
+  },
+  {
+   "id": "n10",
+   "question": "Wie oft passt das Saarland in Deutschland?",
+   "answer": 139,
+   "unit": "Mal",
+   "note": "Saarland = 2.571 km² · Deutschland: 357.596 km²",
+   "source": "Destatis"
+  },
+  {
+   "id": "n11",
+   "question": "Wie viele Marathons lang ist die Chinesische Mauer?",
+   "answer": 502,
+   "unit": "Marathons",
+   "note": "1 Marathon = 42,195 km · Mauer: 21.196 km (Vermessung 2012)",
+   "source": "Chinesische Denkmalbehörde 2012"
+  },
+  {
+   "id": "n12",
+   "question": "Wie viele Giraffen übereinander reichen bis zur Turmspitze des Ulmer Münsters?",
    "answer": 32,
-   "source": "Wikipedia: Skat / Spielkarte"
+   "unit": "Giraffen",
+   "note": "1 Giraffe = 5 m · Turm: 161,53 m",
+   "source": "Ulmer Münster"
+  },
+  {
+   "id": "n13",
+   "question": "Wie viele Saunen gibt es in Finnland?",
+   "answer": 3300000,
+   "unit": "Saunen",
+   "note": "Bei rund 5,6 Millionen Einwohnern",
+   "source": "finland.fi"
+  },
+  {
+   "id": "n14",
+   "question": "Wie viele Brücken hat Hamburg?",
+   "answer": 2500,
+   "unit": "Brücken",
+   "note": "Mehr als Venedig, Amsterdam und London zusammen (Zählung 2004: 2.496)",
+   "source": "Stadt Hamburg (LSBG)"
+  },
+  {
+   "id": "n15",
+   "question": "Wie viele Stufen führen im Eiffelturm bis zur 2. Etage?",
+   "answer": 674,
+   "unit": "Stufen",
+   "note": "Die 2. Etage liegt auf 115 m Höhe",
+   "source": "france.fr"
+  },
+  {
+   "id": "n16",
+   "question": "Wie viele Liter Wasser stecken in der Herstellung einer Tasse Kaffee?",
+   "answer": 140,
+   "unit": "Liter",
+   "note": "„Virtuelles Wasser“: Anbau, Ernte, Verarbeitung und Transport",
+   "source": "WWF"
+  },
+  {
+   "id": "n17",
+   "question": "Wie viele Liter Kaffee trinkt ein Deutscher im Jahr?",
+   "answer": 161,
+   "unit": "Liter",
+   "note": "Durchschnitt pro Kopf 2025",
+   "source": "Deutscher Kaffeeverband"
+  },
+  {
+   "id": "n18",
+   "question": "Wie oft schlägt ein menschliches Herz an einem Tag?",
+   "answer": 100000,
+   "unit": "Schläge",
+   "note": "Rund 70 Schläge pro Minute",
+   "source": "Lernhelfer"
+  },
+  {
+   "id": "n19",
+   "question": "Rekord: Wie viele Kilometer flog eine Küstenseeschwalbe in einem einzigen Jahr?",
+   "answer": 96000,
+   "unit": "km",
+   "note": "Gemessen mit einem Mini-Peilsender – mehr als zweimal um die Erde",
+   "source": "Newcastle University 2016"
+  },
+  {
+   "id": "n20",
+   "question": "Wie schwer war das Herz eines Blauwals, das ein Museum präpariert hat?",
+   "answer": 180,
+   "unit": "kg",
+   "note": "So schwer wie zwei bis drei Erwachsene",
+   "source": "Royal Ontario Museum"
+  },
+  {
+   "id": "n21",
+   "question": "Wie viele Teelöffel Wasser passen in eine Badewanne?",
+   "answer": 30000,
+   "unit": "Teelöffel",
+   "note": "1 Badewanne = 150 Liter · 1 Teelöffel = 5 ml"
+  },
+  {
+   "id": "n22",
+   "question": "Wie viele Schnapsgläser Blut hat ein erwachsener Mensch?",
+   "answer": 250,
+   "unit": "Schnapsgläser",
+   "note": "1 Schnapsglas = 2 cl · Grundlage: rund 5 Liter Blut",
+   "source": "Planet Wissen"
+  },
+  {
+   "id": "n23",
+   "question": "Wie viele Maßkrüge Luft atmet ein Mensch an einem Tag ein?",
+   "answer": 11000,
+   "unit": "Maß",
+   "note": "1 Maß = 1 Liter · Grundlage: 10.000–12.000 Liter in Ruhe",
+   "source": "Planet Wissen, Elsevier"
+  },
+  {
+   "id": "n24",
+   "question": "Wie viele Maßkrüge Wasser passen in den Bodensee?",
+   "answer": 48000000000000,
+   "unit": "Maß",
+   "note": "1 Maß = 1 Liter · Bodensee: 48,4 km³ Wasser",
+   "source": "Internationale Gewässerschutzkommission"
+  },
+  {
+   "id": "n25",
+   "question": "Wie viele olympische Schwimmbecken Wasser fließen pro Sekunde aus dem Amazonas ins Meer?",
+   "answer": 84,
+   "unit": "Becken",
+   "note": "1 Olympia-Becken = 2.500 m³ · Amazonas: 209.000 m³ pro Sekunde",
+   "source": "Statista / WorldAtlas"
+  },
+  {
+   "id": "n26",
+   "question": "Wie viele Badewannen Kerosin passen in die Tanks eines Airbus A380?",
+   "answer": 2130,
+   "unit": "Badewannen",
+   "note": "1 Badewanne = 150 Liter · A380: rund 320.000 Liter",
+   "source": "Airbus"
+  },
+  {
+   "id": "n27",
+   "question": "Wie viele Gießkannen Wasser braucht die Herstellung von 1 kg Schokolade?",
+   "answer": 1720,
+   "unit": "Gießkannen",
+   "note": "1 Gießkanne = 10 Liter · Grundlage: 1.720 Liter je 100-g-Tafel",
+   "source": "waterfootprint.org"
+  },
+  {
+   "id": "n28",
+   "question": "Wie viele olympische Schwimmbecken Blut pumpt ein Herz in einem ganzen Leben?",
+   "answer": 80,
+   "unit": "Becken",
+   "note": "1 Olympia-Becken = 2.500 m³ · Grundlage: über 200 Millionen Liter in 80 Jahren",
+   "source": "gesundheit.gv.at"
+  },
+  {
+   "id": "n29",
+   "question": "Wie viele Maß Bier trinkt ein Deutscher im Jahr?",
+   "answer": 88,
+   "unit": "Maß",
+   "note": "1 Maß = 1 Liter · Pro-Kopf-Verbrauch 2024",
+   "source": "Deutscher Brauer-Bund"
+  },
+  {
+   "id": "n30",
+   "question": "Wie viele Badewannen Milch gibt eine Kuh in Deutschland pro Jahr?",
+   "answer": 61,
+   "unit": "Badewannen",
+   "note": "1 Badewanne = 150 Liter · Grundlage: 9.452 kg Milch je Kuh (2025)",
+   "source": "BLE / Destatis"
+  },
+  {
+   "id": "n31",
+   "question": "Wie viele Badewannen Regen fallen pro Jahr auf ein Fußballfeld in Deutschland?",
+   "answer": 37200,
+   "unit": "Badewannen",
+   "note": "1 Badewanne = 150 Liter · 1 Fußballfeld = 105 × 68 m (7.140 m²) · Grundlage: 782 Liter pro m² und Jahr",
+   "source": "Deutscher Wetterdienst (1991–2020)"
+  },
+  {
+   "id": "n32",
+   "question": "Wie viele Liter Blut pumpt das Herz eines Blauwals mit einem einzigen Schlag?",
+   "answer": 80,
+   "unit": "Liter",
+   "note": "Es schlägt nur alle 7 bis 15 Sekunden",
+   "source": "Spektrum der Wissenschaft"
+  },
+  {
+   "id": "n33",
+   "question": "Wie viele DIN-A4-Blätter braucht man, um ein Fußballfeld auszulegen?",
+   "answer": 114500,
+   "unit": "Blätter",
+   "note": "1 Fußballfeld = 105 × 68 m (7.140 m²) · 1 Blatt = 21 × 29,7 cm"
+  },
+  {
+   "id": "n34",
+   "question": "Wie viele Tischtennisplatten passen auf die Fläche eines Tennisplatzes?",
+   "answer": 62,
+   "unit": "Tischtennisplatten",
+   "note": "1 Tischtennisplatte = 2,74 × 1,525 m (4,18 m²) · Tennisplatz: 23,77 × 10,97 m"
+  },
+  {
+   "id": "n35",
+   "question": "Wie oft passt das Saarland in Russland?",
+   "answer": 6650,
+   "unit": "Mal",
+   "note": "Saarland = 2.571 km² · Russland: 17,1 Millionen km²"
+  },
+  {
+   "id": "n36",
+   "question": "Wie oft passt das Saarland in Bayern?",
+   "answer": 27,
+   "unit": "Mal",
+   "note": "Saarland = 2.571 km² · Bayern: 70.542 km²"
+  },
+  {
+   "id": "n37",
+   "question": "Wie oft passt das Saarland in Grönland?",
+   "answer": 842,
+   "unit": "Mal",
+   "note": "Saarland = 2.571 km² · Grönland: 2,17 Millionen km²"
+  },
+  {
+   "id": "n38",
+   "question": "Wie oft passt der Bodensee ins Kaspische Meer?",
+   "answer": 692,
+   "unit": "Mal",
+   "note": "Bodensee: 536 km² · Kaspisches Meer: 371.000 km²"
+  },
+  {
+   "id": "n39",
+   "question": "Wie viele Tischtennisplatten Wald gibt es in Deutschland pro Einwohner?",
+   "answer": 330,
+   "unit": "Tischtennisplatten",
+   "note": "1 Tischtennisplatte = 2,74 × 1,525 m (4,18 m²) · Grundlage: 11,5 Millionen Hektar Wald, 83,6 Millionen Einwohner",
+   "source": "Bundeswaldinventur 2022"
+  },
+  {
+   "id": "n40",
+   "question": "Wie viele Fußballfelder groß ist die Hauptinsel von Helgoland?",
+   "answer": 140,
+   "unit": "Fußballfelder",
+   "note": "1 Fußballfeld = 105 × 68 m (7.140 m²) · Hauptinsel: rund 1 km²"
+  },
+  {
+   "id": "n41",
+   "question": "Wie viele Fußballfelder groß ist Rügen, Deutschlands größte Insel?",
+   "answer": 129700,
+   "unit": "Fußballfelder",
+   "note": "1 Fußballfeld = 105 × 68 m (7.140 m²) · Rügen: 926 km²"
+  },
+  {
+   "id": "n42",
+   "question": "Wie viele Bananen hintereinander sind so lang wie ein Fußballfeld?",
+   "answer": 525,
+   "unit": "Bananen",
+   "note": "1 Banane = 20 cm · Fußballfeld: 105 m lang"
+  },
+  {
+   "id": "n43",
+   "question": "Wie viele Spaghetti hintereinander ergeben einen Marathon?",
+   "answer": 168800,
+   "unit": "Spaghetti",
+   "note": "1 Spaghetto = 25 cm · Marathon: 42,195 km"
+  },
+  {
+   "id": "n44",
+   "question": "Wie viele Londoner Doppeldeckerbusse hintereinander sind so lang wie die Titanic?",
+   "answer": 24,
+   "unit": "Busse",
+   "note": "1 Bus = 11,2 m · Titanic: 269 m"
+  },
+  {
+   "id": "n45",
+   "question": "Wie viele ICE-Züge hintereinander passen in den Gotthard-Basistunnel?",
+   "answer": 153,
+   "unit": "Züge",
+   "note": "1 ICE 4 mit 13 Wagen = 374 m · Tunnel: 57,1 km",
+   "source": "Deutsche Bahn"
+  },
+  {
+   "id": "n46",
+   "question": "Wie viele Berliner Fernsehtürme übereinander erreichen die Reiseflughöhe eines Passagierjets?",
+   "answer": 30,
+   "unit": "Fernsehtürme",
+   "note": "1 Fernsehturm = 368 m · Reiseflughöhe: rund 11 km"
+  },
+  {
+   "id": "n47",
+   "question": "Wie viele Giraffen übereinander reichen vom tiefsten Punkt des Marianengrabens bis zur Wasseroberfläche?",
+   "answer": 2200,
+   "unit": "Giraffen",
+   "note": "1 Giraffe = 5 m · Tiefe: rund 11.000 m"
+  },
+  {
+   "id": "n48",
+   "question": "Wie viele Kölner Dome übereinander reichen bis zur Raumstation ISS?",
+   "answer": 2550,
+   "unit": "Kölner Dome",
+   "note": "1 Kölner Dom = 157 m · ISS: rund 400 km hoch"
+  },
+  {
+   "id": "n49",
+   "question": "Wie viele Kilometer Bücherregal hat die größte Bibliothek der Welt?",
+   "answer": 1350,
+   "unit": "km",
+   "note": "Library of Congress in Washington (USA): 838 Meilen",
+   "source": "Guinness World Records"
+  },
+  {
+   "id": "n50",
+   "question": "Wie viele Stufen führen im Ulmer Münster bis zur obersten Aussichtsplattform?",
+   "answer": 768,
+   "unit": "Stufen",
+   "note": "Die Plattform liegt auf 143 m Höhe",
+   "source": "Ulmer Münster"
+  },
+  {
+   "id": "n51",
+   "question": "Wie viele Elefanten wiegt der Eiffelturm?",
+   "answer": 1680,
+   "unit": "Elefanten",
+   "note": "1 Elefant = 6 t · Eiffelturm: 10.100 t",
+   "source": "france.fr"
+  },
+  {
+   "id": "n52",
+   "question": "Wie viele Elefanten wiegt die Freiheitsstatue?",
+   "answer": 38,
+   "unit": "Elefanten",
+   "note": "1 Elefant = 6 t · Freiheitsstatue: 225 t"
+  },
+  {
+   "id": "n53",
+   "question": "Wie viele Smarts wiegt ein Blauwal?",
+   "answer": 210,
+   "unit": "Smarts",
+   "note": "1 Smart = 900 kg · Blauwal: bis zu 190 t"
+  },
+  {
+   "id": "n54",
+   "question": "Wie viele Hühnereier wiegt ein Straußenei?",
+   "answer": 25,
+   "unit": "Hühnereier",
+   "note": "1 Hühnerei = 60 g · Straußenei: rund 1,5 kg",
+   "source": "Alimentarium"
+  },
+  {
+   "id": "n55",
+   "question": "Wie viele Gummibärchen wiegt eine Hauskatze?",
+   "answer": 1960,
+   "unit": "Gummibärchen",
+   "note": "1 Goldbär = 2,3 g · Katze: 4,5 kg",
+   "source": "Haribo"
+  },
+  {
+   "id": "n56",
+   "question": "Wie viele Tonnen Tomaten flogen 2025 bei der Tomatenschlacht „La Tomatina“?",
+   "answer": 120,
+   "unit": "Tonnen",
+   "note": "Rund 22.000 Teilnehmer, eine Stunde lang",
+   "source": "Keystone-SDA"
+  },
+  {
+   "id": "n57",
+   "question": "Wie viele Kilogramm Käse isst ein Deutscher im Jahr?",
+   "answer": 26,
+   "unit": "kg",
+   "note": "Genau: 26,4 kg pro Kopf (2025)",
+   "source": "BLE"
+  },
+  {
+   "id": "n58",
+   "question": "Wie viele Fußballspiele lang schläft ein Mensch in seinem Leben?",
+   "answer": 155700,
+   "unit": "Fußballspiele",
+   "note": "1 Spiel = 90 Minuten · Grundlage: 8 Stunden pro Nacht, 80 Jahre"
+  },
+  {
+   "id": "n59",
+   "question": "Wie viele Folgen „Die Sendung mit der Maus“ könnte man auf dem längsten Linienflug der Welt schauen?",
+   "answer": 38,
+   "unit": "Folgen",
+   "note": "1 Folge = 30 Minuten · Singapur–New York: rund 19 Stunden",
+   "source": "Singapore Airlines"
+  },
+  {
+   "id": "n60",
+   "question": "Wie oft schlägt ein menschliches Herz in einem ganzen Leben?",
+   "answer": 3000000000,
+   "unit": "Schläge",
+   "note": "Grundlage: 80 Lebensjahre",
+   "source": "gesundheit.gv.at"
+  },
+  {
+   "id": "n61",
+   "question": "Wie alt war der älteste bisher datierte Grönlandhai (geschätzt)?",
+   "answer": 392,
+   "unit": "Jahre",
+   "note": "Altersbestimmung über die Augenlinse – mögliche Spanne 272 bis 512 Jahre",
+   "source": "Science 2016"
+  },
+  {
+   "id": "n62",
+   "question": "Wie viele Atemzüge macht ein Erwachsener an einem Tag?",
+   "answer": 20000,
+   "unit": "Atemzüge",
+   "note": "12 bis 18 Atemzüge pro Minute in Ruhe",
+   "source": "Planet Wissen"
+  },
+  {
+   "id": "n63",
+   "question": "Wie viele Badeenten, Plastikfrösche und Co. fielen 1992 bei einem Sturm in den Pazifik?",
+   "answer": 28800,
+   "unit": "Badetiere",
+   "note": "Die „Friendly Floatees“ – manche trieben bis nach Europa",
+   "source": "Guinness World Records"
+  },
+  {
+   "id": "n64",
+   "question": "Wie viele Maßkrüge wollten Gäste auf dem Oktoberfest 2026 heimlich mitnehmen?",
+   "answer": 105000,
+   "unit": "Maßkrüge",
+   "note": "So viele hat der Ordnungsdienst abgefangen",
+   "source": "Stadt München, Wiesn-Bilanz 2026"
+  },
+  {
+   "id": "n65",
+   "question": "Wie viele Federn hat ein Schwan?",
+   "answer": 25000,
+   "unit": "Federn",
+   "note": "Die meisten sind winzig und sitzen an Kopf und Hals"
+  },
+  {
+   "id": "n66",
+   "question": "Wie viele Inseln hat Schweden?",
+   "answer": 267570,
+   "unit": "Inseln",
+   "note": "Weniger als 1.000 davon sind bewohnt",
+   "source": "Statistik Schweden 2013"
+  },
+  {
+   "id": "n67",
+   "question": "Wie viele Seen hat Finnland?",
+   "answer": 187888,
+   "unit": "Seen",
+   "note": "Gezählt ab 500 m² Fläche",
+   "source": "Finnisches Umweltministerium"
+  },
+  {
+   "id": "n68",
+   "question": "Wie viele Gartenzwerge stehen in Deutschland?",
+   "answer": 20000000,
+   "unit": "Gartenzwerge",
+   "note": "Schätzung – gezählt hat sie niemand",
+   "source": "Die Rheinpfalz"
+  },
+  {
+   "id": "n69",
+   "question": "Wie viele Currywürste essen die Deutschen im Jahr?",
+   "answer": 800000000,
+   "unit": "Currywürste",
+   "note": "Schätzung – allein in Berlin rund 70 Millionen",
+   "source": "Deutsches Currywurst Museum"
+  },
+  {
+   "id": "n70",
+   "question": "Wie viele Weihnachtsbäume werden in Deutschland pro Jahr verkauft?",
+   "answer": 25000000,
+   "unit": "Bäume",
+   "note": "Branchenangabe: 23 bis 25 Millionen",
+   "source": "Bundesverband der Weihnachtsbaumerzeuger"
+  },
+  {
+   "id": "n71",
+   "question": "Wie viele Wunschzettel bekam der Weihnachtsmann 2025 in Himmelpfort?",
+   "answer": 280000,
+   "unit": "Wunschzettel",
+   "note": "Deutschlands größte Weihnachtspostfiliale – Briefe aus 63 Ländern",
+   "source": "Deutsche Post"
+  },
+  {
+   "id": "n72",
+   "question": "Wie viele Schafe leben in Neuseeland?",
+   "answer": 23250000,
+   "unit": "Schafe",
+   "note": "Rund 4,5 Schafe pro Einwohner (2025)",
+   "source": "Stats NZ"
+  },
+  {
+   "id": "n73",
+   "question": "Wie viele Blitze zucken weltweit pro Sekunde?",
+   "answer": 100,
+   "unit": "Blitze",
+   "note": "Nur rund jeder zehnte trifft den Boden",
+   "source": "Deutscher Wetterdienst"
+  },
+  {
+   "id": "n74",
+   "question": "Wie viele Blitze schlugen 2024 in Deutschland ein?",
+   "answer": 209619,
+   "unit": "Blitze",
+   "note": "Im Schnitt alle zweieinhalb Minuten einer",
+   "source": "Siemens BLIDS"
+  },
+  {
+   "id": "n75",
+   "question": "Wie viele Lampen glitzern am Eiffelturm, wenn er funkelt?",
+   "answer": 20000,
+   "unit": "Lampen",
+   "note": "Jeden Abend zur vollen Stunde für 5 Minuten",
+   "source": "Paris City Vision"
+  },
+  {
+   "id": "n76",
+   "question": "Wie viele Goldbären stellt Haribo an einem Tag her?",
+   "answer": 160000000,
+   "unit": "Goldbären",
+   "note": "Weltweit, in allen Werken zusammen",
+   "source": "Haribo"
+  },
+  {
+   "id": "n77",
+   "question": "Wie viele Pakete sortiert DHL in Deutschland an einem normalen Tag?",
+   "answer": 6700000,
+   "unit": "Pakete",
+   "note": "Rekordtag 2025: 12,4 Millionen",
+   "source": "DHL Group"
+  },
+  {
+   "id": "n78",
+   "question": "Wie viele Sprachen werden auf der Welt gesprochen?",
+   "answer": 7160,
+   "unit": "Sprachen",
+   "note": "Allein in Papua-Neuguinea über 800",
+   "source": "Ethnologue 2025"
+  },
+  {
+   "id": "n79",
+   "question": "Wie viele Brücken hat Venedig?",
+   "answer": 400,
+   "unit": "Brücken",
+   "note": "Hamburg hat rund sechsmal so viele",
+   "source": "Statista"
+  },
+  {
+   "id": "n80",
+   "question": "Wie viele Gießkannen Wasser stecken in der Herstellung eines Hamburgers?",
+   "answer": 240,
+   "unit": "Gießkannen",
+   "note": "1 Gießkanne = 10 Liter · Grundlage: 2.400 Liter „virtuelles Wasser“",
+   "source": "WWF"
   }
  ]
 }

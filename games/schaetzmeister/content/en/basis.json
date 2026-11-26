@@ -1,24 +1,12 @@
 {
  "name": "Basics",
  "author": "UP!",
- "version": "1.0.0",
- "description": "Estimation questions with verified numbers.",
+ "version": "2.0.0",
+ "description": "Estimation questions with sourced numbers – also in bathtubs, football pitches and giraffes.",
  "items": [
   {
-   "id": "s1",
-   "question": "How many keys does a standard piano have?",
-   "answer": 88,
-   "source": "Wikipedia (de): Klavier"
-  },
-  {
-   "id": "s2",
-   "question": "How many bones does an adult human have?",
-   "answer": 206,
-   "source": "Wikipedia (de): Skelett des Menschen"
-  },
-  {
    "id": "s3",
-   "question": "How tall is the Eiffel Tower (including antennas)?",
+   "question": "How tall is the Eiffel Tower (Paris, France), including antennas?",
    "answer": 330,
    "unit": "m",
    "source": "Wikipedia (de): Eiffelturm"
@@ -31,29 +19,22 @@
    "source": "Wikipedia (de): Zugspitze"
   },
   {
-   "id": "s5",
-   "question": "How high is Mount Everest?",
-   "answer": 8849,
-   "unit": "m",
-   "source": "Wikipedia (de): Mount Everest"
-  },
-  {
    "id": "s6",
-   "question": "How tall is Cologne Cathedral?",
+   "question": "How tall is Cologne Cathedral (Germany)?",
    "answer": 157,
    "unit": "m",
    "source": "Wikipedia (de): Kölner Dom"
   },
   {
    "id": "s7",
-   "question": "How tall is the Berlin TV Tower?",
+   "question": "How tall is the Berlin TV Tower (Germany)?",
    "answer": 368,
    "unit": "m",
    "source": "Wikipedia (de): Berliner Fernsehturm"
   },
   {
    "id": "s8",
-   "question": "How tall is the Burj Khalifa in Dubai?",
+   "question": "How tall is the Burj Khalifa (Dubai, UAE)?",
    "answer": 828,
    "unit": "m",
    "source": "Wikipedia (de): Burj Khalifa"
@@ -66,65 +47,10 @@
    "source": "Wikipedia (de): Mond"
   },
   {
-   "id": "s10",
-   "question": "How long is the equator?",
-   "answer": 40075,
-   "unit": "km",
-   "source": "Wikipedia (de): Äquator"
-  },
-  {
-   "id": "s11",
-   "question": "In which year did humans first land on the Moon?",
-   "answer": 1969,
-   "source": "Wikipedia (de): Apollo 11"
-  },
-  {
-   "id": "s12",
-   "question": "In which year did the Berlin Wall fall?",
-   "answer": 1989,
-   "source": "Wikipedia (de): Berliner Mauer"
-  },
-  {
-   "id": "s13",
-   "question": "In which year did the Titanic sink?",
-   "answer": 1912,
-   "source": "Wikipedia (de): Titanic"
-  },
-  {
-   "id": "s14",
-   "question": "In which year was the first iPhone released?",
-   "answer": 2007,
-   "source": "Wikipedia (de): iPhone"
-  },
-  {
-   "id": "s15",
-   "question": "In which year was Google founded?",
-   "answer": 1998,
-   "source": "Wikipedia (de): Google LLC"
-  },
-  {
    "id": "s16",
    "question": "In which year was the first FIFA World Cup held?",
    "answer": 1930,
    "source": "Wikipedia (de): Fußball-Weltmeisterschaft 1930"
-  },
-  {
-   "id": "s17",
-   "question": "How many seconds are in a day?",
-   "answer": 86400,
-   "source": "24 × 60 × 60"
-  },
-  {
-   "id": "s18",
-   "question": "How many minutes are in a week?",
-   "answer": 10080,
-   "source": "7 × 24 × 60"
-  },
-  {
-   "id": "s19",
-   "question": "How many countries are in the European Union?",
-   "answer": 27,
-   "source": "Wikipedia (de): Europäische Union"
   },
   {
    "id": "s20",
@@ -139,60 +65,16 @@
    "source": "Wikipedia (de): Afrika"
   },
   {
-   "id": "s22",
-   "question": "How many chemical elements are in the periodic table today?",
-   "answer": 118,
-   "source": "Wikipedia (de): Periodensystem"
-  },
-  {
-   "id": "s23",
-   "question": "How many squares does a chessboard have?",
-   "answer": 64,
-   "source": "Wikipedia (de): Schachbrett"
-  },
-  {
    "id": "s24",
    "question": "How many spaces are on a classic Monopoly board?",
    "answer": 40,
    "source": "Wikipedia (de): Monopoly"
   },
   {
-   "id": "s25",
-   "question": "How many teeth does an adult have (including wisdom teeth)?",
-   "answer": 32,
-   "source": "Wikipedia (de): Gebiss des Menschen"
-  },
-  {
-   "id": "s26",
-   "question": "How many hearts does an octopus have?",
-   "answer": 3,
-   "source": "Wikipedia (de): Kraken"
-  },
-  {
-   "id": "s27",
-   "question": "How many symphonies did Beethoven complete?",
-   "answer": 9,
-   "source": "Wikipedia (de): Ludwig van Beethoven"
-  },
-  {
    "id": "s28",
    "question": "How many time zones does Russia have?",
    "answer": 11,
    "source": "Wikipedia (de): Zeitzonen in Russland"
-  },
-  {
-   "id": "s29",
-   "question": "How long is a marathon?",
-   "answer": 42195,
-   "unit": "m",
-   "source": "Wikipedia (de): Marathonlauf"
-  },
-  {
-   "id": "s30",
-   "question": "At how many degrees Fahrenheit does water boil (at sea level)?",
-   "answer": 212,
-   "unit": "°F",
-   "source": "Wikipedia (de): Grad Fahrenheit"
   },
   {
    "id": "s31",
@@ -202,14 +84,14 @@
   },
   {
    "id": "s32",
-   "question": "How tall is the Statue of Liberty from the ground to the tip of the torch?",
+   "question": "How tall is the Statue of Liberty (New York, USA) from the ground to the tip of the torch?",
    "answer": 93,
    "unit": "m",
    "source": "Wikipedia (de): Freiheitsstatue"
   },
   {
    "id": "s33",
-   "question": "What is the total length of the Golden Gate Bridge?",
+   "question": "What is the total length of the Golden Gate Bridge (San Francisco, USA)?",
    "answer": 2737,
    "unit": "m",
    "source": "Wikipedia (de): Golden Gate Bridge"
@@ -228,13 +110,6 @@
    "source": "Wikipedia (de): Schallgeschwindigkeit"
   },
   {
-   "id": "s36",
-   "question": "How fast is light in a vacuum?",
-   "answer": 299792,
-   "unit": "km/s",
-   "source": "Wikipedia (de): Lichtgeschwindigkeit"
-  },
-  {
    "id": "s37",
    "question": "How many episodes does the TV show “Friends” have?",
    "answer": 236,
@@ -248,12 +123,6 @@
    "source": "Wikipedia (de): Wolfgang Amadeus Mozart"
   },
   {
-   "id": "s39",
-   "question": "How many pips are on a standard die in total?",
-   "answer": 21,
-   "source": "1 + 2 + 3 + 4 + 5 + 6"
-  },
-  {
    "id": "s40",
    "question": "How many legs does a lobster have?",
    "answer": 10,
@@ -261,14 +130,14 @@
   },
   {
    "id": "s41",
-   "question": "How tall is the Brandenburg Gate?",
+   "question": "How tall is the Brandenburg Gate (Berlin, Germany)?",
    "answer": 26,
    "unit": "m",
    "source": "Wikipedia (de): Brandenburger Tor"
   },
   {
    "id": "s42",
-   "question": "How large is Lake Constance?",
+   "question": "How large is Lake Constance (Germany/Austria/Switzerland)?",
    "answer": 536,
    "unit": "km²",
    "source": "Wikipedia (de): Bodensee"
@@ -281,10 +150,625 @@
    "source": "Wikipedia (de): Afrikanischer Elefant"
   },
   {
-   "id": "s44",
-   "question": "How many cards are in a standard deck (without jokers)?",
-   "answer": 52,
-   "source": "Wikipedia (de): Skat / Spielkarte"
+   "id": "n1",
+   "question": "How many bathtubs of tap water does the average German use per year?",
+   "answer": 297,
+   "unit": "bathtubs",
+   "note": "1 bathtub = 150 litres · Based on 122 litres per person per day",
+   "source": "BDEW 2024"
+  },
+  {
+   "id": "n2",
+   "question": "How many bathtubs of beer were drunk at Oktoberfest 2026 (Munich, Germany)?",
+   "answer": 44700,
+   "unit": "bathtubs",
+   "note": "1 bathtub = 150 litres · Based on 6.7 million one-litre steins",
+   "source": "Stadt München, Wiesn-Bilanz 2026"
+  },
+  {
+   "id": "n3",
+   "question": "How many bathtubs of water does it take to make one pair of jeans?",
+   "answer": 53,
+   "unit": "bathtubs",
+   "note": "1 bathtub = 150 litres · Based on 8,000 litres (global average)",
+   "source": "Wasserfußabdruck, Öko-Test"
+  },
+  {
+   "id": "n4",
+   "question": "How many bathtubs of blood does a human heart pump in one day?",
+   "answer": 47,
+   "unit": "bathtubs",
+   "note": "1 bathtub = 150 litres · Based on about 7,000 litres per day",
+   "source": "Planet Wissen"
+  },
+  {
+   "id": "n5",
+   "question": "How many bathtubs of water fit into an Olympic swimming pool?",
+   "answer": 16700,
+   "unit": "bathtubs",
+   "note": "1 bathtub = 150 litres · Pool 50 × 25 × 2 m = 2.5 million litres",
+   "source": "World Aquatics (Mindesttiefe 2 m)"
+  },
+  {
+   "id": "n6",
+   "question": "How many football pitches would fit on the Theresienwiese, home of Oktoberfest (Munich, Germany)?",
+   "answer": 59,
+   "unit": "football pitches",
+   "note": "1 football pitch = 105 × 68 m (7,140 m²) · Theresienwiese: 42 hectares",
+   "source": "muenchen.de"
+  },
+  {
+   "id": "n7",
+   "question": "How many football pitches is Vatican City in size?",
+   "answer": 62,
+   "unit": "football pitches",
+   "note": "1 football pitch = 105 × 68 m (7,140 m²) · Vatican City: 0.44 km²",
+   "source": "Statista"
+  },
+  {
+   "id": "n8",
+   "question": "How many football pitches is Monaco in size?",
+   "answer": 283,
+   "unit": "football pitches",
+   "note": "1 football pitch = 105 × 68 m (7,140 m²) · Monaco: 2.02 km²",
+   "source": "Wikipedia: Monaco"
+  },
+  {
+   "id": "n9",
+   "question": "How many football pitches is Central Park (New York, USA) in size?",
+   "answer": 478,
+   "unit": "football pitches",
+   "note": "1 football pitch = 105 × 68 m (7,140 m²) · Central Park: 341 hectares",
+   "source": "Wikipedia: Central Park"
+  },
+  {
+   "id": "n10",
+   "question": "How many times does the Saarland fit into Germany?",
+   "answer": 139,
+   "unit": "times",
+   "note": "Saarland (German state) = 2,571 km² · Germany: 357,596 km²",
+   "source": "Destatis"
+  },
+  {
+   "id": "n11",
+   "question": "How many marathons long is the Great Wall of China?",
+   "answer": 502,
+   "unit": "marathons",
+   "note": "1 marathon = 42.195 km · Wall: 21,196 km (2012 survey)",
+   "source": "Chinesische Denkmalbehörde 2012"
+  },
+  {
+   "id": "n12",
+   "question": "How many giraffes stacked on top of each other would reach the top of Ulm Minster (Ulm, Germany)?",
+   "answer": 32,
+   "unit": "giraffes",
+   "note": "1 giraffe = 5 m · Spire: 161.53 m",
+   "source": "Ulmer Münster"
+  },
+  {
+   "id": "n13",
+   "question": "How many saunas are there in Finland?",
+   "answer": 3300000,
+   "unit": "saunas",
+   "note": "For about 5.6 million inhabitants",
+   "source": "finland.fi"
+  },
+  {
+   "id": "n14",
+   "question": "How many bridges does Hamburg (Germany) have?",
+   "answer": 2500,
+   "unit": "bridges",
+   "note": "More than Venice, Amsterdam and London combined (2004 count: 2,496)",
+   "source": "Stadt Hamburg (LSBG)"
+  },
+  {
+   "id": "n15",
+   "question": "How many steps lead up to the 2nd floor of the Eiffel Tower (Paris, France)?",
+   "answer": 674,
+   "unit": "steps",
+   "note": "The 2nd floor is 115 m up",
+   "source": "france.fr"
+  },
+  {
+   "id": "n16",
+   "question": "How many litres of water go into producing one cup of coffee?",
+   "answer": 140,
+   "unit": "litres",
+   "note": "“Virtual water”: growing, harvesting, processing and transport",
+   "source": "WWF"
+  },
+  {
+   "id": "n17",
+   "question": "How many litres of coffee does the average German drink per year?",
+   "answer": 161,
+   "unit": "litres",
+   "note": "Average per person, 2025",
+   "source": "Deutscher Kaffeeverband"
+  },
+  {
+   "id": "n18",
+   "question": "How many times does a human heart beat in one day?",
+   "answer": 100000,
+   "unit": "beats",
+   "note": "About 70 beats per minute",
+   "source": "Lernhelfer"
+  },
+  {
+   "id": "n19",
+   "question": "Record: how many kilometres did an Arctic tern fly in a single year?",
+   "answer": 96000,
+   "unit": "km",
+   "note": "Tracked with a tiny geolocator – more than twice around the Earth",
+   "source": "Newcastle University 2016"
+  },
+  {
+   "id": "n20",
+   "question": "How heavy was the blue whale heart that a museum preserved?",
+   "answer": 180,
+   "unit": "kg",
+   "note": "As heavy as two to three adults",
+   "source": "Royal Ontario Museum"
+  },
+  {
+   "id": "n21",
+   "question": "How many teaspoons of water fit into a bathtub?",
+   "answer": 30000,
+   "unit": "teaspoons",
+   "note": "1 bathtub = 150 litres · 1 teaspoon = 5 ml"
+  },
+  {
+   "id": "n22",
+   "question": "How many shot glasses of blood does an adult have?",
+   "answer": 250,
+   "unit": "shot glasses",
+   "note": "1 shot glass = 2 cl · Based on about 5 litres of blood",
+   "source": "Planet Wissen"
+  },
+  {
+   "id": "n23",
+   "question": "How many one-litre beer steins of air does a person breathe in per day?",
+   "answer": 11000,
+   "unit": "steins",
+   "note": "1 stein = 1 litre · Based on 10,000–12,000 litres at rest",
+   "source": "Planet Wissen, Elsevier"
+  },
+  {
+   "id": "n24",
+   "question": "How many one-litre beer steins of water fit into Lake Constance (Germany/Austria/Switzerland)?",
+   "answer": 48000000000000,
+   "unit": "steins",
+   "note": "1 stein = 1 litre · Lake Constance: 48.4 km³ of water",
+   "source": "Internationale Gewässerschutzkommission"
+  },
+  {
+   "id": "n25",
+   "question": "How many Olympic swimming pools of water does the Amazon pour into the sea every second?",
+   "answer": 84,
+   "unit": "pools",
+   "note": "1 Olympic pool = 2,500 m³ · Amazon: 209,000 m³ per second",
+   "source": "Statista / WorldAtlas"
+  },
+  {
+   "id": "n26",
+   "question": "How many bathtubs of jet fuel fit into the tanks of an Airbus A380?",
+   "answer": 2130,
+   "unit": "bathtubs",
+   "note": "1 bathtub = 150 litres · A380: about 320,000 litres",
+   "source": "Airbus"
+  },
+  {
+   "id": "n27",
+   "question": "How many watering cans of water does it take to produce 1 kg of chocolate?",
+   "answer": 1720,
+   "unit": "watering cans",
+   "note": "1 watering can = 10 litres · Based on 1,720 litres per 100 g bar",
+   "source": "waterfootprint.org"
+  },
+  {
+   "id": "n28",
+   "question": "How many Olympic swimming pools of blood does a heart pump in a lifetime?",
+   "answer": 80,
+   "unit": "pools",
+   "note": "1 Olympic pool = 2,500 m³ · Based on over 200 million litres in 80 years",
+   "source": "gesundheit.gv.at"
+  },
+  {
+   "id": "n29",
+   "question": "How many one-litre steins of beer does the average German drink per year?",
+   "answer": 88,
+   "unit": "steins",
+   "note": "1 stein = 1 litre · Per-capita consumption 2024",
+   "source": "Deutscher Brauer-Bund"
+  },
+  {
+   "id": "n30",
+   "question": "How many bathtubs of milk does a cow in Germany give per year?",
+   "answer": 61,
+   "unit": "bathtubs",
+   "note": "1 bathtub = 150 litres · Based on 9,452 kg of milk per cow (2025)",
+   "source": "BLE / Destatis"
+  },
+  {
+   "id": "n31",
+   "question": "How many bathtubs of rain fall on a football pitch in Germany per year?",
+   "answer": 37200,
+   "unit": "bathtubs",
+   "note": "1 bathtub = 150 litres · 1 football pitch = 105 × 68 m (7,140 m²) · Based on 782 litres per m² per year",
+   "source": "Deutscher Wetterdienst (1991–2020)"
+  },
+  {
+   "id": "n32",
+   "question": "How many litres of blood does a blue whale’s heart pump with a single beat?",
+   "answer": 80,
+   "unit": "litres",
+   "note": "It only beats every 7 to 15 seconds",
+   "source": "Spektrum der Wissenschaft"
+  },
+  {
+   "id": "n33",
+   "question": "How many sheets of A4 paper would it take to cover a football pitch?",
+   "answer": 114500,
+   "unit": "sheets",
+   "note": "1 football pitch = 105 × 68 m (7,140 m²) · 1 sheet = 21 × 29.7 cm"
+  },
+  {
+   "id": "n34",
+   "question": "How many ping-pong tables fit onto the area of a tennis court?",
+   "answer": 62,
+   "unit": "ping-pong tables",
+   "note": "1 ping-pong table = 2.74 × 1.525 m (4.18 m²) · Tennis court: 23.77 × 10.97 m"
+  },
+  {
+   "id": "n35",
+   "question": "How many times does the Saarland fit into Russia?",
+   "answer": 6650,
+   "unit": "times",
+   "note": "Saarland (German state) = 2,571 km² · Russia: 17.1 million km²"
+  },
+  {
+   "id": "n36",
+   "question": "How many times does the Saarland fit into Bavaria?",
+   "answer": 27,
+   "unit": "times",
+   "note": "Saarland (German state) = 2,571 km² · Bavaria: 70,542 km²"
+  },
+  {
+   "id": "n37",
+   "question": "How many times does the Saarland fit into Greenland?",
+   "answer": 842,
+   "unit": "times",
+   "note": "Saarland (German state) = 2,571 km² · Greenland: 2.17 million km²"
+  },
+  {
+   "id": "n38",
+   "question": "How many times does Lake Constance fit into the Caspian Sea?",
+   "answer": 692,
+   "unit": "times",
+   "note": "Lake Constance: 536 km² · Caspian Sea: 371,000 km²"
+  },
+  {
+   "id": "n39",
+   "question": "How many ping-pong tables of forest does Germany have per inhabitant?",
+   "answer": 330,
+   "unit": "ping-pong tables",
+   "note": "1 ping-pong table = 2.74 × 1.525 m (4.18 m²) · Based on 11.5 million hectares of forest, 83.6 million people",
+   "source": "Bundeswaldinventur 2022"
+  },
+  {
+   "id": "n40",
+   "question": "How many football pitches is the main island of Heligoland (Germany) in size?",
+   "answer": 140,
+   "unit": "football pitches",
+   "note": "1 football pitch = 105 × 68 m (7,140 m²) · Main island: about 1 km²"
+  },
+  {
+   "id": "n41",
+   "question": "How many football pitches is Rügen, Germany’s largest island, in size?",
+   "answer": 129700,
+   "unit": "football pitches",
+   "note": "1 football pitch = 105 × 68 m (7,140 m²) · Rügen: 926 km²"
+  },
+  {
+   "id": "n42",
+   "question": "How many bananas end to end are as long as a football pitch?",
+   "answer": 525,
+   "unit": "bananas",
+   "note": "1 banana = 20 cm · Football pitch: 105 m long"
+  },
+  {
+   "id": "n43",
+   "question": "How many strands of spaghetti end to end make up a marathon?",
+   "answer": 168800,
+   "unit": "spaghetti",
+   "note": "1 strand = 25 cm · Marathon: 42.195 km"
+  },
+  {
+   "id": "n44",
+   "question": "How many London double-decker buses end to end are as long as the Titanic?",
+   "answer": 24,
+   "unit": "buses",
+   "note": "1 bus = 11.2 m · Titanic: 269 m"
+  },
+  {
+   "id": "n45",
+   "question": "How many German ICE high-speed trains end to end fit into the Gotthard Base Tunnel (Switzerland)?",
+   "answer": 153,
+   "unit": "trains",
+   "note": "1 ICE 4 with 13 cars = 374 m · Tunnel: 57.1 km",
+   "source": "Deutsche Bahn"
+  },
+  {
+   "id": "n46",
+   "question": "How many Berlin TV Towers (Germany) stacked on top of each other reach the cruising altitude of a passenger jet?",
+   "answer": 30,
+   "unit": "TV towers",
+   "note": "1 TV Tower = 368 m · Cruising altitude: about 11 km"
+  },
+  {
+   "id": "n47",
+   "question": "How many giraffes stacked on top of each other reach from the deepest point of the Mariana Trench to the surface?",
+   "answer": 2200,
+   "unit": "giraffes",
+   "note": "1 giraffe = 5 m · Depth: about 11,000 m"
+  },
+  {
+   "id": "n48",
+   "question": "How many Cologne Cathedrals (Germany) stacked on top of each other reach the International Space Station?",
+   "answer": 2550,
+   "unit": "Cologne Cathedrals",
+   "note": "1 Cologne Cathedral = 157 m · ISS: about 400 km up"
+  },
+  {
+   "id": "n49",
+   "question": "How many kilometres of bookshelves does the world’s largest library have?",
+   "answer": 1350,
+   "unit": "km",
+   "note": "Library of Congress in Washington (USA): 838 miles",
+   "source": "Guinness World Records"
+  },
+  {
+   "id": "n50",
+   "question": "How many steps lead up to the highest viewing platform of Ulm Minster (Ulm, Germany)?",
+   "answer": 768,
+   "unit": "steps",
+   "note": "The platform is 143 m up",
+   "source": "Ulmer Münster"
+  },
+  {
+   "id": "n51",
+   "question": "How many elephants does the Eiffel Tower (Paris, France) weigh?",
+   "answer": 1680,
+   "unit": "elephants",
+   "note": "1 elephant = 6 t · Eiffel Tower: 10,100 t",
+   "source": "france.fr"
+  },
+  {
+   "id": "n52",
+   "question": "How many elephants does the Statue of Liberty (New York, USA) weigh?",
+   "answer": 38,
+   "unit": "elephants",
+   "note": "1 elephant = 6 t · Statue of Liberty: 225 t"
+  },
+  {
+   "id": "n53",
+   "question": "How many Smart cars does a blue whale weigh?",
+   "answer": 210,
+   "unit": "Smart cars",
+   "note": "1 Smart car = 900 kg · Blue whale: up to 190 t"
+  },
+  {
+   "id": "n54",
+   "question": "How many hen’s eggs does an ostrich egg weigh?",
+   "answer": 25,
+   "unit": "hen’s eggs",
+   "note": "1 hen’s egg = 60 g · Ostrich egg: about 1.5 kg",
+   "source": "Alimentarium"
+  },
+  {
+   "id": "n55",
+   "question": "How many gummy bears does a house cat weigh?",
+   "answer": 1960,
+   "unit": "gummy bears",
+   "note": "1 gummy bear = 2.3 g · Cat: 4.5 kg",
+   "source": "Haribo"
+  },
+  {
+   "id": "n56",
+   "question": "How many tonnes of tomatoes were thrown at La Tomatina 2025 (Buñol, Spain)?",
+   "answer": 120,
+   "unit": "tonnes",
+   "note": "About 22,000 participants, for one hour",
+   "source": "Keystone-SDA"
+  },
+  {
+   "id": "n57",
+   "question": "How many kilograms of cheese does the average German eat per year?",
+   "answer": 26,
+   "unit": "kg",
+   "note": "Exactly: 26.4 kg per person (2025)",
+   "source": "BLE"
+  },
+  {
+   "id": "n58",
+   "question": "How many football matches long does a person sleep in a lifetime?",
+   "answer": 155700,
+   "unit": "football matches",
+   "note": "1 match = 90 minutes · Based on 8 hours a night for 80 years"
+  },
+  {
+   "id": "n59",
+   "question": "How many episodes of the German kids’ show “Die Sendung mit der Maus” could you watch on the world’s longest scheduled flight?",
+   "answer": 38,
+   "unit": "episodes",
+   "note": "1 episode = 30 minutes · Singapore–New York: about 19 hours",
+   "source": "Singapore Airlines"
+  },
+  {
+   "id": "n60",
+   "question": "How many times does a human heart beat in a lifetime?",
+   "answer": 3000000000,
+   "unit": "beats",
+   "note": "Based on 80 years of life",
+   "source": "gesundheit.gv.at"
+  },
+  {
+   "id": "n61",
+   "question": "How old was the oldest Greenland shark ever dated (estimated)?",
+   "answer": 392,
+   "unit": "years",
+   "note": "Dated via the eye lens – possible range 272 to 512 years",
+   "source": "Science 2016"
+  },
+  {
+   "id": "n62",
+   "question": "How many breaths does an adult take in one day?",
+   "answer": 20000,
+   "unit": "breaths",
+   "note": "12 to 18 breaths per minute at rest",
+   "source": "Planet Wissen"
+  },
+  {
+   "id": "n63",
+   "question": "How many rubber ducks, plastic frogs and friends fell into the Pacific in a 1992 storm?",
+   "answer": 28800,
+   "unit": "bath toys",
+   "note": "The “Friendly Floatees” – some drifted all the way to Europe",
+   "source": "Guinness World Records"
+  },
+  {
+   "id": "n64",
+   "question": "How many beer steins did visitors try to sneak out of Oktoberfest 2026 (Munich, Germany)?",
+   "answer": 105000,
+   "unit": "steins",
+   "note": "That’s how many the security staff intercepted",
+   "source": "Stadt München, Wiesn-Bilanz 2026"
+  },
+  {
+   "id": "n65",
+   "question": "How many feathers does a swan have?",
+   "answer": 25000,
+   "unit": "feathers",
+   "note": "Most are tiny and sit on the head and neck"
+  },
+  {
+   "id": "n66",
+   "question": "How many islands does Sweden have?",
+   "answer": 267570,
+   "unit": "islands",
+   "note": "Fewer than 1,000 of them are inhabited",
+   "source": "Statistik Schweden 2013"
+  },
+  {
+   "id": "n67",
+   "question": "How many lakes does Finland have?",
+   "answer": 187888,
+   "unit": "lakes",
+   "note": "Counted from 500 m² upwards",
+   "source": "Finnisches Umweltministerium"
+  },
+  {
+   "id": "n68",
+   "question": "How many garden gnomes are there in Germany?",
+   "answer": 20000000,
+   "unit": "garden gnomes",
+   "note": "An estimate – nobody has counted them",
+   "source": "Die Rheinpfalz"
+  },
+  {
+   "id": "n69",
+   "question": "How many currywursts do Germans eat per year?",
+   "answer": 800000000,
+   "unit": "currywursts",
+   "note": "An estimate – around 70 million in Berlin alone",
+   "source": "Deutsches Currywurst Museum"
+  },
+  {
+   "id": "n70",
+   "question": "How many Christmas trees are sold in Germany per year?",
+   "answer": 25000000,
+   "unit": "trees",
+   "note": "Industry figure: 23 to 25 million",
+   "source": "Bundesverband der Weihnachtsbaumerzeuger"
+  },
+  {
+   "id": "n71",
+   "question": "How many wish lists did Santa receive in 2025 at the Himmelpfort Christmas post office (Germany)?",
+   "answer": 280000,
+   "unit": "wish lists",
+   "note": "Germany’s largest Christmas post office – letters from 63 countries",
+   "source": "Deutsche Post"
+  },
+  {
+   "id": "n72",
+   "question": "How many sheep live in New Zealand?",
+   "answer": 23250000,
+   "unit": "sheep",
+   "note": "About 4.5 sheep per inhabitant (2025)",
+   "source": "Stats NZ"
+  },
+  {
+   "id": "n73",
+   "question": "How many lightning flashes happen worldwide every second?",
+   "answer": 100,
+   "unit": "flashes",
+   "note": "Only about one in ten hits the ground",
+   "source": "Deutscher Wetterdienst"
+  },
+  {
+   "id": "n74",
+   "question": "How many lightning strikes hit the ground in Germany in 2024?",
+   "answer": 209619,
+   "unit": "strikes",
+   "note": "On average one every two and a half minutes",
+   "source": "Siemens BLIDS"
+  },
+  {
+   "id": "n75",
+   "question": "How many lights sparkle on the Eiffel Tower (Paris, France) when it twinkles?",
+   "answer": 20000,
+   "unit": "lights",
+   "note": "Every evening on the hour for 5 minutes",
+   "source": "Paris City Vision"
+  },
+  {
+   "id": "n76",
+   "question": "How many gold bears does Haribo produce in one day?",
+   "answer": 160000000,
+   "unit": "gold bears",
+   "note": "Worldwide, across all factories",
+   "source": "Haribo"
+  },
+  {
+   "id": "n77",
+   "question": "How many parcels does DHL sort in Germany on a normal day?",
+   "answer": 6700000,
+   "unit": "parcels",
+   "note": "Record day in 2025: 12.4 million",
+   "source": "DHL Group"
+  },
+  {
+   "id": "n78",
+   "question": "How many languages are spoken in the world?",
+   "answer": 7160,
+   "unit": "languages",
+   "note": "Over 800 in Papua New Guinea alone",
+   "source": "Ethnologue 2025"
+  },
+  {
+   "id": "n79",
+   "question": "How many bridges does Venice (Italy) have?",
+   "answer": 400,
+   "unit": "bridges",
+   "note": "Hamburg has about six times as many",
+   "source": "Statista"
+  },
+  {
+   "id": "n80",
+   "question": "How many watering cans of water go into producing one hamburger?",
+   "answer": 240,
+   "unit": "watering cans",
+   "note": "1 watering can = 10 litres · Based on 2,400 litres of “virtual water”",
+   "source": "WWF"
   }
  ]
 }

@@ -2,8 +2,8 @@
   "id": "schaetzmeister",
   "name": { "de": "Schätzmeister", "en": "Estimation Master" },
   "description": {
-    "de": "Wie hoch ist der Eiffelturm? Wie viele Knochen hast du? Alle schätzen – je näher, desto mehr Punkte.",
-    "en": "How tall is the Eiffel Tower? How many bones do you have? Everyone estimates – the closer, the more points."
+    "de": "Wie viele Badewannen Bier fließen auf der Wiesn? Wie schwer ist der Eiffelturm in Elefanten? Alle schätzen – je näher, desto mehr Punkte.",
+    "en": "How many bathtubs of beer flow at Oktoberfest? What does the Eiffel Tower weigh in elephants? Everyone estimates – closest wins."
   },
   "minPlayers": 2,
   "maxPlayers": 100,
@@ -13,7 +13,7 @@
   "tags": ["guess", "quick"],
   "sdkVersion": 1,
   "contentFields": ["question"],
-  "version": "1.2.0",
+  "version": "1.3.0",
   "author": "UP!",
   "options": [
     { "id": "rounds", "label": { "de": "Fragen", "en": "Questions" }, "default": 8, "min": 3, "max": 15 },

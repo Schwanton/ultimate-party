@@ -59,7 +59,7 @@ function ticksFor(lo: number, hi: number, log: boolean): number[] {
   return out;
 }
 
-export function Strahl({ answer, entries, startAt, player, color, short, answerText, labels, planOptions, children }: {
+export function Strahl({ answer, entries, startAt, player, color, short, answerText, answerNote, labels, planOptions, children }: {
   answer: number;
   entries: StrahlEntry[];
   startAt: number;
@@ -68,6 +68,8 @@ export function Strahl({ answer, entries, startAt, player, color, short, answerT
   short: (n: number) => string;
   /** große Anzeige der echten Zahl */
   answerText: string;
+  /** kleine Unterzeile unter der Antwort (Maßstab, Grundlage) */
+  answerNote?: string;
   labels: StrahlLabels;
   /** Entfernung als Faktor, alle Tipps am Ende zurückholen (muss zum Server passen) */
   planOptions?: PlanOptions;
@@ -132,8 +134,9 @@ export function Strahl({ answer, entries, startAt, player, color, short, answerT
         <div style={{ marginLeft: 'auto', textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
           {st.answer ? (
             <>
-              <span className="display anim-pop" style={{ fontSize: 58, fontWeight: 800, lineHeight: 1, color: 'var(--yellow)', fontVariantNumeric: 'tabular-nums' }}>{answerText}</span>
+              <span className="display anim-pop" style={{ fontSize: answerText.length > 18 ? 40 : answerText.length > 14 ? 48 : 58, fontWeight: 800, whiteSpace: 'nowrap', lineHeight: 1, color: 'var(--yellow)', fontVariantNumeric: 'tabular-nums' }}>{answerText}</span>
               <span key={phase === 'all' ? 'all' : 'answer'} className={phase === 'all' ? 'anim-pop' : 'muted'} style={{ fontSize: 18, fontWeight: phase === 'all' ? 700 : undefined }}>{phase === 'all' && labels.all ? labels.all : labels.answer}</span>
+              {answerNote && <span className="anim-fade" style={{ fontSize: 16, lineHeight: 1.3, color: '#C9C3EA', maxWidth: 560, textAlign: 'right' }}>{answerNote}</span>}
             </>
           ) : (
             <p key={status} className="display anim-pop" style={{ fontSize: phase === 'drum' ? 40 : 28, fontWeight: 800, color: phase === 'out' ? 'var(--red)' : phase === 'drum' ? 'var(--yellow)' : '#fff', maxWidth: 520, animation: phase === 'drum' ? 'upTick .5s ease-in-out infinite' : undefined }}>{status}</p>

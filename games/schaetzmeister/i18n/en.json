@@ -47,5 +47,9 @@
   "mode.rank.all": "Points by rank",
   "mode.distance.all": "Points by distance",
   "mode.bonus.all": "Points by distance + bonus",
-  "reveal.almost": "Almost!"
+  "reveal.almost": "Almost!",
+  "unit.t": "T",
+  "word.m": "million",
+  "word.b": "billion",
+  "word.t": "trillion"
 }

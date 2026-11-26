@@ -2,6 +2,14 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.51.0
+
+- Schätzmeister: 80 neue Schätzfragen – viele mit verrückten Einheiten: Wie viele Badewannen Bier fließen auf der Wiesn? Wie viele Elefanten wiegt der Eiffelturm? Wie viele Giraffen passen übereinander in den Marianengraben?
+- Schätzmeister: 22 Fragen, deren Antwort viele einfach wissen oder ausrechnen können (z. B. Herzen eines Oktopus, Lichtgeschwindigkeit, Sekunden pro Tag), sind raus
+- Schätzmeister: Unter der richtigen Antwort steht jetzt eine Unterzeile mit Maßstab und Grundlage, z. B. „1 Badewanne = 150 Liter“ – auf dem Fernseher und am Handy
+- Schätzmeister: Sehr große Antworten stehen in Worten da („23,25 Millionen Schafe“), und am Handy lassen sich bis zu 15 Stellen eintippen
+- Schätzmeister (Englisch): Bei Städten und Bauwerken steht das Land in Klammern dahinter
+
 ## 0.50.0
 
 - Schätzmeister: Neue Einstellung „Wertung“ wie bei Guess the Clicks! – Nach Platz (neu Standard), Podest 1000/600/300 (die bisherige Wertung), Nur der Nächste, Nach Entfernung und Entfernung + Bonus. Dazu „Strenge“ (normal oder locker). Die letzte Frage zählt weiter doppelt

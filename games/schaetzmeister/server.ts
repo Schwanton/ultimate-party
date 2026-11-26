@@ -15,6 +15,8 @@ interface Item {
   answer: number | string;
   unit?: string;
   source?: string;
+  /** Unterzeile unter der Antwort: Maßstab und Grundlage */
+  note?: string;
 }
 
 const T = { intro: 7, lastChance: 5, afterReveal: 7 };
@@ -103,12 +105,12 @@ export default {
       const startAt = Date.now() + 300;
       const ride = revealSeconds(truth, shown, opts);
       const doneAt = startAt + answerSeconds(truth, shown, opts) * 1000;
-      ctx.setHostView({ screen: 'reveal', ...base(), answer: truth, source: item().source ?? null, entries: shown, mode: MODE, plan: opts, startAt });
+      ctx.setHostView({ screen: 'reveal', ...base(), answer: truth, source: item().source ?? null, note: item().note ?? null, entries: shown, mode: MODE, plan: opts, startAt });
       ctx.setAllPlayerViews((p) => {
         const mine = placed.find((e) => e.playerId === p.id);
         const g = mine?.guess ?? null;
         return {
-          screen: 'result', doneAt, answer: truth, unit: item().unit ?? '', guess: g, place: mine?.place ?? null, of: placed.length,
+          screen: 'result', doneAt, answer: truth, unit: item().unit ?? '', note: item().note ?? null, guess: g, place: mine?.place ?? null, of: placed.length,
           points: mine?.points ?? 0, exact: mine?.exact ?? false, mode: MODE, year: !!opts.yearNow,
           factor: g == null || opts.yearNow ? null : factor(g, truth), high: g != null && g > truth,
         };

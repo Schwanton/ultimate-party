@@ -47,5 +47,9 @@
   "mode.rank.all": "Punkte nach Platz",
   "mode.distance.all": "Punkte nach Entfernung",
   "mode.bonus.all": "Punkte nach Entfernung + Bonus",
-  "reveal.almost": "Fast genau!"
+  "reveal.almost": "Fast genau!",
+  "unit.t": "Bio.",
+  "word.m": "Millionen",
+  "word.b": "Milliarden",
+  "word.t": "Billionen"
 }

@@ -13,9 +13,19 @@ function fmt(n: number, lang: string) {
 /** „1,2 Mio.“ / „1.2M“ */
 function short(n: number, lang: string, t: Translate) {
   const nf = (x: number) => new Intl.NumberFormat(lang === 'de' ? 'de-DE' : 'en-US', { maximumFractionDigits: 1 }).format(x);
+  if (n >= 1e12) return `${nf(n / 1e12)} ${t('unit.t')}`;
   if (n >= 1e9) return `${nf(n / 1e9)} ${t('unit.b')}`;
   if (n >= 1e6) return `${nf(n / 1e6)} ${t('unit.m')}`;
   if (n >= 1e4) return `${nf(n / 1e3)} ${t('unit.k')}`;
+  return fmt(n, lang);
+}
+
+/** große Antwort: ab 1 Million in Worten („23,25 Millionen“), sonst mit Tausenderpunkten */
+function big(n: number, lang: string, t: Translate) {
+  const nf = (x: number) => new Intl.NumberFormat(lang === 'de' ? 'de-DE' : 'en-US', { maximumFractionDigits: 2 }).format(x);
+  if (n >= 1e12) return `${nf(n / 1e12)} ${t('word.t')}`;
+  if (n >= 1e9) return `${nf(n / 1e9)} ${t('word.b')}`;
+  if (n >= 1e6) return `${nf(n / 1e6)} ${t('word.m')}`;
   return fmt(n, lang);
 }
 
@@ -110,7 +120,8 @@ function HostReveal({ view, t, player, room }: HostViewProps) {
         answer={view.answer} startAt={view.startAt} player={player} color={GREEN} planOptions={view.plan}
         entries={entries.map((e) => ({ playerId: e.playerId, guess: e.guess, win: e.place === 1, badge: e.points ? `+${e.points}` : undefined }))}
         short={(n) => short(n, lang, t)}
-        answerText={`${fmt(view.answer, lang)}${view.unit ? ` ${view.unit}` : ''}`}
+        answerText={`${big(view.answer, lang, t)}${view.unit ? ` ${view.unit}` : ''}`}
+        answerNote={view.note ?? undefined}
         labels={{ placing: t('reveal.placing'), zoom: t('reveal.zoom'), out: (names) => t('reveal.out', { names }), drum: t('reveal.drum'), answer: t('reveal.answer'), all: t(`mode.${mode}.all`) }}
       >
         {(phase) => (
@@ -158,14 +169,14 @@ function Keypad({ lang, t, initial, unit, onSubmit, onDraft, deadline }: { lang:
     vibrate(8);
     setDigits((cur) => {
       const next = (cur === '0' ? '' : cur) + d;
-      return next.length > 12 ? cur : next.replace(/^0+(?=\d)/, '');
+      return next.length > 15 ? cur : next.replace(/^0+(?=\d)/, '');
     });
   };
   const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '000', '0', '⌫'];
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
       <div className="up-card" style={{ textAlign: 'center', padding: '12px 16px' }}>
-        <div className="display" style={{ fontSize: digits.length > 9 ? 34 : 42, fontWeight: 800, fontVariantNumeric: 'tabular-nums', minHeight: 50 }}>{digits ? fmt(value, lang) : '0'}{unit ? <span style={{ fontSize: 20, opacity: 0.7 }}> {unit}</span> : null}</div>
+        <div className="display" style={{ fontSize: digits.length > 12 ? 28 : digits.length > 9 ? 34 : 42, fontWeight: 800, fontVariantNumeric: 'tabular-nums', minHeight: 50 }}>{digits ? fmt(value, lang) : '0'}{unit ? <span style={{ fontSize: 20, opacity: 0.7 }}> {unit}</span> : null}</div>
         <div className="muted" style={{ fontSize: 15, minHeight: 20 }}>{value >= 1e4 ? short(value, lang, t) : ' '}</div>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 8 }}>
@@ -212,7 +223,8 @@ function Controller({ view, t, send, me, room }: ControllerViewProps) {
           {view.place === 1 && <Confetti pieces={14} />}
           <Avatar player={me} size={100} />
           <p className="muted" style={{ fontSize: 16 }}>{t('reveal.answer')}</p>
-          <h1 style={{ fontSize: 34 }}>{fmt(view.answer, lang)} {view.unit}</h1>
+          <h1 style={{ fontSize: 34 }}>{big(view.answer, lang, t)} {view.unit}</h1>
+          {view.note && <p className="muted" style={{ fontSize: 15, lineHeight: 1.35, maxWidth: 340, marginTop: -6 }}>{view.note}</p>}
           <p style={{ fontSize: 18 }}>{view.guess != null ? t('result.yours', { n: `${fmt(view.guess, lang)} ${view.unit}`.trim() }) : t('result.none')}</p>
           {view.place != null && <p style={{ fontSize: 18, fontWeight: 700 }}>{view.guess === view.answer ? t('reveal.exact') + ' · ' : view.mode === 'bonus' && view.exact ? t('reveal.almost') + ' · ' : ''}{view.of ? t('result.placeOf', { n: view.place, of: view.of }) : t('result.place', { n: view.place })}</p>}
           {view.guess != null && view.guess !== view.answer && (
