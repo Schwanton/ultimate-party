@@ -2,8 +2,8 @@
   "id": "schaetzmeister",
   "name": { "de": "Schätzmeister", "en": "Estimation Master" },
   "description": {
-    "de": "Wie hoch ist der Eiffelturm? Wie viele Knochen hast du? Alle schätzen – der Zahlenstrahl zeigt, wer am nächsten dran ist.",
-    "en": "How tall is the Eiffel Tower? How many bones do you have? Everyone estimates – the number line reveals who's closest."
+    "de": "Wie hoch ist der Eiffelturm? Wie viele Knochen hast du? Alle schätzen – je näher, desto mehr Punkte.",
+    "en": "How tall is the Eiffel Tower? How many bones do you have? Everyone estimates – the closer, the more points."
   },
   "minPlayers": 2,
   "maxPlayers": 100,
@@ -13,7 +13,7 @@
   "tags": ["guess", "quick"],
   "sdkVersion": 1,
   "contentFields": ["question"],
-  "version": "1.1.2",
+  "version": "1.2.0",
   "author": "UP!",
   "options": [
     { "id": "rounds", "label": { "de": "Fragen", "en": "Questions" }, "default": 8, "min": 3, "max": 15 },
@@ -23,6 +23,28 @@
         { "value": 20, "label": { "de": "20 Sek.", "en": "20 sec" } },
         { "value": 30, "label": { "de": "30 Sek.", "en": "30 sec" } },
         { "value": 45, "label": { "de": "45 Sek.", "en": "45 sec" } }
+      ]
+    },
+    {
+      "id": "scoring", "label": { "de": "Wertung", "en": "Scoring" }, "default": "rank",
+      "help": {
+        "de": "Nach Platz: Nächster 1000, Letzter 0, dazwischen gleichmäßig. Podest: 1000/600/300, genau +500 (bisherige Wertung). Nur der Nächste: 1 Punkt. Nach Entfernung: genau 1000, doppelt/halb so viel 700, 10-mal daneben 0. Entfernung + Bonus: dazu +250 für den Nächsten, +500 für höchstens 5 % daneben. Letzte Frage immer ×2.",
+        "en": "By rank: closest 1000, last 0, evenly in between. Podium: 1000/600/300, spot on +500 (previous scoring). Closest only: 1 point. By distance: spot on 1000, double/half 700, 10× off 0. Distance + bonus: plus +250 for the closest, +500 for within 5 %. Last question always ×2."
+      },
+      "choices": [
+        { "value": "rank", "label": { "de": "Nach Platz", "en": "By rank" } },
+        { "value": "podium", "label": { "de": "Podest 1000/600/300", "en": "Podium 1000/600/300" } },
+        { "value": "best", "label": { "de": "Nur der Nächste", "en": "Closest only" } },
+        { "value": "distance", "label": { "de": "Nach Entfernung", "en": "By distance" } },
+        { "value": "bonus", "label": { "de": "Entfernung + Bonus", "en": "Distance + bonus" } }
+      ]
+    },
+    {
+      "id": "strictness", "label": { "de": "Strenge", "en": "Strictness" }, "default": "normal",
+      "help": { "de": "Nur für „Nach Entfernung“ und „Entfernung + Bonus“: Ab wann gibt es 0 Punkte?", "en": "Only for “By distance” and “Distance + bonus”: when do you get 0 points?" },
+      "choices": [
+        { "value": "normal", "label": { "de": "Normal (10-mal daneben = 0)", "en": "Normal (10× off = 0)" } },
+        { "value": "loose", "label": { "de": "Locker (100-mal daneben = 0)", "en": "Relaxed (100× off = 0)" } }
       ]
     }
   ]

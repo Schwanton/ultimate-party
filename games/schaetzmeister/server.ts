@@ -1,11 +1,13 @@
 /**
  * Schätzmeister – Schätzfragen mit Zahlen. Auflösung als Zahlenstrahl (wie bei Guess the Clicks!).
  *
- * Punkte nach Platz: 1000 / 600 / 300, genau getroffen +500. Letzte Frage ×2. Gleich nah = gleicher Platz.
+ * Punkte je nach Einstellung „Wertung“ (scoring.ts, gleiche Datei wie bei Guess the Clicks!), letzte Frage ×2.
+ * Entfernung als Faktor; Jahreszahlen relativ dazu, wie lange es her ist. Gleich nah = gleicher Platz.
  */
 
 import { INPUT_GRACE, Scores, shuffle, type GameContext, type GameServerModule } from '@up/sdk';
-import { answerSeconds, revealSeconds } from './reveal';
+import { answerSeconds, revealSeconds, type PlanOptions } from './reveal';
+import { MODES, factor, scoreRound, type ScoringMode } from './scoring';
 
 interface Item {
   id: string;
@@ -16,8 +18,12 @@ interface Item {
 }
 
 const T = { intro: 7, lastChance: 5, afterReveal: 7 };
-const PLACE_POINTS = [1000, 600, 300];
-const EXACT = 500;
+
+/** Jahreszahl-Frage: ohne Einheit, „Jahr“/„year“ in der Frage, Antwort eine plausible Jahreszahl */
+function isYear(it: Item, now: number) {
+  const a = Number(it.answer);
+  return !it.unit && /jahr|year/i.test(it.question) && Number.isInteger(a) && a >= 1000 && a <= now + 1;
+}
 
 export default {
   create(ctx: GameContext) {
@@ -25,6 +31,11 @@ export default {
     const scores = new Scores(ids);
     const total = Number(ctx.options.rounds) || 8;
     const guessTime = Number(ctx.options.guessTime) || 30;
+    const MODE: ScoringMode = MODES.includes(ctx.options.scoring as ScoringMode) ? (ctx.options.scoring as ScoringMode) : 'rank';
+    const LOOSE = ctx.options.strictness === 'loose';
+    const NOW = new Date().getFullYear();
+    /** Auflösung: Entfernung wie bei der Wertung; am Ende kommen alle mit Punkten zurück */
+    const plan = (): PlanOptions => ({ log: true, showAll: MODE !== 'best', ...(isYear(item(), NOW) ? { yearNow: NOW } : {}) });
     const items = ctx.deck<Item>({ filter: (it) => Number.isFinite(Number(it.answer)) && Number(it.answer) >= 0 }).drawMany(total);
     let q = -1;
     let guesses = new Map<string, number>();
@@ -40,7 +51,7 @@ export default {
     const base = () => ({ n: q + 1, total: items.length, mult: mult(), question: item().question, unit: item().unit ?? '' });
 
     function intro() {
-      ctx.setHostView({ screen: 'intro' });
+      ctx.setHostView({ screen: 'intro', mode: MODE, loose: LOOSE });
       ctx.setAllPlayerViews(() => ({ screen: 'intro' }));
       ctx.after(T.intro, next);
     }
@@ -82,27 +93,27 @@ export default {
       for (const [id, n] of drafts) guesses.set(id, n);
       phase = 'reveal';
       const truth = Number(item().answer);
-      const entries = [...guesses].map(([playerId, guess]) => ({ playerId, guess, diff: Math.abs(guess - truth) })).sort((a, b) => a.diff - b.diff);
-      // Platz = Anzahl unterschiedlicher, besserer Abstände (Gleichstand = gleicher Platz)
-      const diffs = [...new Set(entries.map((e) => e.diff))];
       const m = mult();
-      const placed = entries.map((e) => {
-        const place = diffs.indexOf(e.diff) + 1;
-        const points = ((PLACE_POINTS[place - 1] ?? 0) + (e.diff === 0 ? EXACT : 0)) * m;
-        if (points) scores.add(e.playerId, points);
-        return { ...e, place, points };
-      });
+      const opts = plan();
+      const placed = scoreRound([...guesses].map(([playerId, guess]) => ({ playerId, guess })), truth, MODE, LOOSE, opts)
+        .map((e) => ({ ...e, points: e.points * m }));
+      placed.forEach((e) => { if (e.points) scores.add(e.playerId, e.points); });
       // Gemischt schicken: Die Reihenfolge auf dem Strahl darf nichts verraten
-      const shown = shuffle(placed);
+      const shown = shuffle(placed.map(({ playerId, guess, place, points, exact }) => ({ playerId, guess, place, points, exact })));
       const startAt = Date.now() + 300;
-      const ride = revealSeconds(truth, shown);
-      const doneAt = startAt + answerSeconds(truth, shown) * 1000;
-      ctx.setHostView({ screen: 'reveal', ...base(), answer: truth, source: item().source ?? null, entries: shown, startAt });
+      const ride = revealSeconds(truth, shown, opts);
+      const doneAt = startAt + answerSeconds(truth, shown, opts) * 1000;
+      ctx.setHostView({ screen: 'reveal', ...base(), answer: truth, source: item().source ?? null, entries: shown, mode: MODE, plan: opts, startAt });
       ctx.setAllPlayerViews((p) => {
         const mine = placed.find((e) => e.playerId === p.id);
-        return { screen: 'result', doneAt, answer: truth, unit: item().unit ?? '', guess: mine?.guess ?? null, place: mine?.place ?? null, points: mine?.points ?? 0, exact: mine?.diff === 0 };
+        const g = mine?.guess ?? null;
+        return {
+          screen: 'result', doneAt, answer: truth, unit: item().unit ?? '', guess: g, place: mine?.place ?? null, of: placed.length,
+          points: mine?.points ?? 0, exact: mine?.exact ?? false, mode: MODE, year: !!opts.yearNow,
+          factor: g == null || opts.yearNow ? null : factor(g, truth), high: g != null && g > truth,
+        };
       });
-      ctx.after(ride + T.afterReveal, next);
+      ctx.after(ride + (opts.showAll ? 5 : T.afterReveal), next);
     }
 
     function showScores(final: boolean) {

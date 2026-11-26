@@ -2,6 +2,12 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.50.0
+
+- Schätzmeister: Neue Einstellung „Wertung“ wie bei Guess the Clicks! – Nach Platz (neu Standard), Podest 1000/600/300 (die bisherige Wertung), Nur der Nächste, Nach Entfernung und Entfernung + Bonus. Dazu „Strenge“ (normal oder locker). Die letzte Frage zählt weiter doppelt
+- Schätzmeister: Wer am nächsten dran ist, zählt nach dem Faktor. Bei Jahreszahlen zählt, wie viele Jahre daneben im Verhältnis dazu, wie lange es her ist
+- Schätzmeister: Am Ende der Auflösung kommen alle Schätzungen mit ihren Punkten zurück auf den Strahl. Das Handy zeigt Platz, Punkte und wie viel-mal (bzw. wie viele Jahre) du daneben lagst
+
 ## 0.49.0
 
 - Guess the Clicks!: Neue Einstellung „Wertung“ – Nach Platz (neu Standard: der Nächste bekommt 1000, der Letzte 0, alle dazwischen gleichmäßig), Nur der Nächste (1 Punkt wie bisher), Nach Entfernung (genau richtig 1000, doppelt oder halb so viel 700, 10-mal daneben 0) und Entfernung + Bonus (+250 für den Nächsten, +500 für fast genau)

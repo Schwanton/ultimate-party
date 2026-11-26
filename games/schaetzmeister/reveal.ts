@@ -9,6 +9,8 @@
  * 5) Optional (showAll): Danach kommen alle Tipps zurück auf den Strahl – mit ihren Punkten.
  *
  * Entfernung: absolut (Standard) oder als Faktor (log: doppelt so viel = halb so viel daneben).
+ * Jahreszahlen (yearNow): Jahre daneben im Verhältnis dazu, wie lange es her ist –
+ * 57 Jahre daneben bei einem Ereignis vor 57 Jahren zählt wie „doppelt so viel“.
  *
  * Die echte Zahl bleibt bis zum Schluss verborgen; die Reihenfolge der Tipps verrät nichts,
  * weil der Server sie gemischt schickt.
@@ -43,6 +45,17 @@ export interface PlanOptions {
   log?: boolean;
   /** am Ende alle Tipps zurückholen (mit Punkten) */
   showAll?: boolean;
+  /** Antwort ist eine Jahreszahl: Entfernung relativ zu „wie lange her“ (aktuelles Jahr) */
+  yearNow?: number;
+}
+
+/** Entfernung eines Tipps zur Antwort – je nach Optionen absolut, als Faktor (Zehnerpotenzen) oder für Jahreszahlen */
+export function distanceOf(guess: number, answer: number, opts: PlanOptions = {}) {
+  if (opts.yearNow) {
+    const ago = Math.max(1, opts.yearNow - answer);
+    return Math.round(Math.log10(1 + Math.abs(guess - answer) / ago) * 1e9) / 1e9;
+  }
+  return opts.log ? logDist(guess, answer) : Math.abs(guess - answer);
 }
 
 export const START_DELAY = 0.8;
@@ -93,7 +106,7 @@ export function useLog(values: number[]) {
 }
 
 export function buildPlan(answer: number, entries: RevealEntry[], opts: PlanOptions = {}): RevealPlan {
-  const distance = (g: number) => (opts.log ? logDist(g, answer) : Math.abs(g - answer));
+  const distance = (g: number) => distanceOf(g, answer, opts);
   const n = entries.length;
   const step = n ? Math.min(0.55, 5 / n) : 0;
   const placeAt: Record<string, number> = {};

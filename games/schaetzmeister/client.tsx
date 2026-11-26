@@ -33,7 +33,9 @@ function Host(props: HostViewProps) {
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 28, textAlign: 'center' }}>
           <span className="up-tag anim-pop" style={{ background: GREEN, color: '#110D24', boxShadow: `0 8px 0 ${GREEN_D}`, fontSize: 80, padding: '12px 40px', borderRadius: 26, transform: 'rotate(-3deg)' }}>{t('title')}</span>
           <p className="anim-up" style={{ fontSize: 28, maxWidth: 900, lineHeight: 1.35, animationDelay: '.4s' }}>{t('intro.text')}</p>
-          <p className="muted anim-up" style={{ fontSize: 22, animationDelay: '.8s' }}>{t('intro.points')}</p>
+          <p className="anim-up up-chip" style={{ fontSize: 22, maxWidth: 1000, lineHeight: 1.35, animationDelay: '.8s', padding: '10px 20px' }}>
+            {t(`mode.${view.mode ?? 'podium'}.intro`)}{view.loose && (view.mode === 'distance' || view.mode === 'bonus') ? ` ${t('mode.loose')}` : ''} {t('intro.last')}
+          </p>
         </div>
       );
     case 'guess': {
@@ -87,7 +89,7 @@ function Host(props: HostViewProps) {
   return null;
 }
 
-interface Entry { playerId: string; guess: number; diff: number; place: number; points: number }
+interface Entry { playerId: string; guess: number; place: number; points: number; exact: boolean }
 
 /**
  * Zahlenstrahl: Die Säule fährt hoch, Tipps erscheinen beim Erreichen, an der echten Zahl wird kurz angehalten,
@@ -96,43 +98,53 @@ interface Entry { playerId: string; guess: number; diff: number; place: number; 
 function HostReveal({ view, t, player, room }: HostViewProps) {
   const lang = room.lang;
   const entries = (view.entries as Entry[]).filter((e) => player(e.playerId));
-  const podium = entries.filter((e) => e.place <= 3).sort((a, b) => a.place - b.place);
+  const mode: string = view.mode ?? 'podium';
+  /** „Genau!“ nur bei exaktem Treffer; bei „Entfernung + Bonus“ zählt schon „fast genau“ (höchstens 5 % daneben) */
+  const hit = (guess: number, exact: boolean) => (guess === view.answer ? t('reveal.exact') : mode === 'bonus' && exact ? t('reveal.almost') : '');
+  const podium = entries.filter((e) => e.place <= (mode === 'best' ? 1 : 3)).sort((a, b) => a.place - b.place);
   const medal = ['🥇', '🥈', '🥉'];
   return (
     <>
       <HostHeader title={t('title')} color={GREEN} info={info(view, t)} />
       <Strahl
-        answer={view.answer} startAt={view.startAt} player={player} color={GREEN}
+        answer={view.answer} startAt={view.startAt} player={player} color={GREEN} planOptions={view.plan}
         entries={entries.map((e) => ({ playerId: e.playerId, guess: e.guess, win: e.place === 1, badge: e.points ? `+${e.points}` : undefined }))}
         short={(n) => short(n, lang, t)}
         answerText={`${fmt(view.answer, lang)}${view.unit ? ` ${view.unit}` : ''}`}
-        labels={{ placing: t('reveal.placing'), zoom: t('reveal.zoom'), out: (names) => t('reveal.out', { names }), drum: t('reveal.drum'), answer: t('reveal.answer') }}
+        labels={{ placing: t('reveal.placing'), zoom: t('reveal.zoom'), out: (names) => t('reveal.out', { names }), drum: t('reveal.drum'), answer: t('reveal.answer'), all: t(`mode.${mode}.all`) }}
       >
         {(phase) => (
           <div style={{ width: 600, display: 'flex', flexDirection: 'column', gap: 10 }}>
             <p className="display" style={{ fontSize: 26, fontWeight: 800, lineHeight: 1.2 }}>{view.question}</p>
-            {phase === 'done' && (
-              <div className="anim-pop" style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+            {(phase === 'done' || phase === 'all') && (
+              <div className="anim-pop" style={{ display: 'flex', gap: 8, flexWrap: 'nowrap', alignItems: 'center', minWidth: 0 }}>
                 {podium.length === 0 && <b style={{ fontSize: 18 }}>{t('reveal.noGuess')}</b>}
                 {podium.slice(0, 4).map((e) => {
                   const p = player(e.playerId)!;
                   return (
-                    <span key={e.playerId} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: e.place === 1 ? GREEN : 'var(--surface)', color: e.place === 1 ? '#110D24' : '#fff', borderRadius: 14, padding: '5px 12px 5px 6px' }}>
-                      <span style={{ fontSize: 20 }}>{medal[e.place - 1]}</span>
-                      <Avatar player={p} size={28} flat={e.place === 1} />
-                      <b style={{ fontSize: 15 }}>{p.name}{e.diff === 0 ? ` · ${t('reveal.exact')}` : ''}</b>
-                      <b className="display" style={{ fontSize: 16 }}>+{e.points}</b>
+                    <span key={e.playerId} style={{ flex: e.place === 1 ? '0 0 auto' : '0 1 auto', maxWidth: e.place === 1 ? 330 : 220, minWidth: 0, display: 'inline-flex', alignItems: 'center', gap: 8, background: e.place === 1 ? GREEN : 'var(--surface)', color: e.place === 1 ? '#110D24' : '#fff', borderRadius: 14, padding: '5px 12px 5px 6px' }}>
+                      <span style={{ fontSize: 20, flex: 'none' }}>{medal[e.place - 1]}</span>
+                      <span style={{ flex: 'none', display: 'inline-flex' }}><Avatar player={p} size={28} flat={e.place === 1} /></span>
+                      <b style={{ fontSize: 15, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{p.name}{e.place === 1 && hit(e.guess, e.exact) ? ` · ${hit(e.guess, e.exact)}` : ''}</b>
+                      <b className="display" style={{ fontSize: 16, flex: 'none' }}>+{e.points}</b>
                     </span>
                   );
                 })}
-                {view.source && <span className="faint" style={{ fontSize: 13, width: '100%' }}>{t('reveal.source', { source: view.source })}</span>}
               </div>
+            )}
+            {(phase === 'done' || phase === 'all') && view.source && (
+              <span className="faint" style={{ fontSize: 13, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t('reveal.source', { source: view.source })}</span>
             )}
           </div>
         )}
       </Strahl>
     </>
   );
+}
+
+/** „2,3“ – Faktor mit höchstens einer Nachkommastelle, ab 10 ganz */
+function factorText(f: number, lang: string) {
+  return new Intl.NumberFormat(lang === 'de' ? 'de-DE' : 'en-US', { maximumFractionDigits: f >= 10 ? 0 : 1 }).format(f);
 }
 
 /* ================= Handy ================= */
@@ -202,7 +214,14 @@ function Controller({ view, t, send, me, room }: ControllerViewProps) {
           <p className="muted" style={{ fontSize: 16 }}>{t('reveal.answer')}</p>
           <h1 style={{ fontSize: 34 }}>{fmt(view.answer, lang)} {view.unit}</h1>
           <p style={{ fontSize: 18 }}>{view.guess != null ? t('result.yours', { n: `${fmt(view.guess, lang)} ${view.unit}`.trim() }) : t('result.none')}</p>
-          {view.place != null && <p style={{ fontSize: 18, fontWeight: 700 }}>{view.exact ? t('reveal.exact') + ' · ' : ''}{t('result.place', { n: view.place })}</p>}
+          {view.place != null && <p style={{ fontSize: 18, fontWeight: 700 }}>{view.guess === view.answer ? t('reveal.exact') + ' · ' : view.mode === 'bonus' && view.exact ? t('reveal.almost') + ' · ' : ''}{view.of ? t('result.placeOf', { n: view.place, of: view.of }) : t('result.place', { n: view.place })}</p>}
+          {view.guess != null && view.guess !== view.answer && (
+            <p className="muted" style={{ fontSize: 16 }}>
+              {view.year
+                ? t(view.high ? 'result.later' : 'result.earlier', { n: Math.abs(view.guess - view.answer) })
+                : view.factor != null ? t(view.high ? 'result.high' : 'result.low', { f: factorText(view.factor, lang) }) : null}
+            </p>
+          )}
           <span className="display" style={{ fontSize: 56, fontWeight: 800, color: 'var(--yellow)', textShadow: '0 6px 0 var(--yellow-d)', animation: 'upPop .6s ease-out both' }}>+{view.points}</span>
         </div>
       );
