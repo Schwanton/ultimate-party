@@ -2,6 +2,12 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.54.0
+
+- Montagsmaler: Über 1100 neue Begriffe – jetzt 1461 statt 316 (auf Englisch 1451). Neu dabei: viele Tiere, Essen aus aller Welt, Werkzeug und Küchenkram, Sport, Zirkus und Musik, Ritter, Piraten und Weltraum, Märchen und Sagen, berühmte Bauwerke, Partyspiele und knifflige Begriffe wie „Funkloch“, „Schnapsidee“ oder „Wolke sieben“. Begriffe wiederholen sich dadurch viel seltener
+- Montagsmaler: Alle Begriffe neu eingestuft – leicht ist, was jeder sofort malen und erkennen kann, schwer ist, was man nur über Umwege malen kann. Doppelte und kaum malbare Begriffe sind raus
+- Montagsmaler und alle Spiele mit Texteingabe: Die Autokorrektur ist jetzt auch auf dem iPhone an – bisher korrigierte nur Android Tippfehler, iPhone-Spieler hatten dadurch einen Nachteil
+
 ## 0.53.0
 
 - Montagsmaler: Wer richtig geraten hat, sieht am Handy nur noch „Richtig!“ – das Wort steht ganz klein darunter, damit niemand beim Nachbarn abgucken kann

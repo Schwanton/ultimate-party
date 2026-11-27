@@ -130,7 +130,7 @@ export function TextAnswer({
           onChange={(e) => setText(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); submit(); } }} />
       ) : (
         <input ref={ref} className="up-input" maxLength={maxLength} placeholder={placeholder} value={text} onChange={(e) => setText(e.target.value)}
-          autoComplete="off" autoCorrect="off" enterKeyHint="send" />
+          autoComplete="off" autoCorrect="on" spellCheck enterKeyHint="send" />
       )}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 13 }} className="faint">
         <span>{error ? <span style={{ color: '#FF9AA5', fontWeight: 700 }}>{error}</span> : null}</span>

@@ -811,7 +811,7 @@ function GuessInput({ send, t }: { send: (a: any) => void; t: Translate }) {
     <form onSubmit={(e) => { e.preventDefault(); submit(); }} style={{ display: 'flex', gap: 8 }}>
       <label htmlFor="mm-guess" style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)' }}>{t('guess.placeholder')}</label>
       <input id="mm-guess" ref={ref} className="up-input" value={text} maxLength={40} placeholder={t('guess.placeholder')} onChange={(e) => setText(e.target.value)}
-        autoComplete="off" autoCorrect="off" autoCapitalize="sentences" spellCheck={false} enterKeyHint="send" style={{ flex: 1, minWidth: 0 }} />
+        autoComplete="off" autoCorrect="on" autoCapitalize="sentences" spellCheck enterKeyHint="send" style={{ flex: 1, minWidth: 0 }} />
       <button type="submit" aria-label={t('guess.send')} onMouseDown={(e) => e.preventDefault()} onTouchStart={(e) => { e.preventDefault(); submit(); }}
         style={{ width: 64, flex: 'none', border: 0, borderRadius: 16, background: PINK, boxShadow: `0 5px 0 ${PINK_D}`, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, opacity: text.trim() ? 1 : 0.6 }}>
         <Icon d="M5 12h14M13 6l6 6-6 6" size={26} width={2.6} color="#fff" />
