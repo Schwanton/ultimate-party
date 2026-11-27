@@ -3,7 +3,7 @@
   "round": "Round {n} of {total}",
   "drawing": "Drawing {n} of {total}",
   "intro.title": "Vernissage",
-  "intro.text": "Everyone draws a secret prompt. Then you invent fake titles for the drawings – and hunt for the real one.",
+  "intro.text": "Everyone picks one of two secret words and draws it. Then you invent fake titles for the pictures – and hunt for the real one.",
   "intro.points": "Find the real title: 1000 · Everyone who picks your fake title: 500 · Artist: 500 per correct guess",
   "draw.title": "Draw!",
   "draw.onPhone": "Everyone draws their secret prompt on their phone.",
@@ -48,5 +48,13 @@
   "draw.clear": "Clear",
   "draw.clearConfirm": "Really clear the whole drawing?",
   "draw.eraser": "Eraser",
-  "choose.change": "You can change it while time is running."
+  "choose.change": "You can change it while time is running.",
+  "draw.pick": "Pick a word to draw:",
+  "gallery.title": "Which picture do you like best?",
+  "gallery.info": "{n} of {total} have chosen",
+  "gallery.phone": "Your favourite picture?",
+  "gallery.rule": "Tap a picture to give it your heart. The picture with the most hearts gets +200 (2 hearts or more).",
+  "gallery.save": "Tap to save",
+  "fav.title": "Favourite picture",
+  "fav.hearts": "{n} hearts"
 }

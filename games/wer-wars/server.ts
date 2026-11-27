@@ -125,6 +125,9 @@ export default {
       revealNext();
     }
 
+    /** wie oft die Antworten jeder Person falsch zugeordnet wurden */
+    const disguise = new Map<string, number>();
+
     function revealNext() {
       k++;
       if (k >= order.length) return showScores(round >= questions.length - 1);
@@ -142,6 +145,7 @@ export default {
       const fooled = guesses.size - correct.length;
       correct.forEach((id) => scores.add(id, POINTS.correct * m));
       if (fooled) scores.add(author, fooled * POINTS.fooled * m);
+      disguise.set(author, (disguise.get(author) ?? 0) + fooled);
       const voteCount = guesses.size;
       ctx.setHostView({
         screen: 'reveal', ...base(), n: k + 1, of: order.length, text, candidates: ids, votes, author,
@@ -159,8 +163,12 @@ export default {
     function showScores(final: boolean) {
       phase = 'scores';
       const ranking = scores.ranking();
-      ctx.setHostView({ screen: final ? 'final' : 'scores', before: roundStart, after: scores.snapshot(), ranking });
-      ctx.setAllPlayerViews((p) => ({ screen: final ? 'finalMe' : 'scoresMe', score: scores.get(p.id), place: ranking.filter((r) => r.score > scores.get(p.id)).length + 1, of: ranking.length }));
+      // Meister der Tarnung: wessen Antworten am häufigsten falsch zugeordnet wurden
+      const top = Math.max(0, ...disguise.values());
+      const masters = top > 0 ? ids.filter((id) => disguise.get(id) === top) : [];
+      const master = final && masters.length ? { ids: masters, n: top } : null;
+      ctx.setHostView({ screen: final ? 'final' : 'scores', before: roundStart, after: scores.snapshot(), ranking, master });
+      ctx.setAllPlayerViews((p) => ({ screen: final ? 'finalMe' : 'scoresMe', score: scores.get(p.id), place: ranking.filter((r) => r.score > scores.get(p.id)).length + 1, of: ranking.length, master: !!master?.ids.includes(p.id) }));
       if (final) ctx.finish(ranking);
       else ctx.after(7, nextRound);
     }

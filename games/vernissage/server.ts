@@ -19,7 +19,8 @@ interface Stroke {
 const COLOR_COUNT = 13;
 const LAST_CHANCE = 5;
 const T = { draw: 75, title: 40, choose: 22 };
-const POINTS = { truth: 1000, fool: 500, artist: 500, audienceFool: 100 };
+const POINTS = { truth: 1000, fool: 500, artist: 500, audienceFool: 100, favorite: 200 };
+const GALLERY = { time: 30, hurry: 4, minHearts: 2 };
 const REVEAL_STEP = 3.2;
 
 function validStrokes(raw: unknown): Stroke[] | null {
@@ -46,11 +47,19 @@ export default {
     let wordIndex = 0;
     let round = 0;
     let secret = new Map<string, string>();
+    /** zwei Begriffe zur Wahl je Spieler; wer gewählt hat, steht in chosen */
+    let choices = new Map<string, [string, string]>();
+    const chosen = new Set<string>();
+    /** alle Bilder der Partie für die Galerie am Ende */
+    const gallery: { word: string; strokes: Stroke[]; artistId: string }[] = [];
+    /** Galerie: wer hat welchem Bild sein Herz gegeben */
+    const hearts = new Map<string, number>();
+    let favorite: { pics: number[]; points: number; count: number } | null = null;
     let drawings = new Map<string, Stroke[]>();
     let order: string[] = [];
     let current = -1;
     let deception: DeceptionRound;
-    let phase: 'draw' | 'title' | 'choose' | 'reveal' = 'draw';
+    let phase: 'draw' | 'title' | 'choose' | 'reveal' | 'gallery' | 'final' = 'draw';
     let timer: { cancel(): void; deadline: number; duration: number } | null = null;
     let roundStart = scores.snapshot();
 
@@ -70,12 +79,25 @@ export default {
       round++;
       secret = new Map();
       drawings = new Map();
-      ids.forEach((id) => secret.set(id, deck.draw()?.word ?? words[wordIndex++ % Math.max(1, words.length)]?.word ?? '?'));
+      choices = new Map();
+      chosen.clear();
+      const drawWord = () => deck.draw()?.word ?? words[wordIndex++ % Math.max(1, words.length)]?.word ?? '?';
+      ids.forEach((id) => {
+        const a = drawWord();
+        let b = drawWord();
+        if (b === a) b = drawWord();
+        choices.set(id, [a, b]);
+        secret.set(id, a);
+      });
       phase = 'draw';
       timer = ctx.timer(drawTime, endDrawing, { grace: INPUT_GRACE });
       hostDraw();
-      ids.forEach((id) => ctx.setPlayerView(id, { screen: 'draw', input: true, word: secret.get(id), deadline: timer!.deadline, duration: timer!.duration }));
+      ids.forEach(drawView);
       ctx.setAudienceView({ screen: 'audienceWait' });
+    }
+
+    function drawView(id: string) {
+      ctx.setPlayerView(id, { screen: 'draw', input: true, choices: choices.get(id), word: chosen.has(id) ? secret.get(id) : null, deadline: timer!.deadline, duration: timer!.duration });
     }
 
     const submitted = new Set<string>();
@@ -87,6 +109,7 @@ export default {
       timer?.cancel();
       submitted.clear();
       order = shuffle(ids.filter((id) => (drawings.get(id)?.length ?? 0) > 0));
+      for (const id of order) gallery.push({ word: secret.get(id)!, strokes: drawings.get(id)!, artistId: id });
       current = -1;
       nextDrawing();
     }
@@ -193,13 +216,48 @@ export default {
 
     function showScores() {
       const final = round >= totalRounds;
+      if (final && phase !== 'gallery' && gallery.length >= 2) return showGallery();
+      if (final) phase = 'final';
       const ranking = scores.ranking();
-      ctx.setHostView({ screen: final ? 'final' : 'scores', before: roundStart, after: scores.snapshot(), ranking });
+      ctx.setHostView({ screen: final ? 'final' : 'scores', before: roundStart, after: scores.snapshot(), ranking, ...(final ? { pics: gallery, hearts: heartCounts(), favorite } : {}) });
       roundStart = scores.snapshot();
-      ctx.setAllPlayerViews((p) => ({ screen: final ? 'finalMe' : 'scoresMe', score: scores.get(p.id), place: ranking.findIndex((r) => r.playerId === p.id) + 1, of: ranking.length }));
+      ctx.setAllPlayerViews((p) => ({ screen: final ? 'finalMe' : 'scoresMe', score: scores.get(p.id), place: ranking.findIndex((r) => r.playerId === p.id) + 1, of: ranking.length, ...(final ? { pics: gallery, favorite } : {}) }));
       ctx.setAudienceView({ screen: 'lookAtTv' });
       if (final) ctx.finish(ranking);
       else ctx.after(8, startRound);
+    }
+
+    const heartCounts = () => gallery.map((_, i) => [...hearts.values()].filter((v) => v === i).length);
+
+    function showGallery() {
+      timer?.cancel();
+      phase = 'gallery';
+      hearts.clear();
+      timer = ctx.timer(GALLERY.time, endGallery);
+      hostGallery();
+      for (const id of [...ids, ...ctx.audience().map((a) => a.id)]) galleryView(id);
+    }
+
+    function hostGallery() {
+      ctx.setHostView({ screen: 'gallery', pics: gallery, hearts: heartCounts(), voted: hearts.size, voters: ids.length + ctx.audience().length, deadline: timer!.deadline, duration: timer!.duration });
+    }
+
+    function galleryView(id: string) {
+      ctx.setPlayerView(id, { screen: 'gallery', input: true, pics: gallery.map((g, i) => ({ ...g, i })).filter((g) => g.artistId !== id), mine: hearts.get(id) ?? null, deadline: timer!.deadline, duration: timer!.duration });
+    }
+
+    function endGallery() {
+      timer?.cancel();
+      const counts = heartCounts();
+      const top = Math.max(0, ...counts);
+      if (top >= GALLERY.minHearts) {
+        const pics = counts.map((c, i) => (c === top ? i : -1)).filter((i) => i >= 0);
+        // Gleichstand: die Punkte werden aufgeteilt
+        const each = Math.round(POINTS.favorite / pics.length);
+        pics.forEach((i) => scores.add(gallery[i].artistId, each));
+        favorite = { pics, points: each, count: top };
+      }
+      showScores();
     }
 
     return {
@@ -215,6 +273,27 @@ export default {
             ctx.setPlayerView(id, { screen: 'drawn', strokes });
             hostDraw();
             if (ids.every((p) => submitted.has(p) || !ctx.player(p)?.connected)) endDrawing();
+          }
+        } else if (action.type === 'pickWord' && phase === 'draw' && isPlayer(id) && !submitted.has(id) && !chosen.has(id)) {
+          const c = choices.get(id);
+          const i = Number(action.i);
+          if (!c || (i !== 0 && i !== 1)) return;
+          secret.set(id, c[i]);
+          chosen.add(id);
+          drawView(id);
+        } else if (action.type === 'heart' && phase === 'gallery') {
+          const i = Number(action.i);
+          if (!Number.isInteger(i) || i < 0 || i >= gallery.length || gallery[i].artistId === id) return;
+          if (hearts.get(id) === i) hearts.delete(id);
+          else hearts.set(id, i);
+          galleryView(id);
+          hostGallery();
+          const all = ids.filter((p) => ctx.player(p)?.connected);
+          if (all.every((p) => hearts.has(p)) && timer && timer.deadline - Date.now() > GALLERY.hurry * 1000) {
+            timer.cancel();
+            timer = ctx.timer(GALLERY.hurry, endGallery);
+            hostGallery();
+            for (const p of [...ids, ...ctx.audience().map((a) => a.id)]) galleryView(p);
           }
         } else if (action.type === 'title' && phase === 'title' && isPlayer(id) && id !== artist() && !deception.hasLie(id)) {
           const res = deception.submitLie(id, action.text);
@@ -233,9 +312,12 @@ export default {
       },
       onAudienceJoin(id) {
         if (phase === 'choose') chooseView(id);
+        else if (phase === 'gallery') galleryView(id);
         else ctx.setPlayerView(id, { screen: 'audienceWait' });
       },
       bot(_id, view) {
+        if (view.screen === 'draw' && !view.word) return { type: 'pickWord', i: Math.random() < 0.5 ? 0 : 1 };
+        if (view.screen === 'gallery' && view.mine == null && view.pics?.length) return { type: 'heart', i: pick(view.pics as { i: number }[]).i };
         if (view.screen === 'draw') {
           const strokes = Array.from({ length: 3 + Math.floor(Math.random() * 4) }, () => {
             const p: number[] = [];

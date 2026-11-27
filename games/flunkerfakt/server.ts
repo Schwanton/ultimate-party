@@ -16,7 +16,9 @@ interface Fact {
 
 const LAST_CHANCE = 5;
 const T = { write: 45, choose: 22 };
-const POINTS = { truth: 1000, fool: 500, audienceFool: 100 };
+const POINTS = { truth: 1000, fool: 500, audienceFool: 100, favorite: 200 };
+/** Lieblingslüge: mindestens so viele Herzen */
+const FAV_MIN = 2;
 const REVEAL_STEP = 3.2;
 
 export default {
@@ -92,7 +94,7 @@ export default {
     }
 
     function chooseView(id: string) {
-      ctx.setPlayerView(id, { screen: 'choose', input: !round.pickOf(id), question: fact.question, options: round.optionsFor(id), selected: round.pickOf(id) ?? null, deadline: timer!.deadline, duration: timer!.duration });
+      ctx.setPlayerView(id, { screen: 'choose', input: !round.pickOf(id), question: fact.question, options: round.optionsFor(id), selected: round.pickOf(id) ?? null, heart: favs.get(id) ?? null, deadline: timer!.deadline, duration: timer!.duration });
     }
 
     /** Alle haben gewählt: Zeit auf wenige Sekunden verkürzen, damit man sich noch umentscheiden kann. */
@@ -104,6 +106,9 @@ export default {
       hostChoose();
       choosers().forEach(chooseView);
     }
+
+    /** Lieblingslüge: wer hat welcher Antwort sein Herz gegeben */
+    let favs = new Map<string, string>();
 
     function startReveal() {
       timer?.cancel();
@@ -125,8 +130,25 @@ export default {
           points = Math.round((fooled * POINTS.fool * m + aud * POINTS.audienceFool * m) / it.authors.length);
           it.authors.forEach((a) => add(a, points));
         }
-        return { ...it, points: it.kind === 'truth' ? POINTS.truth * m : points };
+        return { ...it, points: it.kind === 'truth' ? POINTS.truth * m : points, hearts: 0, fav: 0 };
       });
+      // Lieblingslüge: nur Lügen von Spielern, die meisten Herzen (mind. 2), bei Gleichstand geteilt
+      for (const opt of favs.values()) {
+        const it = shown.find((x) => x.id === opt);
+        if (it) it.hearts++;
+      }
+      const lies = shown.filter((x) => x.kind === 'lie' && x.authors.some(isPlayer));
+      const top = Math.max(0, ...lies.map((x) => x.hearts));
+      if (top >= FAV_MIN) {
+        const winners = lies.filter((x) => x.hearts === top);
+        const each = Math.round(POINTS.favorite / winners.length);
+        for (const w of winners) {
+          w.fav = each;
+          const per = Math.round(each / w.authors.length);
+          w.authors.forEach((a) => add(a, per));
+        }
+      }
+      favs = new Map();
       ctx.setHostView({ screen: 'reveal', ...hostBase(), items: shown, source: fact.source ?? null, step: REVEAL_STEP });
       for (const id of choosers()) {
         const pickId = round.pickOf(id);
@@ -136,6 +158,7 @@ export default {
         ctx.setPlayerView(id, {
           screen: 'result', found: picked?.kind === 'truth', picked: picked?.text ?? null, truth: fact.answer,
           fooled: myLie ? fooledCount : 0, points: gained.get(id) ?? 0, revealAt: (items.length - 1) * REVEAL_STEP,
+          fav: shown.find((x) => x.authors.includes(id))?.fav ?? 0,
         });
       }
       ctx.after(items.length * REVEAL_STEP + 4, next);
@@ -170,6 +193,12 @@ export default {
           if (ids.every((p) => round.hasLie(p) || !ctx.player(p)?.connected)) startChoose();
         } else if (action.type === 'lieDraft' && phase === 'write' && isPlayer(id) && !round.hasLie(id)) {
           drafts.set(id, String(action.text ?? '').slice(0, 200));
+        } else if (action.type === 'heart' && phase === 'choose') {
+          const opt = String(action.option ?? '');
+          if (!round.optionsFor(id).some((o) => o.id === opt)) return;
+          if (favs.get(id) === opt) favs.delete(id);
+          else favs.set(id, opt);
+          chooseView(id);
         } else if (action.type === 'pick' && phase === 'choose') {
           if (!round.pick(id, action.option)) return;
           chooseView(id);
@@ -187,6 +216,7 @@ export default {
           return { type: 'lie', text: `${pick(pool)}${view.error ? ' ' + Math.floor(Math.random() * 99) : ''}` };
         }
         if (view.screen === 'choose' && !view.selected) return { type: 'pick', option: pick(view.options as { id: string }[]).id };
+        if (view.screen === 'choose' && !view.heart && Math.random() < 0.5) return { type: 'heart', option: pick(view.options as { id: string }[]).id };
         return null;
       },
     };

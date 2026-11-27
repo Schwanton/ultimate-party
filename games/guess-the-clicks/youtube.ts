@@ -87,7 +87,26 @@ function cameraName() {
 
 type Plan = { params: Record<string, string>; prefix?: string };
 
-function plan(lang: string, topics: string[]): Plan {
+/** Themen-Einstellung: YouTube-Kategorie (falls vorhanden) und passende Suchwörter */
+export type Theme = 'all' | 'music' | 'animals' | 'gaming' | 'sport' | 'food';
+export const THEMES: Theme[] = ['all', 'music', 'animals', 'gaming', 'sport', 'food'];
+const THEME_INFO: Record<Exclude<Theme, 'all'>, { category?: string; de: string[]; en: string[] }> = {
+  music: { category: '10', de: ['Musik live', 'Gitarre Cover', 'Klavier', 'Konzert', 'Bandprobe', 'Song', 'Schlagzeug', 'Chor', 'Rap', 'Akustik'], en: ['live music', 'guitar cover', 'piano', 'concert', 'band practice', 'song', 'drums', 'choir', 'rap', 'acoustic'] },
+  animals: { category: '15', de: ['Katze', 'Hund', 'Vogel', 'Pferd', 'Tierpark', 'Aquarium', 'Hamster', 'Kuh', 'Igel', 'Papagei'], en: ['cat', 'dog', 'bird', 'horse', 'zoo', 'aquarium', 'hamster', 'cow', 'hedgehog', 'parrot'] },
+  gaming: { category: '20', de: ['Minecraft', "Let's Play", 'Gameplay', 'Speedrun', 'Fortnite', 'Mario', 'Walkthrough', 'Retro Spiel', 'Roblox', 'Zocken'], en: ['Minecraft', "Let's Play", 'gameplay', 'speedrun', 'Fortnite', 'Mario', 'walkthrough', 'retro game', 'Roblox', 'gaming'] },
+  sport: { category: '17', de: ['Fußball Tor', 'Skateboard', 'Basketball', 'Tennis', 'Marathon', 'Fahrrad', 'Schwimmen', 'Turnen', 'Handball', 'Ski'], en: ['football goal', 'skateboard', 'basketball', 'tennis', 'marathon', 'cycling', 'swimming', 'gymnastics', 'handball', 'skiing'] },
+  food: { de: ['Kochrezept', 'Backen', 'Grillen', 'Kuchen', 'Pizza', 'Essen Test', 'Frühstück', 'Streetfood', 'Nudeln', 'Suppe'], en: ['recipe', 'baking', 'barbecue', 'cake', 'pizza', 'food review', 'breakfast', 'street food', 'pasta', 'soup'] },
+};
+
+function plan(lang: string, topics: string[], theme: Theme = 'all'): Plan {
+  if (theme !== 'all') {
+    const info = THEME_INFO[theme];
+    const words = lang === 'de' ? info.de : info.en;
+    const order = rand(['relevance', 'date', 'viewCount', 'rating', 'relevance']);
+    // mit Kategorie auch mal ein Alltagswort, damit es nicht nur die offensichtlichen Videos werden
+    const q = info.category && Math.random() < 0.4 ? rand(WORDS[lang] ?? WORDS.en) : rand(words);
+    return { params: { q, order, ...randomWindow(365 * 2), ...(info.category ? { videoCategoryId: info.category } : {}) } };
+  }
   const order = rand(['relevance', 'date', 'viewCount', 'rating', 'relevance']);
   const r = Math.random();
   if (r < 0.3) {
@@ -99,11 +118,14 @@ function plan(lang: string, topics: string[]): Plan {
   return { params: { q: topics.length ? rand(topics) : rand(WORDS[lang] ?? WORDS.en), order, ...randomWindow(365 * 3) } };
 }
 
-export async function randomVideo(key: string, topics: string[], lang: string, exclude: Set<string>): Promise<Video> {
-  // Ziel-Größenordnung der Aufrufe, gleichverteilt auf der Log-Skala: 10 … 1 Mrd.
-  const targetLog = 1 + Math.random() * 8;
-  for (let attempt = 0; attempt < 5; attempt++) {
-    const p = plan(lang, topics);
+export async function randomVideo(key: string, topics: string[], lang: string, exclude: Set<string>, opts: { theme?: Theme; known?: boolean } = {}): Promise<Video> {
+  // Ziel-Größenordnung der Aufrufe, gleichverteilt auf der Log-Skala: 10 … 1 Mrd. (eher bekannte: 10.000 … 1 Mrd.)
+  const minLog = opts.known ? 4 : 1;
+  const targetLog = minLog + Math.random() * (9 - minLog);
+  for (let attempt = 0; attempt < (opts.known ? 7 : 5); attempt++) {
+    const p = plan(lang, topics, opts.theme);
+    // Für eher bekannte Videos öfter nach Aufrufen sortieren
+    if (opts.known && !p.prefix && Math.random() < 0.5) p.params.order = 'viewCount';
     const search = await call('search', { part: 'id', type: 'video', maxResults: '50', safeSearch: 'strict', videoEmbeddable: 'true', ...p.params }, key);
     let ids: string[] = (search.items ?? []).map((i: any) => i.id?.videoId).filter((id: string) => id && !exclude.has(id));
     if (p.prefix) {
@@ -118,6 +140,11 @@ export async function randomVideo(key: string, topics: string[], lang: string, e
       && v.snippet?.liveBroadcastContent === 'none' && parseDuration(v.contentDetails?.duration) >= 5,
     );
     if (!usable.length) continue;
+    if (opts.known) {
+      const big = usable.filter((v: any) => Number(v.statistics.viewCount) >= 10 ** minLog);
+      if (!big.length && attempt < 6) continue;
+      if (big.length) usable.splice(0, usable.length, ...big);
+    }
     // Die 3 Kandidaten nächst an der Ziel-Größenordnung, daraus zufällig einen
     const near = usable
       .map((v: any) => ({ v, d: Math.abs(Math.log10(Number(v.statistics.viewCount) + 1) - targetLog) }))

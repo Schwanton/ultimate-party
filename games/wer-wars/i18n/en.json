@@ -34,5 +34,8 @@
   "assign.usedAt": "at no. {n}",
   "assign.done": "Done",
   "assign.missing": "{n} left",
-  "assign.waiting": "Done! You can still change until time runs out."
+  "assign.waiting": "Done! You can still change until time runs out.",
+  "master.title": "Master of disguise",
+  "master.text": "Wrongly guessed {n}×",
+  "master.me": "You are the master of disguise!"
 }

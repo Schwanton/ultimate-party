@@ -25,7 +25,16 @@ export default {
     const mode = ctx.options.mode === 'duell' ? 'duell' : 'kampagne';
     const totalRounds = Number(ctx.options.rounds) || 5;
     const scores = new Scores(ids);
-    const lives = new Map(ids.map((id) => [id, LIVES]));
+    const level = ctx.options.difficulty === 'leicht' ? 'leicht' : ctx.options.difficulty === 'schwer' ? 'schwer' : 'normal';
+    // Schwierigkeit der Kampagne: Leben und Gegnerstärke
+    const startLives = mode === 'kampagne' ? (level === 'leicht' ? 5 : level === 'schwer' ? 2 : LIVES) : LIVES;
+    const DIFF = level === 'leicht' ? { cd: 1.5, err: 1.6, speed: 0.85, turn: 0.75 } : level === 'schwer' ? { cd: 0.8, err: 0.7, speed: 1.1, turn: 1.2 } : null;
+    const enemySpec = (type: string) => {
+      const base = ENEMIES[type];
+      if (!DIFF) return base;
+      return { ...base, fireCd: base.fireCd * DIFF.cd, err: base.err * DIFF.err + (DIFF.err > 1 ? 0.03 : 0), speed: base.speed * DIFF.speed, turn: base.turn * DIFF.turn };
+    };
+    const lives = new Map(ids.map((id) => [id, startLives]));
     const kills = new Map(ids.map((id) => [id, 0]));
     const isBot = (id: string) => !!ctx.player(id)?.isBot;
     let cpuCount = mode === 'duell' ? Number(ctx.options.cpu) || 0 : 0;
@@ -128,7 +137,7 @@ export default {
         w.addTank({ kind: 'enemy', etype: 'cpu', team: 100 + k, color: CPU_COLORS[k % CPU_COLORS.length], spec: CPU_SPEC, x: (c + 0.5) * CELL, y: (r + 0.5) * CELL, turret: face(c, r) });
       }
       for (const [c, r, type] of enemies) {
-        const spec = ENEMIES[type];
+        const spec = enemySpec(type);
         w.addTank({ kind: 'enemy', etype: type, team: 1, color: spec.color, spec, x: (c + 0.5) * CELL, y: (r + 0.5) * CELL, turret: Math.PI });
       }
       w.onKill = onKill;
@@ -156,7 +165,7 @@ export default {
 
     function intro() {
       phase = 'intro';
-      ctx.setHostView({ screen: 'intro', mode, missions: MISSIONS.length, total: totalRounds });
+      ctx.setHostView({ screen: 'intro', mode, missions: MISSIONS.length, total: totalRounds, lives: startLives });
       ctx.setAllPlayerViews(() => ({ screen: 'wait', phase: 'intro' }));
       ctx.after(T.intro, mode === 'kampagne' ? missionCard : nextRound);
     }

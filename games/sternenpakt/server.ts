@@ -61,7 +61,9 @@ export default {
     const map = s.stars.map((st) => [r2(st.x), r2(st.y), st.name, st.home, st.sp]);
     const neb = s.neb.map((n) => [r2(n.x), r2(n.y), r2(n.r)]);
     const wh = s.wh;
-    const half = Math.floor(s.stars.length / 2) + 1;
+    const winMode = String(ctx.options.instantWin ?? 'off');
+    s.winAt = winMode === 'half' ? Math.floor(s.stars.length / 2) + 1 : winMode === 'twothirds' ? Math.ceil((s.stars.length * 2) / 3) : 0;
+    const half = s.winAt;
     // Computer-Reiche und Testspieler wählen ihre Aufträge sofort
     s.empires.forEach((emp, e) => { if (emp.auto) E.chooseMissions(s, e, [0, 1]); });
 

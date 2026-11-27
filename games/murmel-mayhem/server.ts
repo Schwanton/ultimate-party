@@ -11,6 +11,7 @@ import { INPUT_GRACE, Scores, shuffle, type GameContext, type GameServerModule }
 import {
   HOLE, Race, SORT, TICK, TOGGLE, addSocket, generateGoodTrack, makeTube, newItem, railY, rowNumber, swapEnd, tubeForward,
   type CardKind, type DesignName, type Item, type ItemKind, type RaceEvent, type Socket, type Track,
+  DESIGNS,
 } from './engine';
 import { PALETTE, PATTERNS, contrast, nearestFree, validDesign, type Design } from './muster';
 
@@ -60,7 +61,8 @@ export default {
     const total = Number(ctx.options.rounds) || 5;
     const perPlayer = N <= 4 ? 6 : N <= 8 ? 4 : 3;
     // zum Testen lässt sich die Bahnform über MM_DESIGN festlegen
-    const forced = (globalThis as { process?: { env: Record<string, string | undefined> } }).process?.env.MM_DESIGN as DesignName | undefined;
+    const forced = (globalThis as { process?: { env: Record<string, string | undefined> } }).process?.env.MM_DESIGN as DesignName | undefined
+      ?? (DESIGNS.includes(String(ctx.options.track) as DesignName) ? String(ctx.options.track) as DesignName : undefined);
     const { track, check } = generateGoodTrack(4, 2, Math.random, forced);
     ctx.log('Murmel-Mayhem Bahn', track.design, track.mirrored ? 'gespiegelt' : '', track.rows.map((r) => `${r.key}:${r.mids.map((m) => m.kind).join('+') || '-'}/${r.end}`).join(' '), 'Ähnlichkeit', check.rho.toFixed(2), 'Zeit', check.time.toFixed(0), 'im Ziel', check.done.toFixed(2));
     /** Höchstzahl Teile je Spieler: 4, bei vielen Spielern weniger (es gibt nur so viele Bauplätze) */

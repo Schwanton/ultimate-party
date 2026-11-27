@@ -132,6 +132,14 @@ const scenarios: { game: string; players: number; options?: Record<string, numbe
   { game: 'figurendle', players: 3, options: { variante: 'brett', rounds: 3 } },
   { game: 'figurendle', players: 10, options: { variante: 'brett', rounds: 5, schwierigkeit: 'profi' } },
   { game: 'figurendle', players: 2, options: { rounds: 10, schwierigkeit: 'leicht' } },
+  { game: 'bonk', players: 4, options: { rounds: 3, lives: 1 } },
+  { game: 'bonk', players: 3, options: { rounds: 3, lives: 5 } },
+  { game: 'sternenpakt', players: 3, options: { instantWin: 'half', years: 10, ai: 2 } },
+  { game: 'sternenpakt', players: 2, options: { instantWin: 'twothirds', years: 10 } },
+  { game: 'tank-trouble', players: 2, options: { difficulty: 'leicht' } },
+  { game: 'tank-trouble', players: 2, options: { difficulty: 'schwer' } },
+  { game: 'murmel-mayhem', players: 3, options: { rounds: 3, track: 'turm' } },
+  { game: 'guess-the-clicks', players: 3, options: { theme: 'music', views: 'known', videos: 3 } },
 ];
 // Olympia-Modus: mehrere Spiele hintereinander mit Medaillen (npm test -- olympia)
 const olympiaScenarios: { players: number; settings: Record<string, unknown>; list?: string[] }[] = [

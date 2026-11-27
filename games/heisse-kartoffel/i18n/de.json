@@ -43,5 +43,10 @@
   "phone.won": "Du hast überlebt!",
   "me.place": "Platz {place} von {of}",
   "me.score": "{n} Punkte",
-  "lookAtTv": "Schau auf den Fernseher."
+  "lookAtTv": "Schau auf den Fernseher.",
+  "task.stroop": "Welche FARBE hat das Wort?",
+  "colorName.0": "Rot",
+  "colorName.1": "Blau",
+  "colorName.2": "Gelb",
+  "colorName.3": "Grün"
 }

@@ -15,10 +15,17 @@ type Task =
   | { kind: 'shape'; target: [number, number]; options: [number, number][] }
   | { kind: 'order'; cells: (number | null)[] }
   | { kind: 'math'; a: number; b: number; options: number[] }
-  | { kind: 'tap'; count: number };
+  | { kind: 'tap'; count: number }
+  | { kind: 'stroop'; word: number; ink: number; options: number[] };
 
 function makeTask(): Task {
-  const kind = pick(['shape', 'order', 'math', 'tap'] as const);
+  const kind = pick(['shape', 'order', 'math', 'tap', 'stroop'] as const);
+  if (kind === 'stroop') {
+    // Farbwort in einer anderen Farbe – getippt wird die Schriftfarbe
+    const word = Math.floor(Math.random() * 4);
+    const ink = pick([0, 1, 2, 3].filter((c) => c !== word));
+    return { kind, word, ink, options: shuffle([0, 1, 2, 3]) };
+  }
   if (kind === 'shape') {
     // Form (0 Kreis, 1 Quadrat, 2 Dreieck, 3 Stern) × Farbe (0–3); Ziel kommt genau einmal vor
     const all: [number, number][] = [];

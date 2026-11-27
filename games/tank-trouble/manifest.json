@@ -12,7 +12,7 @@
   "color": "#38E1FF",
   "tags": ["action", "team"],
   "sdkVersion": 1,
-  "version": "0.2.3",
+  "version": "0.3.0",
   "author": "UP!",
   "options": [
     {
@@ -23,6 +23,18 @@
       "choices": [
         { "value": "kampagne", "label": { "de": "Kampagne", "en": "Campaign" } },
         { "value": "duell", "label": { "de": "Duell", "en": "Duel" } }
+      ]
+    },
+    {
+      "id": "difficulty",
+      "label": { "de": "Schwierigkeit", "en": "Difficulty" },
+      "showIf": { "id": "mode", "value": "kampagne" },
+      "help": { "de": "Leicht: 5 Leben, Gegner schießen langsamer und ungenauer. Schwer: 2 Leben, Gegner schneller und treffsicherer.", "en": "Easy: 5 lives, enemies shoot slower and less accurately. Hard: 2 lives, enemies faster and more accurate." },
+      "default": "normal",
+      "choices": [
+        { "value": "leicht", "label": { "de": "Leicht", "en": "Easy" } },
+        { "value": "normal", "label": { "de": "Normal", "en": "Normal" } },
+        { "value": "schwer", "label": { "de": "Schwer", "en": "Hard" } }
       ]
     },
     {

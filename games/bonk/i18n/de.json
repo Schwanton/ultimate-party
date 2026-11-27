@@ -1,7 +1,7 @@
 {
   "title": "Bonk!",
   "round": "Runde {n} von {total}",
-  "intro.text": "Haut euch von den Inseln! Je mehr Schaden (%), desto weiter fliegst du. Wer runterfällt, verliert ein Leben – 3 pro Runde.",
+  "intro.text": "Haut euch von den Inseln! Je mehr Schaden (%), desto weiter fliegst du. Wer runterfällt, verliert ein Leben – {lives} pro Runde.",
   "intro.controls": "Joystick = laufen · A = Waffe · B = Ausweichen · {alt}",
   "intro.altButton": "C = Spezial",
   "intro.altGesture": "2× A = Spezial",
@@ -80,7 +80,7 @@
   "pu.flipper": "Flipper",
   "pud.flipper": "Wen du triffst, der prallt von Wänden noch heftiger ab.",
   "pu.viertesleben": "Viertes Leben",
-  "pud.viertesleben": "4 statt 3 Leben pro Runde.",
+  "pud.viertesleben": "Ein Extraleben pro Runde.",
   "pu.schnelllader": "Schnelllader",
   "pud.schnelllader": "Hammer lädt 25 % schneller auf.",
   "pu.langerstiel": "Langer Stiel",

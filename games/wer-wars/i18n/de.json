@@ -34,5 +34,8 @@
   "assign.usedAt": "bei Nr. {n}",
   "assign.done": "Fertig",
   "assign.missing": "Noch {n} offen",
-  "assign.waiting": "Fertig! Ändern geht, solange die Zeit läuft."
+  "assign.waiting": "Fertig! Ändern geht, solange die Zeit läuft.",
+  "master.title": "Meister der Tarnung",
+  "master.text": "{n}× falsch zugeordnet",
+  "master.me": "Du bist Meister der Tarnung!"
 }

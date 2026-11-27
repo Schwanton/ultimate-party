@@ -3,7 +3,7 @@
   "round": "Runde {n} von {total}",
   "drawing": "Bild {n} von {total}",
   "intro.title": "Vernissage",
-  "intro.text": "Jeder malt einen geheimen Begriff. Dann erfindet ihr falsche Titel zu den Bildern – und sucht den echten.",
+  "intro.text": "Jeder wählt einen von zwei geheimen Begriffen und malt ihn. Dann erfindet ihr falsche Titel zu den Bildern – und sucht den echten.",
   "intro.points": "Echten Titel finden: 1000 · Jeder, der deinen falschen Titel wählt: 500 · Zeichner: 500 pro Treffer",
   "draw.title": "Zeichnet!",
   "draw.onPhone": "Jeder zeichnet seinen geheimen Begriff auf dem Handy.",
@@ -48,5 +48,13 @@
   "draw.clear": "Löschen",
   "draw.clearConfirm": "Wirklich die ganze Zeichnung löschen?",
   "draw.eraser": "Radierer",
-  "choose.change": "Ändern geht, solange die Zeit läuft."
+  "choose.change": "Ändern geht, solange die Zeit läuft.",
+  "draw.pick": "Such dir einen Begriff aus:",
+  "gallery.title": "Welches Bild gefällt euch am besten?",
+  "gallery.info": "{n} von {total} haben gewählt",
+  "gallery.phone": "Dein Lieblingsbild?",
+  "gallery.rule": "Tippe auf ein Bild, um ihm dein Herz zu geben. Das Bild mit den meisten Herzen bekommt +200 (ab 2 Herzen).",
+  "gallery.save": "Antippen zum Speichern",
+  "fav.title": "Lieblingsbild",
+  "fav.hearts": "{n} Herzen"
 }

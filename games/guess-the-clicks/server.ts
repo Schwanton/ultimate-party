@@ -4,7 +4,7 @@
  */
 
 import { INPUT_GRACE, Scores, shuffle, type GameContext, type GameServerModule } from '@up/sdk';
-import { YouTubeError, checkKey, fakeVideo, randomVideo, type Video } from './youtube';
+import { THEMES, YouTubeError, checkKey, fakeVideo, randomVideo, type Theme, type Video } from './youtube';
 import { answerSeconds, revealSeconds, type PlanOptions } from './reveal';
 import { MODES, factor, scoreRound, type ScoringMode } from './scoring';
 
@@ -17,6 +17,8 @@ export default {
     const GUESS_TIME = Number(ctx.options.guessTime) || 40;
     const MODE: ScoringMode = MODES.includes(ctx.options.scoring as ScoringMode) ? (ctx.options.scoring as ScoringMode) : 'rank';
     const LOOSE = ctx.options.strictness === 'loose';
+    const THEME: Theme = THEMES.includes(ctx.options.theme as Theme) ? (ctx.options.theme as Theme) : 'all';
+    const KNOWN = ctx.options.views === 'known';
     /** Bei „Nur der Nächste“ reicht das Finale wie bisher; sonst kommen am Ende alle mit Punkten zurück. */
     const PLAN: PlanOptions = { log: true, showAll: MODE !== 'best' };
     const ids = ctx.players.map((p) => p.id);
@@ -72,12 +74,12 @@ export default {
           loadingDone = true;
         } else {
           // erstes Video sofort, die anderen im Hintergrund
-          videos.push(await randomVideo(key!, topics, ctx.lang, seen));
+          videos.push(await randomVideo(key!, topics, ctx.lang, seen, { theme: THEME, known: KNOWN }));
           seen.add(videos[0].id);
           void (async () => {
             while (videos.length < ROUNDS && !disposed) {
               try {
-                const v = await randomVideo(key!, topics, ctx.lang, seen);
+                const v = await randomVideo(key!, topics, ctx.lang, seen, { theme: THEME, known: KNOWN });
                 seen.add(v.id);
                 videos.push(v);
               } catch {

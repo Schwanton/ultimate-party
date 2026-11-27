@@ -22,6 +22,7 @@
   "intro.conquer": "Conquer: tap your star, then a target. Foreign stars mean a fight – the defender shoots first.",
   "intro.build": "Build: economy = money · industry = ships · science = research",
   "intro.pacts": "Pacts: negotiate out loud or in the secret phone chat – betrayal is allowed!",
+  "intro.goalNoWin": "100 points per star at the end. After {years} years the game ends – most points wins.",
   "intro.goal": "100 points per star at the end. Holding {n} stars wins at once – otherwise it ends after {years} years.",
   "intro.rounds": "Rounds mode: 40 seconds of secret planning, then everyone flies at once.",
   "intro.ready": "Ready: {n} of {total}",

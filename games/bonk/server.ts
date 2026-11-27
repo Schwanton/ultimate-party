@@ -56,6 +56,7 @@ export default {
     const N = ids.length;
     const scores = new Scores(ids);
     const total = Number(ctx.options.rounds) || 5;
+    const baseLives = [1, 3, 5].includes(Number(ctx.options.lives)) ? Number(ctx.options.lives) : 3;
     const controls = ctx.options.controls === 'gesten' ? 'gesten' : 'tasten';
     const weapons = new Map<string, WeaponId | null>(ids.map((id) => [id, null]));
     const fighters = new Map<string, Fighter>();
@@ -123,7 +124,7 @@ export default {
     /* ---------- Ablauf ---------- */
 
     function intro() {
-      ctx.setHostView({ screen: 'intro', controls });
+      ctx.setHostView({ screen: 'intro', controls, lives: baseLives });
       ctx.setAllPlayerViews(() => ({ screen: 'intro' }));
       ctx.after(T.intro, chooseWeapons);
     }
@@ -172,7 +173,7 @@ export default {
         const s = arena.spawns[i] ?? arena.spawns[0];
         fighters.set(id, {
           id, weapon: weapons.get(id) ?? 'hammer', x: s.x, y: s.y, vx: 0, vy: 0, ix: 0, iy: 0, fx: 1, fy: 0,
-          dmg: 0, lives: 3 + ((owned.get(id) ?? {}).viertesleben ?? 0), state: 'alive', respawnAt: 0, air: false, airMin: 0, rollUntil: 0, rollReady: 0, invulnUntil: 0, stunUntil: 0, bumpUntil: 0,
+          dmg: 0, lives: baseLives + ((owned.get(id) ?? {}).viertesleben ?? 0), state: 'alive', respawnAt: 0, air: false, airMin: 0, rollUntil: 0, rollReady: 0, invulnUntil: 0, stunUntil: 0, bumpUntil: 0,
           charging: null, swingReady: 0, altReady: 0, fireHeld: false, nextShot: 0, hitBy: null, hitAt: -9, kos: 0, place: 0, botRelease: 0, botRoll: 0,
           pu: owned.get(id) ?? {}, rollStock: 1 + ((owned.get(id) ?? {}).doppelrolle ?? 0), rollRecharge: 0, shots: 0,
           combo: 0, comboAt: -9, blocking: false, blockStart: 0,
@@ -197,7 +198,7 @@ export default {
 
     function hostView(extra: object = {}) {
       ctx.setHostView({
-        screen: 'arena', phase, round, total, ids,
+        screen: 'arena', phase, round, total, ids, baseLives,
         weapons: Object.fromEntries(ids.map((id) => [id, fighters.get(id)?.weapon ?? weapons.get(id)])),
         arena: { cols: arena.cols, rows: arena.rows, grid: arena.grid, walls: arena.walls, bumpers: arena.bumpers, pads: arena.pads, teleports: arena.teleports, ring: arena.ring, ringMax: arena.ringMax, center: arena.center, seed: arena.seed },
         fireStart, fireDur, cell: CELL, radius: PHY.radius,
@@ -1052,7 +1053,7 @@ export default {
       const f = fighters.get(id)!;
       return {
         screen: 'play', live: phase === 'fight', startAt, round, total, weapon: f.weapon, controls,
-        dmg: Math.floor(f.dmg), lives: f.lives, state: f.state, place: f.place,
+        dmg: Math.floor(f.dmg), lives: f.lives, baseLives, state: f.state, place: f.place,
         respawnAt: f.state === 'gone' ? Date.now() + (f.respawnAt - t) * 1000 : undefined,
         kos: f.kos, color: ctx.player(id)?.color,
         weapon2: f.weapon2, special: n(f, 'spezial') ? Math.floor(f.special) : null,

@@ -449,7 +449,7 @@ function TvPlay({ v, t }: { v: any; t: Translate }) {
           </div>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: many ? 5 : 9 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: MUTED }}><span>{t('points')}</span><span>{t('winAt', { n: v.half })}</span></div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: MUTED }}><span>{t('points')}</span><span>{v.half ? t('winAt', { n: v.half }) : ''}</span></div>
           {(v.rank as [number, number, number, number][]).map(([e, n, stars, hy]) => {
             const emp: Emp = v.emp[e];
             return (
@@ -512,7 +512,7 @@ function TvIntro({ v, t }: { v: any; t: Translate }) {
           </div>
         ))}
         <div className="anim-up" style={{ fontSize: 18, lineHeight: 1.3, padding: '10px 14px', borderRadius: 14, background: CARD, border: `1px solid ${LINE}`, animationDelay: '1.3s' }}>
-          {t('intro.goal', { n: v.half, years: v.years })}
+          {v.half ? t('intro.goal', { n: v.half, years: v.years }) : t('intro.goalNoWin', { years: v.years })}
         </div>
         {v.rounds && <span style={{ fontSize: 16, color: '#FFD23F' }}>{t('intro.rounds')}</span>}
         <Legend t={t} size={14} />

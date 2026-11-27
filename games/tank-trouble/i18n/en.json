@@ -2,7 +2,7 @@
   "title": "Tank Trouble",
   "mode.kampagne": "Campaign",
   "mode.duell": "Duel",
-  "intro.kampagne": "Everyone together against the computer tanks: {n} missions, 3 lives each.",
+  "intro.kampagne": "Everyone together against the computer tanks: {n} missions, {lives} lives each.",
   "intro.duell": "Free-for-all, {n} rounds. The last tank driving wins.",
   "intro.rules": "Bullets bounce off walls – your own can hit you too!",
   "intro.controls": "Phone sideways: drive on the left, aim on the right.",

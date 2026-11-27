@@ -3,6 +3,7 @@ import type { ControllerViewProps, GameClientModule, HostViewProps, PlayerInfo, 
 import { Avatar, ChoiceList, Confetti, HostHeader, HostTimer, PhoneTimer, PhoneWait, Podium, Scoreboard, TextAnswer, VoterChips, sfx } from '@up/ui';
 
 const CYAN = '#36D6F5';
+const HEART = '#FF5C8A';
 
 /** Frage mit hervorgehobener Lücke „___“ */
 function Question({ text, fill, size = 44 }: { text: string; fill?: string; size?: number }) {
@@ -148,6 +149,7 @@ function HostReveal({ view, t, player }: HostViewProps) {
               {authors.map((a) => <Avatar key={a.id} player={a} size={56} />)}
               <span className="display" style={{ fontSize: 28, fontWeight: 800 }}>{authors.map((a) => a.name).join(' & ')}</span>
               {it.points > 0 && <span className="display" style={{ fontSize: 36, fontWeight: 800, color: 'var(--yellow)', animation: 'upPop .5s ease-out .3s both' }}>+{it.points}</span>}
+              {it.fav > 0 && <span className="display" style={{ fontSize: 22, fontWeight: 800, color: '#fff', background: HEART, padding: '4px 14px', borderRadius: 999, animation: 'upPop .5s ease-out .7s both' }}>♥ {t('fav.badge', { n: it.hearts })} +{it.fav}</span>}
             </div>
           )}
           {stamp && truth && (
@@ -197,7 +199,21 @@ function Controller({ view, t, send, me }: ControllerViewProps) {
           <PhoneTimer deadline={view.deadline} duration={view.duration} hurryText={view.selected ? undefined : t('timer.hurry')} />
           <span className="up-label">{t('choose.title')}</span>
           <Question text={view.question} size={20} />
-          <ChoiceList options={view.options} selected={view.selected} onPick={(id) => send({ type: 'pick', option: id })} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {(view.options as { id: string; text: string }[]).map((o) => {
+              const isSel = view.selected === o.id;
+              const fav = view.heart === o.id;
+              return (
+                <div key={o.id} style={{ display: 'flex', gap: 8, alignItems: 'stretch' }}>
+                  <button type="button" role="radio" aria-checked={isSel} className={`up-choice${isSel ? ' selected' : ''}${view.selected && !isSel ? ' dim' : ''}`} style={{ flex: 1 }}
+                    onClick={() => send({ type: 'pick', option: o.id })}>{o.text}</button>
+                  <button type="button" aria-label={t('fav.label')} aria-pressed={fav} onClick={() => send({ type: 'heart', option: o.id })}
+                    style={{ width: 52, flex: 'none', border: 0, borderRadius: 18, fontSize: 24, cursor: 'pointer', background: fav ? HEART : 'var(--surface-2)', color: fav ? '#fff' : HEART }}>{fav ? '♥' : '♡'}</button>
+                </div>
+              );
+            })}
+          </div>
+          <p className="muted" style={{ textAlign: 'center', fontSize: 14 }}>{t('fav.hint')}</p>
           <p className="muted" style={{ textAlign: 'center', marginTop: 'auto' }}>{view.selected ? `${t('choose.done')} · ${t('choose.change')}` : t('choose.pick')}</p>
         </>
       );
@@ -209,6 +225,7 @@ function Controller({ view, t, send, me }: ControllerViewProps) {
           <Avatar player={me} size={110} />
           <h1 style={{ fontSize: 30 }}>{view.picked == null ? t('lookAtTv') : view.found ? t('result.found') : t('result.missed')}</h1>
           {view.fooled > 0 && <p style={{ fontSize: 19 }}>{t('result.fooled', { n: view.fooled })}</p>}
+          {view.fav > 0 && <p style={{ fontSize: 19, color: HEART, fontWeight: 800 }}>♥ {t('fav.me', { n: view.fav })}</p>}
           <span className="display" style={{ fontSize: 60, fontWeight: 800, color: 'var(--yellow)', textShadow: '0 6px 0 var(--yellow-d)', animation: 'upPop .6s ease-out both' }}>+{view.points}</span>
         </div>
       );

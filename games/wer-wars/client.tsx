@@ -108,7 +108,21 @@ function Host(props: HostViewProps) {
       return (
         <>
           <HostHeader title={t('title')} color={PINK} info={t('final.title')} />
-          <Podium ranking={view.ranking} player={player} pointsLabel={t('common.points')} />
+          <div style={{ flex: 1, display: 'flex', gap: 36, alignItems: 'center', minHeight: 0 }}>
+            <div style={{ flex: 1, minWidth: 0 }}><Podium ranking={view.ranking} player={player} pointsLabel={t('common.points')} /></div>
+            {view.master && (
+              <div className="anim-pop" style={{ width: 300, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '22px 18px', borderRadius: 26, background: 'var(--surface)', boxShadow: `0 8px 0 ${PINK}`, textAlign: 'center', animationDelay: '1.4s' }}>
+                <span style={{ fontSize: 46 }} aria-hidden="true">🥸</span>
+                <span className="up-label" style={{ color: PINK }}>{t('master.title')}</span>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
+                  {(view.master.ids as string[]).map((id) => player(id)).filter(Boolean).map((p) => (
+                    <span key={p!.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}><Avatar player={p!} size={64} /><b style={{ fontSize: 18 }}>{p!.name}</b></span>
+                  ))}
+                </div>
+                <span className="muted" style={{ fontSize: 16 }}>{t('master.text', { n: view.master.n })}</span>
+              </div>
+            )}
+          </div>
         </>
       );
   }
@@ -318,7 +332,7 @@ function Controller({ view, t, send, me, player }: ControllerViewProps) {
       );
     case 'scoresMe':
     case 'finalMe':
-      return <PhoneWait title={t('me.place', { place: view.place, of: view.of })} text={t('me.score', { n: view.score })} emoji={<Avatar player={me} size={110} />} />;
+      return <PhoneWait title={t('me.place', { place: view.place, of: view.of })} text={view.master ? `${t('me.score', { n: view.score })} · ${t('master.me')}` : t('me.score', { n: view.score })} emoji={<Avatar player={me} size={110} />} />;
     default:
       return <PhoneWait title={t('lookAtTv')} emoji={<Avatar player={me} size={96} />} />;
   }

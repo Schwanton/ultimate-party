@@ -15,7 +15,7 @@
   "color": "#3DF5FF",
   "tags": ["strategy", "deceive"],
   "sdkVersion": 1,
-  "version": "0.3.3",
+  "version": "0.4.0",
   "author": "UP!",
   "options": [
     {
@@ -163,6 +163,17 @@
         "de": "Jeder hat 2 geheime Aufträge. „Erfüllt melden“: Der Fernseher zeigt „Jemand hat einen Auftrag erfüllt!“ – erst nach einer zufälligen Wartezeit, damit man nicht weiß, wer es war.",
         "en": "Everyone has 2 secret missions. “Announce”: the TV shows “Someone completed a mission!” – only after a random delay, so nobody knows who it was."
       }
+    },
+    {
+      "id": "instantWin",
+      "label": { "de": "Sofortsieg", "en": "Instant win" },
+      "help": { "de": "Ob das Spiel sofort endet, wenn ein Reich genug Sterne hält.", "en": "Whether the game ends at once when an empire holds enough stars." },
+      "default": "off",
+      "choices": [
+        { "value": "off", "label": { "de": "Aus", "en": "Off" } },
+        { "value": "half", "label": { "de": "Ab mehr als der Hälfte der Sterne", "en": "More than half of the stars" } },
+        { "value": "twothirds", "label": { "de": "Ab zwei Dritteln der Sterne", "en": "Two thirds of the stars" } }
+      ]
     },
     {
       "id": "ai",

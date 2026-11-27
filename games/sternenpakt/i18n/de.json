@@ -22,6 +22,7 @@
   "intro.conquer": "Erobern: Tippe deinen Stern, dann ein Ziel. Bei fremden Sternen wird gekämpft – der Verteidiger schießt zuerst.",
   "intro.build": "Ausbauen: Wirtschaft = Geld · Industrie = Schiffe · Wissenschaft = Forschung",
   "intro.pacts": "Pakte: Verhandelt laut oder im geheimen Handy-Chat – Verrat ist erlaubt!",
+  "intro.goalNoWin": "100 Punkte je Stern am Ende. Nach {years} Jahren ist Schluss – wer dann die meisten Punkte hat, gewinnt.",
   "intro.goal": "100 Punkte je Stern am Ende. Wer {n} Sterne hält, gewinnt sofort – sonst ist nach {years} Jahren Schluss.",
   "intro.rounds": "Rundenmodus: 40 Sekunden geheim planen, dann fliegen alle gleichzeitig.",
   "intro.ready": "Bereit: {n} von {total}",

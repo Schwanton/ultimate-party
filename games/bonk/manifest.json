@@ -12,7 +12,7 @@
   "color": "#FF4FB8",
   "tags": ["action", "quick"],
   "sdkVersion": 1,
-  "version": "0.4.6",
+  "version": "0.5.0",
   "author": "UP!",
   "options": [
     {
@@ -24,6 +24,16 @@
         { "value": 5, "label": { "de": "5", "en": "5" } },
         { "value": 8, "label": { "de": "8", "en": "8" } },
         { "value": 12, "label": { "de": "12", "en": "12" } }
+      ]
+    },
+    {
+      "id": "lives",
+      "label": { "de": "Leben", "en": "Lives" },
+      "default": 3,
+      "choices": [
+        { "value": 1, "label": { "de": "1 (schnell)", "en": "1 (quick)" } },
+        { "value": 3, "label": { "de": "3", "en": "3" } },
+        { "value": 5, "label": { "de": "5 (lang)", "en": "5 (long)" } }
       ]
     },
     {

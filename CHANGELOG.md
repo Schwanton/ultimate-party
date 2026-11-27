@@ -2,6 +2,20 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.57.0
+
+- Bonk!: Neue Einstellung „Leben“ – 1 (schnell), 3 oder 5 (lang)
+- Flunkerfakt: Lieblingslüge – beim Wählen kannst du mit ♥ die witzigste Antwort markieren. Die Lüge mit den meisten Herzen bekommt +200 (ab 2 Herzen, bei Gleichstand wird geteilt)
+- Guess the Clicks!: Neue Einstellung „Videos“ – alles zufällig oder nur Musik, Tiere, Gaming, Sport oder Essen & Kochen. Und „Bekanntheit“: Auf Wunsch nur eher bekannte Videos ab 10.000 Aufrufen
+- Heiße Kartoffel: Neue Aufgabe – welche FARBE hat das Wort? (Das Wort „ROT“ steht zum Beispiel in Blau da)
+- Murmel-Mayhem: Neue Einstellung „Bahnform“ – zufällig oder eine feste Form wie Turm oder Sanduhr
+- Sternenpakt: Neue Einstellung „Sofortsieg“ – standardmäßig aus, die Partie läuft also immer bis zum Ende. Wer möchte, stellt „ab der Hälfte“ oder „ab zwei Dritteln der Sterne“ ein
+- Tank Trouble: Neue Einstellung „Schwierigkeit“ für die Kampagne – leicht (5 Leben, Gegner schießen langsamer und ungenauer), normal oder schwer (2 Leben, Gegner schneller und treffsicherer)
+- Tank Trouble: 4 neue Duell-Arenen – jetzt 8
+- Vernissage: Jeder sucht sich einen von zwei Begriffen aus
+- Vernissage: Am Ende kommen alle Bilder in eine Galerie. Jeder gibt seinem Lieblingsbild ein Herz – das Bild mit den meisten Herzen bekommt +200 (ab 2 Herzen, bei Gleichstand wird geteilt). Danach lassen sich alle Bilder am Handy speichern
+- Wer war's?: Am Ende wird der „Meister der Tarnung“ gekürt – wessen Antworten am häufigsten falsch zugeordnet wurden
+
 ## 0.56.1
 
 - Lobby: Vorausgewählt ist jetzt das erste Spiel der Liste (nach Namen sortiert) – nicht mehr immer „Der Abgrund“

@@ -154,6 +154,8 @@ export interface GameState {
   over: boolean;
   /** Sofortsieger (mehr als die Hälfte der Sterne) */
   winner: number | null;
+  /** Sterne für den Sofortsieg (0 = kein Sofortsieg; fehlt = mehr als die Hälfte) */
+  winAt?: number;
 }
 
 /* ---------------- Zufall ---------------- */
@@ -958,8 +960,8 @@ export function tick(s: GameState, dt: number, rng: Rng): GameEvent[] {
     }
     checkEmpires(s, ev);
     // Sofortsieg
-    const half = s.stars.length / 2;
-    const winner = s.empires.findIndex((_, e) => starCount(s, e) > half);
+    const need = s.winAt ?? Math.floor(s.stars.length / 2) + 1;
+    const winner = need > 0 ? s.empires.findIndex((_, e) => starCount(s, e) >= need) : -1;
     if (winner >= 0) {
       s.winner = winner;
       s.over = true;

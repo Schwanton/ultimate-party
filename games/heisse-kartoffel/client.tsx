@@ -323,6 +323,16 @@ function TaskView({ view, t, send }: ControllerViewProps) {
         </div>
       </>
     );
+  } else if (task.kind === 'stroop') {
+    prompt = t('task.stroop');
+    body = (
+      <>
+        <p className="display" style={{ fontSize: 64, fontWeight: 800, textAlign: 'center', color: TASK_COLORS[task.ink], letterSpacing: 2 }}>{t(`colorName.${task.word}`).toUpperCase()}</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 }}>
+          {task.options.map((o: number) => <button key={o} type="button" disabled={locked} style={{ ...btn, fontSize: 26 }} onClick={() => (o === task.ink ? solved() : wrong())}>{t(`colorName.${o}`)}</button>)}
+        </div>
+      </>
+    );
   } else {
     prompt = t('task.tap', { n: task.count });
     body = (

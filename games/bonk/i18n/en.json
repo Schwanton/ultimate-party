@@ -1,7 +1,7 @@
 {
   "title": "Bonk!",
   "round": "Round {n} of {total}",
-  "intro.text": "Bonk each other off the islands! The more damage (%), the further you fly. Fall off and you lose a life – 3 per round.",
+  "intro.text": "Bonk each other off the islands! The more damage (%), the further you fly. Fall off and you lose a life – {lives} per round.",
   "intro.controls": "Joystick = move · A = weapon · B = dodge · {alt}",
   "intro.altButton": "C = special",
   "intro.altGesture": "2× A = special",
@@ -80,7 +80,7 @@
   "pu.flipper": "Pinball",
   "pud.flipper": "Anyone you hit bounces off walls even harder.",
   "pu.viertesleben": "Fourth life",
-  "pud.viertesleben": "4 lives per round instead of 3.",
+  "pud.viertesleben": "One extra life per round.",
   "pu.schnelllader": "Quick charge",
   "pud.schnelllader": "Hammer charges 25% faster.",
   "pu.langerstiel": "Long handle",

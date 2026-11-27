@@ -88,7 +88,7 @@ function Host(props: HostViewProps) {
               <TankIcon color="#FF9F1C" size={92} angle={200} />
             </div>
             <span style={{ fontFamily: DISPLAY, fontSize: 26, letterSpacing: 4, color: MUTED }}>{t(`mode.${view.mode}`).toUpperCase()}</span>
-            <p className="anim-up" style={{ fontSize: 28, maxWidth: 980, lineHeight: 1.35, animationDelay: '.3s' }}>{view.mode === 'duell' ? t('intro.duell', { n: view.total }) : t('intro.kampagne', { n: view.missions })}</p>
+            <p className="anim-up" style={{ fontSize: 28, maxWidth: 980, lineHeight: 1.35, animationDelay: '.3s' }}>{view.mode === 'duell' ? t('intro.duell', { n: view.total }) : t('intro.kampagne', { n: view.missions, lives: view.lives ?? 3 })}</p>
             <p className="anim-up" style={{ fontSize: 22, maxWidth: 980, lineHeight: 1.35, color: '#9FF3FF', animationDelay: '.6s' }}>{t('intro.rules')}</p>
             <p className="anim-up" style={{ fontSize: 21, color: MUTED, animationDelay: '.9s' }}>{t('intro.controls')}</p>
             <p className="anim-up" style={{ fontSize: 20, color: '#FFD23F', animationDelay: '1.2s' }}>{t(`intro.points.${view.mode}`)}</p>

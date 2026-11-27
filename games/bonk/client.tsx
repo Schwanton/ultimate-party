@@ -33,7 +33,7 @@ function Host(props: HostViewProps) {
       return (
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 26, textAlign: 'center' }}>
           <span className="display anim-pop" style={{ fontSize: 150, fontWeight: 800, color: '#FFD447', transform: 'rotate(-4deg)', textShadow: '0 0 30px #FFD447, 0 0 60px #FF4FB8' }}>{t('title')}</span>
-          <p className="anim-up" style={{ fontSize: 27, maxWidth: 980, lineHeight: 1.35, animationDelay: '.4s' }}>{t('intro.text')}</p>
+          <p className="anim-up" style={{ fontSize: 27, maxWidth: 980, lineHeight: 1.35, animationDelay: '.4s' }}>{t('intro.text', { lives: (view.lives as number) ?? 3 })}</p>
           <p className="anim-up" style={{ fontSize: 21, color: '#36D6F5', animationDelay: '.7s' }}>{t('intro.controls', { alt: t(view.controls === 'gesten' ? 'intro.altGesture' : 'intro.altButton') })}</p>
           <p className="muted anim-up" style={{ fontSize: 20, animationDelay: '1s' }}>{t('intro.points')}</p>
         </div>
@@ -537,13 +537,14 @@ function HostArena({ view, t, player }: HostViewProps) {
           const st = fr?.p[i];
           if (!p) return null;
           const out = st ? st[3] & FLAG.out : 0;
-          const lives = st?.[5] ?? 3;
+          const base = (view.baseLives as number) ?? 3;
+          const lives = st?.[5] ?? base;
           return (
             <div key={id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: ids.length > 6 ? '3px 10px' : '6px 10px', borderRadius: 14, background: '#110D24', border: `2px solid ${p.color}`, boxShadow: `0 0 10px ${p.color}55`, opacity: out ? 0.35 : 1 }}>
               <WeaponIcon weapon={(view.weapons?.[id] as string) ?? 'hammer'} size={ids.length > 6 ? 18 : 24} color={p.color} />
               <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, flex: 1, lineHeight: 1.15 }}>
                 <b style={{ fontSize: ids.length > 6 ? 12 : 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</b>
-                <span style={{ fontSize: 12, color: p.color, letterSpacing: 1 }}>{'♥'.repeat(Math.max(0, lives))}{'♡'.repeat(Math.max(0, 3 - lives))}</span>
+                <span style={{ fontSize: 12, color: p.color, letterSpacing: 1 }}>{'♥'.repeat(Math.max(0, lives))}{'♡'.repeat(Math.max(0, base - lives))}</span>
               </div>
               <b className="display" style={{ fontSize: ids.length > 6 ? 16 : 20, color: heat(st?.[4] ?? 0) }}>{st?.[4] ?? 0}%</b>
             </div>
@@ -870,7 +871,7 @@ function PlayController({ view, t, send, me }: ControllerViewProps) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <span style={{ borderRadius: '50%', boxShadow: `0 0 0 3px ${color}, 0 0 14px ${color}` }}><Avatar player={me} size={land ? 34 : 44} /></span>
         <b style={{ fontSize: land ? 15 : 17 }}>{me.name}</b>
-        <span style={{ color, fontSize: land ? 18 : 22, letterSpacing: 2 }} aria-label={`${view.lives}`}>{'♥'.repeat(Math.max(0, view.lives))}{'♡'.repeat(Math.max(0, 3 - view.lives))}</span>
+        <span style={{ color, fontSize: land ? 18 : 22, letterSpacing: 2 }} aria-label={`${view.lives}`}>{'♥'.repeat(Math.max(0, view.lives))}{'♡'.repeat(Math.max(0, ((view.baseLives as number) ?? 3) - view.lives))}</span>
       </div>
       <span className="muted" style={{ fontSize: 13 }}>{t('round', { n: view.round, total: view.total })} · <span style={{ color: wColor }}>{t(`w.${view.weapon}`)}</span></span>
       <span className="display" style={{ fontSize: land ? 54 : 80, fontWeight: 800, lineHeight: 1, color: heat(view.dmg), textShadow: `0 0 18px ${heat(view.dmg)}88` }}>{view.dmg}%</span>

@@ -32,5 +32,9 @@
   "me.score": "{n} Punkte",
   "audience.wait": "Du bist im Publikum. Gleich darfst du mitraten!",
   "lookAtTv": "Schau auf den Fernseher.",
-  "choose.change": "Ändern geht, solange die Zeit läuft."
+  "choose.change": "Ändern geht, solange die Zeit läuft.",
+  "fav.label": "Witzigste Lüge",
+  "fav.hint": "♥ = witzigste Lüge (freiwillig). Die mit den meisten Herzen bekommt +200 (ab 2 Herzen).",
+  "fav.badge": "Lieblingslüge · {n}",
+  "fav.me": "Lieblingslüge! +{n}"
 }

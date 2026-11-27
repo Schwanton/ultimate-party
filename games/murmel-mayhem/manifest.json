@@ -12,7 +12,7 @@
   "color": "#E9C46A",
   "tags": ["action"],
   "sdkVersion": 1,
-  "version": "0.6.3",
+  "version": "0.7.0",
   "author": "UP!",
   "options": [
     {
@@ -23,6 +23,21 @@
         { "value": 3, "label": { "de": "3", "en": "3" } },
         { "value": 5, "label": { "de": "5", "en": "5" } },
         { "value": 8, "label": { "de": "8", "en": "8" } }
+      ]
+    },
+    {
+      "id": "track",
+      "label": { "de": "Bahnform", "en": "Track shape" },
+      "default": "random",
+      "choices": [
+        { "value": "random", "label": { "de": "Zufällig", "en": "Random" } },
+        { "value": "klassisch", "label": { "de": "Klassisch", "en": "Classic" } },
+        { "value": "turm", "label": { "de": "Turm", "en": "Tower" } },
+        { "value": "xbahn", "label": { "de": "X-Bahn", "en": "X-Track" } },
+        { "value": "sanduhr", "label": { "de": "Sanduhr", "en": "Hourglass" } },
+        { "value": "tuerme", "label": { "de": "Drei Türme", "en": "Three Towers" } },
+        { "value": "treppenhaus", "label": { "de": "Treppenhaus", "en": "Staircase" } },
+        { "value": "querbahn", "label": { "de": "Querbahn", "en": "Crossway" } }
       ]
     }
   ]

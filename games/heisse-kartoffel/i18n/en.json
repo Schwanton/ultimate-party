@@ -43,5 +43,10 @@
   "phone.won": "You survived!",
   "me.place": "Place {place} of {of}",
   "me.score": "{n} points",
-  "lookAtTv": "Look at the TV."
+  "lookAtTv": "Look at the TV.",
+  "task.stroop": "What COLOUR is the word?",
+  "colorName.0": "Red",
+  "colorName.1": "Blue",
+  "colorName.2": "Yellow",
+  "colorName.3": "Green"
 }
