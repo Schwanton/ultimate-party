@@ -91,6 +91,7 @@ function Host(props: HostViewProps) {
           </div>
           <p className="muted anim-up" style={{ fontSize: 21, maxWidth: 960, animationDelay: '1s' }}>{t('intro.rules', { n: view.totalRounds })}</p>
           <p className="anim-up" style={{ fontSize: 21, maxWidth: 960, color: 'var(--yellow)', animationDelay: '1.3s' }}>{t('intro.physical')}</p>
+          {view.twoFakers && <p className="anim-pop" style={{ fontSize: 26, fontWeight: 800, color: PURPLE, animationDelay: '1.6s' }}>{t('intro.two')}</p>}
         </div>
       );
     case 'read':
@@ -200,7 +201,8 @@ function HostResult({ view, t, player }: HostViewProps) {
     wrong: [t('result.wrong'), view.last ? t('result.lastRound') : t('result.wrongText', { name: accused?.name ?? '' }), 'var(--red)'],
     none: [t('result.noMajority'), view.last ? t('result.lastRound') : t('result.noMajorityText'), 'var(--yellow)'],
   };
-  const [title, text, color] = titles[view.outcome];
+  let [title, text, color] = titles[view.outcome];
+  if (view.oneLeft) text = t('result.oneLeft');
   useEffect(() => {
     sfx.play(view.outcome === 'caught' ? 'fanfare' : 'wrong');
   }, [view.outcome, view.round]);
@@ -253,7 +255,9 @@ const TABLE_AT = 6;
 const ROW_STEP = 0.9;
 
 function HostTally({ view, t, player }: HostViewProps) {
-  const faker = player(view.faker);
+  const fakerIds = (view.fakers ?? [view.faker]) as string[];
+  const fakerSet = new Set(fakerIds);
+  const caughtIn = (view.caughtIn ?? {}) as Record<string, number>;
   const rounds = view.rounds as { round: number; category: string; votes: Record<string, string>; outcome: string }[];
   const order = view.order as string[];
   useEffect(() => {
@@ -268,13 +272,16 @@ function HostTally({ view, t, player }: HostViewProps) {
       <Later at={REVEAL_AT}><Confetti pieces={view.caught ? 30 : 16} silent /></Later>
       <HostHeader title={t('title')} color={PURPLE} info={t('tally.title')} />
       <div style={{ display: 'flex', alignItems: 'center', gap: 22 }}>
-        <p className="anim-fade" style={{ fontSize: 30, fontWeight: 700 }}>{t('tally.was')}</p>
-        {faker && (
-          <div className="up-card" style={{ display: 'flex', alignItems: 'center', gap: 14, background: PURPLE, color: INK, boxShadow: '0 6px 0 #6B4FD1', padding: '8px 22px 8px 10px', animation: `upPop .6s ease-out ${REVEAL_AT}s both` }}>
-            <Avatar player={faker} size={58} />
-            <span className="display" style={{ fontSize: 34, fontWeight: 800 }}>{faker.name}</span>
-          </div>
-        )}
+        <p className="anim-fade" style={{ fontSize: 30, fontWeight: 700 }}>{t(fakerIds.length > 1 ? 'tally.were' : 'tally.was')}</p>
+        {fakerIds.map((id, k) => {
+          const faker = player(id);
+          return faker ? (
+            <div key={id} className="up-card" style={{ display: 'flex', alignItems: 'center', gap: 14, background: PURPLE, color: INK, boxShadow: '0 6px 0 #6B4FD1', padding: '8px 22px 8px 10px', animation: `upPop .6s ease-out ${REVEAL_AT + k * 0.5}s both` }}>
+              <Avatar player={faker} size={fakerIds.length > 1 ? 46 : 58} />
+              <span className="display" style={{ fontSize: fakerIds.length > 1 ? 26 : 34, fontWeight: 800 }}>{faker.name}</span>
+            </div>
+          ) : null;
+        })}
         <p className="display" style={{ fontSize: 26, fontWeight: 800, color: view.caught ? 'var(--green)' : 'var(--red)', animation: `upPop .5s ease-out ${REVEAL_AT + 0.8}s both` }}>
           {view.caught ? t('tally.caughtIn', { n: view.caughtRound }) : t('tally.escaped')}
         </p>
@@ -293,7 +300,7 @@ function HostTally({ view, t, player }: HostViewProps) {
         {order.map((id, i) => {
           const p = player(id);
           if (!p) return null;
-          const isFaker = id === view.faker;
+          const isFaker = fakerSet.has(id);
           const parts = (view.breakdown[id] as { label: string; points: number; n?: number }[]).map((b) => t(`tally.${b.label}`, { n: b.n ?? b.points })).join(' · ');
           return (
             <div key={id} className="up-card" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 14px', background: isFaker ? '#2A2150' : undefined, boxShadow: isFaker ? `inset 0 0 0 3px ${PURPLE}` : undefined, animation: `upSlideUp .4s ease-out ${(TABLE_AT + i * ROW_STEP).toFixed(2)}s both` }}>
@@ -302,9 +309,13 @@ function HostTally({ view, t, player }: HostViewProps) {
                 <b style={{ fontSize: 18, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</b>
               </span>
               {rounds.map((r) => {
-                if (isFaker) return <span key={r.round} className="display" style={{ width: cell, textAlign: 'center', color: r.outcome === 'caught' ? 'var(--red)' : PURPLE, fontWeight: 800, fontSize: 22 }}>{r.outcome === 'caught' ? '✗' : '✓'}</span>;
+                if (isFaker) {
+                  const caughtHere = caughtIn[id] === r.round;
+                  const gone = caughtIn[id] != null && caughtIn[id] < r.round;
+                  return <span key={r.round} className="display" style={{ width: cell, textAlign: 'center', color: caughtHere ? 'var(--red)' : PURPLE, opacity: gone ? 0.3 : 1, fontWeight: 800, fontSize: 22 }}>{caughtHere ? '✗' : gone ? '–' : '✓'}</span>;
+                }
                 const target = r.votes[id] ? player(r.votes[id]) : undefined;
-                const hit = r.votes[id] === view.faker;
+                const hit = fakerSet.has(r.votes[id]);
                 return (
                   <span key={r.round} style={{ width: cell, display: 'flex', justifyContent: 'center' }}>
                     {target ? (
@@ -405,6 +416,7 @@ function Controller(props: ControllerViewProps) {
       let title = t('me.next');
       let text = '';
       if (view.last) { title = view.outcome === 'caught' ? t('result.caught') : t('me.lastRound'); text = t('me.tallySoon'); }
+      else if (view.oneLeft) { title = view.accusedMe ? t('me.caught') : t('result.caught'); text = t('result.oneLeft'); }
       else if (view.accusedMe) { title = t('me.innocent'); text = t('me.next'); }
       else if (view.isFaker) { title = t('me.stillHidden'); text = view.accusedName ? t('result.wrongText', { name: view.accusedName }) : ''; }
       else if (view.accusedName) text = t('result.wrongText', { name: view.accusedName });
@@ -417,7 +429,7 @@ function Controller(props: ControllerViewProps) {
       );
     }
     case 'end': {
-      const title = view.isFaker ? (view.caught ? t('me.caught') : t('me.escaped')) : t('result.caughtText', { name: view.fakerName });
+      const title = view.isFaker ? (view.caught ? t('me.caught') : t('me.escaped')) : t(view.twoFakers ? 'result.caughtText2' : 'result.caughtText', { name: view.fakerName });
       const happy = view.isFaker ? !view.caught : view.hits > 0;
       return (
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, textAlign: 'center' }} className="anim-fade">

@@ -12,6 +12,23 @@ const T = { intro: 9, ready: 3, roundEnd: 5, maxRound: 75, shrinkFrom: 8, shrink
 const PHY = { accel: 1500, maxSpeed: 360, drag: 2.4, dash: 620, dashTime: 0.25, dashCooldown: 2.2, dashMass: 2.6, bounce: 0.85, kick: 1.35, creditWindow: 2.5 };
 const POINTS = { outlast: 50, knockout: 150, win: 300 };
 
+type Shape = 'kreis' | 'ring' | 'quadrat' | 'raute';
+const SHAPES: Shape[] = ['kreis', 'ring', 'quadrat', 'raute'];
+/** Steht ein Punkt (Mitte der Kugel) noch auf der Plattform? Alle Formen haben etwa dieselbe Fläche. */
+export function onPlatform(shape: Shape, x: number, y: number, R: number) {
+  const d = Math.hypot(x, y);
+  if (shape === 'ring') return d <= R && d >= R * 0.3;
+  if (shape === 'quadrat') return Math.abs(x) <= R * 0.886 && Math.abs(y) <= R * 0.886;
+  if (shape === 'raute') return Math.abs(x) + Math.abs(y) <= R * 1.25;
+  return d <= R;
+}
+/** Wie weit (0 = Mitte, 1 = Rand) – für die Testspieler */
+function edgeness(shape: Shape, x: number, y: number, R: number) {
+  if (shape === 'quadrat') return Math.max(Math.abs(x), Math.abs(y)) / (R * 0.886);
+  if (shape === 'raute') return (Math.abs(x) + Math.abs(y)) / (R * 1.25);
+  return Math.hypot(x, y) / R;
+}
+
 interface Ball { x: number; y: number; vx: number; vy: number; ix: number; iy: number; dashUntil: number; dashReady: number; out: boolean; hitBy: string | null; hitAt: number }
 
 export default {
@@ -22,6 +39,8 @@ export default {
     const N = ids.length;
     const r = N <= 6 ? 34 : N <= 16 ? 26 : N <= 40 ? 18 : 13;
     const R0 = Math.min(290, Math.max(180, r * Math.sqrt(N) * 3.2));
+    const arena = String(ctx.options.arena ?? 'kreis');
+    let shape: Shape = 'kreis';
     let round = 0;
     let phase: 'intro' | 'ready' | 'fight' | 'roundEnd' | 'scores' | 'final' = 'intro';
     let balls = new Map<string, Ball>();
@@ -45,6 +64,8 @@ export default {
       round++;
       if (round > total) return final();
       phase = 'ready';
+      // Form der Plattform: fest oder jede Runde eine andere
+      shape = arena === 'zufall' ? SHAPES[(round - 1 + Math.floor(Math.random() * 4)) % 4] : SHAPES.includes(arena as Shape) ? (arena as Shape) : 'kreis';
       t = 0;
       outOrder = [];
       kos = new Map();
@@ -62,7 +83,7 @@ export default {
     }
 
     function hostView(extra: object = {}) {
-      ctx.setHostView({ screen: phase === 'roundEnd' ? 'roundEnd' : 'arena', phase, round, total, ids, r, R0, out: outOrder, kos: Object.fromEntries(kos), ...extra });
+      ctx.setHostView({ screen: phase === 'roundEnd' ? 'roundEnd' : 'arena', phase, round, total, ids, r, R0, shape, out: outOrder, kos: Object.fromEntries(kos), ...extra });
     }
 
     function fight() {
@@ -93,7 +114,9 @@ export default {
           if (d < best) [best, tx, ty] = [d, ob.x - b.x, ob.y - b.y];
         }
         const dist = Math.hypot(b.x, b.y);
-        if (dist > R * 0.72) [tx, ty] = [-b.x, -b.y];
+        if (edgeness(shape, b.x, b.y, R) > 0.72) [tx, ty] = [-b.x, -b.y];
+        // Ring: nicht ins Loch in der Mitte
+        if (shape === 'ring' && dist < R * 0.45) [tx, ty] = [b.x || 1, b.y];
         const len = Math.hypot(tx, ty) || 1;
         b.ix = (tx / len) * 0.9 + (Math.random() - 0.5) * 0.3;
         b.iy = (ty / len) * 0.9 + (Math.random() - 0.5) * 0.3;
@@ -150,7 +173,7 @@ export default {
       const fell: string[] = [];
       for (const id of live) {
         const b = balls.get(id)!;
-        if (Math.hypot(b.x, b.y) > R) {
+        if (!onPlatform(shape, b.x, b.y, R)) {
           b.out = true;
           fell.push(id);
         }

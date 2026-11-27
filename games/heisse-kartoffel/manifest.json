@@ -12,7 +12,7 @@
   "color": "#FF8A3D",
   "tags": ["action", "quick"],
   "sdkVersion": 1,
-  "version": "1.3.0",
+  "version": "1.4.0",
   "author": "UP!",
   "options": [
     {
@@ -21,6 +21,14 @@
         { "value": 1, "label": { "de": "1 (schnell)", "en": "1 (quick)" } },
         { "value": 2, "label": { "de": "2", "en": "2" } },
         { "value": 3, "label": { "de": "3 (lang)", "en": "3 (long)" } }
+      ]
+    },
+    {
+      "id": "potatoes", "label": { "de": "Zwei Kartoffeln", "en": "Two potatoes" }, "default": "one",
+      "help": { "de": "Ab 8 Spielern, die noch dabei sind, wandern zwei Kartoffeln gleichzeitig – beim Knall erwischt es beide Halter.", "en": "With 8 or more players still in, two potatoes travel at once – when they blow, both holders are hit." },
+      "choices": [
+        { "value": "one", "label": { "de": "Aus", "en": "Off" } },
+        { "value": "two", "label": { "de": "Ab 8 Spielern", "en": "From 8 players" } }
       ]
     }
   ]

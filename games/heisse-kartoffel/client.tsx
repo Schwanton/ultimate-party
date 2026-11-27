@@ -173,7 +173,10 @@ function HostCircle({ view, t, player }: HostViewProps) {
     return [cx + rx * Math.cos(a), cy + ry * Math.sin(a)];
   };
   const holder = player(view.holder);
-  const [hx, hy] = posOf(view.holder);
+  const pots = (view.pots ?? [{ holder: view.holder, phase: view.phase }]) as { holder: string; phase: string }[];
+  const holders = new Set(pots.map((p) => p.holder));
+  const victims = (view.victims ?? (view.victim ? [view.victim] : [])) as string[];
+  const outs = new Set<string>(view.outs ?? (view.out ? [view.victim] : []));
 
   // Ticken
   const lastTick = useRef(0);
@@ -203,8 +206,8 @@ function HostCircle({ view, t, player }: HostViewProps) {
           const p = player(id);
           if (!p) return null;
           const [x, y] = posOf(id);
-          const isHolder = id === view.holder;
-          const out = !alive.has(id) && !(boom && id === view.victim);
+          const isHolder = holders.has(id);
+          const out = !alive.has(id) && !(boom && victims.includes(id));
           return (
             <div key={id} style={{ position: 'absolute', left: x, top: y, transform: 'translate(-50%, -50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, opacity: out ? 0.3 : 1, filter: out ? 'grayscale(1)' : undefined, transition: 'opacity .4s' }}>
               <span style={{ borderRadius: '50%', boxShadow: isHolder && !boom ? `0 0 0 5px ${ORANGE}, 0 0 30px ${ORANGE}` : undefined, animation: isHolder && !boom ? 'upJitter .3s linear infinite' : undefined }}>
@@ -216,38 +219,53 @@ function HostCircle({ view, t, player }: HostViewProps) {
           );
         })}
 
-        {/* Kartoffel fliegt zum Halter */}
-        {!boom && started && (
-          <div style={{ position: 'absolute', left: hx + size * 0.55, top: hy - size * 0.55, transform: 'translate(-50%, -50%)', transition: 'left .45s cubic-bezier(.3,1.4,.5,1), top .45s cubic-bezier(.3,1.4,.5,1)', zIndex: 3 }}>
-            <Potato size={size * 0.9} elapsed={elapsed} />
-          </div>
-        )}
-        {boom && (
-          <div style={{ position: 'absolute', left: hx, top: hy, transform: 'translate(-50%, -50%)', zIndex: 4 }}>
+        {/* Kartoffel(n) fliegen zum Halter */}
+        {!boom && started && pots.map((pot, i) => {
+          const [px, py] = posOf(pot.holder);
+          return (
+            <div key={i} style={{ position: 'absolute', left: px + size * 0.55, top: py - size * 0.55, transform: 'translate(-50%, -50%)', transition: 'left .45s cubic-bezier(.3,1.4,.5,1), top .45s cubic-bezier(.3,1.4,.5,1)', zIndex: 3 }}>
+              <Potato size={size * 0.9} elapsed={elapsed} />
+            </div>
+          );
+        })}
+        {boom && victims.map((v) => {
+          const [vx, vy] = posOf(v);
+          return (
+          <div key={v} style={{ position: 'absolute', left: vx, top: vy, transform: 'translate(-50%, -50%)', zIndex: 4 }}>
             <svg width={320} height={320} viewBox="-100 -100 200 200" aria-hidden="true" style={{ animation: 'upPop .5s ease-out both' }}>
               <polygon points="0,-95 22,-35 85,-55 45,-5 95,30 30,30 40,95 0,45 -40,95 -30,30 -95,30 -45,-5 -85,-55 -22,-35" fill="#FF9F43" />
               <polygon points="0,-60 14,-22 52,-34 28,-2 58,20 18,20 24,58 0,28 -24,58 -18,20 -58,20 -28,-2 -52,-34 -14,-22" fill="#FFD447" />
               <text y="12" textAnchor="middle" fontSize="40" fontWeight="900" fill="#B8202E" fontFamily="Bricolage Grotesque, sans-serif">BOOM</text>
             </svg>
           </div>
-        )}
+          );
+        })}
 
         {/* Mitte */}
         <div style={{ position: 'absolute', left: cx, top: cy, transform: 'translate(-50%, -50%)', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, maxWidth: 560 }}>
           {boom ? (
             <>
-              <h1 className="anim-pop" style={{ fontSize: 48 }}>{view.out ? t('boom.out', { name: player(view.victim)?.name ?? '?' }) : t('boom.life', { name: player(view.victim)?.name ?? '?' })}</h1>
+              {victims.map((v) => (
+                <h1 key={v} className="anim-pop" style={{ fontSize: victims.length > 1 ? 36 : 48 }}>{outs.has(v) ? t('boom.out', { name: player(v)?.name ?? '?' }) : t('boom.life', { name: player(v)?.name ?? '?' })}</h1>
+              ))}
               <p className="muted" style={{ fontSize: 20 }}>{t('boom.others')}</p>
             </>
           ) : !started ? (
             <>
               <span className="display" style={{ fontSize: 110, fontWeight: 800 }}>{Math.max(1, Math.ceil((view.roundStart - now) / 1000))}</span>
-              <p style={{ fontSize: 24, fontWeight: 700 }}>{t('start.first', { name: holder?.name ?? '?' })}</p>
+              <p style={{ fontSize: 24, fontWeight: 700 }}>{t('start.first', { name: pots.map((p) => player(p.holder)?.name ?? '?').join(' & ') })}</p>
+              {pots.length > 1 && <p style={{ fontSize: 20, color: ORANGE, fontWeight: 800 }}>{t('two.pots')}</p>}
             </>
           ) : (
             <>
-              <h1 style={{ fontSize: 44 }}>{t('holder', { name: holder?.name ?? '?' })}</h1>
-              <p className="muted" style={{ fontSize: 22 }}>{view.phase === 'throw' ? t('holder.throw') : t('holder.task')}</p>
+              {pots.length > 1 ? (
+                <h1 style={{ fontSize: 38 }}>{t('holder.two', { a: player(pots[0].holder)?.name ?? '?', b: player(pots[1].holder)?.name ?? '?' })}</h1>
+              ) : (
+                <>
+                  <h1 style={{ fontSize: 44 }}>{t('holder', { name: holder?.name ?? '?' })}</h1>
+                  <p className="muted" style={{ fontSize: 22 }}>{view.phase === 'throw' ? t('holder.throw') : t('holder.task')}</p>
+                </>
+              )}
             </>
           )}
         </div>

@@ -70,5 +70,9 @@
   "tally.caught": "entlarvt +{n}",
   "tally.survived": "unentdeckt +{n}",
   "tally.wrongAccused": "Unschuldige angeklagt +{n}",
-  "tally.escaped_pts": "entkommen +{n}"
+  "tally.escaped_pts": "entkommen +{n}",
+  "result.oneLeft": "Einer ist aufgeflogen – aber es gibt noch einen zweiten Hochstapler!",
+  "tally.were": "Die Hochstapler waren …",
+  "intro.two": "Achtung: Diesmal gibt es zwei Hochstapler – sie wissen nichts voneinander!",
+  "result.caughtText2": "{name} waren die Hochstapler!"
 }

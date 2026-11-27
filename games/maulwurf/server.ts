@@ -11,7 +11,7 @@
 import { Scores, pick, shuffle, type GameContext, type GameServerModule } from '@up/sdk';
 import { votersSeconds } from './timing';
 
-const T = { intro: 10, roles: 12, pick: 40, mission: 20, flip: 1.1, missionResult: 4, lastChance: 5, voteResult: 5, end: 12 };
+const T = { intro: 10, roles: 12, pick: 40, approve: 25, approveResult: 5, mission: 20, flip: 1.1, missionResult: 4, lastChance: 5, voteResult: 5, end: 12 };
 const WIN = 3;
 const POINTS = { win: 1000, survived: 500, goodVote: 250 };
 const NOBODY = 'nobody';
@@ -33,6 +33,10 @@ export default {
     const wanted = Number(ctx.options.traitors) || traitorCount(ids.length);
     const nTraitors = Math.min(wanted, Math.floor((ids.length - 1) / 2));
     const discuss = Number(ctx.options.discussTime) || 90;
+    /** Einstellung Team-Abstimmung: alle stimmen über das Team ab, 3× abgelehnt = Punkt für die Verräter */
+    const approveOn = ctx.options.teamVote === 'on';
+    let rejects = 0;
+    let approvals = new Map<string, boolean>();
     const traitors = new Set(shuffle(ids).slice(0, nTraitors));
     const role = (id: string): Role => (traitors.has(id) ? 'traitor' : 'loyal');
     const alive = new Set(ids);
@@ -47,14 +51,14 @@ export default {
     let cards = new Map<string, 'ok' | 'fail'>();
     let votes = new Map<string, string>();
     let timer: { cancel(): void; deadline: number; duration: number } | null = null;
-    let phase: 'intro' | 'roles' | 'pick' | 'mission' | 'missionResult' | 'vote' | 'voteResult' | 'end' = 'intro';
+    let phase: 'intro' | 'roles' | 'pick' | 'approve' | 'approveResult' | 'mission' | 'missionResult' | 'vote' | 'voteResult' | 'end' = 'intro';
 
     const aliveList = () => ids.filter((id) => alive.has(id));
     const traitorsAlive = () => aliveList().filter((id) => traitors.has(id)).length;
     const loyalAlive = () => aliveList().length - traitorsAlive();
     const ok = () => missions.filter((m) => m === 'ok').length;
     const fail = () => missions.filter((m) => m === 'fail').length;
-    const status = () => ({ round, ok: ok(), fail: fail(), alive: aliveList(), traitorsTotal: nTraitors, banished, win: WIN });
+    const status = () => ({ round, ok: ok(), fail: fail(), alive: aliveList(), traitorsTotal: nTraitors, banished, win: WIN, rejects: approveOn ? rejects : null });
     const roleInfo = (id: string) => ({
       role: role(id), alive: alive.has(id),
       mates: traitors.has(id) ? [...traitors].filter((x) => x !== id) : [],
@@ -107,7 +111,58 @@ export default {
     function autoTeam() {
       const rest = shuffle(aliveList().filter((x) => !team.includes(x)));
       team = [...team, ...rest].slice(0, size());
-      startMission();
+      teamChosen();
+    }
+
+    function teamChosen() {
+      if (approveOn) startApprove();
+      else startMission();
+    }
+
+    /* ---------- Team-Abstimmung (Einstellung) ---------- */
+
+    function startApprove() {
+      timer?.cancel();
+      confirmed = true;
+      phase = 'approve';
+      approvals = new Map();
+      timer = ctx.timer(T.approve, resolveApprove);
+      approveViews();
+    }
+
+    function approveViews() {
+      ctx.setHostView({ screen: 'approve', ...status(), leader, team, voted: approvals.size, voters: aliveList().length, deadline: timer!.deadline, duration: timer!.duration });
+      for (const id of ids) {
+        if (!alive.has(id)) ctx.setPlayerView(id, { screen: 'out', ...roleInfo(id) });
+        else ctx.setPlayerView(id, { screen: 'approve', input: !approvals.has(id), ...roleInfo(id), leader, team, choice: approvals.get(id) ?? null, deadline: timer!.deadline, duration: timer!.duration });
+      }
+    }
+
+    function resolveApprove() {
+      timer?.cancel();
+      phase = 'approveResult';
+      const yes = [...approvals].filter(([, v]) => v).map(([id]) => id);
+      const no = [...approvals].filter(([, v]) => !v).map(([id]) => id);
+      // Mehrheit der abgegebenen Stimmen, Gleichstand = abgelehnt
+      const approved = yes.length > no.length;
+      let penalty = false;
+      if (approved) rejects = 0;
+      else {
+        rejects++;
+        if (rejects >= 3) {
+          // dreimal abgelehnt: die Mission gilt als sabotiert
+          missions.push('fail');
+          rejects = 0;
+          penalty = true;
+        }
+      }
+      ctx.setHostView({ screen: 'approveResult', ...status(), leader, team, yes, no, approved, penalty });
+      ctx.setAllPlayerViews((p) => (alive.has(p.id) ? { screen: 'lookAtTv', ...roleInfo(p.id) } : { screen: 'out', ...roleInfo(p.id) }));
+      ctx.after(T.approveResult, () => {
+        if (approved) return startMission();
+        if (checkEnd()) return;
+        nextRound();
+      });
     }
 
     /* ---------- Mission ---------- */
@@ -226,7 +281,14 @@ export default {
             if (team.includes(target)) team = team.filter((x) => x !== target);
             else if (team.length < size()) team = [...team, target];
             pickViews();
-          } else if (action.type === 'confirm' && team.length === size()) startMission();
+          } else if (action.type === 'confirm' && team.length === size()) teamChosen();
+        } else if (phase === 'approve' && action.type === 'approve') {
+          approvals.set(id, !!action.yes);
+          approveViews();
+          if (aliveList().every((p) => approvals.has(p) || !ctx.player(p)?.connected)) {
+            timer?.cancel();
+            ctx.after(1, resolveApprove);
+          }
         } else if (phase === 'mission' && action.type === 'card' && team.includes(id) && !cards.has(id)) {
           const card = action.card === 'fail' && traitors.has(id) ? 'fail' : 'ok';
           cards.set(id, card);
@@ -252,6 +314,11 @@ export default {
             return { type: 'toggle', target };
           }
           return { type: 'confirm' };
+        }
+        if (view.screen === 'approve' && view.input) {
+          // Verräter stimmen für Teams mit Verrätern, Loyale meistens dafür
+          const hasTraitor = (view.team as string[]).some((x) => traitors.has(x));
+          return { type: 'approve', yes: traitors.has(id) ? hasTraitor || Math.random() < 0.3 : Math.random() < 0.7 };
         }
         if (view.screen === 'mission' && view.input) return { type: 'card', card: traitors.has(id) && Math.random() < 0.7 ? 'fail' : 'ok' };
         if (view.screen === 'vote' && !view.selected) {

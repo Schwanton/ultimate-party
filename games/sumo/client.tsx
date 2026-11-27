@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type SVGProps } from 'react';
 import type { ControllerViewProps, GameClientModule, HostViewProps, PlayerInfo } from '@up/sdk';
 import { Avatar, Confetti, Crown, HostHeader, Joystick, PhoneWait, Podium, Scoreboard, sfx, useServerNow, useStream, vibrate } from '@up/ui';
 
@@ -44,12 +44,29 @@ function Host(props: HostViewProps) {
   return null;
 }
 
+/** Plattform in der passenden Form zeichnen (gleiche Maße wie onPlatform auf dem Server) */
+function PlatformShape({ shape, cx, cy, R, ...rest }: { shape: string; cx: number; cy: number; R: number } & SVGProps<SVGPathElement>) {
+  let d: string;
+  if (shape === 'quadrat') {
+    const s = R * 0.886;
+    d = `M${cx - s} ${cy - s}H${cx + s}V${cy + s}H${cx - s}Z`;
+  } else if (shape === 'raute') {
+    const s = R * 1.25;
+    d = `M${cx} ${cy - s}L${cx + s} ${cy}L${cx} ${cy + s}L${cx - s} ${cy}Z`;
+  } else {
+    const circle = (r: number) => `M${cx - r} ${cy}a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0Z`;
+    d = circle(R) + (shape === 'ring' ? circle(R * 0.3) : '');
+  }
+  return <path d={d} fillRule="evenodd" {...rest} />;
+}
+
 function HostArena({ view, t, player }: HostViewProps) {
   const frame = useStream<Frame>();
   const now = useServerNow(200);
   const ids = view.ids as string[];
   const fr = frame && frame.round === view.round && frame.b.length === ids.length ? frame : null;
-  const scale = Math.min(1.6, 262 / view.R0);
+  // Raute ragt weiter hinaus – etwas kleiner zeichnen
+  const scale = Math.min(1.6, 262 / (view.R0 * (view.shape === 'raute' ? 1.25 : 1)));
   const R = (fr?.R ?? view.R0) * scale;
   const size = view.r * 2 * scale;
   const W = 1224, H = 600, cx = W / 2 - 120, cy = 292;
@@ -105,9 +122,9 @@ function HostArena({ view, t, player }: HostViewProps) {
               <stop offset="1" stopColor="#3A2F80" />
             </radialGradient>
           </defs>
-          <circle cx={cx} cy={cy} r={view.R0 * scale} fill="none" stroke="#2A2350" strokeWidth={3} strokeDasharray="10 10" />
-          <circle cx={cx} cy={cy} r={R} fill="url(#sumo-floor)" stroke={MINT} strokeWidth={6} style={{ filter: `drop-shadow(0 0 16px ${MINT})`, transition: 'r .1s linear' }} />
-          <circle cx={cx} cy={cy} r={R * 0.08} fill="none" stroke="#4A4378" strokeWidth={3} />
+          <PlatformShape shape={view.shape ?? 'kreis'} cx={cx} cy={cy} R={view.R0 * scale} fill="none" stroke="#2A2350" strokeWidth={3} strokeDasharray="10 10" />
+          <PlatformShape shape={view.shape ?? 'kreis'} cx={cx} cy={cy} R={R} fill="url(#sumo-floor)" stroke={MINT} strokeWidth={6} style={{ filter: `drop-shadow(0 0 16px ${MINT})` }} />
+          {(view.shape ?? 'kreis') !== 'ring' && <circle cx={cx} cy={cy} r={R * 0.08} fill="none" stroke="#4A4378" strokeWidth={3} />}
         </svg>
         {fr && ids.map((id, i) => {
           const p = player(id);

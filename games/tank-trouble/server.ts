@@ -38,6 +38,17 @@ export default {
     const kills = new Map(ids.map((id) => [id, 0]));
     const isBot = (id: string) => !!ctx.player(id)?.isBot;
     let cpuCount = mode === 'duell' ? Number(ctx.options.cpu) || 0 : 0;
+    // Team-Duell: zwei Teams, zufällig und gleich groß eingeteilt
+    const teamMode = mode === 'duell' && ctx.options.teams === 'on' && ids.length >= 2;
+    const TEAM_COLORS = [['#FF4B4B', '#FF8A3D', '#FF5FA2', '#FFC23F'], ['#3EC8FF', '#5B7CFF', '#2FD9C9', '#A07CFF']];
+    const teamOf = new Map<string, number>();
+    const teamColor = new Map<string, string>();
+    if (teamMode) shuffle(ids).forEach((id, i) => {
+      teamOf.set(id, (i % 2) + 1);
+      teamColor.set(id, TEAM_COLORS[i % 2][Math.floor(i / 2) % 4]);
+    });
+    const colorOf = (id: string) => teamColor.get(id) ?? ctx.player(id)?.color ?? '#3EC8FF';
+    let winners: string[] = [];
     if (mode === 'duell' && ids.length + cpuCount < 2) cpuCount = 1;
 
     let phase: Phase = 'intro';
@@ -71,7 +82,8 @@ export default {
       ctx.setHostView({
         screen: 'arena', mode, phase, key, grid: world.grid.map((r) => r.join('')), tanks: tanksInfo(),
         mission, missions: MISSIONS.length, round, total: totalRounds, startAt,
-        lives: Object.fromEntries(lives), scores: scores.snapshot(), enemies, winner, extraLife,
+        lives: Object.fromEntries(lives), scores: scores.snapshot(), enemies, winner, winners, extraLife,
+        teams: teamMode ? Object.fromEntries(teamOf) : null, colors: Object.fromEntries(ids.map((id) => [id, colorOf(id)])),
         alive: ids.filter((id) => tankOf.get(id)?.alive),
         ...extra,
       });
@@ -79,7 +91,7 @@ export default {
 
     function playerView(id: string) {
       const tk = tankOf.get(id);
-      const base = { mode, mission, missions: MISSIONS.length, round, total: totalRounds, lives: lives.get(id) ?? 0, score: scores.get(id), color: ctx.player(id)?.color ?? '#3EC8FF' };
+      const base = { mode, mission, missions: MISSIONS.length, round, total: totalRounds, lives: lives.get(id) ?? 0, score: scores.get(id), color: colorOf(id), team: teamOf.get(id) ?? null };
       if (phase === 'ready' || phase === 'fight') {
         if (!tk) return { screen: 'down', ...base, out: (lives.get(id) ?? 0) <= 0 };
         if (!tk.alive) return { screen: 'down', ...base, out: mode === 'kampagne' && (lives.get(id) ?? 0) <= 0 };
@@ -91,7 +103,7 @@ export default {
           shield: tk.shield, ammo: tk.ammo ? `${tk.ammo.kind}:${tk.ammo.n}` : null, turbo: w.t < tk.turboUntil,
         };
       }
-      if (phase === 'clear' || phase === 'fail' || phase === 'roundEnd') return { screen: 'between', ...base, phase, won: winner === id, alive: !!tk?.alive };
+      if (phase === 'clear' || phase === 'fail' || phase === 'roundEnd') return { screen: 'between', ...base, phase, won: winners.includes(id), alive: !!tk?.alive };
       return { screen: 'wait', ...base, phase };
     }
 
@@ -129,7 +141,7 @@ export default {
       const face = (c: number, r: number) => Math.atan2(H / 2 - (r + 0.5) * CELL, W / 2 - (c + 0.5) * CELL);
       players.forEach((id, i) => {
         const [c, r] = pick(i);
-        const tk = w.addTank({ kind: 'player', pid: id, team: duel ? i + 1 : 0, color: ctx.player(id)?.color ?? '#3EC8FF', spec: isBot(id) ? BOT_SPEC : PLAYER_SPEC, x: (c + 0.5) * CELL, y: (r + 0.5) * CELL, turret: face(c, r) });
+        const tk = w.addTank({ kind: 'player', pid: id, team: duel ? (teamOf.get(id) ?? i + 1) : 0, color: colorOf(id), spec: isBot(id) ? BOT_SPEC : PLAYER_SPEC, x: (c + 0.5) * CELL, y: (r + 0.5) * CELL, turret: face(c, r) });
         tankOf.set(id, tk);
       });
       if (duel) for (let k = 0; k < cpuCount; k++) {
@@ -145,6 +157,7 @@ export default {
       world = w;
       recent = [];
       winner = null;
+      winners = [];
     }
 
     function onKill(victim: Tank, by: Tank | null) {
@@ -154,7 +167,7 @@ export default {
           scores.add(by.pid, victim.spec.points);
           kills.set(by.pid, (kills.get(by.pid) ?? 0) + 1);
         }
-      } else if (by && by !== victim && by.kind === 'player' && by.pid) {
+      } else if (by && by !== victim && by.kind === 'player' && by.pid && !(teamMode && by.team === victim.team)) {
         scores.add(by.pid, POINTS.duelKill);
         kills.set(by.pid, (kills.get(by.pid) ?? 0) + 1);
       }
@@ -165,7 +178,7 @@ export default {
 
     function intro() {
       phase = 'intro';
-      ctx.setHostView({ screen: 'intro', mode, missions: MISSIONS.length, total: totalRounds, lives: startLives });
+      ctx.setHostView({ screen: 'intro', mode, missions: MISSIONS.length, total: totalRounds, lives: startLives, teams: teamMode ? Object.fromEntries(teamOf) : null });
       ctx.setAllPlayerViews(() => ({ screen: 'wait', phase: 'intro' }));
       ctx.after(T.intro, mode === 'kampagne' ? missionCard : nextRound);
     }
@@ -249,6 +262,8 @@ export default {
         }
       } else {
         const left = w.tanks.filter((t) => t.alive);
+        const teamsLeft = new Set(left.map((t) => t.team));
+        if (teamMode && teamsLeft.size <= 1 && left.length) return endRound(left[0]);
         if (left.length <= 1 || w.t >= T.roundMax) endRound(left.length === 1 ? left[0] : null);
       }
     }
@@ -286,7 +301,8 @@ export default {
       stop();
       phase = 'roundEnd';
       winner = last?.kind === 'player' && last.pid ? last.pid : null;
-      if (winner) scores.add(winner, POINTS.duelWin);
+      winners = teamMode && winner ? ids.filter((id) => teamOf.get(id) === teamOf.get(winner!)) : winner ? [winner] : [];
+      for (const id of winners) scores.add(id, POINTS.duelWin);
       hostView({ cpuWon: last?.kind === 'enemy' });
       sendPhones(true);
       ctx.after(T.roundEnd, () => (round < totalRounds ? showScores() : nextRound()));

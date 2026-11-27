@@ -70,5 +70,9 @@
   "tally.caught": "exposed +{n}",
   "tally.survived": "undercover +{n}",
   "tally.wrongAccused": "innocents accused +{n}",
-  "tally.escaped_pts": "escaped +{n}"
+  "tally.escaped_pts": "escaped +{n}",
+  "result.oneLeft": "One has been caught – but there's a second impostor!",
+  "tally.were": "The impostors were …",
+  "intro.two": "Watch out: this time there are two impostors – and they don't know about each other!",
+  "result.caughtText2": "{name} were the impostors!"
 }

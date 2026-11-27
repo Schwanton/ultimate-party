@@ -73,5 +73,8 @@
   "lives": "{n} lives",
   "me.place": "Place {place} of {of}",
   "me.score": "{n} points",
-  "lookAtTv": "Look at the TV."
+  "lookAtTv": "Look at the TV.",
+  "teamWin1": "Team Red wins the round!",
+  "teamWin2": "Team Blue wins the round!",
+  "intro.teams": "Two teams: Red vs Blue. Careful – your shots can hit your own team too!"
 }

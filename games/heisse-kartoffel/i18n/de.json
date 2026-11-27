@@ -48,5 +48,7 @@
   "colorName.0": "Rot",
   "colorName.1": "Blau",
   "colorName.2": "Gelb",
-  "colorName.3": "Grün"
+  "colorName.3": "Grün",
+  "two.pots": "Zwei Kartoffeln im Spiel!",
+  "holder.two": "{a} und {b} haben eine Kartoffel!"
 }

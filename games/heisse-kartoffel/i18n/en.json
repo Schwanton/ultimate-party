@@ -48,5 +48,7 @@
   "colorName.0": "Red",
   "colorName.1": "Blue",
   "colorName.2": "Yellow",
-  "colorName.3": "Green"
+  "colorName.3": "Green",
+  "two.pots": "Two potatoes in play!",
+  "holder.two": "{a} and {b} have a potato!"
 }

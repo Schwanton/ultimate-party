@@ -12,7 +12,7 @@
   "color": "#6C8CFF",
   "tags": ["deceive"],
   "sdkVersion": 1,
-  "version": "1.0.3",
+  "version": "1.1.0",
   "author": "UP!",
   "options": [
     {
@@ -32,6 +32,14 @@
         { "value": 60, "label": { "de": "1 Min.", "en": "1 min" } },
         { "value": 90, "label": { "de": "1,5 Min.", "en": "1.5 min" } },
         { "value": 150, "label": { "de": "2,5 Min.", "en": "2.5 min" } }
+      ]
+    },
+    {
+      "id": "teamVote", "label": { "de": "Team-Abstimmung", "en": "Team vote" }, "default": "off",
+      "help": { "de": "Alle stimmen ab, ob sie das Team der Anführerin oder des Anführers wollen. Dreimal hintereinander abgelehnt = Punkt für die Verräter.", "en": "Everyone votes on the leader's team. Rejected three times in a row = a point for the traitors." },
+      "choices": [
+        { "value": "off", "label": { "de": "Aus", "en": "Off" } },
+        { "value": "on", "label": { "de": "An", "en": "On" } }
       ]
     }
   ]

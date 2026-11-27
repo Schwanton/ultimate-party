@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
-import type { ControllerViewProps, GameClientModule, HostViewProps } from '@up/sdk';
+import type { ControllerViewProps, GameClientModule, HostViewProps, PlayerInfo } from '@up/sdk';
 import { Avatar, Confetti, Crown, Joystick, PhoneWait, Podium, Scoreboard, sfx, useServerNow, useStream, vibrate } from '@up/ui';
 import { COLS, ROWS } from './levels';
 import { BARREL, CELL, H, POWERUPS, W, traceShot } from './engine';
@@ -89,6 +89,7 @@ function Host(props: HostViewProps) {
             </div>
             <span style={{ fontFamily: DISPLAY, fontSize: 26, letterSpacing: 4, color: MUTED }}>{t(`mode.${view.mode}`).toUpperCase()}</span>
             <p className="anim-up" style={{ fontSize: 28, maxWidth: 980, lineHeight: 1.35, animationDelay: '.3s' }}>{view.mode === 'duell' ? t('intro.duell', { n: view.total }) : t('intro.kampagne', { n: view.missions, lives: view.lives ?? 3 })}</p>
+            {view.teams && <p className="anim-up" style={{ fontSize: 24, color: '#FFD23F', animationDelay: '.6s' }}>{t('intro.teams')}</p>}
             <p className="anim-up" style={{ fontSize: 22, maxWidth: 980, lineHeight: 1.35, color: '#9FF3FF', animationDelay: '.6s' }}>{t('intro.rules')}</p>
             <p className="anim-up" style={{ fontSize: 21, color: MUTED, animationDelay: '.9s' }}>{t('intro.controls')}</p>
             <p className="anim-up" style={{ fontSize: 20, color: '#FFD23F', animationDelay: '1.2s' }}>{t(`intro.points.${view.mode}`)}</p>
@@ -468,13 +469,14 @@ function HostArena({ view, t, player, room }: HostViewProps) {
   const enemies = view.enemies as Record<string, [number, number]>;
   const left = Object.values(enemies).reduce((s, e) => s + e[0], 0), totalE = Object.values(enemies).reduce((s, e) => s + e[1], 0);
 
+  const pc = (id: string, fallback: string) => (view.colors?.[id] as string | undefined) ?? fallback;
   const card = (ti: TankInfo) => {
     const p = player(ti.pid!);
     if (!p) return null;
     const alive = aliveIds.has(p.id);
     return (
-      <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 11px', borderRadius: 10, background: CARD, border: `1px solid ${p.color}55`, opacity: alive ? 1 : 0.45 }}>
-        <span style={{ borderRadius: '50%', boxShadow: `0 0 0 2px ${p.color}`, flex: 'none' }}><Avatar player={p} size={32} /></span>
+      <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 11px', borderRadius: 10, background: CARD, border: `1px solid ${pc(p.id, p.color)}55`, opacity: alive ? 1 : 0.45 }}>
+        <span style={{ borderRadius: '50%', boxShadow: `0 0 0 2px ${pc(p.id, p.color)}`, flex: 'none' }}><Avatar player={p} size={32} /></span>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0 }}>
           <div style={{ fontWeight: 600, fontSize: 15, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</div>
           {campaign ? <LifeIcons n={view.lives[p.id] ?? 0} color={p.color} /> : <div style={{ fontFamily: DISPLAY, fontSize: 13, color: MUTED }}>{t('points', { n: view.scores[p.id] ?? 0 })}</div>}
@@ -499,6 +501,8 @@ function HostArena({ view, t, player, room }: HostViewProps) {
   ) : players.slice(half).map(card);
 
   const winner = view.winner ? player(view.winner) : null;
+  const teamWinners = ((view.winners ?? []) as string[]).length > 1 ? (view.winners as string[]).map((id) => player(id)).filter(Boolean) as PlayerInfo[] : null;
+  const winTeam = view.teams && view.winner ? view.teams[view.winner] : null;
   const mid = campaign ? t('missionOf', { n: view.mission, total: view.missions }).toUpperCase() : `${t('mode.duell').toUpperCase()} · ${t('round', { n: view.round, total: view.total }).toUpperCase()}`;
   const right = campaign ? t('enemiesLeft', { n: left, total: totalE }) : t('inGame', { n: aliveIds.size, total: players.length });
 
@@ -519,7 +523,15 @@ function HostArena({ view, t, player, room }: HostViewProps) {
               <div className="anim-pop" style={{ padding: '24px 40px', borderRadius: 24, background: 'rgba(7,11,24,.88)', border: `2px solid ${view.phase === 'fail' ? '#FF5B5B' : WALL}`, boxShadow: `0 0 40px ${view.phase === 'fail' ? '#FF5B5B' : WALL}55`, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
                 {view.phase === 'clear' && <><Confetti silent /><h1 style={{ fontFamily: DISPLAY, fontSize: 52, color: '#7CFF6B' }}>{t('clear')}</h1>{view.extraLife && <b style={{ fontFamily: DISPLAY, fontSize: 24, color: '#FFD23F' }}>{t('extraLife')}</b>}</>}
                 {view.phase === 'fail' && <><h1 style={{ fontFamily: DISPLAY, fontSize: 48, color: '#FF5B5B' }}>{t('fail')}</h1><span style={{ fontSize: 20, color: MUTED }}>{t('failRetry')}</span></>}
-                {view.phase === 'roundEnd' && (winner ? (
+                {view.phase === 'roundEnd' && teamWinners && (
+                  <>
+                    <Confetti silent />
+                    <div style={{ display: 'flex', gap: 10 }}>{teamWinners.map((p) => <Avatar key={p.id} player={p} size={64} />)}</div>
+                    <h1 style={{ fontFamily: DISPLAY, fontSize: 40, color: winTeam === 1 ? '#FF4B4B' : '#3EC8FF' }}>{t(winTeam === 1 ? 'teamWin1' : 'teamWin2')}</h1>
+                    <b style={{ fontFamily: DISPLAY, fontSize: 28, color: '#FFD23F' }}>+300</b>
+                  </>
+                )}
+                {view.phase === 'roundEnd' && !teamWinners && (winner ? (
                   <>
                     <Confetti silent />
                     <span style={{ position: 'relative' }}><Avatar player={winner} size={96} /><Crown size={44} style={{ position: 'absolute', top: -30, left: 26 }} /></span>

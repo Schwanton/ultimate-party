@@ -12,7 +12,7 @@
   "color": "#38E1FF",
   "tags": ["action", "team"],
   "sdkVersion": 1,
-  "version": "0.3.0",
+  "version": "0.4.0",
   "author": "UP!",
   "options": [
     {
@@ -56,6 +56,15 @@
         { "value": 1, "label": { "de": "1", "en": "1" } },
         { "value": 2, "label": { "de": "2", "en": "2" } },
         { "value": 3, "label": { "de": "3", "en": "3" } }
+      ]
+    },
+    {
+      "id": "teams", "label": { "de": "Teams im Duell", "en": "Teams in duel" }, "default": "off",
+      "showIf": { "id": "mode", "value": "duell" },
+      "help": { "de": "Rot gegen Blau: Die Spieler werden zufällig in zwei gleich große Teams eingeteilt. Gewinnt ein Team die Runde, bekommen alle im Team +300.", "en": "Red vs Blue: players are split randomly into two equal teams. When a team wins the round, everyone in it gets +300." },
+      "choices": [
+        { "value": "off", "label": { "de": "Jeder gegen jeden", "en": "Free for all" } },
+        { "value": "on", "label": { "de": "Zwei Teams", "en": "Two teams" } }
       ]
     }
   ]

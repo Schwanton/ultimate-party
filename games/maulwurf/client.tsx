@@ -150,6 +150,46 @@ function Host(props: HostViewProps) {
         </>
       );
     }
+    case 'approve': {
+      const leader = player(view.leader);
+      return (
+        <>
+          <Header view={view} t={t} />
+          <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <h1 style={{ fontSize: 42 }}>{t('approve.title')}</h1>
+            <p className="muted" style={{ fontSize: 22 }}>{t('approve.text', { name: leader?.name ?? '?' })}</p>
+          </div>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}><div style={{ flex: 1 }}><Grid ids={view.alive} player={player} team={view.team} leader={view.leader} /></div></div>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 12 }}>
+            <span className="up-chip" style={{ fontSize: 17 }}>{t('vote.count', { n: view.voted, total: view.voters })}</span>
+            <span className="up-chip" style={{ fontSize: 17, color: view.rejects >= 2 ? TRAITOR : undefined }}>{t('approve.rejects', { n: view.rejects })}</span>
+          </div>
+        </>
+      );
+    }
+    case 'approveResult': {
+      const yes = (view.yes as string[]).map((id) => player(id)).filter(Boolean) as PlayerInfo[];
+      const no = (view.no as string[]).map((id) => player(id)).filter(Boolean) as PlayerInfo[];
+      return (
+        <>
+          <Header view={view} t={t} />
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 26, textAlign: 'center' }}>
+            <h1 className="anim-pop" style={{ fontSize: 58, color: view.approved ? LOYAL : TRAITOR }}>{view.approved ? t('approve.yes') : view.penalty ? t('approve.penalty') : t('approve.no')}</h1>
+            {!view.approved && !view.penalty && <p className="muted" style={{ fontSize: 22 }}>{t('approve.next', { n: 3 - view.rejects })}</p>}
+            <div style={{ display: 'flex', gap: 60 }}>
+              {([['👍', yes, LOYAL], ['👎', no, TRAITOR]] as const).map(([icon, list, color]) => (
+                <div key={icon} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, minWidth: 260 }}>
+                  <span className="display" style={{ fontSize: 40, fontWeight: 800, color }}>{icon} {list.length}</span>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center', maxWidth: 420 }}>
+                    {list.map((p, i) => <span key={p.id} style={{ animation: `upPop .35s ease-out ${(0.12 * i).toFixed(2)}s both` }}><Avatar player={p} size={50} /></span>)}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      );
+    }
     case 'mission':
       return (
         <>
@@ -433,6 +473,21 @@ function Controller({ view, t, send, me, player }: ControllerViewProps) {
           <PhoneWait title={t('pick.wait', { name: player(view.leader)?.name ?? '?' })} text={t('pick.waitText', { n: view.size })} emoji={<span style={{ fontSize: 64 }}>👑</span>} />
         </>
       );
+    case 'approve': {
+      if (view.choice !== null) return <>{chip}<PhoneWait title={view.choice ? '👍 ' + t('approve.youYes') : '👎 ' + t('approve.youNo')} text={t('lookAtTv')} /></>;
+      return (
+        <>
+          <PhoneTimer deadline={view.deadline} duration={view.duration} hurryText={t('timer.hurry')} />
+          {chip}
+          <h1 style={{ fontSize: 24, textAlign: 'center' }}>{t('approve.phone', { name: player(view.leader)?.name ?? '?' })}</h1>
+          <PlayerPicker ids={view.team} selected={view.team} onPick={() => {}} player={player} multi />
+          <div style={{ display: 'flex', gap: 12, marginTop: 'auto' }}>
+            <button className="up-btn big" style={{ flex: 1, background: LOYAL, color: '#110D24', boxShadow: `0 6px 0 ${LOYAL_D}`, minHeight: 80, fontSize: 24 }} onClick={() => send({ type: 'approve', yes: true })}>👍 {t('approve.btnYes')}</button>
+            <button className="up-btn big" style={{ flex: 1, background: TRAITOR, color: '#110D24', boxShadow: `0 6px 0 ${TRAITOR_D}`, minHeight: 80, fontSize: 24 }} onClick={() => send({ type: 'approve', yes: false })}>👎 {t('approve.btnNo')}</button>
+          </div>
+        </>
+      );
+    }
     case 'mission': {
       const traitor = view.role === 'traitor';
       if (view.choice) return <>{chip}<PhoneWait title={t('mission.sent')} text={t('mission.sentText')} emoji={<span style={{ fontSize: 64 }}>🤐</span>} /></>;

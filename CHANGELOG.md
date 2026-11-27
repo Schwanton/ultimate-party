@@ -2,6 +2,14 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.59.0
+
+- Heiße Kartoffel: Neue Einstellung „Zwei Kartoffeln“ – ab 8 Spielern, die noch dabei sind, wandern zwei Kartoffeln gleichzeitig. Beim Knall erwischt es beide Halter
+- Hochstapler: Neue Einstellung „Hochstapler“ – ab 7 Spielern auf Wunsch zwei, die nichts voneinander wissen. Das Spiel endet erst, wenn beide aufgeflogen sind
+- Maulwurf: Neue Einstellung „Team-Abstimmung“ – alle stimmen über das Team der Anführerin oder des Anführers ab. Dreimal hintereinander abgelehnt = Punkt für die Verräter
+- Sumo: Neue Einstellung „Plattform“ – Kreis, Ring mit Loch in der Mitte, Quadrat, Raute oder jede Runde eine andere
+- Tank Trouble: Neue Einstellung „Teams im Duell“ – Rot gegen Blau, die Spieler werden zufällig eingeteilt. Gewinnt ein Team die Runde, bekommen alle im Team +300
+
 ## 0.58.0
 
 - Mainstream: 107 neue Fragen – jetzt 152 statt 45

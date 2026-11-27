@@ -73,5 +73,8 @@
   "lives": "{n} Leben",
   "me.place": "Platz {place} von {of}",
   "me.score": "{n} Punkte",
-  "lookAtTv": "Schau auf den Fernseher."
+  "lookAtTv": "Schau auf den Fernseher.",
+  "teamWin1": "Team Rot gewinnt die Runde!",
+  "teamWin2": "Team Blau gewinnt die Runde!",
+  "intro.teams": "Zwei Teams: Rot gegen Blau. Pass auf – deine Kugeln treffen auch dein eigenes Team!"
 }

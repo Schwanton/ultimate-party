@@ -146,6 +146,16 @@ const scenarios: { game: string; players: number; options?: Record<string, numbe
   { game: 'wer-wars', players: 3, options: { rounds: 2, stufe: 'familie' } },
   { game: 'mic-drop', players: 5, options: { rounds: 2, stufe: 'familie', ownQuestions: 'on' } },
   { game: 'mic-drop', players: 14, options: { rounds: 2, stufe: 'frech', ownQuestions: 'on' } },
+  { game: 'heisse-kartoffel', players: 10, options: { potatoes: 'two' } },
+  { game: 'heisse-kartoffel', players: 12, options: { potatoes: 'two', lives: 2 } },
+  { game: 'hochstapler', players: 8, options: { fakers: 'two', rounds: 7 } },
+  { game: 'hochstapler', players: 5, options: { fakers: 'two', rounds: 3 } },
+  { game: 'maulwurf', players: 7, options: { teamVote: 'on', discussTime: 60 } },
+  { game: 'maulwurf', players: 12, options: { teamVote: 'on' } },
+  { game: 'sumo', players: 6, options: { rounds: 4, arena: 'zufall' } },
+  { game: 'sumo', players: 4, options: { rounds: 2, arena: 'ring' } },
+  { game: 'tank-trouble', players: 4, options: { mode: 'duell', rounds: 3, teams: 'on' } },
+  { game: 'tank-trouble', players: 5, options: { mode: 'duell', rounds: 3, teams: 'on', cpu: 1 } },
 ];
 // Olympia-Modus: mehrere Spiele hintereinander mit Medaillen (npm test -- olympia)
 const olympiaScenarios: { players: number; settings: Record<string, unknown>; list?: string[] }[] = [

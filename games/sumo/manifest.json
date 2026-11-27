@@ -12,9 +12,19 @@
   "color": "#36F5C8",
   "tags": ["action", "quick"],
   "sdkVersion": 1,
-  "version": "1.0.4",
+  "version": "1.1.0",
   "author": "UP!",
   "options": [
-    { "id": "rounds", "label": { "de": "Runden", "en": "Rounds" }, "default": 3, "min": 1, "max": 7 }
+    { "id": "rounds", "label": { "de": "Runden", "en": "Rounds" }, "default": 3, "min": 1, "max": 7 },
+    {
+      "id": "arena", "label": { "de": "Plattform", "en": "Platform" }, "default": "kreis",
+      "choices": [
+        { "value": "kreis", "label": { "de": "Kreis", "en": "Circle" } },
+        { "value": "ring", "label": { "de": "Ring mit Loch", "en": "Ring with a hole" } },
+        { "value": "quadrat", "label": { "de": "Quadrat", "en": "Square" } },
+        { "value": "raute", "label": { "de": "Raute", "en": "Diamond" } },
+        { "value": "zufall", "label": { "de": "Jede Runde eine andere", "en": "Different every round" } }
+      ]
+    }
   ]
 }

@@ -76,5 +76,17 @@
   "end.youLost": "Verloren!",
   "final.title": "Endstand",
   "me.score": "{n} Punkte",
-  "lookAtTv": "Schau auf den Fernseher."
+  "lookAtTv": "Schau auf den Fernseher.",
+  "approve.title": "Team-Abstimmung",
+  "approve.text": "Seid ihr mit dem Team von {name} einverstanden?",
+  "approve.rejects": "Abgelehnt: {n} von 3",
+  "approve.yes": "Team angenommen!",
+  "approve.no": "Team abgelehnt!",
+  "approve.penalty": "Dreimal abgelehnt – Punkt für die Verräter!",
+  "approve.next": "Die nächste Person stellt ein Team zusammen. Noch {n}× ablehnen, dann gibt es einen Punkt für die Verräter.",
+  "approve.phone": "Team von {name} – einverstanden?",
+  "approve.btnYes": "Ja",
+  "approve.btnNo": "Nein",
+  "approve.youYes": "Du bist dafür",
+  "approve.youNo": "Du bist dagegen"
 }

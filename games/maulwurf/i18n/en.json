@@ -76,5 +76,17 @@
   "end.youLost": "You lost!",
   "final.title": "Final standings",
   "me.score": "{n} points",
-  "lookAtTv": "Look at the TV."
+  "lookAtTv": "Look at the TV.",
+  "approve.title": "Team vote",
+  "approve.text": "Do you accept {name}'s team?",
+  "approve.rejects": "Rejected: {n} of 3",
+  "approve.yes": "Team accepted!",
+  "approve.no": "Team rejected!",
+  "approve.penalty": "Rejected three times – a point for the traitors!",
+  "approve.next": "The next person picks a team. {n} more rejections and the traitors score a point.",
+  "approve.phone": "{name}'s team – do you agree?",
+  "approve.btnYes": "Yes",
+  "approve.btnNo": "No",
+  "approve.youYes": "You voted yes",
+  "approve.youNo": "You voted no"
 }

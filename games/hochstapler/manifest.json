@@ -21,7 +21,7 @@
     "category",
     "task"
   ],
-  "version": "2.1.0",
+  "version": "2.2.0",
   "author": "UP!",
   "options": [
     {
@@ -117,6 +117,14 @@
         "de": "Automatisch: 6 Runden. Das Spiel endet früher, sobald der Hochstapler erwischt wird.",
         "en": "Auto: 6 rounds. The game ends early once the undercover player is caught."
       }
+    },
+    {
+      "id": "fakers", "label": { "de": "Hochstapler", "en": "Impostors" }, "default": "one",
+      "help": { "de": "Ab 7 Spielern gibt es auf Wunsch zwei Hochstapler, die nichts voneinander wissen. Das Spiel endet erst, wenn beide aufgeflogen sind.", "en": "With 7 or more players there can be two impostors who don't know about each other. The game only ends when both are caught." },
+      "choices": [
+        { "value": "one", "label": { "de": "Einer", "en": "One" } },
+        { "value": "two", "label": { "de": "Zwei ab 7 Spielern", "en": "Two from 7 players" } }
+      ]
     }
   ]
 }

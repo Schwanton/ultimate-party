@@ -54,8 +54,13 @@ export default {
     const all = ctx.content<Task>().filter((t) => CATEGORIES.includes(t.category));
     const byCat = new Map<Category, Task[]>(CATEGORIES.map((c) => [c, all.filter((t) => t.category === c)]));
     const rotation = shuffle(CATEGORIES);
-    // Ein Hochstapler für die ganze Partie – zufällig, damit niemand ihn vorhersagen kann
-    const faker = pick(ids);
+    // Ein Hochstapler für die ganze Partie – zufällig, damit niemand ihn vorhersagen kann.
+    // Einstellung: ab 7 Spielern zwei, die nichts voneinander wissen.
+    const fakers = ctx.options.fakers === 'two' && ids.length >= 7 ? shuffle(ids).slice(0, 2) : [pick(ids)];
+    const faker = fakers[0];
+    const isFaker = (id: string) => fakers.includes(id);
+    /** schon erwischte Hochstapler mit Runde */
+    const caughtIn = new Map<string, number>();
 
     let round = 0;
     let category: Category = 'hands';
@@ -69,7 +74,7 @@ export default {
     const base = () => ({ round, totalRounds, category });
 
     function intro() {
-      ctx.setHostView({ screen: 'intro', mode, totalRounds });
+      ctx.setHostView({ screen: 'intro', mode, totalRounds, twoFakers: fakers.length > 1 });
       ctx.setAllPlayerViews(() => ({ screen: 'intro' }));
       ctx.after(12, startRound);
     }
@@ -89,7 +94,7 @@ export default {
     }
 
     function playerTaskView(id: string, extra: object = {}) {
-      return id === faker
+      return isFaker(id)
         ? { screen: 'faker', category, ...extra }
         : { screen: 'task', category, task: task.task, ...extra };
     }
@@ -130,7 +135,7 @@ export default {
 
     function voteView(id: string) {
       ctx.setPlayerView(id, {
-        screen: 'vote', input: !votes.has(id), isFaker: id === faker, category, task: task.task, options: ids.filter((x) => x !== id),
+        screen: 'vote', input: !votes.has(id), isFaker: isFaker(id), category, task: task.task, options: ids.filter((x) => x !== id),
         selected: votes.get(id) ?? null, deadline: timer!.deadline, duration: timer!.duration,
       });
     }
@@ -152,25 +157,32 @@ export default {
         .sort((a, b) => b.votes - a.votes);
       const top = tally[0];
       const majority = !!top && top.votes > ids.length / 2;
-      const outcome: Outcome = majority ? (top.playerId === faker ? 'caught' : 'wrong') : 'none';
+      const hitFaker = majority && isFaker(top.playerId);
+      // schon erwischter Hochstapler noch einmal angeklagt: zählt wie keine Mehrheit
+      const outcome: Outcome = !majority || (hitFaker && caughtIn.has(top.playerId)) ? 'none' : hitFaker ? 'caught' : 'wrong';
+      if (outcome === 'caught') caughtIn.set(top.playerId, round);
       history.push({ round, category, task: task.task, votes: Object.fromEntries(votes), outcome, accused: majority ? top.playerId : null });
+      const allCaught = caughtIn.size >= fakers.length;
 
-      if (outcome === 'caught' || round >= totalRounds) {
+      if ((outcome === 'caught' && allCaught) || round >= totalRounds) {
         // Erwischt oder letzte Runde vorbei: ab zur großen Auszählung
         ctx.setHostView({ screen: 'result', ...base(), outcome, tally: tally.filter((x) => x.votes > 0), accused: majority ? top.playerId : null, last: true });
         ctx.setAllPlayerViews(() => ({ screen: 'outcome', outcome, last: true }));
         ctx.after(outcome === 'caught' ? 3 : T.result, finish);
         return;
       }
-      ctx.setHostView({ screen: 'result', ...base(), outcome, tally: tally.filter((x) => x.votes > 0), accused: majority ? top.playerId : null, last: false });
-      ctx.setAllPlayerViews((p) => ({ screen: 'outcome', outcome, last: false, isFaker: p.id === faker, accusedName: majority ? name(top.playerId) : null, accusedMe: majority && top.playerId === p.id }));
+      // zwei Hochstapler: einer erwischt, die Jagd geht weiter
+      const oneLeft = outcome === 'caught' && !allCaught;
+      ctx.setHostView({ screen: 'result', ...base(), outcome, oneLeft, tally: tally.filter((x) => x.votes > 0), accused: majority ? top.playerId : null, last: false });
+      ctx.setAllPlayerViews((p) => ({ screen: 'outcome', outcome, oneLeft, last: false, isFaker: isFaker(p.id), accusedName: majority ? name(top.playerId) : null, accusedMe: majority && top.playerId === p.id }));
       ctx.after(T.result, startRound);
     }
 
     /** Punkte für alle Runden auf einmal */
     function finish() {
       phase = 'end';
-      const caughtRound = history.find((h) => h.outcome === 'caught')?.round ?? null;
+      // erwischt = alle Hochstapler erwischt; caughtRound = Runde, in der der letzte aufflog
+      const caughtRound = caughtIn.size >= fakers.length ? Math.max(...caughtIn.values()) : null;
       const breakdown: Record<string, { label: string; points: number; n?: number }[]> = Object.fromEntries(ids.map((id) => [id, []]));
       const add = (id: string, label: string, points: number, n?: number) => {
         if (!points) return;
@@ -178,26 +190,29 @@ export default {
         breakdown[id].push({ label, points, n });
       };
       for (const id of ids) {
-        if (id === faker) continue;
-        const hits = history.filter((h) => h.votes[id] === faker).length;
+        if (isFaker(id)) continue;
+        const hits = history.filter((h) => isFaker(h.votes[id])).length;
         add(id, 'hits', hits * POINTS.correctVote, hits);
-        if (caughtRound && history[caughtRound - 1].votes[id] === faker) add(id, 'caught', POINTS.caughtBonus(caughtRound));
+        // Bonus für jeden Hochstapler, den man in seiner entscheidenden Runde richtig angeklagt hat
+        for (const [f, r] of caughtIn) if (history[r - 1].votes[id] === f) add(id, 'caught', POINTS.caughtBonus(r));
       }
-      const survivedRounds = caughtRound ? caughtRound - 1 : history.length;
-      add(faker, 'survived', survivedRounds * POINTS.survived);
-      add(faker, 'wrongAccused', history.filter((h) => h.outcome === 'wrong').length * POINTS.wrongAccusation);
-      if (!caughtRound) add(faker, 'escaped_pts', POINTS.escaped);
+      for (const f of fakers) {
+        const r = caughtIn.get(f);
+        add(f, 'survived', (r ? r - 1 : history.length) * POINTS.survived);
+        add(f, 'wrongAccused', history.filter((h) => h.outcome === 'wrong').length * POINTS.wrongAccusation);
+        if (!r) add(f, 'escaped_pts', POINTS.escaped);
+      }
 
       const ranking = scores.ranking();
       const rounds = history.map((h) => ({ round: h.round, category: h.category, task: h.task, votes: h.votes, outcome: h.outcome, accused: h.accused }));
       const tallyMs = (T.reveal + ids.length * T.tallyPerRow + T.tallyRest) * 1000;
       ctx.setHostView({
-        screen: 'tally', faker, caught: !!caughtRound, caughtRound, rounds, totals: scores.snapshot(), breakdown,
+        screen: 'tally', faker, fakers, caughtIn: Object.fromEntries(caughtIn), caught: !!caughtRound, caughtRound, rounds, totals: scores.snapshot(), breakdown,
         order: [...ranking].reverse().map((r) => r.playerId), ranking,
       });
       ctx.setAllPlayerViews((p) => ({
-        screen: 'end', isFaker: p.id === faker, caught: !!caughtRound, fakerName: name(faker),
-        hits: history.filter((h) => h.votes[p.id] === faker).length, rounds: history.length,
+        screen: 'end', isFaker: isFaker(p.id), caught: isFaker(p.id) ? caughtIn.has(p.id) : !!caughtRound, fakerName: fakers.map(name).join(' & '), twoFakers: fakers.length > 1,
+        hits: history.filter((h) => isFaker(h.votes[p.id])).length, rounds: history.length,
         score: scores.get(p.id), place: ranking.filter((r) => r.score > scores.get(p.id)).length + 1, of: ranking.length,
       }));
       ctx.after(tallyMs / 1000, () => {
@@ -220,7 +235,7 @@ export default {
       bot(id, view) {
         if (view.screen === 'vote' && !view.selected) {
           // Bots tippen etwas besser als zufällig: 40 % auf den Hochstapler
-          const target = id !== faker && Math.random() < 0.4 ? faker : pick(view.options as string[]);
+          const target = !isFaker(id) && Math.random() < 0.4 ? pick(fakers) : pick(view.options as string[]);
           return { type: 'vote', target };
         }
         return null;
