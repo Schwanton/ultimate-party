@@ -6,11 +6,12 @@
  */
 
 import { votersSeconds } from './timing';
-import { INPUT_GRACE, Scores, cleanText, pick, shuffle, splitEvenly, type GameContext, type GameServerModule } from '@up/sdk';
+import { INPUT_GRACE, Scores, cleanText, deckByStufe, ownQuestionsPhase, pick, shuffle, splitEvenly, stufeOf, type GameContext, type GameServerModule } from '@up/sdk';
 
 interface Prompt {
   id: string;
   prompt: string;
+  stufe?: string;
 }
 
 const DUEL_LIMIT = 12;
@@ -38,10 +39,26 @@ export default {
     const ids = players.map((p) => p.id);
     const duelMode = players.length <= DUEL_LIMIT;
     const scores = new Scores(ids);
-    const prompts = ctx.content<Prompt>();
+    const stufe = stufeOf(ctx.options.stufe);
+    const prompts = ctx.content<Prompt>().filter((p) => (stufe === 'familie' ? p.stufe === 'familie' : stufe === 'normal' ? p.stufe !== 'frech' : true));
     let promptIndex = 0;
-    const deck = ctx.deck<Prompt>();
-    const nextPrompt = (): Prompt => deck.draw() ?? prompts[promptIndex++ % Math.max(1, prompts.length)] ?? { id: 'x', prompt: '…' };
+    const deck = deckByStufe<Prompt>(ctx, stufe);
+    /** eigene Fragen der Spieler (Einstellung), werden etwa zur Hälfte untergemischt */
+    let ownQueue: Prompt[] = [];
+    let ownUsed = 0;
+    let drawnCount = 0;
+    const nextPrompt = (): Prompt => {
+      drawnCount++;
+      if (ownQueue.length && ownUsed < Math.ceil(drawnCount / 2)) {
+        ownUsed++;
+        return ownQueue.shift()!;
+      }
+      return deck.draw() ?? prompts[promptIndex++ % Math.max(1, prompts.length)] ?? { id: 'x', prompt: '…' };
+    };
+    const own = ownQuestionsPhase(ctx, { ids, kind: 'prompt', maxLength: 90, onDone: (qs) => {
+      ownQueue = shuffle(qs).map((q, i) => ({ id: `own-${i}`, prompt: q.text }));
+      startRound();
+    } });
 
     let round = 0; // 1..3
     const totalRounds = Number(ctx.options.rounds) || 3;
@@ -74,7 +91,7 @@ export default {
       ctx.setHostView({ screen: 'intro', duelMode, players: players.length });
       ctx.setAllPlayerViews(() => ({ screen: 'intro' }));
       ctx.setAudienceView({ screen: 'intro' });
-      ctx.after(5, startRound);
+      ctx.after(5, () => (ctx.options.ownQuestions === 'on' ? own.start() : startRound()));
     }
 
     function startRound() {
@@ -395,6 +412,7 @@ export default {
       start: intro,
       onAction(id, action) {
         if (!action || typeof action !== 'object') return;
+        if (own.onAction(id, action)) return;
         if (action.type === 'answer') onAnswer(id, String(action.promptId), action.text);
         else if (action.type === 'answerDraft') {
           const pid = String(action.promptId);
@@ -406,6 +424,7 @@ export default {
         ctx.setPlayerView(id, { screen: 'audienceWait' });
       },
       bot(id, view) {
+        if (view.screen === 'ownQuestions') return own.bot(id, view);
         if (view.screen === 'answer') return { type: 'answer', promptId: view.promptId, text: pick(BOT_ANSWERS[ctx.lang] ?? BOT_ANSWERS.en) };
         if (view.screen === 'vote' && !view.selected && view.options?.length) return { type: 'vote', choice: pick(view.options as { id: string }[]).id };
         void id;

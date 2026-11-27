@@ -1,7 +1,7 @@
 {
  "name": "Extra",
  "author": "UP!",
- "version": "1.0.0",
+ "version": "1.1.0",
  "description": "Even more personal questions",
  "items": [
   {
@@ -14,7 +14,8 @@
   },
   {
    "id": "wx3",
-   "question": "What was your favorite toy as a kid?"
+   "question": "What was your favorite toy as a kid?",
+   "stufe": "familie"
   },
   {
    "id": "wx4",
@@ -26,7 +27,8 @@
   },
   {
    "id": "wx6",
-   "question": "What song do you sing in the shower?"
+   "question": "What song do you sing in the shower?",
+   "stufe": "familie"
   },
   {
    "id": "wx7",
@@ -34,7 +36,8 @@
   },
   {
    "id": "wx8",
-   "question": "What item do you constantly lose?"
+   "question": "What item do you constantly lose?",
+   "stufe": "familie"
   },
   {
    "id": "wx9",
@@ -42,15 +45,18 @@
   },
   {
    "id": "wx10",
-   "question": "Which useless superpower would you like to have?"
+   "question": "Which useless superpower would you like to have?",
+   "stufe": "familie"
   },
   {
    "id": "wx11",
-   "question": "What's the first thing you do in the morning?"
+   "question": "What's the first thing you do in the morning?",
+   "stufe": "familie"
   },
   {
    "id": "wx12",
-   "question": "Which smell reminds you of your childhood?"
+   "question": "Which smell reminds you of your childhood?",
+   "stufe": "familie"
   },
   {
    "id": "wx13",
@@ -62,7 +68,8 @@
   },
   {
    "id": "wx15",
-   "question": "What's your worst joke?"
+   "question": "What's your worst joke?",
+   "stufe": "familie"
   },
   {
    "id": "wx16",
@@ -82,7 +89,8 @@
   },
   {
    "id": "wx20",
-   "question": "What's your favorite emoji?"
+   "question": "What's your favorite emoji?",
+   "stufe": "familie"
   },
   {
    "id": "wx21",
@@ -90,19 +98,23 @@
   },
   {
    "id": "wx22",
-   "question": "Which game did you always win as a kid?"
+   "question": "Which game did you always win as a kid?",
+   "stufe": "familie"
   },
   {
    "id": "wx23",
-   "question": "What would you do if you were invisible for a day?"
+   "question": "What would you do if you were invisible for a day?",
+   "stufe": "familie"
   },
   {
    "id": "wx24",
-   "question": "What's your favorite word?"
+   "question": "What's your favorite word?",
+   "stufe": "familie"
   },
   {
    "id": "wx25",
-   "question": "Which pet did you have – or always want?"
+   "question": "Which pet did you have – or always want?",
+   "stufe": "familie"
   },
   {
    "id": "wx26",
@@ -114,7 +126,8 @@
   },
   {
    "id": "wx28",
-   "question": "What's your favorite place in your town?"
+   "question": "What's your favorite place in your town?",
+   "stufe": "familie"
   },
   {
    "id": "wx29",
@@ -122,7 +135,8 @@
   },
   {
    "id": "wx30",
-   "question": "Which talent do you wish you had?"
+   "question": "Which talent do you wish you had?",
+   "stufe": "familie"
   },
   {
    "id": "wx31",
@@ -134,7 +148,8 @@
   },
   {
    "id": "wx33",
-   "question": "What invention is the world still missing?"
+   "question": "What invention is the world still missing?",
+   "stufe": "familie"
   },
   {
    "id": "wx34",
@@ -142,7 +157,8 @@
   },
   {
    "id": "wx35",
-   "question": "What could you talk about for hours?"
+   "question": "What could you talk about for hours?",
+   "stufe": "familie"
   },
   {
    "id": "wx36",
@@ -170,7 +186,8 @@
   },
   {
    "id": "wx42",
-   "question": "What's your favorite smell?"
+   "question": "What's your favorite smell?",
+   "stufe": "familie"
   },
   {
    "id": "wx43",
@@ -178,7 +195,8 @@
   },
   {
    "id": "wx44",
-   "question": "How would you spend a free day with no obligations?"
+   "question": "How would you spend a free day with no obligations?",
+   "stufe": "familie"
   },
   {
    "id": "wx45",
@@ -186,7 +204,8 @@
   },
   {
    "id": "wx46",
-   "question": "What's your favorite board game?"
+   "question": "What's your favorite board game?",
+   "stufe": "familie"
   },
   {
    "id": "wx47",
@@ -194,7 +213,8 @@
   },
   {
    "id": "wx48",
-   "question": "What did you collect as a kid?"
+   "question": "What did you collect as a kid?",
+   "stufe": "familie"
   },
   {
    "id": "wx49",
@@ -210,7 +230,8 @@
   },
   {
    "id": "wx52",
-   "question": "Which song makes you dance instantly?"
+   "question": "Which song makes you dance instantly?",
+   "stufe": "familie"
   },
   {
    "id": "wx53",
@@ -218,11 +239,13 @@
   },
   {
    "id": "wx54",
-   "question": "What would you name a boat?"
+   "question": "What would you name a boat?",
+   "stufe": "familie"
   },
   {
    "id": "wx55",
-   "question": "What's the most childish thing you still do?"
+   "question": "What's the most childish thing you still do?",
+   "stufe": "familie"
   },
   {
    "id": "wx56",
@@ -230,11 +253,13 @@
   },
   {
    "id": "wx57",
-   "question": "Which TV show would you like to live in?"
+   "question": "Which TV show would you like to live in?",
+   "stufe": "familie"
   },
   {
    "id": "wx58",
-   "question": "Which sound do you hate?"
+   "question": "Which sound do you hate?",
+   "stufe": "familie"
   },
   {
    "id": "wx59",
@@ -242,7 +267,473 @@
   },
   {
    "id": "wx60",
-   "question": "What would you hide in a time capsule?"
+   "question": "What would you hide in a time capsule?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn1",
+   "question": "What's your favourite meal at your grandparents'?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn2",
+   "question": "Which animal is totally underrated?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn3",
+   "question": "What would you invent if you were an inventor?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn4",
+   "question": "What colour would your dream house be?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn5",
+   "question": "What's the best thing about your home?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn6",
+   "question": "Which game could you play for hours?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn7",
+   "question": "What's your favourite weather?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn8",
+   "question": "Which fairy tale do you like best?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn9",
+   "question": "What would you show an alien first?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn10",
+   "question": "What's your favourite ice cream?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn11",
+   "question": "What would you name your pet dragon?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn12",
+   "question": "What's the funniest thing that happened to you this year?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn13",
+   "question": "Which country do you really want to visit?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn14",
+   "question": "What's – or was – your favourite school subject?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn15",
+   "question": "Which film character would you like to be?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn16",
+   "question": "What's your favourite sound in nature?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn17",
+   "question": "What would you like a whole room full of?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn18",
+   "question": "What's your favourite piece of playground equipment?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn19",
+   "question": "Which food did you hate as a child but like now?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn20",
+   "question": "Which job would you like to try for one day?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn21",
+   "question": "Which is the best season – and why?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn22",
+   "question": "Your favourite joke in one sentence?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn23",
+   "question": "What would you go and see with a time machine?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn24",
+   "question": "Your favourite place to read or relax?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn25",
+   "question": "What's the nicest present you've given?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn26",
+   "question": "Which animal would you like to be for a day?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn27",
+   "question": "Your favourite dish to cook yourself?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn28",
+   "question": "Which toy would you still love to have today?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn29",
+   "question": "What's your favourite holiday of the year?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn30",
+   "question": "Which sport would you love to be really good at?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn31",
+   "question": "What's the most pointless thing you've ever bought?"
+  },
+  {
+   "id": "wn32",
+   "question": "Which habit would you like to break?"
+  },
+  {
+   "id": "wn33",
+   "question": "Your best tip against boredom?"
+  },
+  {
+   "id": "wn34",
+   "question": "Which song do you secretly have on repeat?"
+  },
+  {
+   "id": "wn35",
+   "question": "What did you last plan to do and not do?"
+  },
+  {
+   "id": "wn36",
+   "question": "Which advert do you know by heart?"
+  },
+  {
+   "id": "wn37",
+   "question": "Your favourite place to think?"
+  },
+  {
+   "id": "wn38",
+   "question": "Which app would you delete at once if you could?"
+  },
+  {
+   "id": "wn39",
+   "question": "Your best purchase in recent years?"
+  },
+  {
+   "id": "wn40",
+   "question": "Which task have you been putting off for months?"
+  },
+  {
+   "id": "wn41",
+   "question": "The best decision you've ever made?"
+  },
+  {
+   "id": "wn42",
+   "question": "Which little thing instantly cheers you up?"
+  },
+  {
+   "id": "wn43",
+   "question": "What do you cook to impress guests?"
+  },
+  {
+   "id": "wn44",
+   "question": "Your favourite sound in the kitchen?"
+  },
+  {
+   "id": "wn45",
+   "question": "Which memory always makes you laugh?"
+  },
+  {
+   "id": "wn46",
+   "question": "What's your bedtime ritual?"
+  },
+  {
+   "id": "wn47",
+   "question": "Which phrase do your parents say all the time?"
+  },
+  {
+   "id": "wn48",
+   "question": "The longest queue you've ever stood in – and what for?"
+  },
+  {
+   "id": "wn49",
+   "question": "Which city would you never visit again?"
+  },
+  {
+   "id": "wn50",
+   "question": "The strangest thing you've ever found?"
+  },
+  {
+   "id": "wn51",
+   "question": "Which trend did you completely miss?"
+  },
+  {
+   "id": "wn52",
+   "question": "What gave you your last fit of laughter?"
+  },
+  {
+   "id": "wn53",
+   "question": "Which skill do you have that nobody expects?"
+  },
+  {
+   "id": "wn54",
+   "question": "Your favourite canteen meal?"
+  },
+  {
+   "id": "wn55",
+   "question": "Which series would you love to forget and watch fresh?"
+  },
+  {
+   "id": "wn56",
+   "question": "Your personal record – in anything?"
+  },
+  {
+   "id": "wn57",
+   "question": "Which piece of advice did you ignore and regret?"
+  },
+  {
+   "id": "wn58",
+   "question": "What would you do if tomorrow were a day off?"
+  },
+  {
+   "id": "wn59",
+   "question": "Which book or film do you recommend to everyone?"
+  },
+  {
+   "id": "wn60",
+   "question": "Your favourite thing on your desk?"
+  },
+  {
+   "id": "wn61",
+   "question": "Which word do you just find funny?"
+  },
+  {
+   "id": "wn62",
+   "question": "What did you once win a prize or certificate for?"
+  },
+  {
+   "id": "wn63",
+   "question": "The most spontaneous thing you've ever done?"
+  },
+  {
+   "id": "wn64",
+   "question": "What would you never lend to anyone?"
+  },
+  {
+   "id": "wn65",
+   "question": "What's your plan for retirement?"
+  },
+  {
+   "id": "wn66",
+   "question": "What was your worst date?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn67",
+   "question": "Your most embarrassing message sent to the wrong person?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn68",
+   "question": "What do you secretly google?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn69",
+   "question": "Your worst hangover – and from what?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn70",
+   "question": "Which excuse have you used to skip a party?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn71",
+   "question": "Your most embarrassing moment at a party?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn72",
+   "question": "Your worst pick-up line?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn73",
+   "question": "Your dumbest idea after midnight?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn74",
+   "question": "Which lie do you tell most often?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn75",
+   "question": "Your most embarrassing nickname?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn76",
+   "question": "The most embarrassing thing your parents know about you?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn77",
+   "question": "Your worst 2 a.m. online purchase?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn78",
+   "question": "What would you do if your ex walked in now?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn79",
+   "question": "What have you been caught doing?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn80",
+   "question": "What's your biggest vice?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn81",
+   "question": "Which song do you sing drunk at karaoke?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn82",
+   "question": "Your most embarrassing slip of the tongue?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn83",
+   "question": "Which secret have you kept the longest?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn84",
+   "question": "The craziest thing you've done on holiday?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn85",
+   "question": "Which rule did you break most as a teenager?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn86",
+   "question": "Who did you secretly have a crush on as a teenager?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn87",
+   "question": "Your most embarrassing photo online?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn88",
+   "question": "What have you claimed you could do but couldn't?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn89",
+   "question": "The cheesiest thing you've ever done for someone?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn90",
+   "question": "Your worst excuse for being late?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn91",
+   "question": "What food someone cooked for you have you secretly thrown away?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn92",
+   "question": "What's in your last search nobody should see?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn93",
+   "question": "Your most embarrassing dance move?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn94",
+   "question": "What have you found the morning after a party?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn95",
+   "question": "Which message did you send and regret instantly?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn96",
+   "question": "The clumsiest thing that happened to you while flirting?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn97",
+   "question": "Your secret weakness when it comes to food?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn98",
+   "question": "What have you cringed hard at on someone else's behalf?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn99",
+   "question": "The funniest excuse someone has given you?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn100",
+   "question": "Which compliment embarrassed you most?",
+   "stufe": "frech"
   }
  ]
 }

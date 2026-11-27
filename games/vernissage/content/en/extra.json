@@ -1,7 +1,7 @@
 {
  "name": "Extra",
  "author": "UP!",
- "version": "1.0.0",
+ "version": "1.1.0",
  "description": "Even more silly things to draw",
  "items": [
   {
@@ -333,6 +333,366 @@
   },
   {
    "word": "A Ferris wheel made of doughnuts"
+  },
+  {
+   "word": "A rhino in a hot-air balloon"
+  },
+  {
+   "word": "A seagull stealing chips"
+  },
+  {
+   "word": "A fir tree at the hairdresser's"
+  },
+  {
+   "word": "A potato in a sun hat"
+  },
+  {
+   "word": "A skeleton at the doctor's"
+  },
+  {
+   "word": "A spoon falls in love with a fork"
+  },
+  {
+   "word": "A wobbly tower of pancakes"
+  },
+  {
+   "word": "A snowman with a hot-water bottle"
+  },
+  {
+   "word": "A bear on a unicycle"
+  },
+  {
+   "word": "An ant lifting weights"
+  },
+  {
+   "word": "A skyscraper with a cold"
+  },
+  {
+   "word": "A pirate at the dentist"
+  },
+  {
+   "word": "A goat on a roof"
+  },
+  {
+   "word": "Toast jumping out of the toaster"
+  },
+  {
+   "word": "A lion in hair curlers"
+  },
+  {
+   "word": "A hen laying a golden egg"
+  },
+  {
+   "word": "A rocket at the petrol station"
+  },
+  {
+   "word": "A cactus holding a balloon"
+  },
+  {
+   "word": "A pug in a superhero costume"
+  },
+  {
+   "word": "A lemon pulling a sour face"
+  },
+  {
+   "word": "A bookworm with reading glasses"
+  },
+  {
+   "word": "A fridge out jogging"
+  },
+  {
+   "word": "A camel with three humps"
+  },
+  {
+   "word": "An earthworm doing the limbo"
+  },
+  {
+   "word": "A tortoise overtaking a hare"
+  },
+  {
+   "word": "An octopus shaking hands"
+  },
+  {
+   "word": "An alarm clock wearing a sleep mask"
+  },
+  {
+   "word": "A penguin on safari"
+  },
+  {
+   "word": "A tomato blushing with embarrassment"
+  },
+  {
+   "word": "A sumo wrestler on tiptoe"
+  },
+  {
+   "word": "A knight polishing his armour"
+  },
+  {
+   "word": "A cow with sunburn"
+  },
+  {
+   "word": "A dinosaur in a pram"
+  },
+  {
+   "word": "A loaf of bread at the gym"
+  },
+  {
+   "word": "A ghost with hiccups"
+  },
+  {
+   "word": "A zebra at a zebra crossing"
+  },
+  {
+   "word": "A spider in eight trainers"
+  },
+  {
+   "word": "An elephant balancing on a ball"
+  },
+  {
+   "word": "A digger eating spaghetti"
+  },
+  {
+   "word": "A candle afraid of the wind"
+  },
+  {
+   "word": "A raccoon doing the laundry"
+  },
+  {
+   "word": "A goldfish in its bowl going on holiday"
+  },
+  {
+   "word": "A robot dog going for a walk"
+  },
+  {
+   "word": "A muffin wearing a crown"
+  },
+  {
+   "word": "A cloud raining confetti"
+  },
+  {
+   "word": "A rabbit pulling a magician out of a hat"
+  },
+  {
+   "word": "A garden gnome on holiday"
+  },
+  {
+   "word": "A banana slipping on a banana peel"
+  },
+  {
+   "word": "A bird building a skyscraper"
+  },
+  {
+   "word": "A hibernating bear with an alarm clock"
+  },
+  {
+   "word": "A cucumber in a tuxedo"
+  },
+  {
+   "word": "A seal juggling"
+  },
+  {
+   "word": "A car with legs"
+  },
+  {
+   "word": "A pirate hunting treasure in a sandpit"
+  },
+  {
+   "word": "A chef chasing a sausage"
+  },
+  {
+   "word": "An ice cream melting on a swing"
+  },
+  {
+   "word": "A giant with a tiny umbrella"
+  },
+  {
+   "word": "A mouse scaring an elephant"
+  },
+  {
+   "word": "A shark in the bath"
+  },
+  {
+   "word": "A clock running backwards"
+  },
+  {
+   "word": "A llama in a bobble hat"
+  },
+  {
+   "word": "A potato sack in a sack race"
+  },
+  {
+   "word": "An angel on roller skates"
+  },
+  {
+   "word": "A dog painting a picture"
+  },
+  {
+   "word": "A Viking in a paddling pool"
+  },
+  {
+   "word": "A rabbit wearing bunny ears"
+  },
+  {
+   "word": "A plane with feathers"
+  },
+  {
+   "word": "A cow giving chocolate milk"
+  },
+  {
+   "word": "A meerkat on guard duty"
+  },
+  {
+   "word": "A mushroom under an umbrella"
+  },
+  {
+   "word": "A wizard magicking up a cake"
+  },
+  {
+   "word": "A frog on a throne"
+  },
+  {
+   "word": "A lion brushing its teeth"
+  },
+  {
+   "word": "A slide made of spaghetti"
+  },
+  {
+   "word": "A farmer milking a giraffe"
+  },
+  {
+   "word": "A TV watching TV"
+  },
+  {
+   "word": "A bear on a sledge"
+  },
+  {
+   "word": "A kangaroo pouch full of toys"
+  },
+  {
+   "word": "A hamster in a spaceship"
+  },
+  {
+   "word": "A carrot bodybuilding"
+  },
+  {
+   "word": "A sandwich as tall as a house"
+  },
+  {
+   "word": "An owl that can't sleep"
+  },
+  {
+   "word": "An octopus braiding hair"
+  },
+  {
+   "word": "A fire dragon with ice cubes"
+  },
+  {
+   "word": "A bus full of cats"
+  },
+  {
+   "word": "A worm in an apple with a window"
+  },
+  {
+   "word": "A tiger with spots"
+  },
+  {
+   "word": "A clown with a sad nose"
+  },
+  {
+   "word": "A watermelon as a helmet"
+  },
+  {
+   "word": "A crane bird in a hard hat"
+  },
+  {
+   "word": "A snail in a Formula 1 race"
+  },
+  {
+   "word": "A fridge full of socks"
+  },
+  {
+   "word": "A skunk with perfume"
+  },
+  {
+   "word": "A moon in a nightcap"
+  },
+  {
+   "word": "A donkey playing the piano"
+  },
+  {
+   "word": "A seagull as a postman"
+  },
+  {
+   "word": "A pudding on stilts"
+  },
+  {
+   "word": "A shark at the barber's"
+  },
+  {
+   "word": "A bald sheep"
+  },
+  {
+   "word": "A football with eyes"
+  },
+  {
+   "word": "A thunderstorm in a teacup"
+  },
+  {
+   "word": "A duck in wellies"
+  },
+  {
+   "word": "A bear selling ice cream"
+  },
+  {
+   "word": "A paper plane in a storm"
+  },
+  {
+   "word": "A tower of hats"
+  },
+  {
+   "word": "A penguin in the fridge"
+  },
+  {
+   "word": "A crocodile reading bedtime stories"
+  },
+  {
+   "word": "Broccoli with a hairdo"
+  },
+  {
+   "word": "A centipede buying shoes"
+  },
+  {
+   "word": "A volcano full of ketchup"
+  },
+  {
+   "word": "A ghost playing hide and seek"
+  },
+  {
+   "word": "A dog carrying its kennel"
+  },
+  {
+   "word": "A UFO abducting a cow"
+  },
+  {
+   "word": "A train made of sausages"
+  },
+  {
+   "word": "A princess with a toolbox"
+  },
+  {
+   "word": "A porcupine having a cuddle"
+  },
+  {
+   "word": "A bear in a canoe"
+  },
+  {
+   "word": "A sunflower in sunglasses"
+  },
+  {
+   "word": "A robot baking biscuits"
+  },
+  {
+   "word": "A raven wearing a bow tie"
   }
  ]
 }

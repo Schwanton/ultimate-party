@@ -2,7 +2,7 @@ import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
 import { voterSchedule, votersSeconds } from './timing';
 import type { ControllerViewProps, GameClientModule, HostViewProps, PlayerInfo } from '@up/sdk';
 import {
-  Avatar, ChoiceList, Confetti, Crown, HostHeader, HostPrompt, HostTimer, PhoneTimer, PhoneWait, Podium, Scoreboard, TextAnswer, VoterChips, sfx, useServerNow,
+  Avatar, ChoiceList, Confetti, Crown, HostHeader, HostPrompt, HostTimer, OwnQuestionsHost, OwnQuestionsPhone, PhoneTimer, PhoneWait, Podium, Scoreboard, TextAnswer, VoterChips, sfx, useServerNow,
 } from '@up/ui';
 
 const PINK = '#E8336F';
@@ -46,6 +46,8 @@ function roundInfo(view: any, t: HostViewProps['t']) {
 function Host(props: HostViewProps) {
   const { view, t } = props;
   switch (view.screen) {
+    case 'ownQuestions':
+      return <OwnQuestionsHost view={view} t={t} player={props.player} title={t('title')} color={PINK} />;
     case 'intro':
       return (
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 28, textAlign: 'center' }}>
@@ -414,6 +416,9 @@ function PhoneVote({ view, t, send }: ControllerViewProps) {
 function Controller(props: ControllerViewProps) {
   const { view, t, send, me } = props;
   switch (view.screen) {
+    case 'ownQuestions':
+    case 'ownQuestionsDone':
+      return <OwnQuestionsPhone view={view} t={t} send={send} />;
     case 'intro':
       return <PhoneWait title={t('intro.title')} text={t('lookAtTv')} />;
     case 'answer':

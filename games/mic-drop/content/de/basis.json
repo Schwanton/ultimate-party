@@ -1,77 +1,94 @@
 {
  "name": "Basis",
  "author": "UP!",
- "version": "1.0.0",
+ "version": "1.1.0",
  "description": "Mitgelieferte Fragen",
  "items": [
   {
    "prompt": "Das schlechteste Motto für eine Hochzeitsfeier"
   },
   {
-   "prompt": "Was ein Hund wirklich denkt, wenn er dich anstarrt"
+   "prompt": "Was ein Hund wirklich denkt, wenn er dich anstarrt",
+   "stufe": "familie"
   },
   {
-   "prompt": "Der langweiligste Superheld aller Zeiten heißt …"
+   "prompt": "Der langweiligste Superheld aller Zeiten heißt …",
+   "stufe": "familie"
   },
   {
    "prompt": "Ein Satz, den man nie bei einem ersten Date sagen sollte"
   },
   {
-   "prompt": "Was Außerirdische als Erstes über die Menschheit googeln würden"
+   "prompt": "Was Außerirdische als Erstes über die Menschheit googeln würden",
+   "stufe": "familie"
   },
   {
-   "prompt": "Der ehrlichste Werbeslogan für Montage"
+   "prompt": "Der ehrlichste Werbeslogan für Montage",
+   "stufe": "familie"
   },
   {
    "prompt": "Was wirklich im Kleingedruckten deines Handyvertrags steht"
   },
   {
-   "prompt": "Ein neuer Feiertag, den Deutschland dringend braucht"
+   "prompt": "Ein neuer Feiertag, den Deutschland dringend braucht",
+   "stufe": "familie"
   },
   {
-   "prompt": "Das Geheimrezept von Omas Kartoffelsalat ist in Wahrheit …"
+   "prompt": "Das Geheimrezept von Omas Kartoffelsalat ist in Wahrheit …",
+   "stufe": "familie"
   },
   {
-   "prompt": "Der schlechteste Name für ein Kreuzfahrtschiff"
+   "prompt": "Der schlechteste Name für ein Kreuzfahrtschiff",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was Katzen nachts heimlich machen"
+   "prompt": "Was Katzen nachts heimlich machen",
+   "stufe": "familie"
   },
   {
-   "prompt": "Eine olympische Disziplin, in der du Gold holen würdest"
+   "prompt": "Eine olympische Disziplin, in der du Gold holen würdest",
+   "stufe": "familie"
   },
   {
-   "prompt": "Das Erste, was ein Roboter nach der Weltherrschaft verbietet"
+   "prompt": "Das Erste, was ein Roboter nach der Weltherrschaft verbietet",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was der Navi wirklich sagen möchte, wenn du falsch abbiegst"
+   "prompt": "Was der Navi wirklich sagen möchte, wenn du falsch abbiegst",
+   "stufe": "familie"
   },
   {
    "prompt": "Die überraschendste Zutat in einem Hochzeitskuchen"
   },
   {
-   "prompt": "Ein Titel für die Autobiografie deines Kühlschranks"
+   "prompt": "Ein Titel für die Autobiografie deines Kühlschranks",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was Pinguine über uns Menschen erzählen"
+   "prompt": "Was Pinguine über uns Menschen erzählen",
+   "stufe": "familie"
   },
   {
    "prompt": "Der schlechteste Tipp für ein Vorstellungsgespräch"
   },
   {
-   "prompt": "Eine App, die niemand braucht, aber alle herunterladen würden"
+   "prompt": "Eine App, die niemand braucht, aber alle herunterladen würden",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was im geheimen Tagebuch eines Gartenzwergs steht"
+   "prompt": "Was im geheimen Tagebuch eines Gartenzwergs steht",
+   "stufe": "familie"
   },
   {
    "prompt": "Der ehrlichste Name für ein Fitnessstudio"
   },
   {
-   "prompt": "Ein Grund, warum Dinosaurier wirklich ausgestorben sind"
+   "prompt": "Ein Grund, warum Dinosaurier wirklich ausgestorben sind",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was man auf keinen Fall in einen Glückskeks schreiben sollte"
+   "prompt": "Was man auf keinen Fall in einen Glückskeks schreiben sollte",
+   "stufe": "familie"
   },
   {
    "prompt": "Der schlechteste Spruch auf einem Grabstein"
@@ -80,22 +97,28 @@
    "prompt": "Die neue Regel, die du als Bundeskanzler am ersten Tag einführst"
   },
   {
-   "prompt": "Was Bienen eigentlich die ganze Zeit summen"
+   "prompt": "Was Bienen eigentlich die ganze Zeit summen",
+   "stufe": "familie"
   },
   {
-   "prompt": "Ein schlechter Name für eine Bäckerei"
+   "prompt": "Ein schlechter Name für eine Bäckerei",
+   "stufe": "familie"
   },
   {
-   "prompt": "Das unnötigste Zubehör für ein Fahrrad"
+   "prompt": "Das unnötigste Zubehör für ein Fahrrad",
+   "stufe": "familie"
   },
   {
-   "prompt": "Der wahre Grund, warum Socken in der Waschmaschine verschwinden"
+   "prompt": "Der wahre Grund, warum Socken in der Waschmaschine verschwinden",
+   "stufe": "familie"
   },
   {
-   "prompt": "Eine Sportart, die man nur im Schlafanzug ausüben darf"
+   "prompt": "Eine Sportart, die man nur im Schlafanzug ausüben darf",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was der Weihnachtsmann im Sommer macht"
+   "prompt": "Was der Weihnachtsmann im Sommer macht",
+   "stufe": "familie"
   },
   {
    "prompt": "Ein Lied, das man auf keinen Fall auf einer Beerdigung spielen sollte"
@@ -107,103 +130,130 @@
    "prompt": "Der Slogan einer Partei, die nur aus Katzen besteht"
   },
   {
-   "prompt": "Was dein Wecker über dich denkt"
+   "prompt": "Was dein Wecker über dich denkt",
+   "stufe": "familie"
   },
   {
-   "prompt": "Ein Gericht, das es in keiner Mensa geben sollte"
+   "prompt": "Ein Gericht, das es in keiner Mensa geben sollte",
+   "stufe": "familie"
   },
   {
-   "prompt": "Die schlechteste Ausrede für Zuspätkommen"
+   "prompt": "Die schlechteste Ausrede für Zuspätkommen",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was der Mond nachts beobachtet"
+   "prompt": "Was der Mond nachts beobachtet",
+   "stufe": "familie"
   },
   {
-   "prompt": "Eine Superkraft, die total nutzlos ist"
+   "prompt": "Eine Superkraft, die total nutzlos ist",
+   "stufe": "familie"
   },
   {
    "prompt": "Das Motto für ein Klassentreffen nach 30 Jahren"
   },
   {
-   "prompt": "Was in der Bedienungsanleitung für Kinder stehen sollte"
+   "prompt": "Was in der Bedienungsanleitung für Kinder stehen sollte",
+   "stufe": "familie"
   },
   {
    "prompt": "Der unpassendste Ort für einen Heiratsantrag"
   },
   {
-   "prompt": "Ein Buch, das niemand zu Ende lesen kann"
+   "prompt": "Ein Buch, das niemand zu Ende lesen kann",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was Tauben wirklich planen"
+   "prompt": "Was Tauben wirklich planen",
+   "stufe": "familie"
   },
   {
-   "prompt": "Eine Eissorte, die sofort wieder vom Markt genommen wurde"
+   "prompt": "Eine Eissorte, die sofort wieder vom Markt genommen wurde",
+   "stufe": "familie"
   },
   {
    "prompt": "Der ehrlichste Satz im Lebenslauf"
   },
   {
-   "prompt": "Was man im Aufzug auf keinen Fall sagen sollte"
+   "prompt": "Was man im Aufzug auf keinen Fall sagen sollte",
+   "stufe": "familie"
   },
   {
-   "prompt": "Ein neues Sternzeichen und seine Eigenschaften"
+   "prompt": "Ein neues Sternzeichen und seine Eigenschaften",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was die Mona Lisa eigentlich denkt"
+   "prompt": "Was die Mona Lisa eigentlich denkt",
+   "stufe": "familie"
   },
   {
-   "prompt": "Der schlechteste Name für einen Hund"
+   "prompt": "Der schlechteste Name für einen Hund",
+   "stufe": "familie"
   },
   {
    "prompt": "Ein Gesetz, das nur für Schwiegereltern gilt"
   },
   {
-   "prompt": "Was der Toaster dem Kühlschrank erzählt"
+   "prompt": "Was der Toaster dem Kühlschrank erzählt",
+   "stufe": "familie"
   },
   {
    "prompt": "Die schlechteste Idee für eine Reality-Show"
   },
   {
-   "prompt": "Was Bäume über Herbst denken"
+   "prompt": "Was Bäume über Herbst denken",
+   "stufe": "familie"
   },
   {
-   "prompt": "Ein Tier, das unbedingt Jobs bei der Post bekommen sollte"
+   "prompt": "Ein Tier, das unbedingt Jobs bei der Post bekommen sollte",
+   "stufe": "familie"
   },
   {
-   "prompt": "Der wahre Inhalt des Bermuda-Dreiecks"
+   "prompt": "Der wahre Inhalt des Bermuda-Dreiecks",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was ein Schaf zählt, wenn es nicht schlafen kann"
+   "prompt": "Was ein Schaf zählt, wenn es nicht schlafen kann",
+   "stufe": "familie"
   },
   {
-   "prompt": "Ein unpassendes Thema für einen Kindergeburtstag"
+   "prompt": "Ein unpassendes Thema für einen Kindergeburtstag",
+   "stufe": "familie"
   },
   {
-   "prompt": "Das Erste, was du mit einer Zeitmaschine machen würdest"
+   "prompt": "Das Erste, was du mit einer Zeitmaschine machen würdest",
+   "stufe": "familie"
   },
   {
-   "prompt": "Der dümmste Grund, einen Streit zu beginnen"
+   "prompt": "Der dümmste Grund, einen Streit zu beginnen",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was im Handbuch für Geister steht"
+   "prompt": "Was im Handbuch für Geister steht",
+   "stufe": "familie"
   },
   {
    "prompt": "Ein Satz, der jede Familienfeier sofort beendet"
   },
   {
-   "prompt": "Was Goldfische sich nach drei Sekunden merken"
+   "prompt": "Was Goldfische sich nach drei Sekunden merken",
+   "stufe": "familie"
   },
   {
-   "prompt": "Die schlechteste Pizza-Kombination der Welt"
+   "prompt": "Die schlechteste Pizza-Kombination der Welt",
+   "stufe": "familie"
   },
   {
-   "prompt": "Ein Hobby, das Nachbarn in den Wahnsinn treibt"
+   "prompt": "Ein Hobby, das Nachbarn in den Wahnsinn treibt",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was der Briefträger wirklich mit deinen Paketen macht"
+   "prompt": "Was der Briefträger wirklich mit deinen Paketen macht",
+   "stufe": "familie"
   },
   {
-   "prompt": "Ein neues Wort für „Montagmorgen“"
+   "prompt": "Ein neues Wort für „Montagmorgen“",
+   "stufe": "familie"
   },
   {
    "prompt": "Was ein Pirat in seinem Lebenslauf schreibt"
@@ -212,37 +262,47 @@
    "prompt": "Der schlechteste Name für ein Parfüm"
   },
   {
-   "prompt": "Was dein Spiegel heimlich über dich sagt"
+   "prompt": "Was dein Spiegel heimlich über dich sagt",
+   "stufe": "familie"
   },
   {
-   "prompt": "Eine Werbung für Luft in Dosen"
+   "prompt": "Eine Werbung für Luft in Dosen",
+   "stufe": "familie"
   },
   {
-   "prompt": "Das Gegenteil von einem Glückspilz ist ein …"
+   "prompt": "Das Gegenteil von einem Glückspilz ist ein …",
+   "stufe": "familie"
   },
   {
    "prompt": "Das peinlichste Lied, das du heimlich mitsingst"
   },
   {
-   "prompt": "Was man einem Drachen zum Geburtstag schenkt"
+   "prompt": "Was man einem Drachen zum Geburtstag schenkt",
+   "stufe": "familie"
   },
   {
-   "prompt": "Ein schlechter Name für eine Zahnarztpraxis"
+   "prompt": "Ein schlechter Name für eine Zahnarztpraxis",
+   "stufe": "familie"
   },
   {
-   "prompt": "Der Grund, warum die Ampel immer rot ist, wenn du kommst"
+   "prompt": "Der Grund, warum die Ampel immer rot ist, wenn du kommst",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was ein Faultier an einem stressigen Tag macht"
+   "prompt": "Was ein Faultier an einem stressigen Tag macht",
+   "stufe": "familie"
   },
   {
-   "prompt": "Eine Erfindung, die die Welt nicht gebraucht hat"
+   "prompt": "Eine Erfindung, die die Welt nicht gebraucht hat",
+   "stufe": "familie"
   },
   {
-   "prompt": "Der wahre Grund für Ebbe und Flut"
+   "prompt": "Der wahre Grund für Ebbe und Flut",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was Schnecken unter „schnell“ verstehen"
+   "prompt": "Was Schnecken unter „schnell“ verstehen",
+   "stufe": "familie"
   }
  ]
 }

@@ -1,77 +1,94 @@
 {
  "name": "Basic",
  "author": "UP!",
- "version": "1.0.0",
+ "version": "1.1.0",
  "description": "Built-in prompts",
  "items": [
   {
    "prompt": "The worst motto for a wedding party"
   },
   {
-   "prompt": "What a dog is really thinking when it stares at you"
+   "prompt": "What a dog is really thinking when it stares at you",
+   "stufe": "familie"
   },
   {
-   "prompt": "The most boring superhero of all time is called …"
+   "prompt": "The most boring superhero of all time is called …",
+   "stufe": "familie"
   },
   {
    "prompt": "Something you should never say on a first date"
   },
   {
-   "prompt": "The first thing aliens would google about humanity"
+   "prompt": "The first thing aliens would google about humanity",
+   "stufe": "familie"
   },
   {
-   "prompt": "The most honest advertising slogan for Mondays"
+   "prompt": "The most honest advertising slogan for Mondays",
+   "stufe": "familie"
   },
   {
    "prompt": "What the fine print of your phone contract really says"
   },
   {
-   "prompt": "A new public holiday the world urgently needs"
+   "prompt": "A new public holiday the world urgently needs",
+   "stufe": "familie"
   },
   {
-   "prompt": "Grandma's secret ingredient is actually …"
+   "prompt": "Grandma's secret ingredient is actually …",
+   "stufe": "familie"
   },
   {
-   "prompt": "The worst name for a cruise ship"
+   "prompt": "The worst name for a cruise ship",
+   "stufe": "familie"
   },
   {
-   "prompt": "What cats secretly do at night"
+   "prompt": "What cats secretly do at night",
+   "stufe": "familie"
   },
   {
-   "prompt": "An Olympic event you would win gold in"
+   "prompt": "An Olympic event you would win gold in",
+   "stufe": "familie"
   },
   {
-   "prompt": "The first thing a robot bans after taking over the world"
+   "prompt": "The first thing a robot bans after taking over the world",
+   "stufe": "familie"
   },
   {
-   "prompt": "What the sat nav really wants to say when you take a wrong turn"
+   "prompt": "What the sat nav really wants to say when you take a wrong turn",
+   "stufe": "familie"
   },
   {
    "prompt": "The most surprising ingredient in a wedding cake"
   },
   {
-   "prompt": "A title for your fridge's autobiography"
+   "prompt": "A title for your fridge's autobiography",
+   "stufe": "familie"
   },
   {
-   "prompt": "What penguins say about humans"
+   "prompt": "What penguins say about humans",
+   "stufe": "familie"
   },
   {
    "prompt": "The worst tip for a job interview"
   },
   {
-   "prompt": "An app nobody needs but everyone would download"
+   "prompt": "An app nobody needs but everyone would download",
+   "stufe": "familie"
   },
   {
-   "prompt": "What is written in a garden gnome's secret diary"
+   "prompt": "What is written in a garden gnome's secret diary",
+   "stufe": "familie"
   },
   {
    "prompt": "The most honest name for a gym"
   },
   {
-   "prompt": "The real reason dinosaurs went extinct"
+   "prompt": "The real reason dinosaurs went extinct",
+   "stufe": "familie"
   },
   {
-   "prompt": "Something you should never put in a fortune cookie"
+   "prompt": "Something you should never put in a fortune cookie",
+   "stufe": "familie"
   },
   {
    "prompt": "The worst thing to engrave on a tombstone"
@@ -80,22 +97,28 @@
    "prompt": "The new rule you'd introduce on your first day as president"
   },
   {
-   "prompt": "What bees are actually humming all day"
+   "prompt": "What bees are actually humming all day",
+   "stufe": "familie"
   },
   {
-   "prompt": "A bad name for a bakery"
+   "prompt": "A bad name for a bakery",
+   "stufe": "familie"
   },
   {
-   "prompt": "The most pointless accessory for a bicycle"
+   "prompt": "The most pointless accessory for a bicycle",
+   "stufe": "familie"
   },
   {
-   "prompt": "The real reason socks disappear in the washing machine"
+   "prompt": "The real reason socks disappear in the washing machine",
+   "stufe": "familie"
   },
   {
-   "prompt": "A sport you can only play in pyjamas"
+   "prompt": "A sport you can only play in pyjamas",
+   "stufe": "familie"
   },
   {
-   "prompt": "What Santa does in the summer"
+   "prompt": "What Santa does in the summer",
+   "stufe": "familie"
   },
   {
    "prompt": "A song you should never play at a funeral"
@@ -107,103 +130,130 @@
    "prompt": "The slogan of a political party run entirely by cats"
   },
   {
-   "prompt": "What your alarm clock thinks of you"
+   "prompt": "What your alarm clock thinks of you",
+   "stufe": "familie"
   },
   {
-   "prompt": "A dish no school cafeteria should ever serve"
+   "prompt": "A dish no school cafeteria should ever serve",
+   "stufe": "familie"
   },
   {
-   "prompt": "The worst excuse for being late"
+   "prompt": "The worst excuse for being late",
+   "stufe": "familie"
   },
   {
-   "prompt": "What the moon watches at night"
+   "prompt": "What the moon watches at night",
+   "stufe": "familie"
   },
   {
-   "prompt": "A superpower that is completely useless"
+   "prompt": "A superpower that is completely useless",
+   "stufe": "familie"
   },
   {
    "prompt": "The theme for a 30-year class reunion"
   },
   {
-   "prompt": "What should be in the instruction manual for children"
+   "prompt": "What should be in the instruction manual for children",
+   "stufe": "familie"
   },
   {
    "prompt": "The most awkward place to propose"
   },
   {
-   "prompt": "A book nobody can finish"
+   "prompt": "A book nobody can finish",
+   "stufe": "familie"
   },
   {
-   "prompt": "What pigeons are really planning"
+   "prompt": "What pigeons are really planning",
+   "stufe": "familie"
   },
   {
-   "prompt": "An ice cream flavour that was instantly pulled from shops"
+   "prompt": "An ice cream flavour that was instantly pulled from shops",
+   "stufe": "familie"
   },
   {
    "prompt": "The most honest line on a CV"
   },
   {
-   "prompt": "Something you should never say in a lift"
+   "prompt": "Something you should never say in a lift",
+   "stufe": "familie"
   },
   {
-   "prompt": "A new star sign and its personality traits"
+   "prompt": "A new star sign and its personality traits",
+   "stufe": "familie"
   },
   {
-   "prompt": "What the Mona Lisa is actually thinking"
+   "prompt": "What the Mona Lisa is actually thinking",
+   "stufe": "familie"
   },
   {
-   "prompt": "The worst name for a dog"
+   "prompt": "The worst name for a dog",
+   "stufe": "familie"
   },
   {
    "prompt": "A law that only applies to in-laws"
   },
   {
-   "prompt": "What the toaster tells the fridge"
+   "prompt": "What the toaster tells the fridge",
+   "stufe": "familie"
   },
   {
    "prompt": "The worst idea for a reality show"
   },
   {
-   "prompt": "What trees think about autumn"
+   "prompt": "What trees think about autumn",
+   "stufe": "familie"
   },
   {
-   "prompt": "An animal that should definitely work at the post office"
+   "prompt": "An animal that should definitely work at the post office",
+   "stufe": "familie"
   },
   {
-   "prompt": "What's really inside the Bermuda Triangle"
+   "prompt": "What's really inside the Bermuda Triangle",
+   "stufe": "familie"
   },
   {
-   "prompt": "What a sheep counts when it can't sleep"
+   "prompt": "What a sheep counts when it can't sleep",
+   "stufe": "familie"
   },
   {
-   "prompt": "An unsuitable theme for a children's birthday party"
+   "prompt": "An unsuitable theme for a children's birthday party",
+   "stufe": "familie"
   },
   {
-   "prompt": "The first thing you'd do with a time machine"
+   "prompt": "The first thing you'd do with a time machine",
+   "stufe": "familie"
   },
   {
-   "prompt": "The dumbest reason to start an argument"
+   "prompt": "The dumbest reason to start an argument",
+   "stufe": "familie"
   },
   {
-   "prompt": "What's written in the handbook for ghosts"
+   "prompt": "What's written in the handbook for ghosts",
+   "stufe": "familie"
   },
   {
    "prompt": "A sentence that instantly ends any family gathering"
   },
   {
-   "prompt": "What goldfish remember after three seconds"
+   "prompt": "What goldfish remember after three seconds",
+   "stufe": "familie"
   },
   {
-   "prompt": "The worst pizza topping combination in the world"
+   "prompt": "The worst pizza topping combination in the world",
+   "stufe": "familie"
   },
   {
-   "prompt": "A hobby that drives the neighbours crazy"
+   "prompt": "A hobby that drives the neighbours crazy",
+   "stufe": "familie"
   },
   {
-   "prompt": "What the postman really does with your parcels"
+   "prompt": "What the postman really does with your parcels",
+   "stufe": "familie"
   },
   {
-   "prompt": "A new word for \"Monday morning\""
+   "prompt": "A new word for \"Monday morning\"",
+   "stufe": "familie"
   },
   {
    "prompt": "What a pirate puts on their CV"
@@ -212,37 +262,47 @@
    "prompt": "The worst name for a perfume"
   },
   {
-   "prompt": "What your mirror secretly says about you"
+   "prompt": "What your mirror secretly says about you",
+   "stufe": "familie"
   },
   {
-   "prompt": "An advert for canned air"
+   "prompt": "An advert for canned air",
+   "stufe": "familie"
   },
   {
-   "prompt": "The opposite of a lucky charm is a …"
+   "prompt": "The opposite of a lucky charm is a …",
+   "stufe": "familie"
   },
   {
    "prompt": "The most embarrassing song you secretly sing along to"
   },
   {
-   "prompt": "What do you give a dragon for its birthday?"
+   "prompt": "What do you give a dragon for its birthday?",
+   "stufe": "familie"
   },
   {
-   "prompt": "A bad name for a dentist's office"
+   "prompt": "A bad name for a dentist's office",
+   "stufe": "familie"
   },
   {
-   "prompt": "Why the traffic light is always red when you arrive"
+   "prompt": "Why the traffic light is always red when you arrive",
+   "stufe": "familie"
   },
   {
-   "prompt": "What a sloth does on a stressful day"
+   "prompt": "What a sloth does on a stressful day",
+   "stufe": "familie"
   },
   {
-   "prompt": "An invention the world never needed"
+   "prompt": "An invention the world never needed",
+   "stufe": "familie"
   },
   {
-   "prompt": "The real reason for the tides"
+   "prompt": "The real reason for the tides",
+   "stufe": "familie"
   },
   {
-   "prompt": "What snails consider \"fast\""
+   "prompt": "What snails consider \"fast\"",
+   "stufe": "familie"
   }
  ]
 }

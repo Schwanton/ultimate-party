@@ -5,13 +5,14 @@
  * Gleichstand an der Spitze: alle Antworten mit den meisten Stimmen zählen als Mehrheit.
  */
 
-import { Scores, shuffle, type GameContext, type GameServerModule } from '@up/sdk';
+import { Scores, drawByStufe, shuffle, stufeOf, type GameContext, type GameServerModule } from '@up/sdk';
 import { revealPlan } from './timing';
 
 interface Item {
   id: string;
   question: string;
   answers: string[];
+  stufe?: string;
 }
 
 const T = { vote: 25, lastChance: 5, intro: 7 };
@@ -23,7 +24,7 @@ export default {
     const scores = new Scores(ids);
     const total = Number(ctx.options.rounds) || 8;
     const tf = Number(ctx.options.voteTime) || 1;
-    const items = ctx.deck<Item>({ filter: (it) => Array.isArray(it.answers) && it.answers.length >= 2 && it.answers.length <= 4 }).drawMany(total);
+    const items = drawByStufe<Item>(ctx, stufeOf(ctx.options.stufe), total, (it) => Array.isArray(it.answers) && it.answers.length >= 2 && it.answers.length <= 4);
     let q = -1;
     let own = new Map<string, number>();
     let guess = new Map<string, number>();

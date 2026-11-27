@@ -2,6 +2,17 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.58.0
+
+- Mainstream: 107 neue Fragen – jetzt 152 statt 45
+- Wer war's?: 100 neue Fragen – jetzt 200
+- Flunkerfakt: 83 neue verrückte, aber wahre Fakten – jetzt 141
+- Hochstapler: 75 neue Aufgaben – jetzt 120
+- Vernissage: 120 neue Zeichen-Aufgaben – jetzt 300
+- Mic Drop: 40 neue freche Fragen
+- Mainstream, Wer war's? und Mic Drop: Neue Einstellung „Fragen“ – Familie (harmlos, auch für Kinder), Normal oder Frech (auch Fragen über Dates, Partys und Peinliches – nichts Derbes)
+- Wer war's? und Mic Drop: Neue Einstellung „Eigene Fragen“ (standardmäßig aus) – vor dem Spiel schreibt jeder eine Frage, die anonym unter die normalen gemischt wird
+
 ## 0.57.0
 
 - Bonk!: Neue Einstellung „Leben“ – 1 (schnell), 3 oder 5 (lang)

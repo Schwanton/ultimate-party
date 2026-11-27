@@ -1,7 +1,7 @@
 {
  "name": "Basis",
  "author": "UP!",
- "version": "1.0.0",
+ "version": "1.1.0",
  "items": [
   {
    "category": "hands",
@@ -182,6 +182,306 @@
   {
    "category": "point",
    "task": "Zeig auf die Person, die am ehesten Weihnachtsdeko im Oktober aufhängt."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du schon mal einen Sonnenbrand im Winter hattest."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du lieber Tee als Kaffee trinkst."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du schon mal ein Tattoo wolltest."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du schon mal ein Lied komplett falsch mitgesungen hast."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du im Kino schon mal eingeschlafen bist."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du eine Pflanze zu Hause hast, die noch lebt."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du schon mal in einen Pool gefallen bist – mit Kleidung."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du schon mal auf einem Pferd geritten bist."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du dein Handy gerade unter 20 Prozent Akku hat."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du lieber Süßes als Salziges isst."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du schon mal einen Promi getroffen hast."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du schon mal auf einem Festival gezeltet hast."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du Socken in verschiedenen Farben trägst – genau jetzt."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du schon mal mit dem Fahrrad gestürzt bist."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du im Supermarkt immer die langsamste Kasse erwischst."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du schon mal ein ganzes Buch an einem Tag gelesen hast."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du im Winter lieber Ski fährst als am Kamin sitzt."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du schon mal einen Wecker überhört hast und zu spät gekommen bist."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du schon mal eine Sandburg gebaut hast, auf die du stolz warst."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du dir Namen schlechter merkst als Gesichter."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du schon mal Karaoke gesungen hast."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du lieber Hunde als Katzen magst."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du schon mal einen Kuchen komplett allein gebacken hast."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du schon mal in einem Zelt übernachtet hast."
+  },
+  {
+   "category": "hands",
+   "task": "Hand hoch, wenn du schon mal eine Nachricht an die falsche Person geschickt hast."
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie viele Kissen liegen auf deinem Bett?"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie gern gehst du ins Fitnessstudio? (0 bis 10)"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie viele Wecker stellst du dir morgens? (max. 10)"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie scharf isst du gern? (0 bis 10)"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie viele Stunden am Tag schaust du aufs Handy? (max. 10)"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie ordentlich ist dein Zimmer gerade? (0 bis 10)"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie viele Sprachen kannst du wenigstens ein bisschen?"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie gut kannst du Witze erzählen? (0 bis 10)"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie viele Umzüge hast du schon hinter dir? (max. 10)"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie viele Tage hält dein Handy-Akku durch? (max. 10)"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie sehr freust du dich auf Weihnachten? (0 bis 10)"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie gut kannst du ein Geheimnis für dich behalten? (0 bis 10)"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie viele Haustiere hattest du schon in deinem Leben? (max. 10)"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie gern fährst du Achterbahn? (0 bis 10)"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie viele Gläser Wasser hast du heute getrunken?"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie gut bist du im Einparken? (0 bis 10)"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie viele Stunden würdest du für dein Lieblingsessen anstehen? (max. 10)"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie gut kennst du dich mit Fußball aus? (0 bis 10)"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie viele Mahlzeiten isst du an einem normalen Tag?"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie gern gehst du campen? (0 bis 10)"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie viele Bücher hast du dieses Jahr gelesen? (max. 10)"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie sehr magst du Überraschungspartys? (0 bis 10)"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie viele Minuten kommst du im Schnitt zu spät? (in 5er-Schritten, max. 10 Finger)"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie gut kannst du mit Stäbchen essen? (0 bis 10)"
+  },
+  {
+   "category": "number",
+   "task": "Zeig mit den Fingern: Wie viele Kerzen standen auf deiner letzten Geburtstagstorte? (max. 10 – mehr geht nicht)"
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten bei einer Quizshow die Millionenfrage vergeigt."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten im Urlaub einen Sonnenbrand bekommt."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten eine Pflanze vertrocknen lässt."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten beim Monopoly schummelt."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten einen Tanzkurs macht."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten den Geburtstag eines Freundes vergisst."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten ein eigenes Café eröffnet."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten im Supermarkt mehr kauft als geplant."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten beim Wandern verloren geht."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten einen Kuchen anbrennen lässt."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten einen Weltrekord aufstellt."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten im Kino laut lacht."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten seinen Schlüssel im Kühlschrank findet."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten ein Buch schreibt."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten bei Glatteis ausrutscht."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten in einer Band spielt."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten beim Karaoke das Mikro nicht mehr hergibt."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten sein Essen fotografiert."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten auf einer Party als Letzte geht."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten einen Hund adoptiert."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten beim Elfmeter danebenschießt."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten heimlich Liebesromane liest."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten eine Weltreise macht."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten beim Spieleabend als Erste wütend wird."
+  },
+  {
+   "category": "point",
+   "task": "Zeig auf die Person, die am ehesten im Lotto gewinnt und es niemandem erzählt."
   }
  ]
 }

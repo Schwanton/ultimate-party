@@ -1,7 +1,7 @@
 {
  "name": "Basis",
  "author": "UP!",
- "version": "1.0.0",
+ "version": "1.1.0",
  "description": "Alltagsfragen, bei denen sich jede Gruppe anders entscheidet.",
  "items": [
   {
@@ -10,7 +10,8 @@
    "answers": [
     "Ja, lecker!",
     "Niemals!"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m2",
@@ -29,7 +30,8 @@
     "Auf dem Bauch",
     "Auf der Seite",
     "Wie ein Seestern"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m4",
@@ -38,7 +40,8 @@
     "vorne über",
     "hinten runter",
     "Ist mir egal"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m5",
@@ -46,7 +49,8 @@
    "answers": [
     "Sommer",
     "Winter"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m6",
@@ -56,7 +60,8 @@
     "Unsichtbar sein",
     "Gedanken lesen",
     "Zeitreisen"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m7",
@@ -85,7 +90,8 @@
     "Penne",
     "Fusilli",
     "Farfalle"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m10",
@@ -94,7 +100,8 @@
     "Hund",
     "Katze",
     "Keins von beiden"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m11",
@@ -113,7 +120,8 @@
     "Immer",
     "Nie",
     "Nur im Winter"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m13",
@@ -123,7 +131,8 @@
     "Müsli",
     "Rührei",
     "Kaffee reicht"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m14",
@@ -141,7 +150,8 @@
     "Mayo",
     "Beides – rot-weiß",
     "Gar nichts"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m16",
@@ -169,7 +179,8 @@
     "Strand",
     "Berge",
     "Stadt"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m19",
@@ -178,7 +189,8 @@
     "Alle Farben durcheinander",
     "Lieblingsfarbe zuerst",
     "Lieblingsfarbe zuletzt"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m20",
@@ -187,7 +199,8 @@
     "Ja",
     "Nein",
     "Was ist das für eine Frage?"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m21",
@@ -224,7 +237,8 @@
     "Sommer",
     "Herbst",
     "Winter"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m25",
@@ -233,7 +247,8 @@
     "Zu früh",
     "Zu spät",
     "Pünktlich auf die Sekunde"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m26",
@@ -280,7 +295,8 @@
     "Pinguin",
     "Faultier",
     "Waschbär"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m31",
@@ -289,7 +305,8 @@
     "Ganz vorne",
     "Mitte",
     "Ganz hinten"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m32",
@@ -299,7 +316,8 @@
     "Höhe",
     "Enge Räume",
     "Öffentlich reden"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m33",
@@ -307,7 +325,8 @@
    "answers": [
     "Vergangenheit",
     "Zukunft"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m34",
@@ -325,7 +344,8 @@
     "Gewinnen",
     "Andere ärgern",
     "Snacks nebenbei"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m36",
@@ -353,7 +373,8 @@
     "Vanille",
     "Erdbeere",
     "Stracciatella"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m39",
@@ -371,7 +392,8 @@
    "answers": [
     "Singen",
     "Tanzen"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m41",
@@ -379,7 +401,8 @@
    "answers": [
     "Die 100 Mini-Pferde",
     "Das Riesenhuhn"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m42",
@@ -415,7 +438,1112 @@
    "answers": [
     "Mini-Elefant",
     "Riesen-Katze"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m46",
+   "question": "Was ist das beste Pausenbrot?",
+   "answers": [
+    "Käsebrot",
+    "Wurstbrot",
+    "Nutellabrot",
+    "Apfel reicht"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m47",
+   "question": "Welches Tier wärst du am liebsten?",
+   "answers": [
+    "Adler",
+    "Delfin",
+    "Katze",
+    "Faultier"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m48",
+   "question": "Was ist die beste Pizza?",
+   "answers": [
+    "Margherita",
+    "Salami",
+    "Hawaii",
+    "Vier Käse"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m49",
+   "question": "Lieber Schnee oder Sonne?",
+   "answers": [
+    "Schnee",
+    "Sonne"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m50",
+   "question": "Was spielst du am liebsten draußen?",
+   "answers": [
+    "Fußball",
+    "Verstecken",
+    "Fangen",
+    "Ich bleibe lieber drinnen"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m51",
+   "question": "Welche Farbe hat das schönste Auto?",
+   "answers": [
+    "Rot",
+    "Schwarz",
+    "Blau",
+    "Knallgelb"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m52",
+   "question": "Was ist das beste Geräusch?",
+   "answers": [
+    "Regen am Fenster",
+    "Meeresrauschen",
+    "Knisterndes Feuer",
+    "Vogelgezwitscher"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m53",
+   "question": "Lieber fliegen können oder unter Wasser atmen?",
+   "answers": [
+    "Fliegen",
+    "Unter Wasser atmen"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m54",
+   "question": "Was ist die beste Süßigkeit?",
+   "answers": [
+    "Gummibärchen",
+    "Schokolade",
+    "Lakritz",
+    "Lutscher"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m55",
+   "question": "Wohin geht der Traumurlaub?",
+   "answers": [
+    "Meer",
+    "Berge",
+    "Freizeitpark",
+    "Großstadt"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m56",
+   "question": "Welcher Wochentag ist der beste?",
+   "answers": [
+    "Freitag",
+    "Samstag",
+    "Sonntag",
+    "Mittwoch – halbe Woche geschafft"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m57",
+   "question": "Lieber ein Baumhaus oder ein Schloss?",
+   "answers": [
+    "Baumhaus",
+    "Schloss"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m58",
+   "question": "Was ist das beste Spiel auf einer Geburtstagsparty?",
+   "answers": [
+    "Topfschlagen",
+    "Reise nach Jerusalem",
+    "Schatzsuche",
+    "Stopptanz"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m59",
+   "question": "Welche Pommes sind die besten?",
+   "answers": [
+    "Dünne",
+    "Dicke",
+    "Wellen-Pommes",
+    "Süßkartoffel-Pommes"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m60",
+   "question": "Lieber Riese oder Zwerg für einen Tag?",
+   "answers": [
+    "Riese",
+    "Zwerg"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m61",
+   "question": "Was ist das beste Wetter für einen freien Tag?",
+   "answers": [
+    "Sonnig und warm",
+    "Gewitter",
+    "Schneegestöber",
+    "Nieselregen auf dem Sofa"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m62",
+   "question": "Wie isst du einen Keks mit Füllung?",
+   "answers": [
+    "Im Ganzen",
+    "Erst aufschrauben",
+    "Eintunken"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m63",
+   "question": "Welches Fahrgeschäft auf dem Rummel?",
+   "answers": [
+    "Riesenrad",
+    "Autoscooter",
+    "Achterbahn",
+    "Geisterbahn"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m64",
+   "question": "Lieber mit Dinos leben oder mit Drachen?",
+   "answers": [
+    "Dinos",
+    "Drachen"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m65",
+   "question": "Was gehört aufs Brötchen am Sonntag?",
+   "answers": [
+    "Marmelade",
+    "Honig",
+    "Käse",
+    "Ei"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m66",
+   "question": "Welches Instrument würdest du am liebsten spielen?",
+   "answers": [
+    "Gitarre",
+    "Klavier",
+    "Schlagzeug",
+    "Trompete"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m67",
+   "question": "Wo ist der beste Platz im Auto?",
+   "answers": [
+    "Fahrersitz",
+    "Beifahrer",
+    "Hinten am Fenster",
+    "Hinten in der Mitte"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m68",
+   "question": "Was ist das beste am Winter?",
+   "answers": [
+    "Schlittenfahren",
+    "Plätzchen",
+    "Kuscheldecke",
+    "Gar nichts"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m69",
+   "question": "Welche Superheldin oder welcher Superheld wärst du?",
+   "answers": [
+    "Super stark",
+    "Super schnell",
+    "Kann sich verwandeln",
+    "Kann mit Tieren reden"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m70",
+   "question": "Was machst du zuerst, wenn du nach Hause kommst?",
+   "answers": [
+    "Schuhe aus",
+    "Kühlschrank auf",
+    "Aufs Sofa",
+    "Handy laden"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m71",
+   "question": "Wie isst du Spaghetti?",
+   "answers": [
+    "Aufdrehen mit Löffel",
+    "Aufdrehen ohne Löffel",
+    "Klein schneiden",
+    "Schlürfen"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m72",
+   "question": "Lieber für immer 8 Jahre alt oder für immer 80?",
+   "answers": [
+    "8 Jahre",
+    "80 Jahre"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m73",
+   "question": "Welche Jahreszeit riecht am besten?",
+   "answers": [
+    "Frühling",
+    "Sommer",
+    "Herbst",
+    "Winter"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m74",
+   "question": "Was ist das beste Brettspiel?",
+   "answers": [
+    "Mensch ärgere dich nicht",
+    "Monopoly",
+    "Uno",
+    "Schach"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m75",
+   "question": "Wie hoch würdest du dich trauen zu springen – ins Wasser?",
+   "answers": [
+    "1 Meter",
+    "3 Meter",
+    "5 Meter",
+    "10 Meter"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m76",
+   "question": "Was hättest du lieber als Haustier?",
+   "answers": [
+    "Pony",
+    "Papagei",
+    "Schildkröte",
+    "Riesenschnecke"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m77",
+   "question": "Welches Eis im Sommer?",
+   "answers": [
+    "In der Waffel",
+    "Im Becher",
+    "Am Stiel",
+    "Softeis"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m78",
+   "question": "Der beste Ort für ein Picknick?",
+   "answers": [
+    "Park",
+    "Strand",
+    "Wald",
+    "Wohnzimmerboden"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m79",
+   "question": "Lieber lesen oder vorgelesen bekommen?",
+   "answers": [
+    "Selbst lesen",
+    "Vorgelesen bekommen",
+    "Hörbuch"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m80",
+   "question": "Was wäre der beste Beruf?",
+   "answers": [
+    "Astronautin oder Astronaut",
+    "Tierärztin oder Tierarzt",
+    "Eisverkäufer",
+    "Erfinder"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m81",
+   "question": "Wie lange hält dein Neujahrsvorsatz?",
+   "answers": [
+    "Hatte nie einen",
+    "Bis 2. Januar",
+    "Ein paar Wochen",
+    "Ganzes Jahr"
    ]
+  },
+  {
+   "id": "m82",
+   "question": "Wie viele Fotos sind auf deinem Handy?",
+   "answers": [
+    "Unter 1.000",
+    "1.000–5.000",
+    "5.000–20.000",
+    "Mehr als 20.000"
+   ]
+  },
+  {
+   "id": "m83",
+   "question": "Was machst du, wenn das Essen im Restaurant nicht schmeckt?",
+   "answers": [
+    "Sagen",
+    "Still essen",
+    "Liegen lassen",
+    "Nie wieder hingehen"
+   ]
+  },
+  {
+   "id": "m84",
+   "question": "Wie packst du für den Urlaub?",
+   "answers": [
+    "Eine Woche vorher",
+    "Am Abend davor",
+    "Eine Stunde vorher",
+    "Gar nicht – kaufe vor Ort"
+   ]
+  },
+  {
+   "id": "m85",
+   "question": "Was ist die nervigste Frage im Smalltalk?",
+   "answers": [
+    "Und, was machst du so?",
+    "Schon Pläne fürs Wochenende?",
+    "Wie war die Anreise?",
+    "Wann heiratet ihr?"
+   ]
+  },
+  {
+   "id": "m86",
+   "question": "Wie sortierst du deine Kleidung?",
+   "answers": [
+    "Nach Farbe",
+    "Nach Art",
+    "Stuhl-System",
+    "Gar nicht"
+   ]
+  },
+  {
+   "id": "m87",
+   "question": "Der beste Snack beim Fernsehen?",
+   "answers": [
+    "Chips",
+    "Popcorn",
+    "Gummibärchen",
+    "Obst – ehrlich!"
+   ]
+  },
+  {
+   "id": "m88",
+   "question": "Wie gehst du ans Telefon, wenn eine unbekannte Nummer anruft?",
+   "answers": [
+    "Rangehen",
+    "Wegdrücken",
+    "Klingeln lassen und googeln"
+   ]
+  },
+  {
+   "id": "m89",
+   "question": "Wer räumt bei euch die Spülmaschine aus?",
+   "answers": [
+    "Ich",
+    "Die anderen",
+    "Niemand – wir nehmen direkt raus"
+   ]
+  },
+  {
+   "id": "m90",
+   "question": "Wie viel Trinkgeld gibst du im Restaurant?",
+   "answers": [
+    "Nichts",
+    "Aufrunden",
+    "Etwa 10 %",
+    "Mehr als 10 %"
+   ]
+  },
+  {
+   "id": "m91",
+   "question": "Was ist die schlimmste Zugverspätung?",
+   "answers": [
+    "5 Minuten, wenn der Anschluss weg ist",
+    "30 Minuten",
+    "Zugausfall",
+    "Wenn keiner was durchsagt"
+   ]
+  },
+  {
+   "id": "m92",
+   "question": "Wie oft wäschst du dein Handtuch?",
+   "answers": [
+    "Nach jedem Mal",
+    "Einmal pro Woche",
+    "Alle zwei Wochen",
+    "Lieber nicht fragen"
+   ]
+  },
+  {
+   "id": "m93",
+   "question": "Wie lange brauchst du morgens bis zur Tür?",
+   "answers": [
+    "Unter 15 Minuten",
+    "15–30 Minuten",
+    "30–60 Minuten",
+    "Über eine Stunde"
+   ]
+  },
+  {
+   "id": "m94",
+   "question": "Lieber eine Woche ohne Handy oder eine Woche ohne Kaffee?",
+   "answers": [
+    "Ohne Handy",
+    "Ohne Kaffee"
+   ]
+  },
+  {
+   "id": "m95",
+   "question": "Was ist die beste Art zu reisen?",
+   "answers": [
+    "Zug",
+    "Auto",
+    "Flugzeug",
+    "Fahrrad"
+   ]
+  },
+  {
+   "id": "m96",
+   "question": "Wie reagierst du auf einen Ohrwurm?",
+   "answers": [
+    "Laut mitsingen",
+    "Anderes Lied anmachen",
+    "Leiden"
+   ]
+  },
+  {
+   "id": "m97",
+   "question": "Was ist das Erste, was du im Hotelzimmer machst?",
+   "answers": [
+    "Bett testen",
+    "Aussicht checken",
+    "WLAN suchen",
+    "Minibar ansehen"
+   ]
+  },
+  {
+   "id": "m98",
+   "question": "Das beste Getränk auf einer Party?",
+   "answers": [
+    "Bier",
+    "Wein",
+    "Cocktail",
+    "Wasser"
+   ]
+  },
+  {
+   "id": "m99",
+   "question": "Wie viele Kissen braucht ein Sofa?",
+   "answers": [
+    "Keins",
+    "Zwei",
+    "Vier",
+    "So viele, dass man nicht mehr sitzen kann"
+   ]
+  },
+  {
+   "id": "m100",
+   "question": "Was ist der beste Platz auf einer Party?",
+   "answers": [
+    "Küche",
+    "Tanzfläche",
+    "Sofa",
+    "Draußen"
+   ]
+  },
+  {
+   "id": "m101",
+   "question": "Wie bezahlst du am liebsten?",
+   "answers": [
+    "Bar",
+    "Karte",
+    "Handy"
+   ]
+  },
+  {
+   "id": "m102",
+   "question": "Welche Serie würdest du dir nochmal komplett ansehen?",
+   "answers": [
+    "Eine Krimiserie",
+    "Eine Comedy",
+    "Eine Fantasyserie",
+    "Gar keine – zu viel Neues"
+   ]
+  },
+  {
+   "id": "m103",
+   "question": "Wie lange darf ein Film höchstens sein?",
+   "answers": [
+    "90 Minuten",
+    "2 Stunden",
+    "3 Stunden",
+    "Egal, Hauptsache gut"
+   ]
+  },
+  {
+   "id": "m104",
+   "question": "Was ist schlimmer?",
+   "answers": [
+    "Stau",
+    "Funkloch",
+    "Leerer Akku",
+    "Kein Klopapier"
+   ]
+  },
+  {
+   "id": "m105",
+   "question": "Wie viele Wecker-Schlummer gönnst du dir?",
+   "answers": [
+    "Keinen",
+    "Einen",
+    "Zwei bis drei",
+    "Bis es brennt"
+   ]
+  },
+  {
+   "id": "m106",
+   "question": "Welcher Sitz im Flugzeug?",
+   "answers": [
+    "Fenster",
+    "Gang",
+    "Mitte – ich bin ein Heiliger"
+   ]
+  },
+  {
+   "id": "m107",
+   "question": "Wie geht man mit dem letzten Stück Pizza um?",
+   "answers": [
+    "Fragen, wer es will",
+    "Einfach nehmen",
+    "Teilen",
+    "Liegen lassen, bis es keiner mehr will"
+   ]
+  },
+  {
+   "id": "m108",
+   "question": "Wann ist der beste Zeitpunkt für Weihnachtsmusik?",
+   "answers": [
+    "Ab November",
+    "Ab dem 1. Advent",
+    "Erst an Heiligabend",
+    "Nie"
+   ]
+  },
+  {
+   "id": "m109",
+   "question": "Wie wählst du im Restaurant?",
+   "answers": [
+    "Immer dasselbe",
+    "Das Erste, was gut klingt",
+    "Was der Nachbartisch hat",
+    "Erst nach 10 Minuten"
+   ]
+  },
+  {
+   "id": "m110",
+   "question": "Welche Superkraft wäre im Alltag am nützlichsten?",
+   "answers": [
+    "Nie müde",
+    "Nie Stau",
+    "Immer Parkplatz",
+    "Nie etwas vergessen"
+   ]
+  },
+  {
+   "id": "m111",
+   "question": "Wie viele ungelesene Mails hast du?",
+   "answers": [
+    "0",
+    "1–50",
+    "50–1.000",
+    "Über 1.000"
+   ]
+  },
+  {
+   "id": "m112",
+   "question": "Was ist das beste Grillgut?",
+   "answers": [
+    "Bratwurst",
+    "Steak",
+    "Gemüse",
+    "Halloumi"
+   ]
+  },
+  {
+   "id": "m113",
+   "question": "Kaffee wie?",
+   "answers": [
+    "Schwarz",
+    "Mit Milch",
+    "Mit Milch und Zucker",
+    "Gar nicht"
+   ]
+  },
+  {
+   "id": "m114",
+   "question": "Wie gehst du mit Spoilern um?",
+   "answers": [
+    "Sind mir egal",
+    "Ich werde wütend",
+    "Ich spoilere selbst"
+   ]
+  },
+  {
+   "id": "m115",
+   "question": "Wie lange brauchst du für eine Entscheidung im Supermarkt?",
+   "answers": [
+    "Sekunden",
+    "Ein paar Minuten",
+    "Ich rufe jemanden an",
+    "Ich gehe ohne etwas"
+   ]
+  },
+  {
+   "id": "m116",
+   "question": "Was ist das beste Geräusch am Morgen?",
+   "answers": [
+    "Kaffeemaschine",
+    "Stille",
+    "Vögel",
+    "Gar keins – ich schlafe"
+   ]
+  },
+  {
+   "id": "m117",
+   "question": "Lieber bei 35 Grad im Büro oder bei −10 Grad an der Bushaltestelle?",
+   "answers": [
+    "35 Grad im Büro",
+    "−10 an der Haltestelle"
+   ]
+  },
+  {
+   "id": "m118",
+   "question": "Wie schreibst du Nachrichten?",
+   "answers": [
+    "Ganze Sätze",
+    "kurz & klein",
+    "Nur Emojis",
+    "Sprachnachrichten"
+   ]
+  },
+  {
+   "id": "m119",
+   "question": "Wo landet dein Schlüssel zu Hause?",
+   "answers": [
+    "Fester Haken",
+    "Irgendwo",
+    "In der Jacke",
+    "Weiß ich nie"
+   ]
+  },
+  {
+   "id": "m120",
+   "question": "Was ist das beste Fast Food?",
+   "answers": [
+    "Burger",
+    "Döner",
+    "Pizza",
+    "Currywurst"
+   ]
+  },
+  {
+   "id": "m121",
+   "question": "Wie oft gehst du zum Friseur?",
+   "answers": [
+    "Jeden Monat",
+    "Alle paar Monate",
+    "Einmal im Jahr",
+    "Ich schneide selbst"
+   ]
+  },
+  {
+   "id": "m122",
+   "question": "Lieber ein Jahr gratis Essen oder ein Jahr gratis Reisen?",
+   "answers": [
+    "Essen",
+    "Reisen"
+   ]
+  },
+  {
+   "id": "m123",
+   "question": "Wie lange nach einem Date schreibst du?",
+   "answers": [
+    "Sofort",
+    "Am nächsten Tag",
+    "Ich warte, bis die andere Person schreibt",
+    "Gar nicht"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m124",
+   "question": "Was ist das schlimmste beim ersten Date?",
+   "answers": [
+    "Schmatzen",
+    "Nur über sich reden",
+    "Ständig aufs Handy schauen",
+    "Über die Ex reden"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m125",
+   "question": "Das beste Katerfrühstück?",
+   "answers": [
+    "Rollmops",
+    "Fettiges Frühstück",
+    "Viel Wasser",
+    "Weiterschlafen"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m126",
+   "question": "Ab wie vielen Gläsern singst du Karaoke?",
+   "answers": [
+    "Null – immer!",
+    "Zwei",
+    "Fünf",
+    "Niemals"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m127",
+   "question": "Wie lange darf man auf einer Party bleiben, wenn man nur kurz vorbeischauen wollte?",
+   "answers": [
+    "Eine Stunde",
+    "Bis Mitternacht",
+    "Bis zum Frühstück"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m128",
+   "question": "Was ist peinlicher?",
+   "answers": [
+    "Beim Gähnen erwischt",
+    "Beim Selbstgespräch erwischt",
+    "Beim Nasebohren erwischt",
+    "Beim Tanzen allein erwischt"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m129",
+   "question": "Lieber den Ex auf der Hochzeit treffen oder den Chef im Club?",
+   "answers": [
+    "Den Ex auf der Hochzeit",
+    "Den Chef im Club"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m130",
+   "question": "Wie lange liest du die Nachrichten von jemandem, ohne zu antworten?",
+   "answers": [
+    "Gar nicht – ich antworte sofort",
+    "Stunden",
+    "Tage",
+    "Für immer"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m131",
+   "question": "Was verrät ein Mensch über seinen Kühlschrank?",
+   "answers": [
+    "Alles",
+    "Nichts",
+    "Ob man da noch essen möchte"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m132",
+   "question": "Was ist die beste Ausrede, um früh von der Party zu gehen?",
+   "answers": [
+    "Babysitter",
+    "Früh raus morgen",
+    "Mir geht's nicht gut",
+    "Ich verschwinde einfach"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m133",
+   "question": "Wie gut ist dein Tanz nach Mitternacht?",
+   "answers": [
+    "Weltklasse",
+    "Genauso schlecht wie vorher",
+    "Gar nicht – ich tanze nicht",
+    "Peinlich, aber mit Hingabe"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m134",
+   "question": "Was ist schlimmer beim Partner?",
+   "answers": [
+    "Schnarchen",
+    "Kalte Füße",
+    "Decke klauen",
+    "Wecker 6× schlummern"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m135",
+   "question": "Wie lange stalkst du jemanden online vor dem ersten Treffen?",
+   "answers": [
+    "Gar nicht",
+    "5 Minuten",
+    "Bis zum Urlaubsfoto von 2014",
+    "Ich kenne schon die Oma"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m136",
+   "question": "Was sagst du beim Weinladen-Besuch?",
+   "answers": [
+    "Den hier, der hat ein schönes Etikett",
+    "Etwas Trockenes bitte",
+    "Der Günstigste wird's",
+    "Ich nehme einfach Bier"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m137",
+   "question": "Wie viele Ex-Partner darf man zur Hochzeit einladen?",
+   "answers": [
+    "Keinen",
+    "Einen",
+    "Alle – wird lustig"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m138",
+   "question": "Wer bezahlt beim ersten Date?",
+   "answers": [
+    "Wer eingeladen hat",
+    "Halbe-halbe",
+    "Wer mehr verdient",
+    "Wer schneller zum Portemonnaie greift"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m139",
+   "question": "Was ist die schlimmste Nachricht um 2 Uhr nachts?",
+   "answers": [
+    "„Bist du wach?“",
+    "„Wir müssen reden“",
+    "Ein Foto vom Döner",
+    "Eine Sprachnachricht von 9 Minuten"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m140",
+   "question": "Was machst du nach einer durchfeierten Nacht?",
+   "answers": [
+    "Ausschlafen",
+    "Sport – jetzt erst recht",
+    "Pizza bestellen",
+    "Schwören: nie wieder"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m141",
+   "question": "Was darf man auf einem Junggesellenabschied auf keinen Fall?",
+   "answers": [
+    "Den Ring verlieren",
+    "Ein Tattoo stechen lassen",
+    "Die Braut oder den Bräutigam anrufen",
+    "Alles ist erlaubt"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m142",
+   "question": "Wie viele Stunden Schlaf hattest du nach der letzten Party?",
+   "answers": [
+    "Unter 3",
+    "3–5",
+    "6–8",
+    "Party? Ich war um 22 Uhr im Bett"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m143",
+   "question": "Was verrätst du deinen Eltern eher nicht?",
+   "answers": [
+    "Was die Wohnung gekostet hat",
+    "Wie oft du Pizza bestellst",
+    "Wo du letztes Wochenende warst",
+    "Gar nichts – ich erzähle alles"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m144",
+   "question": "Was ist der beste Flirt-Spruch?",
+   "answers": [
+    "Gar keiner – einfach Hallo",
+    "Etwas über das Essen",
+    "Ein schlechter Witz",
+    "Ein Kompliment"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m145",
+   "question": "Wie viel Prozent deiner Ausreden sind wahr?",
+   "answers": [
+    "Alle",
+    "Die meisten",
+    "Etwa die Hälfte",
+    "Ausreden? Ich?"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m146",
+   "question": "Was wäre peinlicher, wenn es alle sehen?",
+   "answers": [
+    "Dein Suchverlauf",
+    "Deine Handy-Fotos",
+    "Deine letzte Sprachnachricht",
+    "Deine Playlist"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m147",
+   "question": "Wie lange brauchst du, um nach einem Streit Sorry zu sagen?",
+   "answers": [
+    "Sofort",
+    "Einen Tag",
+    "Eine Woche",
+    "Ich warte auf ein Sorry"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m148",
+   "question": "Welche Lüge ist am häufigsten?",
+   "answers": [
+    "„Bin gleich da“",
+    "„Hab's gelesen“",
+    "„Mir geht's gut“",
+    "„Nur noch eine Folge“"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m149",
+   "question": "Was ist das peinlichste Lied auf deiner Playlist?",
+   "answers": [
+    "Ein Schlager",
+    "Ein Kinderlied",
+    "Ein Boyband-Song",
+    "Ich schäme mich für nichts"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m150",
+   "question": "Wie oft hast du schon „Ich bin krank“ gesagt, ohne krank zu sein?",
+   "answers": [
+    "Nie",
+    "Ein-, zweimal",
+    "Öfter",
+    "Kein Kommentar"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m151",
+   "question": "Wie lange liegst du nach dem Wecker noch im Bett und scrollst?",
+   "answers": [
+    "Gar nicht",
+    "5 Minuten",
+    "Eine halbe Stunde",
+    "Bis ich zu spät bin"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m152",
+   "question": "Wer ist auf Partys am anstrengendsten?",
+   "answers": [
+    "Der DJ-Besserwisser",
+    "Die, die über Arbeit reden",
+    "Die, die um 23 Uhr gehen wollen",
+    "Ich"
+   ],
+   "stufe": "frech"
   }
  ]
 }

@@ -1,7 +1,7 @@
 {
  "name": "Basis",
  "author": "UP!",
- "version": "1.0.0",
+ "version": "1.1.0",
  "description": "Persönliche Fragen für Gruppen, die sich (ein bisschen) kennen.",
  "items": [
   {
@@ -10,15 +10,18 @@
   },
   {
    "id": "w2",
-   "question": "Was wolltest du als Kind werden?"
+   "question": "Was wolltest du als Kind werden?",
+   "stufe": "familie"
   },
   {
    "id": "w3",
-   "question": "Was ist dein seltsamstes Talent?"
+   "question": "Was ist dein seltsamstes Talent?",
+   "stufe": "familie"
   },
   {
    "id": "w4",
-   "question": "Welches Essen könntest du jeden Tag essen?"
+   "question": "Welches Essen könntest du jeden Tag essen?",
+   "stufe": "familie"
   },
   {
    "id": "w5",
@@ -30,7 +33,8 @@
   },
   {
    "id": "w7",
-   "question": "Wovor hattest du als Kind Angst?"
+   "question": "Wovor hattest du als Kind Angst?",
+   "stufe": "familie"
   },
   {
    "id": "w8",
@@ -50,7 +54,8 @@
   },
   {
    "id": "w12",
-   "question": "Wo wärst du jetzt am liebsten?"
+   "question": "Wo wärst du jetzt am liebsten?",
+   "stufe": "familie"
   },
   {
    "id": "w13",
@@ -58,11 +63,13 @@
   },
   {
    "id": "w14",
-   "question": "Welches Tier wärst du – und warum?"
+   "question": "Welches Tier wärst du – und warum?",
+   "stufe": "familie"
   },
   {
    "id": "w15",
-   "question": "Was ist dein größtes No-Go beim Date?"
+   "question": "Was ist dein größtes No-Go beim Date?",
+   "stufe": "frech"
   },
   {
    "id": "w16",
@@ -102,11 +109,13 @@
   },
   {
    "id": "w25",
-   "question": "Was ist dein Lieblingsgeräusch?"
+   "question": "Was ist dein Lieblingsgeräusch?",
+   "stufe": "familie"
   },
   {
    "id": "w26",
-   "question": "Welche Fähigkeit würdest du gerne über Nacht lernen?"
+   "question": "Welche Fähigkeit würdest du gerne über Nacht lernen?",
+   "stufe": "familie"
   },
   {
    "id": "w27",
@@ -130,7 +139,8 @@
   },
   {
    "id": "w32",
-   "question": "Mit wem würdest du gerne einen Tag tauschen?"
+   "question": "Mit wem würdest du gerne einen Tag tauschen?",
+   "stufe": "familie"
   },
   {
    "id": "w33",
@@ -150,7 +160,8 @@
   },
   {
    "id": "w37",
-   "question": "Was würdest du auf eine einsame Insel mitnehmen?"
+   "question": "Was würdest du auf eine einsame Insel mitnehmen?",
+   "stufe": "familie"
   },
   {
    "id": "w38",
@@ -158,7 +169,8 @@
   },
   {
    "id": "w39",
-   "question": "Was ist dein absurdester Traum, an den du dich erinnerst?"
+   "question": "Was ist dein absurdester Traum, an den du dich erinnerst?",
+   "stufe": "familie"
   },
   {
    "id": "w40",

@@ -1,7 +1,7 @@
 {
  "name": "Basic",
  "author": "UP!",
- "version": "1.0.0",
+ "version": "1.1.0",
  "items": [
   {
    "category": "hands",
@@ -182,6 +182,306 @@
   {
    "category": "point",
    "task": "Point at the person most likely to put up Christmas decorations in October."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you've ever had sunburn in winter."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you prefer tea to coffee."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you've ever wanted a tattoo."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you've ever sung a song with completely wrong lyrics."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you've ever fallen asleep at the cinema."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you have a plant at home that's still alive."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you've ever fallen into a pool fully clothed."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you've ever ridden a horse."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if your phone battery is below 20 percent right now."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you prefer sweet snacks to salty ones."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you've ever met a celebrity."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you've ever camped at a festival."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you're wearing odd socks right now."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you've ever fallen off a bike."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you always pick the slowest checkout line."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you've ever read a whole book in one day."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you'd rather ski than sit by the fire in winter."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you've ever slept through an alarm and been late."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you've ever built a sandcastle you were proud of."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you remember faces better than names."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you've ever sung karaoke."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you prefer dogs to cats."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you've ever baked a whole cake on your own."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you've ever spent the night in a tent."
+  },
+  {
+   "category": "hands",
+   "task": "Raise your hand if you've ever sent a message to the wrong person."
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How many pillows are on your bed?"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How much do you like going to the gym? (0 to 10)"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How many alarms do you set in the morning? (max. 10)"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How spicy do you like your food? (0 to 10)"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How many hours a day do you look at your phone? (max. 10)"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How tidy is your room right now? (0 to 10)"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How many languages do you speak at least a little?"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How good are you at telling jokes? (0 to 10)"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How many times have you moved house? (max. 10)"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How many days does your phone battery last? (max. 10)"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How much do you look forward to Christmas? (0 to 10)"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How good are you at keeping a secret? (0 to 10)"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How many pets have you had in your life? (max. 10)"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How much do you like roller coasters? (0 to 10)"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How many glasses of water have you drunk today?"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How good are you at parking? (0 to 10)"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How many hours would you queue for your favourite food? (max. 10)"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How much do you know about football? (0 to 10)"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How many meals do you eat on a normal day?"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How much do you like camping? (0 to 10)"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How many books have you read this year? (max. 10)"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How much do you like surprise parties? (0 to 10)"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: On average, how many minutes late are you? (in steps of 5, max. 10 fingers)"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How good are you with chopsticks? (0 to 10)"
+  },
+  {
+   "category": "number",
+   "task": "Show with your fingers: How many candles were on your last birthday cake? (max. 10 – no more)"
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to blow the million-pound question on a quiz show."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to get sunburnt on holiday."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to let a plant dry out."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to cheat at Monopoly."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to take a dance class."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to forget a friend's birthday."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to open their own café."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to buy more than planned at the supermarket."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to get lost on a hike."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to burn a cake."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to set a world record."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to laugh out loud at the cinema."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to find their keys in the fridge."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to write a book."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to slip on ice."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to play in a band."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to hog the microphone at karaoke."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to take photos of their food."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to be the last to leave a party."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to adopt a dog."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to miss a penalty."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to secretly read romance novels."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to travel around the world."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to get angry first at games night."
+  },
+  {
+   "category": "point",
+   "task": "Point at the person most likely to win the lottery and tell no one."
   }
  ]
 }

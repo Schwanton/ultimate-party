@@ -1,7 +1,7 @@
 {
  "name": "Extra",
  "author": "UP!",
- "version": "1.0.0",
+ "version": "1.1.0",
  "description": "Noch mehr schräge Zeichen-Aufgaben",
  "items": [
   {
@@ -333,6 +333,366 @@
   },
   {
    "word": "Ein Riesenrad aus Donuts"
+  },
+  {
+   "word": "Ein Nashorn beim Ballonfahren"
+  },
+  {
+   "word": "Eine Möwe klaut Pommes"
+  },
+  {
+   "word": "Ein Tannenbaum beim Friseur"
+  },
+  {
+   "word": "Eine Kartoffel mit Sonnenhut"
+  },
+  {
+   "word": "Ein Skelett beim Arztbesuch"
+  },
+  {
+   "word": "Ein Löffel verliebt sich in eine Gabel"
+  },
+  {
+   "word": "Ein Pfannkuchen-Turm, der wackelt"
+  },
+  {
+   "word": "Ein Schneemann mit Wärmflasche"
+  },
+  {
+   "word": "Ein Bär auf dem Einrad"
+  },
+  {
+   "word": "Eine Ameise mit Hantel"
+  },
+  {
+   "word": "Ein Wolkenkratzer mit Schnupfen"
+  },
+  {
+   "word": "Ein Pirat beim Zahnarzt"
+  },
+  {
+   "word": "Eine Ziege auf dem Dach"
+  },
+  {
+   "word": "Ein Toast springt aus dem Toaster"
+  },
+  {
+   "word": "Ein Löwe mit Lockenwicklern"
+  },
+  {
+   "word": "Ein Huhn legt ein goldenes Ei"
+  },
+  {
+   "word": "Eine Rakete beim Tanken"
+  },
+  {
+   "word": "Ein Kaktus mit Luftballon"
+  },
+  {
+   "word": "Ein Mops im Superheldenkostüm"
+  },
+  {
+   "word": "Eine Zitrone verzieht das Gesicht"
+  },
+  {
+   "word": "Ein Bücherwurm mit Lesebrille"
+  },
+  {
+   "word": "Ein Kühlschrank beim Joggen"
+  },
+  {
+   "word": "Ein Kamel mit drei Höckern"
+  },
+  {
+   "word": "Ein Regenwurm beim Limbo"
+  },
+  {
+   "word": "Eine Schildkröte überholt einen Hasen"
+  },
+  {
+   "word": "Ein Tintenfisch beim Händeschütteln"
+  },
+  {
+   "word": "Ein Wecker mit Schlafmaske"
+  },
+  {
+   "word": "Ein Pinguin auf Safari"
+  },
+  {
+   "word": "Eine Tomate wird rot vor Scham"
+  },
+  {
+   "word": "Ein Sumo-Ringer auf Zehenspitzen"
+  },
+  {
+   "word": "Ein Ritter putzt seine Rüstung"
+  },
+  {
+   "word": "Eine Kuh mit Sonnenbrand"
+  },
+  {
+   "word": "Ein Dinosaurier im Kinderwagen"
+  },
+  {
+   "word": "Ein Brot im Fitnessstudio"
+  },
+  {
+   "word": "Ein Geist hat Schluckauf"
+  },
+  {
+   "word": "Ein Zebra am Zebrastreifen"
+  },
+  {
+   "word": "Eine Spinne mit acht Turnschuhen"
+  },
+  {
+   "word": "Ein Elefant balanciert auf einem Ball"
+  },
+  {
+   "word": "Ein Bagger isst Spaghetti"
+  },
+  {
+   "word": "Eine Kerze hat Angst vor Wind"
+  },
+  {
+   "word": "Ein Waschbär wäscht Wäsche"
+  },
+  {
+   "word": "Ein Fisch im Goldfischglas auf Reisen"
+  },
+  {
+   "word": "Ein Roboter-Hund beim Gassigehen"
+  },
+  {
+   "word": "Ein Muffin mit Krone"
+  },
+  {
+   "word": "Eine Wolke regnet Konfetti"
+  },
+  {
+   "word": "Ein Hase zieht einen Zauberer aus dem Hut"
+  },
+  {
+   "word": "Ein Gartenzwerg im Urlaub"
+  },
+  {
+   "word": "Eine Banane auf der Bananenschale"
+  },
+  {
+   "word": "Ein Vogel baut ein Hochhaus"
+  },
+  {
+   "word": "Ein Bär beim Winterschlaf mit Wecker"
+  },
+  {
+   "word": "Eine Gurke im Smoking"
+  },
+  {
+   "word": "Ein Seehund jongliert"
+  },
+  {
+   "word": "Ein Auto mit Beinen"
+  },
+  {
+   "word": "Ein Pirat sucht einen Schatz im Sandkasten"
+  },
+  {
+   "word": "Ein Koch jagt eine Wurst"
+  },
+  {
+   "word": "Ein Eis schmilzt auf einer Schaukel"
+  },
+  {
+   "word": "Ein Riese mit winzigem Regenschirm"
+  },
+  {
+   "word": "Eine Maus erschreckt einen Elefanten"
+  },
+  {
+   "word": "Ein Haifisch in der Badewanne"
+  },
+  {
+   "word": "Eine Uhr läuft rückwärts"
+  },
+  {
+   "word": "Ein Lama mit Pudelmütze"
+  },
+  {
+   "word": "Ein Kartoffelsack beim Sackhüpfen"
+  },
+  {
+   "word": "Ein Engel mit Rollschuhen"
+  },
+  {
+   "word": "Ein Hund malt ein Bild"
+  },
+  {
+   "word": "Ein Wikinger im Planschbecken"
+  },
+  {
+   "word": "Ein Kaninchen mit Hasenohren-Haarreif"
+  },
+  {
+   "word": "Ein Flugzeug mit Federn"
+  },
+  {
+   "word": "Eine Kuh gibt Schokomilch"
+  },
+  {
+   "word": "Ein Erdmännchen hält Wache"
+  },
+  {
+   "word": "Ein Pilz unter einem Regenschirm"
+  },
+  {
+   "word": "Ein Zauberer zaubert einen Kuchen"
+  },
+  {
+   "word": "Ein Frosch auf dem Thron"
+  },
+  {
+   "word": "Ein Löwe beim Zähneputzen"
+  },
+  {
+   "word": "Eine Rutsche aus Spaghetti"
+  },
+  {
+   "word": "Ein Bauer melkt eine Giraffe"
+  },
+  {
+   "word": "Ein Fernseher schaut Fernsehen"
+  },
+  {
+   "word": "Ein Bär fährt Schlitten"
+  },
+  {
+   "word": "Ein Kängurubeutel voller Spielzeug"
+  },
+  {
+   "word": "Ein Hamster im Raumschiff"
+  },
+  {
+   "word": "Eine Möhre beim Bodybuilding"
+  },
+  {
+   "word": "Ein Sandwich so hoch wie ein Haus"
+  },
+  {
+   "word": "Eine Eule, die nicht schlafen kann"
+  },
+  {
+   "word": "Ein Krake beim Zöpfeflechten"
+  },
+  {
+   "word": "Ein Feuerdrache mit Eiswürfeln"
+  },
+  {
+   "word": "Ein Bus voller Katzen"
+  },
+  {
+   "word": "Ein Wurm im Apfel mit Fenster"
+  },
+  {
+   "word": "Ein Tiger mit Punkten"
+  },
+  {
+   "word": "Ein Clown mit trauriger Nase"
+  },
+  {
+   "word": "Eine Wassermelone als Helm"
+  },
+  {
+   "word": "Ein Kranich mit Bauhelm"
+  },
+  {
+   "word": "Eine Schnecke beim Formel-1-Rennen"
+  },
+  {
+   "word": "Ein Kühlschrank voller Socken"
+  },
+  {
+   "word": "Ein Stinktier mit Parfüm"
+  },
+  {
+   "word": "Ein Mond mit Gute-Nacht-Mütze"
+  },
+  {
+   "word": "Ein Esel spielt Klavier"
+  },
+  {
+   "word": "Eine Möwe als Postbote"
+  },
+  {
+   "word": "Ein Pudding auf Stelzen"
+  },
+  {
+   "word": "Ein Hai beim Friseur"
+  },
+  {
+   "word": "Ein Schaf mit Glatze"
+  },
+  {
+   "word": "Ein Fußball mit Augen"
+  },
+  {
+   "word": "Ein Gewitter in einer Tasse"
+  },
+  {
+   "word": "Eine Ente mit Gummistiefeln"
+  },
+  {
+   "word": "Ein Bär verkauft Eis"
+  },
+  {
+   "word": "Ein Papierflieger im Sturm"
+  },
+  {
+   "word": "Ein Turm aus Hüten"
+  },
+  {
+   "word": "Ein Pinguin im Kühlschrank"
+  },
+  {
+   "word": "Ein Krokodil liest Gute-Nacht-Geschichten"
+  },
+  {
+   "word": "Ein Brokkoli mit Frisur"
+  },
+  {
+   "word": "Ein Tausendfüßler kauft Schuhe"
+  },
+  {
+   "word": "Ein Vulkan voller Ketchup"
+  },
+  {
+   "word": "Ein Gespenst spielt Verstecken"
+  },
+  {
+   "word": "Ein Hund mit Hundehütte auf dem Rücken"
+  },
+  {
+   "word": "Ein Ufo entführt eine Kuh"
+  },
+  {
+   "word": "Ein Zug aus Würsten"
+  },
+  {
+   "word": "Eine Prinzessin mit Werkzeugkasten"
+  },
+  {
+   "word": "Ein Stachelschwein beim Kuscheln"
+  },
+  {
+   "word": "Ein Bär im Kanu"
+  },
+  {
+   "word": "Eine Sonnenblume mit Sonnenbrille"
+  },
+  {
+   "word": "Ein Roboter backt Plätzchen"
+  },
+  {
+   "word": "Ein Rabe mit Fliege"
   }
  ]
 }

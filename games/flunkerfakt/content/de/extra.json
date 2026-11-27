@@ -1,7 +1,7 @@
 {
  "name": "Extra",
  "author": "UP!",
- "version": "1.0.0",
+ "version": "1.1.0",
  "description": "Noch mehr verrückte, aber wahre Fakten",
  "items": [
   {
@@ -398,6 +398,1149 @@
     "Heimweh"
    ],
    "source": "Guinness World Records: Longest attack of hiccups"
+  },
+  {
+   "question": "Honigbienen können menschliche ___ unterscheiden.",
+   "answer": "Gesichter",
+   "alternatives": [
+    "Gesicht"
+   ],
+   "decoys": [
+    "Stimmen",
+    "Farben",
+    "Schritte"
+   ],
+   "source": "Journal of Experimental Biology (Dyer et al., 2005)"
+  },
+  {
+   "question": "Kühe haben ___ und sind in deren Nähe weniger gestresst.",
+   "answer": "beste Freundinnen",
+   "alternatives": [
+    "Freundinnen",
+    "beste Freunde",
+    "Freunde"
+   ],
+   "decoys": [
+    "Lieblingslieder",
+    "Lieblingsplätze",
+    "Spiegel"
+   ],
+   "source": "Northampton University (Krista McLennan, 2013)"
+  },
+  {
+   "question": "Das Herz eines Blauwals ist etwa so groß wie ein ___.",
+   "answer": "Autoscooter",
+   "alternatives": [
+    "kleines Auto",
+    "Auto"
+   ],
+   "decoys": [
+    "Fußball",
+    "Kühlschrank",
+    "Fahrrad"
+   ],
+   "source": "Wikipedia: Blue whale"
+  },
+  {
+   "question": "Bei Seepferdchen werden die ___ schwanger.",
+   "answer": "Männchen",
+   "alternatives": [
+    "Väter",
+    "Männer"
+   ],
+   "decoys": [
+    "Großmütter",
+    "Jungtiere",
+    "Ältesten"
+   ],
+   "source": "Wikipedia: Seahorse"
+  },
+  {
+   "question": "Bärtierchen haben einen Ausflug ins ___ überlebt.",
+   "answer": "Weltall",
+   "alternatives": [
+    "All",
+    "Weltraum"
+   ],
+   "decoys": [
+    "Vulkaninnere",
+    "Säurebad",
+    "Tiefkühlfach"
+   ],
+   "source": "Wikipedia: Tardigrade (FOTON-M3, 2007)"
+  },
+  {
+   "question": "Die Schweiz hat genug Schutzbunker für ___.",
+   "answer": "die gesamte Bevölkerung",
+   "alternatives": [
+    "alle Einwohner",
+    "alle",
+    "die ganze Bevölkerung"
+   ],
+   "decoys": [
+    "alle Kühe",
+    "die Hälfte",
+    "alle Banken"
+   ],
+   "source": "Wikipedia: Civil defense in Switzerland"
+  },
+  {
+   "question": "Der Pinguin Sir Nils Olav wurde von der norwegischen Königsgarde zum ___ ernannt.",
+   "answer": "Ritter",
+   "alternatives": [
+    "Ritter geschlagen",
+    "Sir"
+   ],
+   "decoys": [
+    "Bürgermeister",
+    "Koch",
+    "Prinzen"
+   ],
+   "source": "Wikipedia: Nils Olav"
+  },
+  {
+   "question": "Napoleon wurde bei einer Jagd von einer Horde ___ angegriffen.",
+   "answer": "Kaninchen",
+   "alternatives": [
+    "Hasen"
+   ],
+   "decoys": [
+    "Gänse",
+    "Wildschweine",
+    "Ziegen"
+   ],
+   "source": "Wikipedia: Napoleon (rabbit hunt, 1807)"
+  },
+  {
+   "question": "Australien führte 1932 einen „Krieg“ gegen ___ – und verlor.",
+   "answer": "Emus",
+   "alternatives": [
+    "Emu"
+   ],
+   "decoys": [
+    "Kängurus",
+    "Koalas",
+    "Kaninchen"
+   ],
+   "source": "Wikipedia: Emu War"
+  },
+  {
+   "question": "Die Universität Oxford ist älter als das Reich der ___.",
+   "answer": "Azteken",
+   "alternatives": [
+    "Aztekenreich"
+   ],
+   "decoys": [
+    "Römer",
+    "Ägypter",
+    "Griechen"
+   ],
+   "source": "Wikipedia: University of Oxford / Tenochtitlan"
+  },
+  {
+   "question": "Kleopatra lebte zeitlich näher an der Mondlandung als am Bau der ___.",
+   "answer": "Cheops-Pyramide",
+   "alternatives": [
+    "Pyramiden",
+    "großen Pyramide",
+    "Pyramide"
+   ],
+   "decoys": [
+    "Chinesischen Mauer",
+    "Akropolis",
+    "Stonehenge-Steine"
+   ],
+   "source": "Wikipedia: Great Pyramid of Giza"
+  },
+  {
+   "question": "Faultiere sind so langsam, dass in ihrem Fell ___ wachsen.",
+   "answer": "Algen",
+   "alternatives": [
+    "Alge",
+    "grüne Algen"
+   ],
+   "decoys": [
+    "Pilze",
+    "Moos",
+    "Blumen"
+   ],
+   "source": "Wikipedia: Sloth"
+  },
+  {
+   "question": "Botanisch gesehen sind Erdbeeren keine Beeren, sondern ___.",
+   "answer": "Sammelnussfrüchte",
+   "alternatives": [
+    "Nussfrüchte",
+    "Sammelnussfrucht"
+   ],
+   "decoys": [
+    "Gemüse",
+    "Steinfrüchte",
+    "Kürbisse"
+   ],
+   "source": "Wikipedia: Strawberry"
+  },
+  {
+   "question": "Der Eiffelturm sollte ursprünglich nach ___ Jahren wieder abgebaut werden.",
+   "answer": "20",
+   "alternatives": [
+    "zwanzig"
+   ],
+   "decoys": [
+    "5",
+    "50",
+    "100"
+   ],
+   "source": "Wikipedia: Eiffel Tower"
+  },
+  {
+   "question": "Napoleon hängte die Mona Lisa eine Zeit lang in sein ___.",
+   "answer": "Schlafzimmer",
+   "alternatives": [
+    "Schlafgemach"
+   ],
+   "decoys": [
+    "Badezimmer",
+    "Pferdestall",
+    "Zelt"
+   ],
+   "source": "Wikipedia: Mona Lisa"
+  },
+  {
+   "question": "Der erste mechanische Wecker von Levi Hutchins klingelte nur um ___ Uhr.",
+   "answer": "4",
+   "alternatives": [
+    "vier",
+    "4 Uhr morgens"
+   ],
+   "decoys": [
+    "6",
+    "7",
+    "12"
+   ],
+   "source": "Wikipedia: Alarm clock"
+  },
+  {
+   "question": "Flusspferde schwitzen eine ___ Flüssigkeit, die wie Sonnencreme wirkt.",
+   "answer": "rote",
+   "alternatives": [
+    "rötliche",
+    "rötlich",
+    "rot"
+   ],
+   "decoys": [
+    "grüne",
+    "blaue",
+    "goldene"
+   ],
+   "source": "Wikipedia: Hippopotamus"
+  },
+  {
+   "question": "Die Zunge einer Giraffe ist ___.",
+   "answer": "blau",
+   "alternatives": [
+    "dunkelblau",
+    "lila",
+    "schwarz",
+    "bläulich"
+   ],
+   "decoys": [
+    "gestreift",
+    "gepunktet",
+    "weiß"
+   ],
+   "source": "Wikipedia: Giraffe"
+  },
+  {
+   "question": "Rentiere können ___ Licht sehen.",
+   "answer": "ultraviolettes",
+   "alternatives": [
+    "UV",
+    "UV-Licht",
+    "ultraviolett"
+   ],
+   "decoys": [
+    "infrarotes",
+    "polarisiertes",
+    "grünes"
+   ],
+   "source": "Wikipedia: Reindeer"
+  },
+  {
+   "question": "Große Mengen Pistazien können sich bei der Lagerung selbst ___.",
+   "answer": "entzünden",
+   "alternatives": [
+    "anzünden",
+    "in Brand setzen",
+    "entflammen"
+   ],
+   "decoys": [
+    "öffnen",
+    "vermehren",
+    "salzen"
+   ],
+   "source": "Wikipedia: Pistachio"
+  },
+  {
+   "question": "Der Kölner Dom war nach seiner Fertigstellung 1880 ein paar Jahre lang das ___ Gebäude der Welt.",
+   "answer": "höchste",
+   "alternatives": [
+    "größte"
+   ],
+   "decoys": [
+    "teuerste",
+    "schiefste",
+    "älteste"
+   ],
+   "source": "Wikipedia: Cologne Cathedral"
+  },
+  {
+   "question": "Gummibärchen wurden 1922 in ___ erfunden.",
+   "answer": "Bonn",
+   "alternatives": [
+    "Deutschland"
+   ],
+   "decoys": [
+    "Hamburg",
+    "Wien",
+    "Zürich"
+   ],
+   "source": "Wikipedia: Gummy bear / Haribo"
+  },
+  {
+   "question": "Der Teddybär ist nach einem ___ benannt.",
+   "answer": "US-Präsidenten",
+   "alternatives": [
+    "Präsidenten",
+    "Theodore Roosevelt",
+    "Roosevelt"
+   ],
+   "decoys": [
+    "Zirkusdirektor",
+    "Bäcker",
+    "Spielzeugmacher"
+   ],
+   "source": "Wikipedia: Teddy bear"
+  },
+  {
+   "question": "Luftpolsterfolie war ursprünglich als ___ gedacht.",
+   "answer": "Tapete",
+   "alternatives": [
+    "Wandtapete"
+   ],
+   "decoys": [
+    "Badematte",
+    "Regenjacke",
+    "Kinderspielzeug"
+   ],
+   "source": "Wikipedia: Bubble wrap"
+  },
+  {
+   "question": "Die Knetmasse Play-Doh war ursprünglich ein ___.",
+   "answer": "Tapetenreiniger",
+   "alternatives": [
+    "Reinigungsmittel",
+    "Reiniger"
+   ],
+   "decoys": [
+    "Kaugummi",
+    "Kitt",
+    "Brotteig"
+   ],
+   "source": "Wikipedia: Play-Doh"
+  },
+  {
+   "question": "Super Mario hieß in seinem ersten Spiel noch ___.",
+   "answer": "Jumpman",
+   "alternatives": [
+    "Jump Man"
+   ],
+   "decoys": [
+    "Mr. Video",
+    "Plumberman",
+    "Luigi"
+   ],
+   "source": "Wikipedia: Mario"
+  },
+  {
+   "question": "Die Krawatte geht auf ___ Soldaten zurück.",
+   "answer": "kroatische",
+   "alternatives": [
+    "Kroatien",
+    "kroatischen"
+   ],
+   "decoys": [
+    "römische",
+    "schottische",
+    "japanische"
+   ],
+   "source": "Wikipedia: Necktie (cravat)"
+  },
+  {
+   "question": "Kaffeebohnen sind eigentlich die ___ einer Frucht.",
+   "answer": "Samen",
+   "alternatives": [
+    "Kerne",
+    "Kern",
+    "Same"
+   ],
+   "decoys": [
+    "Blätter",
+    "Schalen",
+    "Wurzeln"
+   ],
+   "source": "Wikipedia: Coffee bean"
+  },
+  {
+   "question": "Wassermelonen bestehen zu etwa ___ Prozent aus Wasser.",
+   "answer": "92",
+   "alternatives": [
+    "zweiundneunzig",
+    "90"
+   ],
+   "decoys": [
+    "60",
+    "75",
+    "99"
+   ],
+   "source": "Wikipedia: Watermelon"
+  },
+  {
+   "question": "Avocados reifen erst, nachdem sie ___ wurden.",
+   "answer": "gepflückt",
+   "alternatives": [
+    "geerntet",
+    "vom Baum gepflückt"
+   ],
+   "decoys": [
+    "gewaschen",
+    "geschält",
+    "gekühlt"
+   ],
+   "source": "Wikipedia: Avocado"
+  },
+  {
+   "question": "Eine Ananas braucht bis zur Ernte etwa ___ Jahre.",
+   "answer": "zwei",
+   "alternatives": [
+    "2",
+    "anderthalb bis zwei"
+   ],
+   "decoys": [
+    "fünf",
+    "zehn",
+    "sieben"
+   ],
+   "source": "Wikipedia: Pineapple"
+  },
+  {
+   "question": "Möhren waren ursprünglich meist ___.",
+   "answer": "lila",
+   "alternatives": [
+    "violett",
+    "gelb",
+    "purpur"
+   ],
+   "decoys": [
+    "blau",
+    "schwarz",
+    "weiß-gestreift"
+   ],
+   "source": "Wikipedia: Carrot"
+  },
+  {
+   "question": "Haie haben keine ___.",
+   "answer": "Knochen",
+   "alternatives": [
+    "Knochen im Körper"
+   ],
+   "decoys": [
+    "Zähne",
+    "Flossen",
+    "Augenlider"
+   ],
+   "source": "Wikipedia: Shark (cartilage skeleton)"
+  },
+  {
+   "question": "Delfine schlafen mit einem offenen ___.",
+   "answer": "Auge",
+   "alternatives": [
+    "Auge offen"
+   ],
+   "decoys": [
+    "Ohr",
+    "Maul",
+    "Blasloch"
+   ],
+   "source": "Wikipedia: Unihemispheric slow-wave sleep"
+  },
+  {
+   "question": "Eulen können ihren Kopf um bis zu ___ Grad drehen.",
+   "answer": "270",
+   "alternatives": [
+    "zweihundertsiebzig"
+   ],
+   "decoys": [
+    "90",
+    "180",
+    "360"
+   ],
+   "source": "Wikipedia: Owl"
+  },
+  {
+   "question": "Krokodile können ihre ___ nicht herausstrecken.",
+   "answer": "Zunge",
+   "alternatives": [
+    "Zungen"
+   ],
+   "decoys": [
+    "Krallen",
+    "Zähne",
+    "Augen"
+   ],
+   "source": "Wikipedia: Crocodile"
+  },
+  {
+   "question": "Eine Gruppe Krähen heißt auf Englisch „a ___ of crows“.",
+   "answer": "murder",
+   "alternatives": [
+    "Murder"
+   ],
+   "decoys": [
+    "party",
+    "choir",
+    "gang"
+   ],
+   "source": "Wikipedia: List of English terms of venery"
+  },
+  {
+   "question": "Seesterne haben kein ___.",
+   "answer": "Gehirn",
+   "alternatives": [
+    "Hirn"
+   ],
+   "decoys": [
+    "Maul",
+    "Herz",
+    "Skelett"
+   ],
+   "source": "Wikipedia: Starfish"
+  },
+  {
+   "question": "Quallen bestehen zu etwa ___ Prozent aus Wasser.",
+   "answer": "95",
+   "alternatives": [
+    "fünfundneunzig",
+    "98"
+   ],
+   "decoys": [
+    "50",
+    "70",
+    "80"
+   ],
+   "source": "Wikipedia: Jellyfish"
+  },
+  {
+   "question": "Goldfische können sich Dinge mehrere ___ lang merken.",
+   "answer": "Monate",
+   "alternatives": [
+    "Monate lang"
+   ],
+   "decoys": [
+    "Sekunden",
+    "Minuten",
+    "Stunden"
+   ],
+   "source": "Wikipedia: Goldfish (memory)"
+  },
+  {
+   "question": "Die Form der Toblerone erinnert an das ___.",
+   "answer": "Matterhorn",
+   "alternatives": [
+    "Matterhorns"
+   ],
+   "decoys": [
+    "Brandenburger Tor",
+    "Kölner Dom",
+    "Gartenhaus"
+   ],
+   "source": "Wikipedia: Toblerone"
+  },
+  {
+   "question": "Das hawaiische Alphabet hat nur ___ Buchstaben.",
+   "answer": "13",
+   "alternatives": [
+    "dreizehn",
+    "12",
+    "zwölf"
+   ],
+   "decoys": [
+    "18",
+    "20",
+    "9"
+   ],
+   "source": "Wikipedia: Hawaiian alphabet"
+  },
+  {
+   "question": "Auf der Venus geht die Sonne im ___ auf.",
+   "answer": "Westen",
+   "alternatives": [
+    "West"
+   ],
+   "decoys": [
+    "Norden",
+    "Süden",
+    "Osten"
+   ],
+   "source": "Wikipedia: Venus (retrograde rotation)"
+  },
+  {
+   "question": "Auf dem Mars sind Sonnenuntergänge ___.",
+   "answer": "blau",
+   "alternatives": [
+    "bläulich"
+   ],
+   "decoys": [
+    "grün",
+    "pink",
+    "golden"
+   ],
+   "source": "NASA: Curiosity sunset images"
+  },
+  {
+   "question": "Fußabdrücke auf dem Mond bleiben sehr lange erhalten, weil es dort keinen ___ gibt.",
+   "answer": "Wind",
+   "alternatives": [
+    "Wetter",
+    "Luft",
+    "Atmosphäre"
+   ],
+   "decoys": [
+    "Sand",
+    "Schatten",
+    "Staub"
+   ],
+   "source": "NASA: Apollo footprints"
+  },
+  {
+   "question": "Die Internationale Raumstation umrundet die Erde etwa alle ___ Minuten.",
+   "answer": "90",
+   "alternatives": [
+    "neunzig",
+    "92"
+   ],
+   "decoys": [
+    "30",
+    "300",
+    "600"
+   ],
+   "source": "Wikipedia: International Space Station"
+  },
+  {
+   "question": "Den Namen Pluto schlug ein ___ Jahre altes Mädchen vor.",
+   "answer": "11",
+   "alternatives": [
+    "elf"
+   ],
+   "decoys": [
+    "6",
+    "16",
+    "8"
+   ],
+   "source": "Wikipedia: Venetia Burney"
+  },
+  {
+   "question": "Im All werden Astronauten um bis zu ___ Zentimeter größer.",
+   "answer": "5",
+   "alternatives": [
+    "fünf",
+    "3",
+    "drei"
+   ],
+   "decoys": [
+    "20",
+    "1",
+    "15"
+   ],
+   "source": "NASA: Spinal elongation in microgravity"
+  },
+  {
+   "question": "Das Gehirn verbraucht etwa ___ Prozent der Energie des Körpers.",
+   "answer": "20",
+   "alternatives": [
+    "zwanzig"
+   ],
+   "decoys": [
+    "2",
+    "50",
+    "5"
+   ],
+   "source": "Wikipedia: Human brain"
+  },
+  {
+   "question": "Der Mensch ist das einzige Tier mit einem ___.",
+   "answer": "Kinn",
+   "alternatives": [
+    "richtigen Kinn"
+   ],
+   "decoys": [
+    "Bauchnabel",
+    "Daumen",
+    "Lächeln"
+   ],
+   "source": "Wikipedia: Chin"
+  },
+  {
+   "question": "Im Mittelalter wurden in Europa auch ___ vor Gericht gestellt.",
+   "answer": "Tiere",
+   "alternatives": [
+    "Schweine",
+    "Tiere wie Schweine"
+   ],
+   "decoys": [
+    "Bäume",
+    "Gespenster",
+    "Kinderpuppen"
+   ],
+   "source": "Wikipedia: Animal trial"
+  },
+  {
+   "question": "Wikinger trugen an ihren Helmen keine ___.",
+   "answer": "Hörner",
+   "alternatives": [
+    "Horn"
+   ],
+   "decoys": [
+    "Nieten",
+    "Riemen",
+    "Visiere"
+   ],
+   "source": "Wikipedia: Horned helmet"
+  },
+  {
+   "question": "Das deutsche Wort „Kindergarten“ wird auch im ___ verwendet.",
+   "answer": "Englischen",
+   "alternatives": [
+    "Englisch"
+   ],
+   "decoys": [
+    "Japanischen",
+    "Türkischen",
+    "Isländischen"
+   ],
+   "source": "Wikipedia: Kindergarten"
+  },
+  {
+   "question": "Ein Zauberwürfel hat über 43 ___ mögliche Stellungen.",
+   "answer": "Trillionen",
+   "alternatives": [
+    "Trillion"
+   ],
+   "decoys": [
+    "Tausend",
+    "Millionen",
+    "Milliarden"
+   ],
+   "source": "Wikipedia: Rubik's Cube"
+  },
+  {
+   "question": "Die erste SMS der Welt lautete „___“.",
+   "answer": "Merry Christmas",
+   "alternatives": [
+    "Frohe Weihnachten"
+   ],
+   "decoys": [
+    "Hallo Welt",
+    "Test",
+    "Bin gleich da"
+   ],
+   "source": "Wikipedia: SMS (1992)"
+  },
+  {
+   "question": "Das erste YouTube-Video wurde in einem ___ gedreht.",
+   "answer": "Zoo",
+   "alternatives": [
+    "Tierpark"
+   ],
+   "decoys": [
+    "Badezimmer",
+    "Supermarkt",
+    "Kino"
+   ],
+   "source": "Wikipedia: Me at the zoo"
+  },
+  {
+   "question": "Das Lied „Happy Birthday“ war bis 2016 ___.",
+   "answer": "urheberrechtlich geschützt",
+   "alternatives": [
+    "geschützt",
+    "nicht frei"
+   ],
+   "decoys": [
+    "verboten",
+    "unbekannt",
+    "nur auf Englisch"
+   ],
+   "source": "Wikipedia: Happy Birthday to You"
+  },
+  {
+   "question": "Die Golden Gate Bridge ist nicht golden, sondern ___.",
+   "answer": "orange",
+   "alternatives": [
+    "rot",
+    "orangerot"
+   ],
+   "decoys": [
+    "silbern",
+    "grün",
+    "weiß"
+   ],
+   "source": "Wikipedia: Golden Gate Bridge"
+  },
+  {
+   "question": "Die Chinesische Mauer ist vom Mond aus ___.",
+   "answer": "nicht zu sehen",
+   "alternatives": [
+    "nicht sichtbar",
+    "unsichtbar"
+   ],
+   "decoys": [
+    "gut zu sehen",
+    "nachts beleuchtet",
+    "grün"
+   ],
+   "source": "Wikipedia: Great Wall of China"
+  },
+  {
+   "question": "Die größte Wüste der Welt ist die ___.",
+   "answer": "Antarktis",
+   "alternatives": [
+    "antarktische Wüste"
+   ],
+   "decoys": [
+    "Sahara",
+    "Gobi",
+    "Kalahari"
+   ],
+   "source": "Wikipedia: Desert"
+  },
+  {
+   "question": "Kanada hat mehr ___ als der Rest der Welt zusammen.",
+   "answer": "Seen",
+   "alternatives": [
+    "See"
+   ],
+   "decoys": [
+    "Elche",
+    "Eishockeyschläger",
+    "Ahornbäume"
+   ],
+   "source": "Wikipedia: List of lakes of Canada"
+  },
+  {
+   "question": "In Island gibt es keine ___.",
+   "answer": "Mücken",
+   "alternatives": [
+    "Stechmücken"
+   ],
+   "decoys": [
+    "Schafe",
+    "Bäume",
+    "Autos"
+   ],
+   "source": "Wikipedia: Fauna of Iceland"
+  },
+  {
+   "question": "Russland ist flächenmäßig größer als der Zwergplanet ___.",
+   "answer": "Pluto",
+   "alternatives": [
+    "Pluto (Zwergplanet)"
+   ],
+   "decoys": [
+    "Mars",
+    "Merkur",
+    "Mond"
+   ],
+   "source": "Wikipedia: Pluto / Russia"
+  },
+  {
+   "question": "Koalas schlafen bis zu ___ Stunden am Tag.",
+   "answer": "20",
+   "alternatives": [
+    "zwanzig",
+    "22",
+    "18"
+   ],
+   "decoys": [
+    "8",
+    "12",
+    "3"
+   ],
+   "source": "Wikipedia: Koala"
+  },
+  {
+   "question": "Das Herz eines Kolibris schlägt bis zu ___ Mal pro Minute.",
+   "answer": "1200",
+   "alternatives": [
+    "1.200",
+    "tausendzweihundert",
+    "1000"
+   ],
+   "decoys": [
+    "80",
+    "300",
+    "5000"
+   ],
+   "source": "Wikipedia: Hummingbird"
+  },
+  {
+   "question": "Pferde können sich nicht ___.",
+   "answer": "übergeben",
+   "alternatives": [
+    "erbrechen",
+    "kotzen"
+   ],
+   "decoys": [
+    "hinlegen",
+    "umdrehen",
+    "kratzen"
+   ],
+   "source": "Wikipedia: Horse (digestion)"
+  },
+  {
+   "question": "Hühner sind nahe Verwandte des ___.",
+   "answer": "Tyrannosaurus",
+   "alternatives": [
+    "T. rex",
+    "Tyrannosaurus rex",
+    "Dinosauriers"
+   ],
+   "decoys": [
+    "Krokodils",
+    "Pinguins",
+    "Maulwurfs"
+   ],
+   "source": "Wikipedia: Tyrannosaurus (protein studies)"
+  },
+  {
+   "question": "Der Stoßzahn des Narwals ist eigentlich ein ___.",
+   "answer": "Zahn",
+   "alternatives": [
+    "Eckzahn",
+    "langer Zahn"
+   ],
+   "decoys": [
+    "Horn",
+    "Knochen",
+    "Haar"
+   ],
+   "source": "Wikipedia: Narwhal"
+  },
+  {
+   "question": "Die Haare eines Eisbären sind eigentlich ___.",
+   "answer": "durchsichtig",
+   "alternatives": [
+    "farblos",
+    "transparent"
+   ],
+   "decoys": [
+    "gelb",
+    "grau",
+    "hohl und rosa"
+   ],
+   "source": "Wikipedia: Polar bear"
+  },
+  {
+   "question": "Bananen sind ganz leicht ___.",
+   "answer": "radioaktiv",
+   "alternatives": [
+    "strahlend"
+   ],
+   "decoys": [
+    "magnetisch",
+    "giftig",
+    "elektrisch"
+   ],
+   "source": "Wikipedia: Banana equivalent dose"
+  },
+  {
+   "question": "Der typische Geruch nach Regen heißt ___.",
+   "answer": "Petrichor",
+   "alternatives": [
+    "Petrikor"
+   ],
+   "decoys": [
+    "Pluviol",
+    "Hydrosmie",
+    "Nimbusduft"
+   ],
+   "source": "Wikipedia: Petrichor"
+  },
+  {
+   "question": "Das Knacken beim Fingerknacken entsteht durch ___ in der Gelenkflüssigkeit.",
+   "answer": "Gasblasen",
+   "alternatives": [
+    "Bläschen",
+    "Blasen",
+    "Gas"
+   ],
+   "decoys": [
+    "Knochenreiben",
+    "Sehnenschnappen",
+    "Kristalle"
+   ],
+   "source": "Wikipedia: Cracking joints"
+  },
+  {
+   "question": "Die USA kauften ___ im Jahr 1867 von Russland.",
+   "answer": "Alaska",
+   "alternatives": [
+    "Alaska-Territorium"
+   ],
+   "decoys": [
+    "Hawaii",
+    "Kalifornien",
+    "Grönland"
+   ],
+   "source": "Wikipedia: Alaska Purchase"
+  },
+  {
+   "question": "Die Berliner Mauer stand ___ Jahre lang.",
+   "answer": "28",
+   "alternatives": [
+    "achtundzwanzig"
+   ],
+   "decoys": [
+    "12",
+    "40",
+    "45"
+   ],
+   "source": "Wikipedia: Berlin Wall"
+  },
+  {
+   "question": "In der Schweiz ist es verboten, nur ein einzelnes ___ zu halten.",
+   "answer": "Meerschweinchen",
+   "alternatives": [
+    "Meerschwein"
+   ],
+   "decoys": [
+    "Pferd",
+    "Goldfisch",
+    "Kaninchen"
+   ],
+   "source": "Wikipedia: Animal welfare in Switzerland"
+  },
+  {
+   "question": "Der Planet Uranus dreht sich fast ___ um die Sonne.",
+   "answer": "liegend",
+   "alternatives": [
+    "auf der Seite",
+    "seitlich"
+   ],
+   "decoys": [
+    "rückwärts",
+    "gar nicht",
+    "doppelt so schnell"
+   ],
+   "source": "Wikipedia: Uranus (axial tilt)"
+  },
+  {
+   "question": "Der Saturn hat eine so geringe Dichte, dass er in Wasser ___ würde.",
+   "answer": "schwimmen",
+   "alternatives": [
+    "oben schwimmen",
+    "nicht untergehen"
+   ],
+   "decoys": [
+    "explodieren",
+    "verdampfen",
+    "leuchten"
+   ],
+   "source": "Wikipedia: Saturn"
+  },
+  {
+   "question": "Die Sonne macht etwa ___ Prozent der Masse des Sonnensystems aus.",
+   "answer": "99,8",
+   "alternatives": [
+    "99.8",
+    "99",
+    "99,86"
+   ],
+   "decoys": [
+    "50",
+    "75",
+    "90"
+   ],
+   "source": "Wikipedia: Sun"
+  },
+  {
+   "question": "Das Land mit den meisten Zeitzonen ist ___.",
+   "answer": "Frankreich",
+   "alternatives": [
+    "Frankreich (mit Überseegebieten)"
+   ],
+   "decoys": [
+    "Russland",
+    "USA",
+    "China"
+   ],
+   "source": "Wikipedia: Time in France"
+  },
+  {
+   "question": "Das Land mit den meisten Pyramiden ist ___.",
+   "answer": "Sudan",
+   "alternatives": [
+    "der Sudan"
+   ],
+   "decoys": [
+    "Ägypten",
+    "Mexiko",
+    "Peru"
+   ],
+   "source": "Wikipedia: Nubian pyramids"
+  },
+  {
+   "question": "1969 wurden die amerikanischen Niagarafälle für einige Monate ___.",
+   "answer": "trockengelegt",
+   "alternatives": [
+    "abgestellt",
+    "abgeschaltet",
+    "ausgetrocknet",
+    "trocken"
+   ],
+   "decoys": [
+    "zugefroren",
+    "beleuchtet",
+    "verkauft"
+   ],
+   "source": "Wikipedia: Niagara Falls"
+  },
+  {
+   "question": "Das Sandwich ist nach einem englischen ___ benannt.",
+   "answer": "Grafen",
+   "alternatives": [
+    "Graf",
+    "Earl"
+   ],
+   "decoys": [
+    "Bäcker",
+    "Hafen",
+    "Seefahrer"
+   ],
+   "source": "Wikipedia: John Montagu, 4th Earl of Sandwich"
+  },
+  {
+   "question": "In ___ ist der Verkauf von Kaugummi weitgehend verboten.",
+   "answer": "Singapur",
+   "alternatives": [
+    "Singapore"
+   ],
+   "decoys": [
+    "Japan",
+    "Dubai",
+    "Norwegen"
+   ],
+   "source": "Wikipedia: Chewing gum sales ban in Singapore"
   }
  ]
 }

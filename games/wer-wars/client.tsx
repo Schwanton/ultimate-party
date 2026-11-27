@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { ControllerViewProps, GameClientModule, HostViewProps, PlayerInfo, Translate } from '@up/sdk';
-import { Avatar, Confetti, HostHeader, HostTimer, PhoneTimer, PhoneWait, Podium, Scoreboard, TextAnswer, sfx, useServerNow } from '@up/ui';
+import { Avatar, Confetti, HostHeader, HostTimer, OwnQuestionsHost, OwnQuestionsPhone, PhoneTimer, PhoneWait, Podium, Scoreboard, TextAnswer, sfx, useServerNow } from '@up/ui';
 import { voterSchedule, votersSeconds } from './timing';
 
 const PINK = '#FF6FB5';
@@ -41,6 +41,8 @@ function Quote({ text, size = 46 }: { text: string; size?: number }) {
 function Host(props: HostViewProps) {
   const { view, t, player } = props;
   switch (view.screen) {
+    case 'ownQuestions':
+      return <OwnQuestionsHost view={view} t={t} player={player} title={t('title')} color={PINK} />;
     case 'intro':
       return (
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 28, textAlign: 'center' }}>
@@ -293,6 +295,9 @@ function PhoneAssign({ view, t, send, player }: Pick<ControllerViewProps, 'view'
 function Controller({ view, t, send, me, player }: ControllerViewProps) {
   const now = useServerNow(250);
   switch (view.screen) {
+    case 'ownQuestions':
+    case 'ownQuestionsDone':
+      return <OwnQuestionsPhone view={view} t={t} send={send} />;
     case 'intro':
       return <PhoneWait title={t('title')} text={t('lookAtTv')} emoji={<Avatar player={me} size={96} />} />;
     case 'write':

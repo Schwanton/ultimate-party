@@ -1,53 +1,66 @@
 {
  "name": "Extra",
  "author": "UP!",
- "version": "1.0.0",
+ "version": "1.1.0",
  "description": "Noch mehr schräge Fragen",
  "items": [
   {
-   "prompt": "Der schlechteste Name für ein Restaurant mit Sternekoch"
+   "prompt": "Der schlechteste Name für ein Restaurant mit Sternekoch",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was ein Staubsauger träumt"
+   "prompt": "Was ein Staubsauger träumt",
+   "stufe": "familie"
   },
   {
-   "prompt": "Das Erste, was du sagst, wenn du einem Einhorn begegnest"
+   "prompt": "Das Erste, was du sagst, wenn du einem Einhorn begegnest",
+   "stufe": "familie"
   },
   {
-   "prompt": "Ein Werbespruch für Wasser ohne Geschmack"
+   "prompt": "Ein Werbespruch für Wasser ohne Geschmack",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was dein Haustier hinter deinem Rücken über dich erzählt"
+   "prompt": "Was dein Haustier hinter deinem Rücken über dich erzählt",
+   "stufe": "familie"
   },
   {
-   "prompt": "Ein Schild, das man nie an einer Haustür sehen will"
+   "prompt": "Ein Schild, das man nie an einer Haustür sehen will",
+   "stufe": "familie"
   },
   {
-   "prompt": "Die schlechteste Durchsage im Flugzeug"
+   "prompt": "Die schlechteste Durchsage im Flugzeug",
+   "stufe": "familie"
   },
   {
-   "prompt": "Ein neuer Name für Brokkoli, damit Kinder ihn essen"
+   "prompt": "Ein neuer Name für Brokkoli, damit Kinder ihn essen",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was in der Gebrauchsanweisung für Montage steht"
+   "prompt": "Was in der Gebrauchsanweisung für Montage steht",
+   "stufe": "familie"
   },
   {
-   "prompt": "Der wahre Grund, warum Zebras gestreift sind"
+   "prompt": "Der wahre Grund, warum Zebras gestreift sind",
+   "stufe": "familie"
   },
   {
    "prompt": "Ein Song, den man nie bei einer Hochzeit spielen sollte"
   },
   {
-   "prompt": "Was ein Kaktus sagt, wenn er umarmt werden will"
+   "prompt": "Was ein Kaktus sagt, wenn er umarmt werden will",
+   "stufe": "familie"
   },
   {
    "prompt": "Der unpassendste Satz bei einer Beerdigung eines Goldfischs"
   },
   {
-   "prompt": "Die schlechteste Geschäftsidee aller Zeiten"
+   "prompt": "Die schlechteste Geschäftsidee aller Zeiten",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was der Nachbar wirklich in seiner Garage macht"
+   "prompt": "Was der Nachbar wirklich in seiner Garage macht",
+   "stufe": "familie"
   },
   {
    "prompt": "Ein Titel für einen Actionfilm über Rentner"
@@ -56,115 +69,150 @@
    "prompt": "Das peinlichste, was dir beim Bewerbungsgespräch passieren kann"
   },
   {
-   "prompt": "Was Schneemänner im Sommer machen"
+   "prompt": "Was Schneemänner im Sommer machen",
+   "stufe": "familie"
   },
   {
-   "prompt": "Ein neuer Geschmack für Zahnpasta"
+   "prompt": "Ein neuer Geschmack für Zahnpasta",
+   "stufe": "familie"
   },
   {
    "prompt": "Was auf dem T-Shirt eines Superschurken im Urlaub steht"
   },
   {
-   "prompt": "Das schlechteste Passwort der Welt"
+   "prompt": "Das schlechteste Passwort der Welt",
+   "stufe": "familie"
   },
   {
-   "prompt": "Ein Grund, warum die Erde eigentlich eine Scheibe ist"
+   "prompt": "Ein Grund, warum die Erde eigentlich eine Scheibe ist",
+   "stufe": "familie"
   },
   {
    "prompt": "Was man auf keinen Fall in eine Kontaktanzeige schreiben sollte"
   },
   {
-   "prompt": "Die erste Frage, die ein Baby stellen würde, wenn es sprechen könnte"
+   "prompt": "Die erste Frage, die ein Baby stellen würde, wenn es sprechen könnte",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was ein Hai beim Zahnarzt sagt"
+   "prompt": "Was ein Hai beim Zahnarzt sagt",
+   "stufe": "familie"
   },
   {
-   "prompt": "Ein Name für eine Boyband aus Opas"
+   "prompt": "Ein Name für eine Boyband aus Opas",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was die Ritter der Tafelrunde wirklich besprochen haben"
+   "prompt": "Was die Ritter der Tafelrunde wirklich besprochen haben",
+   "stufe": "familie"
   },
   {
-   "prompt": "Ein Gericht, das nur aus Resten besteht, mit einem schicken Namen"
+   "prompt": "Ein Gericht, das nur aus Resten besteht, mit einem schicken Namen",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was du sagst, wenn dich ein Bär im Wald nach dem Weg fragt"
+   "prompt": "Was du sagst, wenn dich ein Bär im Wald nach dem Weg fragt",
+   "stufe": "familie"
   },
   {
-   "prompt": "Die langweiligste Achterbahn der Welt heißt …"
+   "prompt": "Die langweiligste Achterbahn der Welt heißt …",
+   "stufe": "familie"
   },
   {
-   "prompt": "Ein neues olympisches Fach für Couch-Potatoes"
+   "prompt": "Ein neues olympisches Fach für Couch-Potatoes",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was ein Wikinger bei IKEA sagt"
+   "prompt": "Was ein Wikinger bei IKEA sagt",
+   "stufe": "familie"
   },
   {
-   "prompt": "Die ehrlichste Bewertung für ein Hotel mit einem Stern"
+   "prompt": "Die ehrlichste Bewertung für ein Hotel mit einem Stern",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was in der Geheimakte deiner Grundschullehrerin steht"
+   "prompt": "Was in der Geheimakte deiner Grundschullehrerin steht",
+   "stufe": "familie"
   },
   {
-   "prompt": "Ein Spruch für einen Kühlschrankmagneten, der Leute verwirrt"
+   "prompt": "Ein Spruch für einen Kühlschrankmagneten, der Leute verwirrt",
+   "stufe": "familie"
   },
   {
-   "prompt": "Der schlechteste Moment, um Schluckauf zu bekommen"
+   "prompt": "Der schlechteste Moment, um Schluckauf zu bekommen",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was die Zahnfee mit all den Zähnen macht"
+   "prompt": "Was die Zahnfee mit all den Zähnen macht",
+   "stufe": "familie"
   },
   {
-   "prompt": "Ein Name für eine Sauna für Pinguine"
+   "prompt": "Ein Name für eine Sauna für Pinguine",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was ein Smartphone sagen würde, wenn es kündigen könnte"
+   "prompt": "Was ein Smartphone sagen würde, wenn es kündigen könnte",
+   "stufe": "familie"
   },
   {
-   "prompt": "Das seltsamste Haustier, das man an der Leine ausführen kann"
+   "prompt": "Das seltsamste Haustier, das man an der Leine ausführen kann",
+   "stufe": "familie"
   },
   {
-   "prompt": "Ein Werbeslogan für einen Regenschirm mit Loch"
+   "prompt": "Ein Werbeslogan für einen Regenschirm mit Loch",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was Ritter unter ihrer Rüstung tragen"
+   "prompt": "Was Ritter unter ihrer Rüstung tragen",
+   "stufe": "familie"
   },
   {
-   "prompt": "Die schlechteste Pointe für einen Witz"
+   "prompt": "Die schlechteste Pointe für einen Witz",
+   "stufe": "familie"
   },
   {
-   "prompt": "Ein Grund, warum der Bus nie pünktlich kommt"
+   "prompt": "Ein Grund, warum der Bus nie pünktlich kommt",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was Sockenmonster mit den geklauten Socken machen"
+   "prompt": "Was Sockenmonster mit den geklauten Socken machen",
+   "stufe": "familie"
   },
   {
-   "prompt": "Eine Pizza, die nur Außerirdische bestellen würden"
+   "prompt": "Eine Pizza, die nur Außerirdische bestellen würden",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was man nie auf einen Geburtstagskuchen schreiben sollte"
+   "prompt": "Was man nie auf einen Geburtstagskuchen schreiben sollte",
+   "stufe": "familie"
   },
   {
-   "prompt": "Das erste Gesetz in einem Land, das von Kindern regiert wird"
+   "prompt": "Das erste Gesetz in einem Land, das von Kindern regiert wird",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was ein Leuchtturmwärter in seiner Freizeit macht"
+   "prompt": "Was ein Leuchtturmwärter in seiner Freizeit macht",
+   "stufe": "familie"
   },
   {
-   "prompt": "Der schlechteste Name für eine Fluggesellschaft"
+   "prompt": "Der schlechteste Name für eine Fluggesellschaft",
+   "stufe": "familie"
   },
   {
-   "prompt": "Ein Tanz, der garantiert nie viral geht"
+   "prompt": "Ein Tanz, der garantiert nie viral geht",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was dein Kopfkissen über deine Träume weiß"
+   "prompt": "Was dein Kopfkissen über deine Träume weiß",
+   "stufe": "familie"
   },
   {
-   "prompt": "Ein Gerücht über den Osterhasen"
+   "prompt": "Ein Gerücht über den Osterhasen",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was auf der Rückseite der Mona Lisa steht"
+   "prompt": "Was auf der Rückseite der Mona Lisa steht",
+   "stufe": "familie"
   },
   {
    "prompt": "Die schlimmste Wahl für eine Karaoke-Nacht"
@@ -173,166 +221,211 @@
    "prompt": "Ein Satz, der jede Videokonferenz sofort beendet"
   },
   {
-   "prompt": "Was ein Dinosaurier zum Frühstück bestellt"
+   "prompt": "Was ein Dinosaurier zum Frühstück bestellt",
+   "stufe": "familie"
   },
   {
-   "prompt": "Ein Name für ein Fitnessprogramm für Faule"
+   "prompt": "Ein Name für ein Fitnessprogramm für Faule",
+   "stufe": "familie"
   },
   {
    "prompt": "Was man in einem Escape Room nie finden möchte"
   },
   {
-   "prompt": "Der wahre Grund, warum Katzen Dinge vom Tisch werfen"
+   "prompt": "Der wahre Grund, warum Katzen Dinge vom Tisch werfen",
+   "stufe": "familie"
   },
   {
-   "prompt": "Ein Werbeslogan für eine Zeitmaschine mit Rückfahrschein"
+   "prompt": "Ein Werbeslogan für eine Zeitmaschine mit Rückfahrschein",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was im Nachtschrank eines Vampirs liegt"
+   "prompt": "Was im Nachtschrank eines Vampirs liegt",
+   "stufe": "familie"
   },
   {
-   "prompt": "Ein Hobby für jemanden, der unsterblich ist"
+   "prompt": "Ein Hobby für jemanden, der unsterblich ist",
+   "stufe": "familie"
   },
   {
-   "prompt": "Die unhöflichste Art, sich zu verabschieden"
+   "prompt": "Die unhöflichste Art, sich zu verabschieden",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was die Freiheitsstatue wirklich in der Hand halten wollte"
+   "prompt": "Was die Freiheitsstatue wirklich in der Hand halten wollte",
+   "stufe": "familie"
   },
   {
-   "prompt": "Ein neuer Name für den Montag"
+   "prompt": "Ein neuer Name für den Montag",
+   "stufe": "familie"
   },
   {
-   "prompt": "Der schlechteste Ratschlag von einem Glückskeks"
+   "prompt": "Der schlechteste Ratschlag von einem Glückskeks",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was ein Koch heimlich in jedes Gericht tut"
+   "prompt": "Was ein Koch heimlich in jedes Gericht tut",
+   "stufe": "familie"
   },
   {
-   "prompt": "Eine Erfindung, die das Aufstehen leichter macht"
+   "prompt": "Eine Erfindung, die das Aufstehen leichter macht",
+   "stufe": "familie"
   },
   {
    "prompt": "Was ein Pinguin auf seinen Grabstein schreiben lässt"
   },
   {
-   "prompt": "Ein Lieblingssatz von Bauarbeitern"
+   "prompt": "Ein Lieblingssatz von Bauarbeitern",
+   "stufe": "familie"
   },
   {
-   "prompt": "Der Grund, warum es keine Kühlschränke in der Wüste gibt"
+   "prompt": "Der Grund, warum es keine Kühlschränke in der Wüste gibt",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was ein Ritter sagt, wenn der Drache Urlaub hat"
+   "prompt": "Was ein Ritter sagt, wenn der Drache Urlaub hat",
+   "stufe": "familie"
   },
   {
-   "prompt": "Ein Name für ein Restaurant, in dem nur Suppe serviert wird"
+   "prompt": "Ein Name für ein Restaurant, in dem nur Suppe serviert wird",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was dein Navi sagt, wenn es keine Lust mehr hat"
+   "prompt": "Was dein Navi sagt, wenn es keine Lust mehr hat",
+   "stufe": "familie"
   },
   {
-   "prompt": "Eine Talkshow, in der nur Haustiere zu Gast sind"
+   "prompt": "Eine Talkshow, in der nur Haustiere zu Gast sind",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was in der Zeitung steht, wenn Aliens landen"
+   "prompt": "Was in der Zeitung steht, wenn Aliens landen",
+   "stufe": "familie"
   },
   {
    "prompt": "Eine schlechte Idee für ein Tattoo"
   },
   {
-   "prompt": "Was ein Schaf beim Friseur bestellt"
+   "prompt": "Was ein Schaf beim Friseur bestellt",
+   "stufe": "familie"
   },
   {
    "prompt": "Der seltsamste Grund für eine Krankmeldung"
   },
   {
-   "prompt": "Ein Lied, das Pflanzen schneller wachsen lässt"
+   "prompt": "Ein Lied, das Pflanzen schneller wachsen lässt",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was ein Detektiv im Kühlschrank findet"
+   "prompt": "Was ein Detektiv im Kühlschrank findet",
+   "stufe": "familie"
   },
   {
-   "prompt": "Der Name eines Superhelden, dessen einzige Kraft gutes Parken ist"
+   "prompt": "Der Name eines Superhelden, dessen einzige Kraft gutes Parken ist",
+   "stufe": "familie"
   },
   {
    "prompt": "Was der Kapitän der Titanic eigentlich sagen wollte"
   },
   {
-   "prompt": "Ein Grund, warum Bananen krumm sind"
+   "prompt": "Ein Grund, warum Bananen krumm sind",
+   "stufe": "familie"
   },
   {
    "prompt": "Was im Kleingedruckten beim Hausbau steht"
   },
   {
-   "prompt": "Eine neue Sportart mit Gummienten"
+   "prompt": "Eine neue Sportart mit Gummienten",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was man zu einem Geist sagt, der nicht ausziehen will"
+   "prompt": "Was man zu einem Geist sagt, der nicht ausziehen will",
+   "stufe": "familie"
   },
   {
-   "prompt": "Ein neues Schulfach, das alle lieben würden"
+   "prompt": "Ein neues Schulfach, das alle lieben würden",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was ein Toaster einem Brot ins Ohr flüstert"
+   "prompt": "Was ein Toaster einem Brot ins Ohr flüstert",
+   "stufe": "familie"
   },
   {
-   "prompt": "Das unpassendste Kostüm für einen Kindergeburtstag"
+   "prompt": "Das unpassendste Kostüm für einen Kindergeburtstag",
+   "stufe": "familie"
   },
   {
-   "prompt": "Ein Name für einen Hamster, der in die Politik geht"
+   "prompt": "Ein Name für einen Hamster, der in die Politik geht",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was ein Astronaut auf dem Mond vergessen hat"
+   "prompt": "Was ein Astronaut auf dem Mond vergessen hat",
+   "stufe": "familie"
   },
   {
-   "prompt": "Die schlechteste Belohnung für einen Helden"
+   "prompt": "Die schlechteste Belohnung für einen Helden",
+   "stufe": "familie"
   },
   {
    "prompt": "Was die Großeltern heimlich im Internet machen"
   },
   {
-   "prompt": "Ein neuer Feiertag nur für Katzen"
+   "prompt": "Ein neuer Feiertag nur für Katzen",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was im Rucksack eines Bergsteigers auf keinen Fall fehlen darf"
+   "prompt": "Was im Rucksack eines Bergsteigers auf keinen Fall fehlen darf",
+   "stufe": "familie"
   },
   {
-   "prompt": "Ein Satz, mit dem man jede Party rettet"
+   "prompt": "Ein Satz, mit dem man jede Party rettet",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was Wolken voneinander denken"
+   "prompt": "Was Wolken voneinander denken",
+   "stufe": "familie"
   },
   {
-   "prompt": "Ein Werbespruch für unsichtbare Farbe"
+   "prompt": "Ein Werbespruch für unsichtbare Farbe",
+   "stufe": "familie"
   },
   {
-   "prompt": "Die schlechteste Musik für einen Horrorfilm"
+   "prompt": "Die schlechteste Musik für einen Horrorfilm",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was in einem Brief an dein zukünftiges Ich steht"
+   "prompt": "Was in einem Brief an dein zukünftiges Ich steht",
+   "stufe": "familie"
   },
   {
-   "prompt": "Ein Name für eine Band, die nur aus Küchengeräten besteht"
+   "prompt": "Ein Name für eine Band, die nur aus Küchengeräten besteht",
+   "stufe": "familie"
   },
   {
    "prompt": "Was ein Gespenst bei einer Gehaltsverhandlung sagt"
   },
   {
-   "prompt": "Die seltsamste Regel in einem Schwimmbad"
+   "prompt": "Die seltsamste Regel in einem Schwimmbad",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was ein Papagei verrät, wenn er zu viel gehört hat"
+   "prompt": "Was ein Papagei verrät, wenn er zu viel gehört hat",
+   "stufe": "familie"
   },
   {
    "prompt": "Eine schlechte Idee für eine Hochzeitsreise"
   },
   {
-   "prompt": "Ein Gericht, das nur in Märchen serviert wird"
+   "prompt": "Ein Gericht, das nur in Märchen serviert wird",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was dein Fahrrad über dich erzählt"
+   "prompt": "Was dein Fahrrad über dich erzählt",
+   "stufe": "familie"
   },
   {
-   "prompt": "Der Name eines Shampoos für Bärte von Weihnachtsmännern"
+   "prompt": "Der Name eines Shampoos für Bärte von Weihnachtsmännern",
+   "stufe": "familie"
   },
   {
    "prompt": "Was man im Wartezimmer beim Arzt besser nicht sagt"
@@ -341,25 +434,192 @@
    "prompt": "Ein Tipp für ein unvergessliches erstes Date im Supermarkt"
   },
   {
-   "prompt": "Das ehrlichste Etikett auf einer Schokoladentafel"
+   "prompt": "Das ehrlichste Etikett auf einer Schokoladentafel",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was ein Wal beim Singen eigentlich singt"
+   "prompt": "Was ein Wal beim Singen eigentlich singt",
+   "stufe": "familie"
   },
   {
-   "prompt": "Ein Grund, warum man nie mit Eichhörnchen wetten sollte"
+   "prompt": "Ein Grund, warum man nie mit Eichhörnchen wetten sollte",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was der letzte Satz in einem sehr schlechten Krimi ist"
+   "prompt": "Was der letzte Satz in einem sehr schlechten Krimi ist",
+   "stufe": "familie"
   },
   {
-   "prompt": "Ein neues Spiel für den Kindergeburtstag mit großem Chaos"
+   "prompt": "Ein neues Spiel für den Kindergeburtstag mit großem Chaos",
+   "stufe": "familie"
   },
   {
-   "prompt": "Was Drachen sammeln, wenn sie kein Gold finden"
+   "prompt": "Was Drachen sammeln, wenn sie kein Gold finden",
+   "stufe": "familie"
   },
   {
-   "prompt": "Der schlimmste Satz, den man einem Koch sagen kann"
+   "prompt": "Der schlimmste Satz, den man einem Koch sagen kann",
+   "stufe": "familie"
+  },
+  {
+   "prompt": "Der schlechteste Spruch, um nach einem Date noch auf einen Kaffee mit reinzukommen",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Was in der Nachricht steht, die man um 3 Uhr nachts besser nicht abschickt",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Die ehrlichste Antwort auf „Was machst du am Wochenende?“",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Der schlechteste Name für einen Cocktail",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Was dein Kater am Sonntagmorgen zu dir sagt",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Das Peinlichste, was man beim ersten Treffen mit den Schwiegereltern sagen kann",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Ein ehrlicher Text für ein Dating-Profil",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Was der Türsteher wirklich denkt, wenn er dich ansieht",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Die schlechteste Ausrede, warum du nicht zurückgeschrieben hast",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Was auf dem T-Shirt beim Junggesellenabschied auf keinen Fall stehen sollte",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Der schlimmste Song für einen ersten Kuss",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Was man auf einer Firmenfeier nach dem dritten Glas besser nicht sagt",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Der wahre Grund, warum der Ex sich wieder meldet",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Ein Name für eine Bar, in die niemand gehen will",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Was im Gruppenchat steht, wenn du die Party früh verlässt",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Die ehrlichste Bewertung deines letzten Dates in fünf Wörtern",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Was man nie beim Speed-Dating fragen sollte",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Das schlechteste Mitbringsel zu einer Einweihungsparty",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Ein Trinkspiel, das sofort verboten wurde",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Was deine Nachbarn über deine letzte Party erzählen",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Die ungünstigste Person, die dich beim Tanzen filmt",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Was du nach einer langen Nacht im Kühlschrank findest",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Der schlechteste Grund, Schluss zu machen",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Eine Dating-App nur für sehr spezielle Menschen heißt …",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Was man nie in eine Hochzeitsrede einbauen sollte",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Der Satz, der jede Flirt-Situation sofort beendet",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Was der Taxifahrer um 4 Uhr nachts schon alles gehört hat",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Ein ehrlicher Name für einen Kater-Drink",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Was in einer Sprachnachricht steht, die man am nächsten Morgen löscht",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Das schlechteste Kompliment, das man jemandem machen kann",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Was du sagst, wenn dich dein Chef im Club entdeckt",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Ein Grund, warum der Mitbewohner auszieht",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Was auf dem Handy-Hintergrund steht, wenn man frisch verliebt ist",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Die peinlichste Sache, die beim Elternabend auffliegen kann",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Das ehrlichste Motto für einen Mädels- oder Jungsabend",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Was man im Fitnessstudio auf keinen Fall laut sagen sollte",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Was Oma wirklich über deine neue Frisur denkt",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Die schlechteste Ausrede, warum du zu spät zur eigenen Party kommst",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Was in der Abschlusszeitung über dich stehen würde",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "Der schlechteste Moment für einen Heiratsantrag",
+   "stufe": "frech"
   }
  ]
 }

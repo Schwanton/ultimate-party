@@ -1,53 +1,66 @@
 {
  "name": "Extra",
  "author": "UP!",
- "version": "1.0.0",
+ "version": "1.1.0",
  "description": "Even more odd prompts",
  "items": [
   {
-   "prompt": "The worst name for a fancy restaurant"
+   "prompt": "The worst name for a fancy restaurant",
+   "stufe": "familie"
   },
   {
-   "prompt": "What a vacuum cleaner dreams about"
+   "prompt": "What a vacuum cleaner dreams about",
+   "stufe": "familie"
   },
   {
-   "prompt": "The first thing you'd say if you met a unicorn"
+   "prompt": "The first thing you'd say if you met a unicorn",
+   "stufe": "familie"
   },
   {
-   "prompt": "An ad slogan for flavorless water"
+   "prompt": "An ad slogan for flavorless water",
+   "stufe": "familie"
   },
   {
-   "prompt": "What your pet tells others about you behind your back"
+   "prompt": "What your pet tells others about you behind your back",
+   "stufe": "familie"
   },
   {
-   "prompt": "A sign you never want to see on a front door"
+   "prompt": "A sign you never want to see on a front door",
+   "stufe": "familie"
   },
   {
-   "prompt": "The worst announcement on a plane"
+   "prompt": "The worst announcement on a plane",
+   "stufe": "familie"
   },
   {
-   "prompt": "A new name for broccoli so kids will eat it"
+   "prompt": "A new name for broccoli so kids will eat it",
+   "stufe": "familie"
   },
   {
-   "prompt": "What the instruction manual for Mondays says"
+   "prompt": "What the instruction manual for Mondays says",
+   "stufe": "familie"
   },
   {
-   "prompt": "The real reason zebras have stripes"
+   "prompt": "The real reason zebras have stripes",
+   "stufe": "familie"
   },
   {
    "prompt": "A song you should never play at a wedding"
   },
   {
-   "prompt": "What a cactus says when it wants a hug"
+   "prompt": "What a cactus says when it wants a hug",
+   "stufe": "familie"
   },
   {
    "prompt": "The most awkward thing to say at a goldfish funeral"
   },
   {
-   "prompt": "The worst business idea of all time"
+   "prompt": "The worst business idea of all time",
+   "stufe": "familie"
   },
   {
-   "prompt": "What your neighbor is really doing in the garage"
+   "prompt": "What your neighbor is really doing in the garage",
+   "stufe": "familie"
   },
   {
    "prompt": "A title for an action movie about retirees"
@@ -56,115 +69,150 @@
    "prompt": "The most embarrassing thing that could happen in a job interview"
   },
   {
-   "prompt": "What snowmen do in summer"
+   "prompt": "What snowmen do in summer",
+   "stufe": "familie"
   },
   {
-   "prompt": "A new toothpaste flavor"
+   "prompt": "A new toothpaste flavor",
+   "stufe": "familie"
   },
   {
    "prompt": "What a supervillain's vacation T-shirt says"
   },
   {
-   "prompt": "The worst password in the world"
+   "prompt": "The worst password in the world",
+   "stufe": "familie"
   },
   {
-   "prompt": "Proof that the Earth is actually flat"
+   "prompt": "Proof that the Earth is actually flat",
+   "stufe": "familie"
   },
   {
    "prompt": "Something you should never write in a dating profile"
   },
   {
-   "prompt": "The first question a baby would ask if it could talk"
+   "prompt": "The first question a baby would ask if it could talk",
+   "stufe": "familie"
   },
   {
-   "prompt": "What a shark says at the dentist"
+   "prompt": "What a shark says at the dentist",
+   "stufe": "familie"
   },
   {
-   "prompt": "A name for a boy band made of grandpas"
+   "prompt": "A name for a boy band made of grandpas",
+   "stufe": "familie"
   },
   {
-   "prompt": "What the Knights of the Round Table actually talked about"
+   "prompt": "What the Knights of the Round Table actually talked about",
+   "stufe": "familie"
   },
   {
-   "prompt": "A fancy name for a dish made only of leftovers"
+   "prompt": "A fancy name for a dish made only of leftovers",
+   "stufe": "familie"
   },
   {
-   "prompt": "What you say when a bear asks you for directions"
+   "prompt": "What you say when a bear asks you for directions",
+   "stufe": "familie"
   },
   {
-   "prompt": "The most boring roller coaster in the world is called …"
+   "prompt": "The most boring roller coaster in the world is called …",
+   "stufe": "familie"
   },
   {
-   "prompt": "A new Olympic sport for couch potatoes"
+   "prompt": "A new Olympic sport for couch potatoes",
+   "stufe": "familie"
   },
   {
-   "prompt": "What a Viking says at IKEA"
+   "prompt": "What a Viking says at IKEA",
+   "stufe": "familie"
   },
   {
-   "prompt": "The most honest review of a one-star hotel"
+   "prompt": "The most honest review of a one-star hotel",
+   "stufe": "familie"
   },
   {
-   "prompt": "What's in your primary school teacher's secret file"
+   "prompt": "What's in your primary school teacher's secret file",
+   "stufe": "familie"
   },
   {
-   "prompt": "A fridge magnet slogan that confuses people"
+   "prompt": "A fridge magnet slogan that confuses people",
+   "stufe": "familie"
   },
   {
-   "prompt": "The worst moment to get hiccups"
+   "prompt": "The worst moment to get hiccups",
+   "stufe": "familie"
   },
   {
-   "prompt": "What the tooth fairy does with all those teeth"
+   "prompt": "What the tooth fairy does with all those teeth",
+   "stufe": "familie"
   },
   {
-   "prompt": "A name for a sauna for penguins"
+   "prompt": "A name for a sauna for penguins",
+   "stufe": "familie"
   },
   {
-   "prompt": "What your smartphone would say if it could quit"
+   "prompt": "What your smartphone would say if it could quit",
+   "stufe": "familie"
   },
   {
-   "prompt": "The strangest pet you could walk on a leash"
+   "prompt": "The strangest pet you could walk on a leash",
+   "stufe": "familie"
   },
   {
-   "prompt": "An ad slogan for an umbrella with a hole"
+   "prompt": "An ad slogan for an umbrella with a hole",
+   "stufe": "familie"
   },
   {
-   "prompt": "What knights wear under their armor"
+   "prompt": "What knights wear under their armor",
+   "stufe": "familie"
   },
   {
-   "prompt": "The worst punchline for a joke"
+   "prompt": "The worst punchline for a joke",
+   "stufe": "familie"
   },
   {
-   "prompt": "The real reason the bus is never on time"
+   "prompt": "The real reason the bus is never on time",
+   "stufe": "familie"
   },
   {
-   "prompt": "What sock monsters do with the stolen socks"
+   "prompt": "What sock monsters do with the stolen socks",
+   "stufe": "familie"
   },
   {
-   "prompt": "A pizza only aliens would order"
+   "prompt": "A pizza only aliens would order",
+   "stufe": "familie"
   },
   {
-   "prompt": "Something you should never write on a birthday cake"
+   "prompt": "Something you should never write on a birthday cake",
+   "stufe": "familie"
   },
   {
-   "prompt": "The first law in a country run by kids"
+   "prompt": "The first law in a country run by kids",
+   "stufe": "familie"
   },
   {
-   "prompt": "What a lighthouse keeper does for fun"
+   "prompt": "What a lighthouse keeper does for fun",
+   "stufe": "familie"
   },
   {
-   "prompt": "The worst name for an airline"
+   "prompt": "The worst name for an airline",
+   "stufe": "familie"
   },
   {
-   "prompt": "A dance that will never go viral"
+   "prompt": "A dance that will never go viral",
+   "stufe": "familie"
   },
   {
-   "prompt": "What your pillow knows about your dreams"
+   "prompt": "What your pillow knows about your dreams",
+   "stufe": "familie"
   },
   {
-   "prompt": "A rumor about the Easter Bunny"
+   "prompt": "A rumor about the Easter Bunny",
+   "stufe": "familie"
   },
   {
-   "prompt": "What's written on the back of the Mona Lisa"
+   "prompt": "What's written on the back of the Mona Lisa",
+   "stufe": "familie"
   },
   {
    "prompt": "The worst song choice for karaoke night"
@@ -173,166 +221,211 @@
    "prompt": "A sentence that instantly ends any video call"
   },
   {
-   "prompt": "What a dinosaur orders for breakfast"
+   "prompt": "What a dinosaur orders for breakfast",
+   "stufe": "familie"
   },
   {
-   "prompt": "A name for a workout program for lazy people"
+   "prompt": "A name for a workout program for lazy people",
+   "stufe": "familie"
   },
   {
    "prompt": "Something you never want to find in an escape room"
   },
   {
-   "prompt": "The real reason cats knock things off tables"
+   "prompt": "The real reason cats knock things off tables",
+   "stufe": "familie"
   },
   {
-   "prompt": "An ad slogan for a time machine with a return ticket"
+   "prompt": "An ad slogan for a time machine with a return ticket",
+   "stufe": "familie"
   },
   {
-   "prompt": "What's in a vampire's nightstand"
+   "prompt": "What's in a vampire's nightstand",
+   "stufe": "familie"
   },
   {
-   "prompt": "A hobby for someone who's immortal"
+   "prompt": "A hobby for someone who's immortal",
+   "stufe": "familie"
   },
   {
-   "prompt": "The rudest way to say goodbye"
+   "prompt": "The rudest way to say goodbye",
+   "stufe": "familie"
   },
   {
-   "prompt": "What the Statue of Liberty really wanted to hold"
+   "prompt": "What the Statue of Liberty really wanted to hold",
+   "stufe": "familie"
   },
   {
-   "prompt": "A new name for Monday"
+   "prompt": "A new name for Monday",
+   "stufe": "familie"
   },
   {
-   "prompt": "The worst advice from a fortune cookie"
+   "prompt": "The worst advice from a fortune cookie",
+   "stufe": "familie"
   },
   {
-   "prompt": "What a chef secretly puts in every dish"
+   "prompt": "What a chef secretly puts in every dish",
+   "stufe": "familie"
   },
   {
-   "prompt": "An invention that makes getting up easier"
+   "prompt": "An invention that makes getting up easier",
+   "stufe": "familie"
   },
   {
    "prompt": "What a penguin wants on its gravestone"
   },
   {
-   "prompt": "A construction worker's favorite saying"
+   "prompt": "A construction worker's favorite saying",
+   "stufe": "familie"
   },
   {
-   "prompt": "Why there are no fridges in the desert"
+   "prompt": "Why there are no fridges in the desert",
+   "stufe": "familie"
   },
   {
-   "prompt": "What a knight says when the dragon is on vacation"
+   "prompt": "What a knight says when the dragon is on vacation",
+   "stufe": "familie"
   },
   {
-   "prompt": "A name for a restaurant that only serves soup"
+   "prompt": "A name for a restaurant that only serves soup",
+   "stufe": "familie"
   },
   {
-   "prompt": "What your GPS says when it's had enough"
+   "prompt": "What your GPS says when it's had enough",
+   "stufe": "familie"
   },
   {
-   "prompt": "A talk show where only pets are guests"
+   "prompt": "A talk show where only pets are guests",
+   "stufe": "familie"
   },
   {
-   "prompt": "The newspaper headline when aliens land"
+   "prompt": "The newspaper headline when aliens land",
+   "stufe": "familie"
   },
   {
    "prompt": "A bad idea for a tattoo"
   },
   {
-   "prompt": "What a sheep orders at the hairdresser"
+   "prompt": "What a sheep orders at the hairdresser",
+   "stufe": "familie"
   },
   {
    "prompt": "The strangest excuse for calling in sick"
   },
   {
-   "prompt": "A song that makes plants grow faster"
+   "prompt": "A song that makes plants grow faster",
+   "stufe": "familie"
   },
   {
-   "prompt": "What a detective finds in the fridge"
+   "prompt": "What a detective finds in the fridge",
+   "stufe": "familie"
   },
   {
-   "prompt": "The name of a superhero whose only power is great parking"
+   "prompt": "The name of a superhero whose only power is great parking",
+   "stufe": "familie"
   },
   {
    "prompt": "What the captain of the Titanic actually meant to say"
   },
   {
-   "prompt": "The reason bananas are curved"
+   "prompt": "The reason bananas are curved",
+   "stufe": "familie"
   },
   {
    "prompt": "What the small print says when you build a house"
   },
   {
-   "prompt": "A new sport played with rubber ducks"
+   "prompt": "A new sport played with rubber ducks",
+   "stufe": "familie"
   },
   {
-   "prompt": "What you say to a ghost that won't move out"
+   "prompt": "What you say to a ghost that won't move out",
+   "stufe": "familie"
   },
   {
-   "prompt": "A new school subject everyone would love"
+   "prompt": "A new school subject everyone would love",
+   "stufe": "familie"
   },
   {
-   "prompt": "What a toaster whispers to the bread"
+   "prompt": "What a toaster whispers to the bread",
+   "stufe": "familie"
   },
   {
-   "prompt": "The most inappropriate costume for a kid's birthday party"
+   "prompt": "The most inappropriate costume for a kid's birthday party",
+   "stufe": "familie"
   },
   {
-   "prompt": "A name for a hamster running for office"
+   "prompt": "A name for a hamster running for office",
+   "stufe": "familie"
   },
   {
-   "prompt": "What an astronaut forgot on the moon"
+   "prompt": "What an astronaut forgot on the moon",
+   "stufe": "familie"
   },
   {
-   "prompt": "The worst reward for a hero"
+   "prompt": "The worst reward for a hero",
+   "stufe": "familie"
   },
   {
    "prompt": "What grandparents secretly do on the internet"
   },
   {
-   "prompt": "A new holiday just for cats"
+   "prompt": "A new holiday just for cats",
+   "stufe": "familie"
   },
   {
-   "prompt": "Something a mountain climber must never forget to pack"
+   "prompt": "Something a mountain climber must never forget to pack",
+   "stufe": "familie"
   },
   {
-   "prompt": "A sentence that saves any party"
+   "prompt": "A sentence that saves any party",
+   "stufe": "familie"
   },
   {
-   "prompt": "What clouds think of each other"
+   "prompt": "What clouds think of each other",
+   "stufe": "familie"
   },
   {
-   "prompt": "An ad slogan for invisible paint"
+   "prompt": "An ad slogan for invisible paint",
+   "stufe": "familie"
   },
   {
-   "prompt": "The worst music for a horror movie"
+   "prompt": "The worst music for a horror movie",
+   "stufe": "familie"
   },
   {
-   "prompt": "What's in a letter to your future self"
+   "prompt": "What's in a letter to your future self",
+   "stufe": "familie"
   },
   {
-   "prompt": "A name for a band made entirely of kitchen appliances"
+   "prompt": "A name for a band made entirely of kitchen appliances",
+   "stufe": "familie"
   },
   {
    "prompt": "What a ghost says when negotiating a raise"
   },
   {
-   "prompt": "The strangest rule at a swimming pool"
+   "prompt": "The strangest rule at a swimming pool",
+   "stufe": "familie"
   },
   {
-   "prompt": "What a parrot reveals after hearing too much"
+   "prompt": "What a parrot reveals after hearing too much",
+   "stufe": "familie"
   },
   {
    "prompt": "A bad idea for a honeymoon"
   },
   {
-   "prompt": "A dish that's only served in fairy tales"
+   "prompt": "A dish that's only served in fairy tales",
+   "stufe": "familie"
   },
   {
-   "prompt": "What your bicycle says about you"
+   "prompt": "What your bicycle says about you",
+   "stufe": "familie"
   },
   {
-   "prompt": "The name of a beard shampoo for Santa"
+   "prompt": "The name of a beard shampoo for Santa",
+   "stufe": "familie"
   },
   {
    "prompt": "Something you shouldn't say in a doctor's waiting room"
@@ -341,25 +434,192 @@
    "prompt": "A tip for an unforgettable first date at the supermarket"
   },
   {
-   "prompt": "The most honest label on a chocolate bar"
+   "prompt": "The most honest label on a chocolate bar",
+   "stufe": "familie"
   },
   {
-   "prompt": "What whales are actually singing about"
+   "prompt": "What whales are actually singing about",
+   "stufe": "familie"
   },
   {
-   "prompt": "Why you should never bet against a squirrel"
+   "prompt": "Why you should never bet against a squirrel",
+   "stufe": "familie"
   },
   {
-   "prompt": "The last line of a really bad detective novel"
+   "prompt": "The last line of a really bad detective novel",
+   "stufe": "familie"
   },
   {
-   "prompt": "A new party game that causes total chaos"
+   "prompt": "A new party game that causes total chaos",
+   "stufe": "familie"
   },
   {
-   "prompt": "What dragons collect when they can't find gold"
+   "prompt": "What dragons collect when they can't find gold",
+   "stufe": "familie"
   },
   {
-   "prompt": "The worst thing you can say to a chef"
+   "prompt": "The worst thing you can say to a chef",
+   "stufe": "familie"
+  },
+  {
+   "prompt": "The worst line to get invited in for coffee after a date",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "What's in the message you'd better not send at 3 a.m.",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "The most honest answer to “Any plans for the weekend?”",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "The worst name for a cocktail",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "What your hangover says to you on Sunday morning",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "The most embarrassing thing to say when meeting the in-laws",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "An honest dating profile text",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "What the bouncer really thinks when he looks at you",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "The worst excuse for not texting back",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "What should never be printed on a stag or hen party T-shirt",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "The worst song for a first kiss",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "What you'd better not say at the office party after the third drink",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "The real reason your ex gets back in touch",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "A name for a bar nobody wants to go to",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "What the group chat says when you leave the party early",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "An honest five-word review of your last date",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "What you should never ask at speed dating",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "The worst housewarming gift",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "A drinking game that was banned immediately",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "What your neighbours say about your last party",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "The worst person to catch you dancing on camera",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "What you find in the fridge after a long night out",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "The worst reason to break up",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "A dating app for very particular people is called …",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "What you should never put in a wedding speech",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "The sentence that ends any flirt instantly",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "What the taxi driver has heard at 4 a.m.",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "An honest name for a hangover drink",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "What's in the voice message you delete the next morning",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "The worst compliment you can give someone",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "What you say when your boss spots you at a club",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "A reason your flatmate moves out",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "What's on your phone background when you're freshly in love",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "The most embarrassing thing that can come out at a parents' evening",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "The most honest motto for a girls' or boys' night out",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "What you should never say out loud at the gym",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "What Grandma really thinks of your new haircut",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "The worst excuse for being late to your own party",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "What the yearbook would say about you",
+   "stufe": "frech"
+  },
+  {
+   "prompt": "The worst moment for a marriage proposal",
+   "stufe": "frech"
   }
  ]
 }

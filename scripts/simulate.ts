@@ -140,6 +140,12 @@ const scenarios: { game: string; players: number; options?: Record<string, numbe
   { game: 'tank-trouble', players: 2, options: { difficulty: 'schwer' } },
   { game: 'murmel-mayhem', players: 3, options: { rounds: 3, track: 'turm' } },
   { game: 'guess-the-clicks', players: 3, options: { theme: 'music', views: 'known', videos: 3 } },
+  { game: 'mainstream', players: 4, options: { rounds: 4, stufe: 'familie' } },
+  { game: 'mainstream', players: 4, options: { rounds: 6, stufe: 'frech' } },
+  { game: 'wer-wars', players: 4, options: { rounds: 2, stufe: 'frech', ownQuestions: 'on' } },
+  { game: 'wer-wars', players: 3, options: { rounds: 2, stufe: 'familie' } },
+  { game: 'mic-drop', players: 5, options: { rounds: 2, stufe: 'familie', ownQuestions: 'on' } },
+  { game: 'mic-drop', players: 14, options: { rounds: 2, stufe: 'frech', ownQuestions: 'on' } },
 ];
 // Olympia-Modus: mehrere Spiele hintereinander mit Medaillen (npm test -- olympia)
 const olympiaScenarios: { players: number; settings: Record<string, unknown>; list?: string[] }[] = [

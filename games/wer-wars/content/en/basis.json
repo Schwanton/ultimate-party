@@ -1,7 +1,7 @@
 {
  "name": "Basics",
  "author": "UP!",
- "version": "1.0.0",
+ "version": "1.1.0",
  "description": "Personal questions for groups who know each other (a bit).",
  "items": [
   {
@@ -10,15 +10,18 @@
   },
   {
    "id": "w2",
-   "question": "What did you want to be as a kid?"
+   "question": "What did you want to be as a kid?",
+   "stufe": "familie"
   },
   {
    "id": "w3",
-   "question": "What's your weirdest talent?"
+   "question": "What's your weirdest talent?",
+   "stufe": "familie"
   },
   {
    "id": "w4",
-   "question": "What food could you eat every day?"
+   "question": "What food could you eat every day?",
+   "stufe": "familie"
   },
   {
    "id": "w5",
@@ -30,7 +33,8 @@
   },
   {
    "id": "w7",
-   "question": "What were you afraid of as a kid?"
+   "question": "What were you afraid of as a kid?",
+   "stufe": "familie"
   },
   {
    "id": "w8",
@@ -50,7 +54,8 @@
   },
   {
    "id": "w12",
-   "question": "Where would you rather be right now?"
+   "question": "Where would you rather be right now?",
+   "stufe": "familie"
   },
   {
    "id": "w13",
@@ -58,11 +63,13 @@
   },
   {
    "id": "w14",
-   "question": "Which animal would you be – and why?"
+   "question": "Which animal would you be – and why?",
+   "stufe": "familie"
   },
   {
    "id": "w15",
-   "question": "What's your biggest dating no-go?"
+   "question": "What's your biggest dating no-go?",
+   "stufe": "frech"
   },
   {
    "id": "w16",
@@ -102,11 +109,13 @@
   },
   {
    "id": "w25",
-   "question": "What's your favorite sound?"
+   "question": "What's your favorite sound?",
+   "stufe": "familie"
   },
   {
    "id": "w26",
-   "question": "Which skill would you like to learn overnight?"
+   "question": "Which skill would you like to learn overnight?",
+   "stufe": "familie"
   },
   {
    "id": "w27",
@@ -130,7 +139,8 @@
   },
   {
    "id": "w32",
-   "question": "Who would you swap lives with for a day?"
+   "question": "Who would you swap lives with for a day?",
+   "stufe": "familie"
   },
   {
    "id": "w33",
@@ -150,7 +160,8 @@
   },
   {
    "id": "w37",
-   "question": "What would you take to a desert island?"
+   "question": "What would you take to a desert island?",
+   "stufe": "familie"
   },
   {
    "id": "w38",
@@ -158,7 +169,8 @@
   },
   {
    "id": "w39",
-   "question": "What's the most absurd dream you remember?"
+   "question": "What's the most absurd dream you remember?",
+   "stufe": "familie"
   },
   {
    "id": "w40",

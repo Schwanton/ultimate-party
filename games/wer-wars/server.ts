@@ -6,12 +6,13 @@
  * Punkte: richtig geraten 500, als Autor 200 für jeden, der falsch geraten hat. Letzte Runde ×2.
  */
 
-import { INPUT_GRACE, Scores, cleanText, pick, shuffle, type GameContext, type GameServerModule } from '@up/sdk';
+import { INPUT_GRACE, Scores, cleanText, drawByStufe, mixOwnQuestions, ownQuestionsPhase, pick, shuffle, stufeOf, type GameContext, type GameServerModule } from '@up/sdk';
 import { votersSeconds } from './timing';
 
 interface Item {
   id: string;
   question: string;
+  stufe?: string;
 }
 
 const T = { intro: 8, write: 60, assignBase: 25, assignPer: 9, assignMax: 120, lastChance: 5, after: 4 };
@@ -24,7 +25,11 @@ export default {
     const scores = new Scores(ids);
     const totalRounds = Number(ctx.options.rounds) || 3;
     const wf = Number(ctx.options.writeTime) || 1;
-    const questions = ctx.deck<Item>().drawMany(totalRounds);
+    let questions = drawByStufe<Item>(ctx, stufeOf(ctx.options.stufe), totalRounds);
+    const own = ownQuestionsPhase(ctx, { ids, kind: 'question', maxLength: 90, onDone: (qs) => {
+      questions = mixOwnQuestions(questions, qs, (q) => ({ id: `own-${q.authorId}`, question: q.text }));
+      nextRound();
+    } });
     let round = -1;
     let answers = new Map<string, string>();
     /** nicht abgeschickte Antworten – zählen bei Zeitablauf */
@@ -48,7 +53,7 @@ export default {
     function intro() {
       ctx.setHostView({ screen: 'intro' });
       ctx.setAllPlayerViews(() => ({ screen: 'intro' }));
-      ctx.after(T.intro, nextRound);
+      ctx.after(T.intro, () => (ctx.options.ownQuestions === 'on' ? own.start() : nextRound()));
     }
 
     function nextRound() {
@@ -177,6 +182,7 @@ export default {
       start: intro,
       onAction(id, action) {
         if (!action || !ids.includes(id)) return;
+        if (own.onAction(id, action)) return;
         if (action.type === 'answer' && phase === 'write' && !answers.has(id)) {
           const text = cleanText(String(action.text ?? ''), MAX_LEN);
           if (!text) return;
@@ -215,6 +221,7 @@ export default {
         }
       },
       bot(id, view) {
+        if (view.screen === 'ownQuestions') return own.bot(id, view);
         if (view.screen === 'write') {
           const pool = ctx.lang === 'de'
             ? ['Pizza um 3 Uhr nachts', 'Mein Nachbar weiß das', 'Ein Einhorn-Kostüm', 'Ich habe geweint', 'Nie wieder Karaoke', 'Mit meiner Oma']

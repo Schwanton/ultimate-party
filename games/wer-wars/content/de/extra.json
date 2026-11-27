@@ -1,7 +1,7 @@
 {
  "name": "Extra",
  "author": "UP!",
- "version": "1.0.0",
+ "version": "1.1.0",
  "description": "Noch mehr persönliche Fragen",
  "items": [
   {
@@ -14,7 +14,8 @@
   },
   {
    "id": "wx3",
-   "question": "Was war dein liebstes Spielzeug als Kind?"
+   "question": "Was war dein liebstes Spielzeug als Kind?",
+   "stufe": "familie"
   },
   {
    "id": "wx4",
@@ -26,7 +27,8 @@
   },
   {
    "id": "wx6",
-   "question": "Welches Lied singst du unter der Dusche?"
+   "question": "Welches Lied singst du unter der Dusche?",
+   "stufe": "familie"
   },
   {
    "id": "wx7",
@@ -34,7 +36,8 @@
   },
   {
    "id": "wx8",
-   "question": "Welchen Gegenstand verlierst du ständig?"
+   "question": "Welchen Gegenstand verlierst du ständig?",
+   "stufe": "familie"
   },
   {
    "id": "wx9",
@@ -42,15 +45,18 @@
   },
   {
    "id": "wx10",
-   "question": "Welche Superkraft hättest du gerne – aber eine nutzlose?"
+   "question": "Welche Superkraft hättest du gerne – aber eine nutzlose?",
+   "stufe": "familie"
   },
   {
    "id": "wx11",
-   "question": "Was ist das Erste, das du morgens machst?"
+   "question": "Was ist das Erste, das du morgens machst?",
+   "stufe": "familie"
   },
   {
    "id": "wx12",
-   "question": "Welcher Geruch erinnert dich an deine Kindheit?"
+   "question": "Welcher Geruch erinnert dich an deine Kindheit?",
+   "stufe": "familie"
   },
   {
    "id": "wx13",
@@ -62,7 +68,8 @@
   },
   {
    "id": "wx15",
-   "question": "Was ist dein schlechtester Witz?"
+   "question": "Was ist dein schlechtester Witz?",
+   "stufe": "familie"
   },
   {
    "id": "wx16",
@@ -82,7 +89,8 @@
   },
   {
    "id": "wx20",
-   "question": "Was ist dein liebstes Emoji?"
+   "question": "Was ist dein liebstes Emoji?",
+   "stufe": "familie"
   },
   {
    "id": "wx21",
@@ -90,19 +98,23 @@
   },
   {
    "id": "wx22",
-   "question": "Welches Spiel hast du als Kind immer gewonnen?"
+   "question": "Welches Spiel hast du als Kind immer gewonnen?",
+   "stufe": "familie"
   },
   {
    "id": "wx23",
-   "question": "Was würdest du tun, wenn du einen Tag unsichtbar wärst?"
+   "question": "Was würdest du tun, wenn du einen Tag unsichtbar wärst?",
+   "stufe": "familie"
   },
   {
    "id": "wx24",
-   "question": "Was ist dein Lieblingswort?"
+   "question": "Was ist dein Lieblingswort?",
+   "stufe": "familie"
   },
   {
    "id": "wx25",
-   "question": "Welches Tier hattest du – oder wolltest du immer haben?"
+   "question": "Welches Tier hattest du – oder wolltest du immer haben?",
+   "stufe": "familie"
   },
   {
    "id": "wx26",
@@ -114,7 +126,8 @@
   },
   {
    "id": "wx28",
-   "question": "Was ist dein Lieblingsort in deiner Stadt?"
+   "question": "Was ist dein Lieblingsort in deiner Stadt?",
+   "stufe": "familie"
   },
   {
    "id": "wx29",
@@ -122,7 +135,8 @@
   },
   {
    "id": "wx30",
-   "question": "Welches Talent hättest du gerne?"
+   "question": "Welches Talent hättest du gerne?",
+   "stufe": "familie"
   },
   {
    "id": "wx31",
@@ -134,7 +148,8 @@
   },
   {
    "id": "wx33",
-   "question": "Welche Erfindung fehlt der Welt noch?"
+   "question": "Welche Erfindung fehlt der Welt noch?",
+   "stufe": "familie"
   },
   {
    "id": "wx34",
@@ -142,7 +157,8 @@
   },
   {
    "id": "wx35",
-   "question": "Worüber kannst du stundenlang reden?"
+   "question": "Worüber kannst du stundenlang reden?",
+   "stufe": "familie"
   },
   {
    "id": "wx36",
@@ -170,7 +186,8 @@
   },
   {
    "id": "wx42",
-   "question": "Was ist dein Lieblingsgeruch?"
+   "question": "Was ist dein Lieblingsgeruch?",
+   "stufe": "familie"
   },
   {
    "id": "wx43",
@@ -178,7 +195,8 @@
   },
   {
    "id": "wx44",
-   "question": "Wie würdest du einen freien Tag ohne Pflichten verbringen?"
+   "question": "Wie würdest du einen freien Tag ohne Pflichten verbringen?",
+   "stufe": "familie"
   },
   {
    "id": "wx45",
@@ -186,7 +204,8 @@
   },
   {
    "id": "wx46",
-   "question": "Was ist dein Lieblings-Brettspiel?"
+   "question": "Was ist dein Lieblings-Brettspiel?",
+   "stufe": "familie"
   },
   {
    "id": "wx47",
@@ -194,7 +213,8 @@
   },
   {
    "id": "wx48",
-   "question": "Was hast du als Kind gesammelt?"
+   "question": "Was hast du als Kind gesammelt?",
+   "stufe": "familie"
   },
   {
    "id": "wx49",
@@ -210,7 +230,8 @@
   },
   {
    "id": "wx52",
-   "question": "Welches Lied bringt dich sofort zum Tanzen?"
+   "question": "Welches Lied bringt dich sofort zum Tanzen?",
+   "stufe": "familie"
   },
   {
    "id": "wx53",
@@ -218,11 +239,13 @@
   },
   {
    "id": "wx54",
-   "question": "Welchen Namen würdest du einem Boot geben?"
+   "question": "Welchen Namen würdest du einem Boot geben?",
+   "stufe": "familie"
   },
   {
    "id": "wx55",
-   "question": "Was ist das Kindischste, das du immer noch machst?"
+   "question": "Was ist das Kindischste, das du immer noch machst?",
+   "stufe": "familie"
   },
   {
    "id": "wx56",
@@ -230,11 +253,13 @@
   },
   {
    "id": "wx57",
-   "question": "Welche Fernsehserie würdest du gern betreten?"
+   "question": "Welche Fernsehserie würdest du gern betreten?",
+   "stufe": "familie"
   },
   {
    "id": "wx58",
-   "question": "Welches Geräusch hasst du?"
+   "question": "Welches Geräusch hasst du?",
+   "stufe": "familie"
   },
   {
    "id": "wx59",
@@ -242,7 +267,473 @@
   },
   {
    "id": "wx60",
-   "question": "Was würdest du in einer Zeitkapsel verstecken?"
+   "question": "Was würdest du in einer Zeitkapsel verstecken?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn1",
+   "question": "Was ist dein Lieblingsessen bei Oma oder Opa?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn2",
+   "question": "Welches Tier findest du total unterschätzt?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn3",
+   "question": "Was würdest du erfinden, wenn du Erfinder wärst?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn4",
+   "question": "Welche Farbe hätte dein Traumhaus?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn5",
+   "question": "Was ist das Beste an deinem Zuhause?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn6",
+   "question": "Welches Spiel könntest du stundenlang spielen?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn7",
+   "question": "Was ist dein Lieblingswetter?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn8",
+   "question": "Welches Märchen magst du am liebsten?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn9",
+   "question": "Was würdest du einem Alien als Erstes zeigen?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn10",
+   "question": "Was ist dein Lieblingseis?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn11",
+   "question": "Wie würde dein Haustier heißen, wenn du ein Drache hättest?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn12",
+   "question": "Was ist das Lustigste, das dir dieses Jahr passiert ist?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn13",
+   "question": "Welches Land möchtest du unbedingt besuchen?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn14",
+   "question": "Was ist dein Lieblingsfach – oder war es?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn15",
+   "question": "Welche Figur aus einem Film wärst du gern?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn16",
+   "question": "Was ist dein liebstes Geräusch in der Natur?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn17",
+   "question": "Wovon würdest du gern ein ganzes Zimmer voll haben?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn18",
+   "question": "Was ist dein Lieblingsspielplatz-Gerät?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn19",
+   "question": "Welches Essen hast du als Kind gehasst und magst es heute?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn20",
+   "question": "Welchen Beruf würdest du gern einen Tag lang ausprobieren?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn21",
+   "question": "Was ist die beste Jahreszeit – und warum?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn22",
+   "question": "Was ist dein Lieblingswitz in einem Satz?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn23",
+   "question": "Was würdest du mit einer Zeitmaschine anschauen?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn24",
+   "question": "Was ist dein Lieblingsplatz zum Lesen oder Ausruhen?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn25",
+   "question": "Was ist das schönste Geschenk, das du gemacht hast?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn26",
+   "question": "Welches Tier würdest du gern für einen Tag sein?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn27",
+   "question": "Was ist dein Lieblingsgericht zum Selberkochen?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn28",
+   "question": "Welches Spielzeug hättest du heute noch gern?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn29",
+   "question": "Was ist dein liebster Feiertag?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn30",
+   "question": "Welche Sportart würdest du gern richtig gut können?",
+   "stufe": "familie"
+  },
+  {
+   "id": "wn31",
+   "question": "Was ist das Unnötigste, das du je gekauft hast?"
+  },
+  {
+   "id": "wn32",
+   "question": "Welche Gewohnheit möchtest du dir abgewöhnen?"
+  },
+  {
+   "id": "wn33",
+   "question": "Was ist dein bester Tipp gegen Langeweile?"
+  },
+  {
+   "id": "wn34",
+   "question": "Welches Lied hörst du heimlich in Dauerschleife?"
+  },
+  {
+   "id": "wn35",
+   "question": "Was hast du dir als Letztes vorgenommen und nicht gemacht?"
+  },
+  {
+   "id": "wn36",
+   "question": "Welche Werbung kannst du auswendig?"
+  },
+  {
+   "id": "wn37",
+   "question": "Was ist dein liebster Ort zum Nachdenken?"
+  },
+  {
+   "id": "wn38",
+   "question": "Welche App würdest du sofort löschen, wenn du könntest?"
+  },
+  {
+   "id": "wn39",
+   "question": "Was war dein bester Kauf der letzten Jahre?"
+  },
+  {
+   "id": "wn40",
+   "question": "Welche Aufgabe schiebst du seit Monaten vor dir her?"
+  },
+  {
+   "id": "wn41",
+   "question": "Was ist die beste Entscheidung, die du je getroffen hast?"
+  },
+  {
+   "id": "wn42",
+   "question": "Welche Kleinigkeit macht dir sofort gute Laune?"
+  },
+  {
+   "id": "wn43",
+   "question": "Welches Gericht kochst du, wenn du Gäste beeindrucken willst?"
+  },
+  {
+   "id": "wn44",
+   "question": "Was ist dein Lieblingsgeräusch in der Küche?"
+  },
+  {
+   "id": "wn45",
+   "question": "Welche Erinnerung bringt dich immer zum Lachen?"
+  },
+  {
+   "id": "wn46",
+   "question": "Was ist dein Ritual vor dem Einschlafen?"
+  },
+  {
+   "id": "wn47",
+   "question": "Welchen Satz sagen deine Eltern ständig?"
+  },
+  {
+   "id": "wn48",
+   "question": "Was war die längste Warteschlange, in der du je standest – und wofür?"
+  },
+  {
+   "id": "wn49",
+   "question": "Welche Stadt würdest du nie wieder besuchen?"
+  },
+  {
+   "id": "wn50",
+   "question": "Was ist das Merkwürdigste, das du je gefunden hast?"
+  },
+  {
+   "id": "wn51",
+   "question": "Welchen Trend hast du komplett verpasst?"
+  },
+  {
+   "id": "wn52",
+   "question": "Was war dein letzter Lachanfall?"
+  },
+  {
+   "id": "wn53",
+   "question": "Welche Fähigkeit hast du, die keiner von dir erwartet?"
+  },
+  {
+   "id": "wn54",
+   "question": "Was ist dein Lieblingsgericht aus der Kantine oder Mensa?"
+  },
+  {
+   "id": "wn55",
+   "question": "Welche Serie würdest du gern löschen und nochmal neu schauen?"
+  },
+  {
+   "id": "wn56",
+   "question": "Was ist dein persönlicher Rekord – egal worin?"
+  },
+  {
+   "id": "wn57",
+   "question": "Welchen Ratschlag hast du ignoriert und bereut?"
+  },
+  {
+   "id": "wn58",
+   "question": "Was würdest du tun, wenn morgen frei wäre?"
+  },
+  {
+   "id": "wn59",
+   "question": "Welches Buch oder welchen Film empfiehlst du allen?"
+  },
+  {
+   "id": "wn60",
+   "question": "Was ist dein Lieblingsgegenstand auf deinem Schreibtisch?"
+  },
+  {
+   "id": "wn61",
+   "question": "Welches Wort findest du einfach lustig?"
+  },
+  {
+   "id": "wn62",
+   "question": "Wofür hast du einmal einen Preis oder eine Urkunde bekommen?"
+  },
+  {
+   "id": "wn63",
+   "question": "Was ist das Spontanste, das du je gemacht hast?"
+  },
+  {
+   "id": "wn64",
+   "question": "Welche Sache würdest du nie verleihen?"
+  },
+  {
+   "id": "wn65",
+   "question": "Was ist dein Plan für die Rente?"
+  },
+  {
+   "id": "wn66",
+   "question": "Was war dein schlimmstes Date?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn67",
+   "question": "Was war deine peinlichste Nachricht an die falsche Person?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn68",
+   "question": "Was googelst du heimlich?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn69",
+   "question": "Was war dein schlimmster Kater – und wovon?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn70",
+   "question": "Welche Ausrede hast du schon mal benutzt, um nicht zu einer Party zu gehen?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn71",
+   "question": "Was war dein peinlichster Moment auf einer Party?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn72",
+   "question": "Was ist dein schlechtester Anmachspruch?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn73",
+   "question": "Was war die dümmste Idee nach Mitternacht?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn74",
+   "question": "Welche Lüge erzählst du am häufigsten?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn75",
+   "question": "Was war dein peinlichster Spitzname?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn76",
+   "question": "Was ist das Peinlichste, das deine Eltern über dich wissen?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn77",
+   "question": "Was war dein schlimmster Fehlkauf im Internet um 2 Uhr nachts?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn78",
+   "question": "Was würdest du tun, wenn dein Ex hier reinkäme?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn79",
+   "question": "Wobei hat man dich schon mal ertappt?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn80",
+   "question": "Was ist dein größtes Laster?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn81",
+   "question": "Welches Lied singst du betrunken beim Karaoke?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn82",
+   "question": "Was war dein peinlichster Versprecher?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn83",
+   "question": "Welches Geheimnis hast du am längsten für dich behalten?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn84",
+   "question": "Was war das Verrückteste, das du im Urlaub gemacht hast?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn85",
+   "question": "Welche Regel hast du als Teenager am häufigsten gebrochen?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn86",
+   "question": "Wen hast du als Teenager heimlich angehimmelt?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn87",
+   "question": "Was war dein peinlichstes Foto im Internet?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn88",
+   "question": "Was hast du schon mal behauptet zu können, obwohl du es nicht konntest?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn89",
+   "question": "Was ist das Kitschigste, das du je für jemanden getan hast?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn90",
+   "question": "Was war deine schlimmste Ausrede fürs Zuspätkommen?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn91",
+   "question": "Welches Essen hast du schon mal heimlich weggeworfen, das jemand für dich gekocht hat?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn92",
+   "question": "Was steht in deiner letzten Suchanfrage, die keiner sehen soll?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn93",
+   "question": "Was war dein peinlichster Tanzmove?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn94",
+   "question": "Was hast du nach einer Party schon mal am nächsten Morgen gefunden?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn95",
+   "question": "Welche Nachricht hast du geschrieben und sofort bereut?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn96",
+   "question": "Was war das Ungeschickteste, das dir beim Flirten passiert ist?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn97",
+   "question": "Was ist deine heimliche Schwäche beim Essen?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn98",
+   "question": "Wofür hast du dich schon mal richtig fremdgeschämt?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn99",
+   "question": "Was war die lustigste Ausrede, die dir jemand erzählt hat?",
+   "stufe": "frech"
+  },
+  {
+   "id": "wn100",
+   "question": "Welches Kompliment hat dich am meisten verlegen gemacht?",
+   "stufe": "frech"
   }
  ]
 }

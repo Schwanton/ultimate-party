@@ -21,7 +21,7 @@
   "contentFields": [
     "prompt"
   ],
-  "version": "1.0.2",
+  "version": "1.1.0",
   "author": "UP!",
   "options": [
     {
@@ -67,6 +67,23 @@
             "en": "Long"
           }
         }
+      ]
+    },
+    {
+      "id": "stufe", "label": { "de": "Fragen", "en": "Questions" }, "default": "normal",
+      "help": { "de": "Familie: harmlose Fragen, auch für Kinder. Frech: auch Fragen über Dates, Partys und Peinliches – nichts Derbes.", "en": "Family: harmless questions, fine for kids. Cheeky: also questions about dates, parties and embarrassing moments – nothing crude." },
+      "choices": [
+        { "value": "familie", "label": { "de": "Familie", "en": "Family" } },
+        { "value": "normal", "label": { "de": "Normal", "en": "Normal" } },
+        { "value": "frech", "label": { "de": "Frech", "en": "Cheeky" } }
+      ]
+    },
+    {
+      "id": "ownQuestions", "label": { "de": "Eigene Fragen", "en": "Own questions" }, "default": "off",
+      "help": { "de": "Vor dem Spiel schreibt jeder eine Frage. Sie werden anonym unter die normalen Fragen gemischt (höchstens die Hälfte der Runden).", "en": "Before the game everyone writes a question. They are mixed anonymously into the normal questions (at most half of the rounds)." },
+      "choices": [
+        { "value": "off", "label": { "de": "Aus", "en": "Off" } },
+        { "value": "on", "label": { "de": "An", "en": "On" } }
       ]
     }
   ]

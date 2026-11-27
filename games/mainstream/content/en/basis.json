@@ -1,7 +1,7 @@
 {
  "name": "Basics",
  "author": "UP!",
- "version": "1.0.0",
+ "version": "1.1.0",
  "description": "Everyday questions every group answers differently.",
  "items": [
   {
@@ -10,7 +10,8 @@
    "answers": [
     "Yes, delicious!",
     "Never!"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m2",
@@ -29,7 +30,8 @@
     "On my stomach",
     "On my side",
     "Like a starfish"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m4",
@@ -38,7 +40,8 @@
     "over",
     "under",
     "Don't care"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m5",
@@ -46,7 +49,8 @@
    "answers": [
     "Summer",
     "Winter"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m6",
@@ -56,7 +60,8 @@
     "Invisibility",
     "Mind reading",
     "Time travel"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m7",
@@ -85,7 +90,8 @@
     "Dog",
     "Cat",
     "Neither"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m10",
@@ -95,7 +101,8 @@
     "1–10",
     "11–100",
     "Over 100"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m11",
@@ -114,7 +121,8 @@
     "Cereal",
     "Eggs",
     "Coffee is enough"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m13",
@@ -122,7 +130,8 @@
    "answers": [
     "listen to music",
     "watch movies"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m14",
@@ -142,7 +151,8 @@
     "Cleaning windows",
     "Cleaning the bathroom",
     "Emptying the dishwasher"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m16",
@@ -169,7 +179,8 @@
     "Yes",
     "No",
     "What kind of question is that?"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m19",
@@ -177,7 +188,8 @@
    "answers": [
     "Rich",
     "Famous"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m20",
@@ -187,7 +199,8 @@
     "One",
     "Two or three",
     "More than three"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m21",
@@ -223,7 +236,8 @@
    "answers": [
     "No more chocolate",
     "No more chips"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m25",
@@ -233,7 +247,8 @@
     "20–50 times",
     "50–100 times",
     "I don't want to know"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m26",
@@ -279,7 +294,8 @@
     "Throw them away",
     "Collect them in my wallet",
     "Never take them"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m31",
@@ -287,7 +303,8 @@
    "answers": [
     "No internet",
     "No friends"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m32",
@@ -297,7 +314,8 @@
     "Watch movies",
     "Look out the window",
     "Be nervous"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m33",
@@ -307,7 +325,8 @@
     "Vanilla",
     "Strawberry",
     "Cookie dough"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m34",
@@ -325,7 +344,8 @@
    "answers": [
     "Sing",
     "Dance"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m36",
@@ -351,7 +371,8 @@
     "Off!",
     "Can stay on",
     "Slippers"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m39",
@@ -369,7 +390,8 @@
     "Mushrooms",
     "Extra cheese",
     "Pineapple"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m41",
@@ -378,7 +400,8 @@
     "Friday after work",
     "Friday noon",
     "Saturday morning"
-   ]
+   ],
+   "stufe": "familie"
   },
   {
    "id": "m42",
@@ -414,7 +437,1112 @@
     "Window",
     "Aisle",
     "Whatever is free"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m46",
+   "question": "The best packed-lunch sandwich?",
+   "answers": [
+    "Cheese",
+    "Ham",
+    "Chocolate spread",
+    "An apple is enough"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m47",
+   "question": "Which animal would you most like to be?",
+   "answers": [
+    "Eagle",
+    "Dolphin",
+    "Cat",
+    "Sloth"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m48",
+   "question": "The best pizza?",
+   "answers": [
+    "Margherita",
+    "Pepperoni",
+    "Hawaiian",
+    "Four cheese"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m49",
+   "question": "Snow or sunshine?",
+   "answers": [
+    "Snow",
+    "Sunshine"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m50",
+   "question": "What do you like playing outside most?",
+   "answers": [
+    "Football",
+    "Hide and seek",
+    "Tag",
+    "I'd rather stay inside"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m51",
+   "question": "What colour is the nicest car?",
+   "answers": [
+    "Red",
+    "Black",
+    "Blue",
+    "Bright yellow"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m52",
+   "question": "The best sound?",
+   "answers": [
+    "Rain on the window",
+    "Waves",
+    "Crackling fire",
+    "Birdsong"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m53",
+   "question": "Fly or breathe underwater?",
+   "answers": [
+    "Fly",
+    "Breathe underwater"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m54",
+   "question": "The best sweet?",
+   "answers": [
+    "Gummy bears",
+    "Chocolate",
+    "Liquorice",
+    "Lollipop"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m55",
+   "question": "Where's the dream holiday?",
+   "answers": [
+    "Seaside",
+    "Mountains",
+    "Theme park",
+    "Big city"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m56",
+   "question": "The best day of the week?",
+   "answers": [
+    "Friday",
+    "Saturday",
+    "Sunday",
+    "Wednesday – halfway there"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m57",
+   "question": "A treehouse or a castle?",
+   "answers": [
+    "Treehouse",
+    "Castle"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m58",
+   "question": "The best birthday party game?",
+   "answers": [
+    "Hit the pot",
+    "Musical chairs",
+    "Treasure hunt",
+    "Musical statues"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m59",
+   "question": "The best chips/fries?",
+   "answers": [
+    "Thin",
+    "Thick",
+    "Crinkle-cut",
+    "Sweet potato"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m60",
+   "question": "Giant or tiny for a day?",
+   "answers": [
+    "Giant",
+    "Tiny"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m61",
+   "question": "The best weather for a day off?",
+   "answers": [
+    "Sunny and warm",
+    "Thunderstorm",
+    "Snowstorm",
+    "Drizzle on the sofa"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m62",
+   "question": "How do you eat a sandwich cookie?",
+   "answers": [
+    "Whole",
+    "Twist it open first",
+    "Dunk it"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m63",
+   "question": "Which fairground ride?",
+   "answers": [
+    "Ferris wheel",
+    "Bumper cars",
+    "Roller coaster",
+    "Ghost train"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m64",
+   "question": "Live with dinosaurs or dragons?",
+   "answers": [
+    "Dinosaurs",
+    "Dragons"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m65",
+   "question": "What goes on a Sunday morning roll?",
+   "answers": [
+    "Jam",
+    "Honey",
+    "Cheese",
+    "Egg"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m66",
+   "question": "Which instrument would you most like to play?",
+   "answers": [
+    "Guitar",
+    "Piano",
+    "Drums",
+    "Trumpet"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m67",
+   "question": "The best seat in the car?",
+   "answers": [
+    "Driver",
+    "Front passenger",
+    "Back by the window",
+    "Back in the middle"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m68",
+   "question": "The best thing about winter?",
+   "answers": [
+    "Sledging",
+    "Biscuits",
+    "Cosy blanket",
+    "Nothing at all"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m69",
+   "question": "What kind of superhero would you be?",
+   "answers": [
+    "Super strong",
+    "Super fast",
+    "Shape-shifter",
+    "Talks to animals"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m70",
+   "question": "First thing you do when you get home?",
+   "answers": [
+    "Shoes off",
+    "Open the fridge",
+    "Onto the sofa",
+    "Charge the phone"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m71",
+   "question": "How do you eat spaghetti?",
+   "answers": [
+    "Twirl with a spoon",
+    "Twirl without a spoon",
+    "Cut them up",
+    "Slurp"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m72",
+   "question": "Forever 8 or forever 80?",
+   "answers": [
+    "8",
+    "80"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m73",
+   "question": "Which season smells best?",
+   "answers": [
+    "Spring",
+    "Summer",
+    "Autumn",
+    "Winter"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m74",
+   "question": "The best board or card game?",
+   "answers": [
+    "Ludo",
+    "Monopoly",
+    "Uno",
+    "Chess"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m75",
+   "question": "How high would you dare to jump into water?",
+   "answers": [
+    "1 metre",
+    "3 metres",
+    "5 metres",
+    "10 metres"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m76",
+   "question": "Which pet would you rather have?",
+   "answers": [
+    "Pony",
+    "Parrot",
+    "Tortoise",
+    "Giant snail"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m77",
+   "question": "Which ice cream in summer?",
+   "answers": [
+    "Cone",
+    "Tub",
+    "On a stick",
+    "Soft serve"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m78",
+   "question": "The best place for a picnic?",
+   "answers": [
+    "Park",
+    "Beach",
+    "Forest",
+    "Living-room floor"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m79",
+   "question": "Read or be read to?",
+   "answers": [
+    "Read myself",
+    "Be read to",
+    "Audiobook"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m80",
+   "question": "The best job?",
+   "answers": [
+    "Astronaut",
+    "Vet",
+    "Ice-cream seller",
+    "Inventor"
+   ],
+   "stufe": "familie"
+  },
+  {
+   "id": "m81",
+   "question": "How long does your New Year's resolution last?",
+   "answers": [
+    "Never had one",
+    "Until 2 January",
+    "A few weeks",
+    "The whole year"
    ]
+  },
+  {
+   "id": "m82",
+   "question": "How many photos are on your phone?",
+   "answers": [
+    "Under 1,000",
+    "1,000–5,000",
+    "5,000–20,000",
+    "More than 20,000"
+   ]
+  },
+  {
+   "id": "m83",
+   "question": "What do you do if your restaurant meal is bad?",
+   "answers": [
+    "Say something",
+    "Eat it quietly",
+    "Leave it",
+    "Never go back"
+   ]
+  },
+  {
+   "id": "m84",
+   "question": "How do you pack for a holiday?",
+   "answers": [
+    "A week before",
+    "The night before",
+    "An hour before",
+    "Not at all – buy it there"
+   ]
+  },
+  {
+   "id": "m85",
+   "question": "The most annoying small-talk question?",
+   "answers": [
+    "So, what do you do?",
+    "Plans for the weekend?",
+    "How was the journey?",
+    "When are you getting married?"
+   ]
+  },
+  {
+   "id": "m86",
+   "question": "How do you sort your clothes?",
+   "answers": [
+    "By colour",
+    "By type",
+    "The chair system",
+    "I don't"
+   ]
+  },
+  {
+   "id": "m87",
+   "question": "The best TV snack?",
+   "answers": [
+    "Crisps",
+    "Popcorn",
+    "Gummy bears",
+    "Fruit – honestly!"
+   ]
+  },
+  {
+   "id": "m88",
+   "question": "Unknown number calling – what do you do?",
+   "answers": [
+    "Answer",
+    "Decline",
+    "Let it ring and google it"
+   ]
+  },
+  {
+   "id": "m89",
+   "question": "Who empties the dishwasher at your place?",
+   "answers": [
+    "Me",
+    "The others",
+    "Nobody – we take from it directly"
+   ]
+  },
+  {
+   "id": "m90",
+   "question": "How much do you tip in a restaurant?",
+   "answers": [
+    "Nothing",
+    "Round up",
+    "About 10%",
+    "More than 10%"
+   ]
+  },
+  {
+   "id": "m91",
+   "question": "The worst train delay?",
+   "answers": [
+    "5 minutes when you miss the connection",
+    "30 minutes",
+    "Cancelled",
+    "When nobody announces anything"
+   ]
+  },
+  {
+   "id": "m92",
+   "question": "How often do you wash your towel?",
+   "answers": [
+    "After every use",
+    "Once a week",
+    "Every two weeks",
+    "Better not ask"
+   ]
+  },
+  {
+   "id": "m93",
+   "question": "How long from waking up to out the door?",
+   "answers": [
+    "Under 15 minutes",
+    "15–30 minutes",
+    "30–60 minutes",
+    "Over an hour"
+   ]
+  },
+  {
+   "id": "m94",
+   "question": "A week without your phone or without coffee?",
+   "answers": [
+    "No phone",
+    "No coffee"
+   ]
+  },
+  {
+   "id": "m95",
+   "question": "The best way to travel?",
+   "answers": [
+    "Train",
+    "Car",
+    "Plane",
+    "Bike"
+   ]
+  },
+  {
+   "id": "m96",
+   "question": "How do you deal with an earworm?",
+   "answers": [
+    "Sing it loud",
+    "Play another song",
+    "Suffer"
+   ]
+  },
+  {
+   "id": "m97",
+   "question": "First thing you do in a hotel room?",
+   "answers": [
+    "Test the bed",
+    "Check the view",
+    "Find the Wi-Fi",
+    "Look at the minibar"
+   ]
+  },
+  {
+   "id": "m98",
+   "question": "The best party drink?",
+   "answers": [
+    "Beer",
+    "Wine",
+    "Cocktail",
+    "Water"
+   ]
+  },
+  {
+   "id": "m99",
+   "question": "How many cushions does a sofa need?",
+   "answers": [
+    "None",
+    "Two",
+    "Four",
+    "So many you can't sit down"
+   ]
+  },
+  {
+   "id": "m100",
+   "question": "The best spot at a party?",
+   "answers": [
+    "Kitchen",
+    "Dance floor",
+    "Sofa",
+    "Outside"
+   ]
+  },
+  {
+   "id": "m101",
+   "question": "How do you prefer to pay?",
+   "answers": [
+    "Cash",
+    "Card",
+    "Phone"
+   ]
+  },
+  {
+   "id": "m102",
+   "question": "Which kind of series would you rewatch?",
+   "answers": [
+    "A crime series",
+    "A comedy",
+    "A fantasy series",
+    "None – too much new stuff"
+   ]
+  },
+  {
+   "id": "m103",
+   "question": "How long can a film be at most?",
+   "answers": [
+    "90 minutes",
+    "2 hours",
+    "3 hours",
+    "Doesn't matter if it's good"
+   ]
+  },
+  {
+   "id": "m104",
+   "question": "What's worse?",
+   "answers": [
+    "Traffic jam",
+    "No signal",
+    "Dead battery",
+    "No toilet paper"
+   ]
+  },
+  {
+   "id": "m105",
+   "question": "How many snoozes do you allow yourself?",
+   "answers": [
+    "None",
+    "One",
+    "Two or three",
+    "Until it's an emergency"
+   ]
+  },
+  {
+   "id": "m106",
+   "question": "Which plane seat?",
+   "answers": [
+    "Window",
+    "Aisle",
+    "Middle – I'm a saint"
+   ]
+  },
+  {
+   "id": "m107",
+   "question": "What about the last slice of pizza?",
+   "answers": [
+    "Ask who wants it",
+    "Just take it",
+    "Share it",
+    "Leave it until nobody wants it"
+   ]
+  },
+  {
+   "id": "m108",
+   "question": "When is it OK to play Christmas music?",
+   "answers": [
+    "From November",
+    "From December",
+    "Only on Christmas Eve",
+    "Never"
+   ]
+  },
+  {
+   "id": "m109",
+   "question": "How do you order in a restaurant?",
+   "answers": [
+    "Always the same",
+    "The first thing that sounds good",
+    "Whatever the next table has",
+    "After 10 minutes"
+   ]
+  },
+  {
+   "id": "m110",
+   "question": "The most useful everyday superpower?",
+   "answers": [
+    "Never tired",
+    "Never stuck in traffic",
+    "Always a parking space",
+    "Never forget anything"
+   ]
+  },
+  {
+   "id": "m111",
+   "question": "How many unread emails do you have?",
+   "answers": [
+    "0",
+    "1–50",
+    "50–1,000",
+    "Over 1,000"
+   ]
+  },
+  {
+   "id": "m112",
+   "question": "The best barbecue food?",
+   "answers": [
+    "Sausage",
+    "Steak",
+    "Vegetables",
+    "Halloumi"
+   ]
+  },
+  {
+   "id": "m113",
+   "question": "Coffee how?",
+   "answers": [
+    "Black",
+    "With milk",
+    "Milk and sugar",
+    "Not at all"
+   ]
+  },
+  {
+   "id": "m114",
+   "question": "How do you handle spoilers?",
+   "answers": [
+    "Don't care",
+    "I get angry",
+    "I spoil things myself"
+   ]
+  },
+  {
+   "id": "m115",
+   "question": "How long do you take to decide in a supermarket?",
+   "answers": [
+    "Seconds",
+    "A few minutes",
+    "I phone someone",
+    "I leave with nothing"
+   ]
+  },
+  {
+   "id": "m116",
+   "question": "The best sound in the morning?",
+   "answers": [
+    "Coffee machine",
+    "Silence",
+    "Birds",
+    "None – I'm asleep"
+   ]
+  },
+  {
+   "id": "m117",
+   "question": "35°C in the office or −10°C at the bus stop?",
+   "answers": [
+    "35°C office",
+    "−10°C bus stop"
+   ]
+  },
+  {
+   "id": "m118",
+   "question": "How do you write messages?",
+   "answers": [
+    "Full sentences",
+    "short & lowercase",
+    "Emojis only",
+    "Voice notes"
+   ]
+  },
+  {
+   "id": "m119",
+   "question": "Where do your keys end up at home?",
+   "answers": [
+    "A fixed hook",
+    "Anywhere",
+    "In my coat",
+    "I never know"
+   ]
+  },
+  {
+   "id": "m120",
+   "question": "The best fast food?",
+   "answers": [
+    "Burger",
+    "Kebab",
+    "Pizza",
+    "Fried chicken"
+   ]
+  },
+  {
+   "id": "m121",
+   "question": "How often do you go to the hairdresser?",
+   "answers": [
+    "Every month",
+    "Every few months",
+    "Once a year",
+    "I cut it myself"
+   ]
+  },
+  {
+   "id": "m122",
+   "question": "A year of free food or a year of free travel?",
+   "answers": [
+    "Food",
+    "Travel"
+   ]
+  },
+  {
+   "id": "m123",
+   "question": "How long after a date do you text?",
+   "answers": [
+    "Right away",
+    "The next day",
+    "I wait for them to text",
+    "Never"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m124",
+   "question": "The worst thing on a first date?",
+   "answers": [
+    "Loud chewing",
+    "Only talking about themselves",
+    "Always on the phone",
+    "Talking about the ex"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m125",
+   "question": "The best hangover breakfast?",
+   "answers": [
+    "Pickled herring",
+    "A greasy fry-up",
+    "Lots of water",
+    "Going back to sleep"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m126",
+   "question": "After how many drinks do you sing karaoke?",
+   "answers": [
+    "Zero – always!",
+    "Two",
+    "Five",
+    "Never"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m127",
+   "question": "How long do you stay when you said you'd only pop in?",
+   "answers": [
+    "An hour",
+    "Until midnight",
+    "Until breakfast"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m128",
+   "question": "What's more embarrassing?",
+   "answers": [
+    "Caught yawning",
+    "Caught talking to yourself",
+    "Caught picking your nose",
+    "Caught dancing alone"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m129",
+   "question": "Meet your ex at a wedding or your boss at a club?",
+   "answers": [
+    "Ex at a wedding",
+    "Boss at a club"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m130",
+   "question": "How long do you leave someone on read?",
+   "answers": [
+    "Never – I reply at once",
+    "Hours",
+    "Days",
+    "Forever"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m131",
+   "question": "What does someone's fridge reveal?",
+   "answers": [
+    "Everything",
+    "Nothing",
+    "Whether you'd still eat there"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m132",
+   "question": "The best excuse to leave a party early?",
+   "answers": [
+    "Babysitter",
+    "Early start tomorrow",
+    "Not feeling well",
+    "I just vanish"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m133",
+   "question": "How good is your dancing after midnight?",
+   "answers": [
+    "World class",
+    "As bad as before",
+    "I don't dance",
+    "Embarrassing but committed"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m134",
+   "question": "What's worse in a partner?",
+   "answers": [
+    "Snoring",
+    "Cold feet",
+    "Stealing the duvet",
+    "Snoozing 6 times"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m135",
+   "question": "How long do you stalk someone online before meeting?",
+   "answers": [
+    "Not at all",
+    "5 minutes",
+    "Back to the 2014 holiday photos",
+    "I already know their grandma"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m136",
+   "question": "What do you say in a wine shop?",
+   "answers": [
+    "This one, nice label",
+    "Something dry please",
+    "The cheapest one",
+    "I'll just get beer"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m137",
+   "question": "How many exes can you invite to your wedding?",
+   "answers": [
+    "None",
+    "One",
+    "All of them – it'll be fun"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m138",
+   "question": "Who pays on a first date?",
+   "answers": [
+    "Whoever asked",
+    "Split it",
+    "Whoever earns more",
+    "Whoever grabs their wallet first"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m139",
+   "question": "The worst message at 2 a.m.?",
+   "answers": [
+    "“You up?”",
+    "“We need to talk”",
+    "A photo of a kebab",
+    "A 9-minute voice note"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m140",
+   "question": "What do you do after a big night out?",
+   "answers": [
+    "Sleep in",
+    "Exercise – now more than ever",
+    "Order pizza",
+    "Swear: never again"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m141",
+   "question": "What must you never do at a stag or hen party?",
+   "answers": [
+    "Lose the ring",
+    "Get a tattoo",
+    "Call the bride or groom",
+    "Anything goes"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m142",
+   "question": "How much sleep did you get after the last party?",
+   "answers": [
+    "Under 3 hours",
+    "3–5",
+    "6–8",
+    "Party? I was in bed at 10"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m143",
+   "question": "What would you rather not tell your parents?",
+   "answers": [
+    "What the flat cost",
+    "How often you order pizza",
+    "Where you were last weekend",
+    "Nothing – I tell them everything"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m144",
+   "question": "The best pick-up line?",
+   "answers": [
+    "None – just say hi",
+    "Something about the food",
+    "A bad joke",
+    "A compliment"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m145",
+   "question": "What percentage of your excuses are true?",
+   "answers": [
+    "All of them",
+    "Most",
+    "About half",
+    "Excuses? Me?"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m146",
+   "question": "What would be more embarrassing if everyone saw it?",
+   "answers": [
+    "Your search history",
+    "Your phone photos",
+    "Your last voice note",
+    "Your playlist"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m147",
+   "question": "How long until you say sorry after a fight?",
+   "answers": [
+    "Straight away",
+    "A day",
+    "A week",
+    "I wait for their sorry"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m148",
+   "question": "The most common lie?",
+   "answers": [
+    "“On my way”",
+    "“I read it”",
+    "“I'm fine”",
+    "“Just one more episode”"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m149",
+   "question": "The most embarrassing song on your playlist?",
+   "answers": [
+    "A cheesy pop hit",
+    "A children's song",
+    "A boy band song",
+    "I'm not ashamed of anything"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m150",
+   "question": "How often have you called in sick without being ill?",
+   "answers": [
+    "Never",
+    "Once or twice",
+    "More often",
+    "No comment"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m151",
+   "question": "How long do you scroll in bed after the alarm?",
+   "answers": [
+    "Not at all",
+    "5 minutes",
+    "Half an hour",
+    "Until I'm late"
+   ],
+   "stufe": "frech"
+  },
+  {
+   "id": "m152",
+   "question": "Who's most exhausting at parties?",
+   "answers": [
+    "The DJ know-it-all",
+    "People talking about work",
+    "People leaving at 11",
+    "Me"
+   ],
+   "stufe": "frech"
   }
  ]
 }
