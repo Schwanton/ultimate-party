@@ -2,6 +2,10 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.56.1
+
+- Lobby: Vorausgewählt ist jetzt das erste Spiel der Liste (nach Namen sortiert) – nicht mehr immer „Der Abgrund“
+
 ## 0.56.0
 
 - Alle Spiele: Die Erklärung am Anfang ist deutlich kürzer und auf das Wichtigste reduziert – weniger Text, schneller verstanden. Die Spielregeln selbst haben sich nicht geändert

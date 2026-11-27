@@ -127,7 +127,10 @@ export class Room {
     this.code = code;
     this.lang = lang;
     this.hostToken = hostToken;
-    this.selectedGameId = allGames().find((g) => !g.manifest.hidden)?.manifest.id ?? null;
+    // erstes Spiel nach angezeigtem Namen vorauswählen (wie in der Spieleliste), nicht nach Ordnername
+    const name = (m: { name: Record<string, string>; id: string }) => m.name[lang] ?? m.name.en ?? m.id;
+    this.selectedGameId = allGames().map((g) => g.manifest).filter((m) => !m.hidden)
+      .sort((a, b) => name(a).localeCompare(name(b), lang))[0]?.id ?? null;
   }
 
   /* ---------------- Mitglieder ---------------- */
