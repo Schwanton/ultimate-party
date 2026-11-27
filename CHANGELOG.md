@@ -2,6 +2,12 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.56.0
+
+- Alle Spiele: Die Erklärung am Anfang ist deutlich kürzer und auf das Wichtigste reduziert – weniger Text, schneller verstanden. Die Spielregeln selbst haben sich nicht geändert
+- Murmel Mayhem, Maulwurf und Figurendle: Der Erklärbildschirm steht dadurch kürzer da, es geht schneller los
+- Spieleauswahl: Die Spiele sind jetzt richtig nach ihrem Namen sortiert – „Der Abgrund“ steht unter D statt ganz vorne
+
 ## 0.55.0
 
 - Heiße Kartoffel: Die Zündschnur brennt jetzt sichtbar – oben an der Spitze glüht und sprüht es Funken, und je näher die Explosion rückt, desto wilder

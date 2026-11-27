@@ -1,8 +1,8 @@
 {
  "title": "Sketch & Guess",
  "round": "Round {n} of {total}",
- "intro.text": "One player draws live on their phone, everyone else types guesses. The faster you guess, the more points – and the artist scores for everyone who gets it.",
- "intro.textTeam": "Two teams take turns drawing. Only your own team guesses. If they fail, the other team gets 15 seconds to steal!",
+ "intro.text": "One player draws on their phone, everyone else guesses. The faster, the more points – for the artist too.",
+ "intro.textTeam": "Two teams take turns drawing, only your own team guesses. If they fail, the other team gets 15 seconds to steal!",
  "intro.rules": "No letters or numbers in your drawing!",
  "intro.teamOrange": "Team Orange",
  "intro.teamBlue": "Team Blue",

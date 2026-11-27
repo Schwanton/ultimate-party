@@ -493,7 +493,6 @@ function TvIntro({ v, t }: { v: any; t: Translate }) {
   const rules: [string, string][] = [
     [CYAN, t('intro.conquer')],
     ['#FFD23F', t('intro.build')],
-    ['#A98BFF', t('intro.research')],
     ['#FFD23F', t('intro.special')],
     [HEART, t('intro.heart')],
     ['#FF4FD8', t('intro.pacts')],

@@ -2,8 +2,8 @@
  "title": "Cash Out or Crash Out!",
  "round": "Round {n} of {total}",
  "double": "Double points!",
- "intro.text": "The price swings like a stock – mostly up, but at some point it crashes to zero. Hit CASH OUT in time! Anyone still in when it crashes gets nothing.",
- "intro.points": "Each round there are free points in the pot: 100 × the round number (round 4: 400). Before the start you can add some of your money. Everyone's money stays secret until the final count.",
+ "intro.text": "The price climbs – until it suddenly crashes to zero. CASH OUT in time! Anyone still in at the crash gets nothing.",
+ "intro.points": "Each round there are free points in the pot, and you can add your own money. Everyone's money stays secret until the end.",
  "ready.text": "Get ready – finger on the button!",
  "ready.phone": "Get ready!",
  "run.points": "{n} points if you cash out now",
@@ -57,5 +57,5 @@
  "bet.allInLeft": "{n}× left",
  "bet.allInGone": "used up",
  "risk.label": "Risk",
- "intro.risk": "Watch the colour: green means crashes are rarer, red means more likely – it's never safe. A steep climb makes it redder, a dip turns it greener after a brief scare."
+ "intro.risk": "Green = crashes less often · Red = crashes more often"
 }

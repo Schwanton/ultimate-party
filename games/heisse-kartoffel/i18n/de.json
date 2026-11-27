@@ -1,6 +1,6 @@
 {
   "title": "Heiße Kartoffel",
-  "intro.text": "Eine heiße Kartoffel mit geheimer Zündschnur wandert von Handy zu Handy. Wer sie hat, löst eine Mini-Aufgabe und wirft sie weiter – nicht direkt zurück!",
+  "intro.text": "Die Kartoffel wandert von Handy zu Handy: Mini-Aufgabe lösen, weiterwerfen – nicht direkt zurück!",
   "intro.rules": "Wer die Kartoffel beim Knall hält, fliegt raus. Wer übrig bleibt, gewinnt.",
   "info.alive": "{n} von {total} im Spiel",
   "info.passes": "{n} Würfe",

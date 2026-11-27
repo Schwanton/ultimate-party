@@ -1,8 +1,8 @@
 {
  "title": "Montagsmaler",
  "round": "Runde {n} von {total}",
- "intro.text": "Einer malt live aufs Handy, alle anderen tippen ihre Tipps. Je schneller ihr's erratet, desto mehr Punkte – und wer malt, bekommt Punkte für jeden, der's erkennt.",
- "intro.textTeam": "Zwei Teams malen abwechselnd. Nur das eigene Team rät. Schafft es das nicht, darf das andere Team 15 Sekunden lang klauen!",
+ "intro.text": "Einer malt aufs Handy, alle anderen raten. Je schneller, desto mehr Punkte – auch für den, der malt.",
+ "intro.textTeam": "Zwei Teams malen abwechselnd, nur das eigene Team rät. Klappt's nicht, darf das andere 15 Sekunden klauen!",
  "intro.rules": "Keine Buchstaben oder Zahlen malen!",
  "intro.teamOrange": "Team Orange",
  "intro.teamBlue": "Team Blau",

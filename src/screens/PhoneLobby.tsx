@@ -77,7 +77,7 @@ export function PhoneLobby({ onEditAvatar }: { onEditAvatar: () => void }) {
   const [error, setError] = useState<string | null>(null);
   const active = room.players.filter((p) => p.connected || p.isBot).length;
   const all = listGames(room.dev);
-  const { tag, setTag, present, shown } = useTagFilter(all);
+  const { tag, setTag, present, shown } = useTagFilter(all, room.lang);
   const [onlyFit, setOnlyFit] = useState(false);
   const [onlyMine, setOnlyMine] = useState(false);
   const [popular, setPopular] = useState(false);

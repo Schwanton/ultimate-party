@@ -15,7 +15,7 @@ import { compare, consistent, soloPoints, valueText, type Cell, type Col, type F
 
 interface ColDef { thema: string; titel?: string; spalten: Col[] }
 
-const T = { intro: 10, revealSolo: 5, revealStep: 0.45, revealMax: 14, revealBrett: 9, scores: 7, cooldown: 3 };
+const T = { intro: 8, revealSolo: 5, revealStep: 0.45, revealMax: 14, revealBrett: 9, scores: 7, cooldown: 3 };
 const LETTER_AFTER = 10;
 /** Bis alle Felder eines Tipps aufgeploppt sind (wie im Client: 0,28 s Abstand) + kurze Pause */
 const popTime = (n: number) => n * 0.28 + 1.4;

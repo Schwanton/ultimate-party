@@ -11,7 +11,7 @@
 import { Scores, pick, shuffle, type GameContext, type GameServerModule } from '@up/sdk';
 import { votersSeconds } from './timing';
 
-const T = { intro: 14, roles: 12, pick: 40, mission: 20, flip: 1.1, missionResult: 4, lastChance: 5, voteResult: 5, end: 12 };
+const T = { intro: 10, roles: 12, pick: 40, mission: 20, flip: 1.1, missionResult: 4, lastChance: 5, voteResult: 5, end: 12 };
 const WIN = 3;
 const POINTS = { win: 1000, survived: 500, goodVote: 250 };
 const NOBODY = 'nobody';

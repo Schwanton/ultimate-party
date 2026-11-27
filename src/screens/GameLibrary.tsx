@@ -100,8 +100,11 @@ export function TagChip({ tag, t, small }: { tag: string; t: Translate; small?: 
 const TAG_ICON: Record<string, string> = { words: '✍️', draw: '🎨', guess: '🎯', deceive: '🕵️', social: '💬', team: '🤝', action: '💥', strategy: '♟️', quick: '⚡', other: '🎲' };
 
 /** Filter-Reiter: Alle + Kategorien, die tatsächlich vorkommen */
-export function useTagFilter(games: GameManifest[]) {
+export function useTagFilter(unsorted: GameManifest[], lang: string) {
   const [tag, setTag] = useState<string>('all');
+  // Nach dem angezeigten Namen sortieren (nicht nach dem Ordnernamen)
+  const name = (g: GameManifest) => (g.name as Record<string, string>)[lang] ?? g.name.en ?? g.id;
+  const games = [...unsorted].sort((a, b) => name(a).localeCompare(name(b), lang));
   const present = [...GAME_TAGS, 'other'].filter((x) => games.some((g) => gameTags(g).includes(x)));
   const shown = tag === 'all' ? games : games.filter((g) => gameTags(g).includes(tag));
   return { tag, setTag, present, shown };
@@ -113,7 +116,7 @@ export function GameLibrary({ games, selectedId, players, lang, t, onPick, onClo
   games: GameManifest[]; selectedId: string | null; players: number; lang: string; t: Translate; hearts?: Record<string, string[]>;
   onPick: (id: string) => void; onClose: () => void;
 }) {
-  const { tag, setTag, present, shown } = useTagFilter(games);
+  const { tag, setTag, present, shown } = useTagFilter(games, lang);
   const [onlyFit, setOnlyFit] = useState(false);
   const [popular, setPopular] = useState(false);
   let list = onlyFit ? shown.filter((g) => fitOf(g, players) === 'ok') : shown;

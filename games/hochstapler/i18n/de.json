@@ -1,9 +1,9 @@
 {
   "title": "Hochstapler",
   "round": "Runde {n} von {total}",
-  "intro.text": "Alle bekommen dieselbe Aufgabe aufs Handy – nur einer nicht: der Hochstapler. Er ist die ganze Partie über derselbe und muss einfach mitmachen, ohne aufzufliegen. Findet ihn!",
-  "intro.rules": "{n} Runden. Nach jeder Aufgabe stimmt ihr ab: Tippt mehr als die Hälfte auf den Hochstapler, ist er erwischt und das Spiel vorbei. Daneben getippt? Dann geht's einfach weiter. Punkte gibt es erst am Ende in der Auszählung.",
-  "intro.physical": "Alle Aufgaben macht ihr in echt – Hand heben, Finger zeigen, auf jemanden zeigen. Schaut euch dabei genau an!",
+  "intro.text": "Alle bekommen dieselbe Aufgabe – nur der Hochstapler nicht. Er muss mitmachen, ohne aufzufliegen. Findet ihn!",
+  "intro.rules": "{n} Runden. Nach jeder Aufgabe stimmt ihr ab: Trifft die Mehrheit den Hochstapler, ist das Spiel vorbei.",
+  "intro.physical": "Alle Aufgaben macht ihr in echt – schaut genau hin!",
   "cat.hands": "Hand heben",
   "cat.number": "Finger zeigen",
   "cat.point": "Auf jemanden zeigen",

@@ -3,7 +3,7 @@
   "round": "Runde {n} von {total}",
   "answerOf": "Antwort {n} von {total}",
   "mult": "×{n} Punkte",
-  "intro.text": "Alle beantworten dieselbe Frage – anonym. Danach seht ihr alle Antworten auf einmal und ordnet jede der Person zu, die sie geschrieben hat.",
+  "intro.text": "Alle beantworten dieselbe Frage – anonym. Dann ordnet ihr jede Antwort ihrem Autor zu.",
   "intro.points": "Richtig geraten: 500 Punkte · Als Autor: 200 für jeden, der danebenliegt",
   "write.label": "Beantwortet ehrlich (oder gut getarnt):",
   "write.hint": "Schreibt eure Antwort aufs Handy. Niemand sieht, von wem sie ist.",

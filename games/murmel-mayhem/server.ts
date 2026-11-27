@@ -14,7 +14,7 @@ import {
 } from './engine';
 import { PALETTE, PATTERNS, contrast, nearestFree, validDesign, type Design } from './muster';
 
-const T = { werkstatt: 45, intro: 16, build: 40, reveal: 2.2, revealPer: 0.45, flight: 16, result: 15, umbau: 5, raceMin: 70, afterFirst: 25, raceMax: 120 };
+const T = { werkstatt: 45, intro: 12, build: 40, reveal: 2.2, revealPer: 0.45, flight: 16, result: 15, umbau: 5, raceMin: 70, afterFirst: 25, raceMax: 120 };
 const POINTS = { perPlace: 10, first: 100, trap: 20, trapMax: 100 };
 const ITEMS: ItemKind[] = ['turbo', 'feder', 'magnet', 'schild', 'kleber', 'schranke', 'gegenfeder', 'falltuer', 'wind', 'bremse', 'farbweiche', 'umleitung', 'wurmloch', 'kanone'];
 const EVENTS: CardKind[] = ['beben', 'oel', 'riese', 'tausch'];

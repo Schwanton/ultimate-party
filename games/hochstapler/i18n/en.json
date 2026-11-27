@@ -1,9 +1,9 @@
 {
   "title": "Undercover",
   "round": "Round {n} of {total}",
-  "intro.text": "Everyone gets the same task on their phone – except one: the undercover player. It's the same person for the whole game, and they must blend in without getting caught. Find them!",
-  "intro.rules": "{n} rounds. After every task you vote: if more than half pick the undercover player, they're caught and the game is over. Wrong guess? Just keep going. Points are only given at the end, in the final tally.",
-  "intro.physical": "All tasks happen in real life – raise hands, show fingers, point at someone. Watch each other closely!",
+  "intro.text": "Everyone gets the same task – except the undercover player, who must blend in without getting caught. Find them!",
+  "intro.rules": "{n} rounds. After every task you vote: if the majority picks the undercover player, the game is over.",
+  "intro.physical": "All tasks happen in real life – watch closely!",
   "cat.hands": "Raise your hand",
   "cat.number": "Show fingers",
   "cat.point": "Point at someone",

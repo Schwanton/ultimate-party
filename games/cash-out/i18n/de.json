@@ -2,8 +2,8 @@
  "title": "Cash Out or Crash Out!",
  "round": "Runde {n} von {total}",
  "double": "Doppelte Punkte!",
- "intro.text": "Der Kurs schwankt wie eine Aktie – meist geht's aufwärts, aber irgendwann kracht es auf null. Drück rechtzeitig auf AUSSTEIGEN! Wer noch drin ist, wenn es kracht, bekommt nichts.",
- "intro.points": "Pro Runde liegen gratis Punkte im Topf: 100 × Rundennummer (Runde 4: 400). Vor dem Start kannst du von deinem Geld dazulegen. Wer wie viel hat, bleibt bis zur Auszählung geheim.",
+ "intro.text": "Der Kurs steigt – bis er plötzlich auf null kracht. Steig rechtzeitig AUS! Wer beim Crash noch drin ist, geht leer aus.",
+ "intro.points": "Jede Runde liegen Gratis-Punkte im Topf, du kannst eigenes Geld dazulegen. Wer wie viel hat, bleibt bis zum Schluss geheim.",
  "ready.text": "Gleich geht's los – Finger auf den Knopf!",
  "ready.phone": "Mach dich bereit!",
  "run.points": "{n} Punkte, wer jetzt aussteigt",
@@ -57,5 +57,5 @@
  "bet.allInLeft": "noch {n}×",
  "bet.allInGone": "aufgebraucht",
  "risk.label": "Risiko",
- "intro.risk": "Achtet auf die Farbe: Bei Grün kracht es seltener, bei Rot öfter – sicher ist es nie. Ein steiler Anstieg macht es röter, ein Einbruch nach kurzem Schreck grüner."
+ "intro.risk": "Grün = kracht seltener · Rot = kracht öfter"
 }

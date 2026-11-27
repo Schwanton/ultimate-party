@@ -3,7 +3,7 @@
   "round": "Round {n} of {total}",
   "answerOf": "Answer {n} of {total}",
   "mult": "×{n} points",
-  "intro.text": "Everyone answers the same question – anonymously. Then you see all answers at once and match each one to the person who wrote it.",
+  "intro.text": "Everyone answers the same question – anonymously. Then you match each answer to its author.",
   "intro.points": "Correct guess: 500 points · As the author: 200 for everyone who gets it wrong",
   "write.label": "Answer honestly (or in disguise):",
   "write.hint": "Type your answer on your phone. Nobody sees who wrote what.",

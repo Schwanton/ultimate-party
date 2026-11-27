@@ -13,7 +13,7 @@
   "tags": ["draw", "guess"],
   "sdkVersion": 1,
   "contentFields": ["word"],
-  "version": "1.2.0",
+  "version": "1.2.1",
   "author": "UP!",
   "options": [
     {

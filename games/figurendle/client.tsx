@@ -108,7 +108,7 @@ function Stamp({ children, color = C.g, size = 34, style }: { children: ReactNod
 /* ================= TV ================= */
 
 function HostIntro({ view, t }: HostViewProps) {
-  const lines = view.mode === 'brett' ? ['intro.brett1', 'intro.brett2'] : ['intro.solo1', 'intro.solo2'];
+  const lines = view.mode === 'brett' ? ['intro.brett1', 'intro.brett2'] : ['intro.solo1'];
   return (
     <Frame pad="48px 72px" gap={22}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
