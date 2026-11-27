@@ -51,7 +51,6 @@ p { margin: 0; }
   display: inline-flex; align-items: center; justify-content: center; gap: 10px;
 }
 .up-btn:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 2px 0 var(--yellow-d); }
-.up-btn:disabled { opacity: .45; }
 .up-btn.big { min-height: 68px; font-size: 24px; border-radius: 22px; }
 .up-btn.ghost { background: var(--surface-2); color: var(--text); box-shadow: 0 5px 0 #0A0716; }
 .up-btn.ghost:active:not(:disabled) { box-shadow: 0 1px 0 #0A0716; }
@@ -59,6 +58,11 @@ p { margin: 0; }
 .up-btn.cyan { background: var(--cyan); color: var(--bg); box-shadow: 0 6px 0 var(--cyan-d); }
 .up-btn.small { min-height: 44px; font-size: 16px; padding: 8px 14px; border-radius: 14px; box-shadow: 0 4px 0 #0A0716; }
 .up-btn.full { width: 100%; }
+/* Gesperrt: einfarbig grau statt halbdurchsichtig (sonst schimmert die Farbe als Streifen durch) */
+.up-btn:disabled, .up-btn.ghost:disabled, .up-btn.pink:disabled, .up-btn.cyan:disabled {
+  background: #3A3460; color: #8F88B8; box-shadow: 0 6px 0 #241F45; cursor: not-allowed; opacity: 1;
+}
+.up-btn.small:disabled { box-shadow: 0 4px 0 #241F45; }
 
 .up-card { background: var(--surface); border-radius: 24px; padding: 20px; }
 .up-chip { background: var(--surface); border-radius: 999px; padding: 8px 14px; font-size: 15px; font-weight: 700; color: var(--muted); display: inline-flex; align-items: center; gap: 6px; }

@@ -15,15 +15,111 @@ const SHAPES = [
 /** Ticken wird mit der Zeit schneller (ohne die geheime Zündschnur zu verraten) */
 const tickInterval = (elapsed: number) => Math.max(0.18, 0.9 - elapsed * 0.025);
 
-/** Die Kartoffel vom Titelbild (ausgeschnitten), pocht im Takt des Tickens */
+/** Die Kartoffel vom Titelbild (ausgeschnitten), pocht im Takt des Tickens; oben brennt die Zündschnur */
 function Potato({ size = 80, elapsed }: { size?: number; elapsed: number }) {
   const beat = tickInterval(elapsed);
+  const w = size * 1.15;
+  const h = w * (227 / 316);
   return (
     <div aria-hidden="true" style={{ width: size, height: size, display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none', animation: `upBeat ${beat}s ease-in-out infinite` }}>
-      <img src="/game/heisse-kartoffel/bilder/kartoffel.webp" alt="" draggable={false}
-        style={{ width: size * 1.15, height: 'auto', maxWidth: 'none', pointerEvents: 'none', userSelect: 'none', filter: 'drop-shadow(0 0 14px rgba(255,138,61,.8))' }} />
+      <div style={{ position: 'relative', width: w, height: h, flex: 'none' }}>
+        <img src="/game/heisse-kartoffel/bilder/kartoffel.webp" alt="" draggable={false}
+          style={{ width: w, height: h, maxWidth: 'none', display: 'block', pointerEvents: 'none', userSelect: 'none', filter: 'drop-shadow(0 0 14px rgba(255,138,61,.8))' }} />
+        {/* Spitze der Zündschnur im Bild: 87,6 % von links, 1,5 % von oben */}
+        <FuseFire x={w * 0.876} y={h * 0.015} scale={w / 150} intensity={Math.max(0, Math.min(1, (0.9 - beat) / 0.72))} />
+      </div>
     </div>
   );
+}
+
+type Spark = { x: number; y: number; px: number; py: number; vx: number; vy: number; life: number; max: number; kind: 0 | 1 | 2 };
+
+/** Brennende Zündschnur: glühender Kern, sprühende Funken, ein Hauch Rauch (Canvas, additiv geblendet) */
+function FuseFire({ x, y, scale, intensity }: { x: number; y: number; scale: number; intensity: number }) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const inten = useRef(intensity);
+  inten.current = intensity;
+  const box = Math.round(110 * scale);
+  useEffect(() => {
+    const cv = ref.current;
+    const ctx = cv?.getContext('2d');
+    if (!cv || !ctx) return;
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    cv.width = box * dpr; cv.height = box * dpr;
+    ctx.scale(dpr, dpr);
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    const cx = box / 2, cy = box / 2, s = scale;
+    const parts: Spark[] = [];
+    let raf = 0, last = performance.now(), carry = 0;
+    const spawn = (kind: 0 | 1 | 2) => {
+      if (kind === 2) {
+        parts.push({ x: cx + (Math.random() - 0.5) * 4 * s, y: cy - 2 * s, px: cx, py: cy, vx: (Math.random() - 0.3) * 8 * s, vy: (-18 - Math.random() * 14) * s, life: 0, max: 0.9 + Math.random() * 0.6, kind });
+        return;
+      }
+      // Funken sprühen vor allem nach oben/außen (Zündschnur zeigt nach rechts oben)
+      const ang = -Math.PI / 2 + 0.35 + (Math.random() - 0.5) * (kind === 1 ? 2.4 : 3.6);
+      const sp = (kind === 1 ? 55 + Math.random() * 75 : 20 + Math.random() * 40) * s;
+      parts.push({ x: cx, y: cy, px: cx, py: cy, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp, life: 0, max: kind === 1 ? 0.28 + Math.random() * 0.4 : 0.15 + Math.random() * 0.2, kind });
+    };
+    const frame = (t: number) => {
+      const dt = Math.min(0.05, (t - last) / 1000);
+      last = t;
+      const k = inten.current;
+      carry += dt * (reduce ? 25 : 70 + 110 * k);
+      while (carry >= 1) { carry -= 1; spawn(Math.random() < 0.55 ? 1 : 0); if (Math.random() < 0.06) spawn(2); }
+      ctx.clearRect(0, 0, box, box);
+      // Rauch (normal geblendet, unter den Funken)
+      ctx.globalCompositeOperation = 'source-over';
+      for (const p of parts) {
+        if (p.kind !== 2) continue;
+        const f = p.life / p.max;
+        ctx.fillStyle = `rgba(120,110,140,${(0.22 * (1 - f)).toFixed(3)})`;
+        ctx.beginPath(); ctx.arc(p.x, p.y, (3 + 9 * f) * s, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.globalCompositeOperation = 'lighter';
+      // flackernder Glutkern
+      const r = (13 + Math.random() * 4 + 5 * k) * s;
+      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+      g.addColorStop(0, 'rgba(255,255,235,1)');
+      g.addColorStop(0.25, 'rgba(255,220,110,.95)');
+      g.addColorStop(0.55, 'rgba(255,130,40,.55)');
+      g.addColorStop(1, 'rgba(255,60,0,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+      // Funken als kurze Leuchtstriche
+      ctx.lineCap = 'round';
+      for (const p of parts) {
+        if (p.kind === 2) continue;
+        const f = p.life / p.max;
+        const hue = 55 - 45 * f; // weißgelb → orange → rot
+        const light = 92 - 40 * f;
+        ctx.strokeStyle = `hsla(${hue.toFixed(0)},100%,${light.toFixed(0)}%,${(1 - f * f).toFixed(3)})`;
+        ctx.lineWidth = (p.kind === 1 ? 1.6 : 2.4) * s * (1 - 0.5 * f);
+        ctx.beginPath(); ctx.moveTo(p.px, p.py); ctx.lineTo(p.x, p.y); ctx.stroke();
+      }
+      // bewegen
+      for (let i = parts.length - 1; i >= 0; i--) {
+        const p = parts[i];
+        p.life += dt;
+        if (p.life >= p.max) { parts.splice(i, 1); continue; }
+        p.px = p.x - p.vx * dt * 1.6; p.py = p.y - p.vy * dt * 1.6; // Schweif
+        if (p.kind === 2) { p.vx *= 0.98; p.vy *= 0.97; }
+        else { p.vy += 140 * s * dt; p.vx *= 0.985; }
+        p.x += p.vx * dt; p.y += p.vy * dt;
+        // gelegentlich zerplatzt ein Funke in kleine
+        if (p.kind === 1 && Math.random() < 0.012 && parts.length < 260) {
+          for (let j = 0; j < 3; j++) {
+            const a2 = Math.random() * Math.PI * 2, sp2 = (20 + Math.random() * 30) * s;
+            parts.push({ x: p.x, y: p.y, px: p.x, py: p.y, vx: Math.cos(a2) * sp2, vy: Math.sin(a2) * sp2, life: 0, max: 0.12 + Math.random() * 0.15, kind: 0 });
+          }
+        }
+      }
+      raf = requestAnimationFrame(frame);
+    };
+    raf = requestAnimationFrame(frame);
+    return () => cancelAnimationFrame(raf);
+  }, [box, scale]);
+  return <canvas ref={ref} style={{ position: 'absolute', left: x - box / 2, top: y - box / 2, width: box, height: box, pointerEvents: 'none' }} />;
 }
 
 function Hearts({ n, max }: { n: number; max: number }) {

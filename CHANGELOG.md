@@ -2,6 +2,11 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.55.0
+
+- Heiße Kartoffel: Die Zündschnur brennt jetzt sichtbar – oben an der Spitze glüht und sprüht es Funken, und je näher die Explosion rückt, desto wilder
+- Lobby: Passt die Spielerzahl nicht, ist „Los geht's“ jetzt einfach grau – auf Handy und Fernseher, ohne den unschönen gelben Streifen
+
 ## 0.54.0
 
 - Montagsmaler: Über 1100 neue Begriffe – jetzt 1461 statt 316 (auf Englisch 1451). Neu dabei: viele Tiere, Essen aus aller Welt, Werkzeug und Küchenkram, Sport, Zirkus und Musik, Ritter, Piraten und Weltraum, Märchen und Sagen, berühmte Bauwerke, Partyspiele und knifflige Begriffe wie „Funkloch“, „Schnapsidee“ oder „Wolke sieben“. Begriffe wiederholen sich dadurch viel seltener
