@@ -156,6 +156,11 @@ const scenarios: { game: string; players: number; options?: Record<string, numbe
   { game: 'sumo', players: 4, options: { rounds: 2, arena: 'ring' } },
   { game: 'tank-trouble', players: 4, options: { mode: 'duell', rounds: 3, teams: 'on' } },
   { game: 'tank-trouble', players: 5, options: { mode: 'duell', rounds: 3, teams: 'on', cpu: 1 } },
+  { game: 'bonk', players: 5, options: { rounds: 3, teams: 'on' } },
+  { game: 'guess-the-clicks', players: 4, options: { game: 'higherlower', videos: 4 } },
+  { game: 'mainstream', players: 4, options: { rounds: 5, playerQuestions: 'on' } },
+  { game: 'murmel-mayhem', players: 4, options: { rounds: 3, bets: 'off' } },
+  { game: 'schaetzmeister', players: 5, options: { rounds: 4, bets: 'on' } },
 ];
 // Olympia-Modus: mehrere Spiele hintereinander mit Medaillen (npm test -- olympia)
 const olympiaScenarios: { players: number; settings: Record<string, unknown>; list?: string[] }[] = [

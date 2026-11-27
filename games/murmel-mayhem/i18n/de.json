@@ -180,5 +180,11 @@
   "track.drehkreuz": "DREHKREUZ",
   "track.lotterie": "LOTTERIE-TROMMEL",
   "end.lotterie": "Lotterie-Trommel",
-  "race.list": "ZIELEINLAUF"
+  "race.list": "ZIELEINLAUF",
+  "bet.phone": "Wer gewinnt das Rennen?",
+  "bet.hint": "Tipp, wessen Murmel als erste ins Ziel rollt. Richtig: +{n}",
+  "bet.done": "Tipp abgegeben – du kannst noch wechseln.",
+  "bet.won": "Tipp richtig! +{n}",
+  "bet.lost": "Tipp leider falsch",
+  "result.betChip": "Tipp"
 }

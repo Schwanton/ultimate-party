@@ -52,7 +52,7 @@ function Host(props: HostViewProps) {
           <span className="up-tag anim-pop" style={{ background: RED, color: '#fff', boxShadow: '0 8px 0 #C22E24', fontSize: 72, padding: '12px 36px', borderRadius: 26, transform: 'rotate(-3deg)' }}>{t('title')}</span>
           <p className="anim-up" style={{ fontSize: 28, maxWidth: 900, lineHeight: 1.35, animationDelay: '.4s' }}>{t('intro.text')}</p>
           <p className="anim-up up-chip" style={{ fontSize: 22, maxWidth: 1000, lineHeight: 1.35, animationDelay: '.9s', padding: '10px 20px' }}>
-            {t(`mode.${view.mode ?? 'best'}.intro`)}{view.loose && (view.mode === 'distance' || view.mode === 'bonus') ? ` ${t('mode.loose')}` : ''}
+            {view.hl ? t('hl.intro') : <>{t(`mode.${view.mode ?? 'best'}.intro`)}{view.loose && (view.mode === 'distance' || view.mode === 'bonus') ? ` ${t('mode.loose')}` : ''}</>}
           </p>
         </div>
       );
@@ -83,6 +83,31 @@ function Host(props: HostViewProps) {
         </>
       );
     }
+    case 'hlGuess': {
+      const a = view.a, b = view.b;
+      return (
+        <>
+          <HostHeader title={t('title')} color={RED} info={`${t('video', { n: view.n, total: view.total })}${view.mult > 1 ? ' · ×2' : ''}`} right={<HostTimer deadline={view.deadline} duration={view.duration} />} />
+          <div style={{ flex: 1, display: 'flex', gap: 28, alignItems: 'center', minHeight: 0 }}>
+            <div style={{ width: 330, flex: 'none', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <img src={`https://i.ytimg.com/vi/${a.id}/mqdefault.jpg`} alt="" style={{ width: 330, height: 186, objectFit: 'cover', borderRadius: 18 }} />
+              <p style={{ fontSize: 18, fontWeight: 700, lineHeight: 1.25, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{a.title}</p>
+              <span className="display" style={{ fontSize: 40, fontWeight: 800, color: 'var(--yellow)' }}>{fmt(a.views, lang)}</span>
+              <span className="muted" style={{ fontSize: 16 }}>{t('reveal.views')}</span>
+            </div>
+            <span className="display" style={{ fontSize: 44, fontWeight: 800, color: RED }}>VS</span>
+            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <VideoPlayer id={b.id} t={t} />
+              <p style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.25, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{b.title}</p>
+              <h2 className="display" style={{ fontSize: 30, color: 'var(--yellow)' }}>{t('hl.question')}</h2>
+              <span className="up-chip" style={{ alignSelf: 'flex-start', fontSize: 17 }}>{t('guess.count', { n: view.picked, total: view.players })}</span>
+            </div>
+          </div>
+        </>
+      );
+    }
+    case 'hlReveal':
+      return <HostHL {...props} />;
     case 'countdown':
       return <HostCountdown key={view.key} n={view.n} total={view.total} t={t} />;
     case 'reveal':
@@ -106,6 +131,43 @@ function Host(props: HostViewProps) {
       );
   }
   return null;
+}
+
+/** Höher oder tiefer: Aufrufe von Video B zählen hoch, dann wer richtig lag */
+function HostHL({ view, t, player, room }: HostViewProps) {
+  const lang = room.lang;
+  const now = useServerNow(50);
+  const k = Math.max(0, Math.min(1, (now - view.startAt) / 2600));
+  const shownViews = Math.round(view.b.views * (k < 1 ? (10 ** (k * 3) - 1) / 999 : 1));
+  const done = k >= 1;
+  const col = (key: 'more' | 'less') => {
+    const ids = (view[key] as string[]).map((id) => player(id)).filter(Boolean) as PlayerInfo[];
+    const ok = done && (view.right as string[]).includes(key);
+    return (
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, padding: 16, borderRadius: 22, background: ok ? 'rgba(75,227,161,.15)' : 'var(--surface)', border: `3px solid ${ok ? 'var(--green)' : 'transparent'}`, opacity: done && !ok ? 0.45 : 1, transition: 'all .4s' }}>
+        <span className="display" style={{ fontSize: 30, fontWeight: 800 }}>{key === 'more' ? `▲ ${t('hl.more')}` : `▼ ${t('hl.less')}`}</span>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, justifyContent: 'center' }}>{ids.map((p) => <Avatar key={p.id} player={p} size={ids.length > 12 ? 34 : 46} />)}</div>
+        {ok && <b className="display anim-pop" style={{ fontSize: 26, color: 'var(--green)' }}>+{view.points}</b>}
+      </div>
+    );
+  };
+  return (
+    <>
+      <HostHeader title={t('title')} color={RED} info={t('video', { n: view.n, total: view.total })} />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 40 }}>
+        <div style={{ textAlign: 'center' }}>
+          <p className="muted" style={{ fontSize: 17, maxWidth: 360, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{view.a.title}</p>
+          <span className="display" style={{ fontSize: 40, fontWeight: 800 }}>{fmt(view.a.views, lang)}</span>
+        </div>
+        <span className="display" style={{ fontSize: 34, color: RED, fontWeight: 800 }}>VS</span>
+        <div style={{ textAlign: 'center' }}>
+          <p className="muted" style={{ fontSize: 17, maxWidth: 360, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{view.b.title}</p>
+          <span className="display" style={{ fontSize: 56, fontWeight: 800, color: 'var(--yellow)' }}>{fmt(shownViews, lang)}</span>
+        </div>
+      </div>
+      <div style={{ flex: 1, display: 'flex', gap: 24, alignItems: 'stretch', padding: '18px 0' }}>{col('more')}{col('less')}</div>
+    </>
+  );
 }
 
 /** 3 – 2 – 1 vor jeder Runde, mit Piepton (der einzige Sound in diesem Spiel) */
@@ -411,6 +473,44 @@ function Controller({ view, t, send, me, room }: ControllerViewProps) {
             </p>
           )}
           {view.place && (view.won || view.mode === 'best' || view.mode == null) && <p className="muted">{t('result.place', { n: view.place, of: view.of })}</p>}
+        </div>
+      );
+    case 'hlGuess':
+      return (
+        <>
+          <PhoneTimer deadline={view.deadline} duration={view.duration} hurryText={view.pick == null ? t('timer.hurry') : undefined} />
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+            <img src={`https://i.ytimg.com/vi/${view.aId}/default.jpg`} alt="" width={80} height={60} style={{ borderRadius: 10, objectFit: 'cover', flex: 'none' }} />
+            <div style={{ minWidth: 0 }}>
+              <p style={{ fontSize: 14, fontWeight: 700, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{view.aTitle}</p>
+              <p className="display" style={{ fontSize: 22, fontWeight: 800, color: 'var(--yellow)' }}>{fmt(view.aViews, lang)}</p>
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+            <img src={`https://i.ytimg.com/vi/${view.bId}/default.jpg`} alt="" width={80} height={60} style={{ borderRadius: 10, objectFit: 'cover', flex: 'none' }} />
+            <p style={{ fontSize: 14, fontWeight: 700, minWidth: 0, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{view.bTitle}</p>
+          </div>
+          <span className="up-label">{t('hl.phone')}</span>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12, justifyContent: 'center' }}>
+            {(['more', 'less'] as const).map((k) => (
+              <button key={k} type="button" className={`up-btn big full ${view.pick === k ? '' : 'ghost'}`} onClick={() => send({ type: 'hl', pick: k })} style={{ minHeight: 96, fontSize: 28 }}>
+                {k === 'more' ? `▲ ${t('hl.more')}` : `▼ ${t('hl.less')}`}
+              </button>
+            ))}
+          </div>
+          {view.pick && <p className="muted" style={{ textAlign: 'center' }}>{t('guess.change')}</p>}
+        </>
+      );
+    case 'hlResult':
+      if (now < view.doneAt) return <PhoneWait title={t('lookAtTv')} emoji={<Avatar player={me} size={96} />} />;
+      return (
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, textAlign: 'center' }} className="anim-fade">
+          {view.right && <Confetti pieces={14} />}
+          <Avatar player={me} size={100} />
+          <h1 style={{ fontSize: 30 }}>{view.pick == null ? t('lookAtTv') : view.right ? t('hl.right') : t('hl.wrong')}</h1>
+          {view.points > 0 && <p className="display anim-pop" style={{ fontSize: 34, fontWeight: 800, color: 'var(--green)' }}>+{view.points}</p>}
+          <p className="muted" style={{ fontSize: 16 }}>{t('reveal.views')}</p>
+          <p className="display" style={{ fontSize: 36, fontWeight: 800, color: 'var(--yellow)' }}>{fmt(view.views, lang)}</p>
         </div>
       );
     case 'audienceWait':

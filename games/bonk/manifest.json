@@ -12,7 +12,7 @@
   "color": "#FF4FB8",
   "tags": ["action", "quick"],
   "sdkVersion": 1,
-  "version": "0.5.0",
+  "version": "0.6.0",
   "author": "UP!",
   "options": [
     {
@@ -34,6 +34,16 @@
         { "value": 1, "label": { "de": "1 (schnell)", "en": "1 (quick)" } },
         { "value": 3, "label": { "de": "3", "en": "3" } },
         { "value": 5, "label": { "de": "5 (lang)", "en": "5 (long)" } }
+      ]
+    },
+    {
+      "id": "teams",
+      "label": { "de": "Teams", "en": "Teams" },
+      "help": { "de": "Ab 3 Spielern: Team Rot gegen Team Blau, zufällig eingeteilt. Eigene Leute kann man nicht treffen. Gewinnt ein Team die Runde, bekommen alle im Team +300.", "en": "From 3 players: Team Red vs Team Blue, split randomly. You can't hit your teammates. When a team wins the round, everyone in it gets +300." },
+      "default": "off",
+      "choices": [
+        { "value": "off", "label": { "de": "Jeder gegen jeden", "en": "Free for all" } },
+        { "value": "on", "label": { "de": "Zwei Teams", "en": "Two teams" } }
       ]
     },
     {

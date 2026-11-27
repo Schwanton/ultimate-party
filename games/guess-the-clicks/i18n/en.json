@@ -73,5 +73,12 @@
   "mode.best.short": "",
   "mode.rank.short": "Everyone scores by rank",
   "mode.distance.short": "Everyone scores – the closer, the more",
-  "mode.bonus.short": "The closer, the more · closest +250 · almost spot on +500"
+  "mode.bonus.short": "The closer, the more · closest +250 · almost spot on +500",
+  "hl.question": "More or fewer views?",
+  "hl.more": "More",
+  "hl.less": "Fewer",
+  "hl.phone": "Does the second video have more or fewer views than the first?",
+  "hl.right": "Right!",
+  "hl.wrong": "Wrong!",
+  "hl.intro": "Higher or lower: does the new video have more or fewer views than the known one? Right: +500, last round doubled."
 }

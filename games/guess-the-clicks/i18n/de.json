@@ -73,5 +73,12 @@
   "mode.best.short": "",
   "mode.rank.short": "Alle bekommen Punkte nach ihrem Platz",
   "mode.distance.short": "Alle bekommen Punkte – je näher, desto mehr",
-  "mode.bonus.short": "Je näher, desto mehr · Nächster +250 · fast genau +500"
+  "mode.bonus.short": "Je näher, desto mehr · Nächster +250 · fast genau +500",
+  "hl.question": "Mehr oder weniger Aufrufe?",
+  "hl.more": "Mehr",
+  "hl.less": "Weniger",
+  "hl.phone": "Hat das zweite Video mehr oder weniger Aufrufe als das erste?",
+  "hl.right": "Richtig!",
+  "hl.wrong": "Daneben!",
+  "hl.intro": "Höher oder tiefer: Hat das neue Video mehr oder weniger Aufrufe als das bekannte? Richtig: +500, letzte Runde doppelt."
 }

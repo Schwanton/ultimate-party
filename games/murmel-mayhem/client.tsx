@@ -1260,6 +1260,7 @@ function HostResult({ view, t, player }: HostViewProps) {
                     </span>
                   ))}
                   {r.trap > 0 && <span style={{ display: 'inline-flex', gap: 3, padding: '1px 6px', borderRadius: 7, border: '2px solid #d3452f', fontSize: big ? 14 : 12, color: '#ff9b88' }}>{t('result.trapChip')}<b>+{r.trap}</b></span>}
+                  {(view.betWinners as string[] | undefined)?.includes(r.id) && <span style={{ display: 'inline-flex', gap: 3, padding: '1px 6px', borderRadius: 7, border: `2px solid ${BRASS}`, fontSize: big ? 14 : 12, color: BRASS_L }}>{t('result.betChip')}<b>+{view.betPts}</b></span>}
                   {r.list.length === 0 && r.trap === 0 && <span style={{ fontSize: 13, color: DIM }}>{t('result.nothing')}</span>}
                 </span>
                 <span style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: big ? 26 : 20, textAlign: 'right', color: BRASS_L }}>+<CountUp value={r.sum} delay={delay * 1000} /></span>
@@ -1362,6 +1363,29 @@ function Controller(props: ControllerViewProps) {
           <PhoneWait title={t(view.key)} text={view.mine?.length ? t('phone.yours', { list: view.mine.map((f: { kind: string }) => t(`k.${f.kind}`)).join(', ') }) : t('lookAtTv')} emoji={<Marble d={design} size={96} />} />
         </Phone>
       );
+    case 'bet':
+      return (
+        <Phone color={color}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <h1 style={{ fontFamily: DISPLAY, fontSize: 26, color: BRASS, margin: 0 }}>{t('bet.phone')}</h1>
+            <p style={{ fontSize: 15, color: MUTED, margin: 0 }}>{t('bet.hint', { n: view.points })}</p>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, overflowY: 'auto' }}>
+              {(view.options as string[]).map((id) => {
+                const on = view.selected === id;
+                const d = view.designs[id] as Design;
+                return (
+                  <button key={id} type="button" onClick={() => props.send({ type: 'bet', target: id })}
+                    style={{ minHeight: 64, display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', borderRadius: 16, border: `2px solid ${on ? BRASS : 'transparent'}`, background: on ? 'rgba(233,196,106,.2)' : 'rgba(255,255,255,.06)', color: TEXT, cursor: 'pointer', opacity: view.selected && !on ? 0.5 : 1 }}>
+                    <Marble d={d} size={34} />
+                    <PatternText d={d} size={16} style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{props.player(id)?.name ?? '?'}</PatternText>
+                  </button>
+                );
+              })}
+            </div>
+            <p style={{ fontSize: 14, color: DIM, textAlign: 'center', marginTop: 'auto' }}>{view.selected ? t('bet.done') : t('lookAtTv')}</p>
+          </div>
+        </Phone>
+      );
     case 'result':
       return (
         <Phone color={color}>
@@ -1371,6 +1395,7 @@ function Controller(props: ControllerViewProps) {
             <PatternText d={design} size={44}>+{view.points}</PatternText>
             <p style={{ fontSize: 18, color: MUTED, margin: 0 }}>{t('phone.finished', { n: view.finished, of: view.of })}</p>
             {view.traps > 0 && <p style={{ fontSize: 17, color: '#ff9b88', margin: 0 }}>{t('phone.traps', { n: view.traps })}</p>}
+            {view.bet && <p style={{ fontSize: 17, color: view.bet.won ? BRASS_L : MUTED, margin: 0 }}>{view.bet.won ? t('bet.won', { n: view.bet.points }) : t('bet.lost')}</p>}
             <p style={{ fontSize: 17, margin: 0 }}>{t('me.place', { place: view.place, of: view.players })} · {t('me.score', { n: view.score })}</p>
           </div>
         </Phone>

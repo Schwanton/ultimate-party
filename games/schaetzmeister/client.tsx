@@ -76,6 +76,33 @@ function Host(props: HostViewProps) {
         </>
       );
     }
+    case 'bet': {
+      const done = new Set<string>(view.done);
+      const opts = view.options as { v: number; by: string[] }[];
+      const lang = props.room.lang;
+      return (
+        <>
+          <HostHeader title={t('title')} color={GREEN} info={info(view, t)} right={<HostTimer deadline={view.deadline} duration={view.duration} />} />
+          <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <h1 style={{ fontSize: 44 }}>{t('bet.title')}</h1>
+            <p className="muted" style={{ fontSize: 22, maxWidth: 1000, margin: '0 auto' }}>{view.question}</p>
+          </div>
+          <div style={{ flex: 1, display: 'flex', flexWrap: 'wrap', gap: 14, alignContent: 'center', justifyContent: 'center' }}>
+            {opts.map((o, i) => (
+              <div key={o.v} className="up-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, minWidth: 150, padding: '12px 18px', animation: `upPop .4s ease-out ${(i * 0.06).toFixed(2)}s both` }}>
+                <span className="display" style={{ fontSize: opts.length > 8 ? 24 : 32, fontWeight: 800 }}>{short(o.v, lang, t)}</span>
+                <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', justifyContent: 'center', maxWidth: 200 }}>
+                  {o.by.map((id) => player(id)).filter(Boolean).map((p) => <Avatar key={p!.id} player={p!} size={28} flat />)}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center', paddingBottom: 8 }}>
+            <span className="up-chip" style={{ fontSize: 18 }}>{t('bet.count', { n: done.size, total: (view.players as string[]).length })}</span>
+          </div>
+        </>
+      );
+    }
     case 'reveal':
       return <HostReveal {...props} />;
     case 'scores': {
@@ -141,6 +168,12 @@ function HostReveal({ view, t, player, room }: HostViewProps) {
                     </span>
                   );
                 })}
+              </div>
+            )}
+            {(phase === 'done' || phase === 'all') && view.bets && (
+              <div className="anim-up" style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                <span style={{ fontSize: 16, fontWeight: 700 }}>🪙 {view.bets.winners.length ? t('bet.winners', { n: view.bets.points }) : t('bet.none')}</span>
+                {(view.bets.winners as string[]).slice(0, 12).map((id) => player(id)).filter(Boolean).map((p) => <Avatar key={p!.id} player={p!} size={26} flat />)}
               </div>
             )}
             {(phase === 'done' || phase === 'all') && view.source && (
@@ -216,6 +249,28 @@ function Controller({ view, t, send, me, room }: ControllerViewProps) {
             onDraft={(n) => send({ type: 'guessDraft', draft: true, value: n })} deadline={view.deadline} />
         </>
       );
+    case 'bet': {
+      const opts = view.options as { v: number; by: string[] }[];
+      return (
+        <>
+          <PhoneTimer deadline={view.deadline} duration={view.duration} hurryText={view.selected == null ? t('timer.hurry') : undefined} />
+          <h1 style={{ fontSize: 22 }}>{t('bet.phone')}</h1>
+          <p className="muted" style={{ fontSize: 15 }}>{t('bet.hint', { n: view.points })}</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, overflowY: 'auto' }}>
+            {opts.map((o) => {
+              const on = view.selected === o.v;
+              return (
+                <button key={o.v} type="button" className={`up-choice${on ? ' selected' : ''}${view.selected != null && !on ? ' dim' : ''}`} onClick={() => send({ type: 'bet', value: o.v })}
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+                  <span>{fmt(o.v, lang)}{view.unit ? ` ${view.unit}` : ''}</span>
+                  {o.by.includes(me.id) && <span style={{ fontSize: 13, fontWeight: 700, opacity: 0.7 }}>{t('bet.mine')}</span>}
+                </button>
+              );
+            })}
+          </div>
+        </>
+      );
+    }
     case 'result':
       if (now < view.doneAt) return <PhoneWait title={t('lookAtTv')} emoji={<Avatar player={me} size={96} />} />;
       return (
@@ -234,7 +289,8 @@ function Controller({ view, t, send, me, room }: ControllerViewProps) {
                 : view.factor != null ? t(view.high ? 'result.high' : 'result.low', { f: factorText(view.factor, lang) }) : null}
             </p>
           )}
-          <span className="display" style={{ fontSize: 56, fontWeight: 800, color: 'var(--yellow)', textShadow: '0 6px 0 var(--yellow-d)', animation: 'upPop .6s ease-out both' }}>+{view.points}</span>
+          {view.bet && <p style={{ fontSize: 17, fontWeight: 700, color: view.bet.won ? 'var(--green)' : 'var(--muted)' }}>🪙 {view.bet.won ? t('bet.won', { n: view.bet.points }) : t('bet.lost')}</p>}
+          <span className="display" style={{ fontSize: 56, fontWeight: 800, color: 'var(--yellow)', textShadow: '0 6px 0 var(--yellow-d)', animation: 'upPop .6s ease-out both' }}>+{view.points + (view.bet?.won ? view.bet.points : 0)}</span>
         </div>
       );
     case 'scoresMe':

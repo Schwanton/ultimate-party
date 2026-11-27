@@ -2,6 +2,14 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.60.0
+
+- Bonk!: Neue Einstellung „Teams“ – ab 3 Spielern Team Rot gegen Team Blau. Eigene Leute kann man nicht treffen, gewinnt ein Team die Runde, bekommen alle im Team +300
+- Guess the Clicks!: Neue Spielart „Höher oder tiefer“ – ein Video mit bekannten Aufrufen gegen ein neues: Hat das neue mehr oder weniger? Richtig: +500
+- Mainstream: Neue Einstellung „Spieler-Fragen“ – jede zweite Frage schreibt reihum jemand aus der Runde selbst
+- Murmel-Mayhem: Tipp aufs Rennen – während der Kamerafahrt tippt jeder, wessen Murmel als erste ins Ziel kommt. Richtig: +100 (lässt sich in den Einstellungen abschalten)
+- Schätzmeister: Neue Einstellung „Wetten“ – nach dem Schätzen setzt jeder auf die Schätzung, die am nächsten liegt. Richtig: +300. So kann auch gewinnen, wer keine Ahnung hat
+
 ## 0.59.0
 
 - Heiße Kartoffel: Neue Einstellung „Zwei Kartoffeln“ – ab 8 Spielern, die noch dabei sind, wandern zwei Kartoffeln gleichzeitig. Beim Knall erwischt es beide Halter

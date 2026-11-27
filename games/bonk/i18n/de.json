@@ -166,5 +166,10 @@
   "shop.weapon": "Zweitwaffe",
   "shop.weaponText": "Kommt auf eine eigene Taste, die Rolle bleibt.",
   "shop.weaponShield": "Du bekommst den Schild auf eine eigene Taste.",
-  "shop.weaponSwap": "Ersetzt deine Zweitwaffe ({name})."
+  "shop.weaponSwap": "Ersetzt deine Zweitwaffe ({name}).",
+  "teamWin1": "Team Rot gewinnt die Runde!",
+  "teamWin2": "Team Blau gewinnt die Runde!",
+  "intro.teams": "Team Rot gegen Team Blau – eigene Leute könnt ihr nicht treffen.",
+  "phone.teamRed": "Team Rot",
+  "phone.teamBlue": "Team Blau"
 }

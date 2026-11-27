@@ -5,7 +5,7 @@
  * Gleichstand an der Spitze: alle Antworten mit den meisten Stimmen zählen als Mehrheit.
  */
 
-import { Scores, drawByStufe, shuffle, stufeOf, type GameContext, type GameServerModule } from '@up/sdk';
+import { Scores, cleanText, drawByStufe, shuffle, stufeOf, type GameContext, type GameServerModule } from '@up/sdk';
 import { revealPlan } from './timing';
 
 interface Item {
@@ -13,9 +13,11 @@ interface Item {
   question: string;
   answers: string[];
   stufe?: string;
+  /** Spieler-Frage: wer sie geschrieben hat */
+  by?: string;
 }
 
-const T = { vote: 25, lastChance: 5, intro: 7 };
+const T = { vote: 25, lastChance: 5, intro: 7, author: 50 };
 const POINTS = { predicted: 1000, inMajority: 250 };
 
 export default {
@@ -29,13 +31,18 @@ export default {
     let own = new Map<string, number>();
     let guess = new Map<string, number>();
     let timer: { cancel(): void; deadline: number; duration: number } | null = null;
-    let phase: 'intro' | 'vote' | 'reveal' | 'scores' = 'intro';
+    let phase: 'intro' | 'author' | 'vote' | 'reveal' | 'scores' = 'intro';
+    /** Spieler-Fragen (Einstellung): jede zweite Frage schreibt reihum jemand selbst */
+    const PQ = ctx.options.playerQuestions === 'on' && ids.length >= 3;
+    const authorOrder = shuffle(ids);
+    let authorTurn = 0;
+    let author = '';
     let roundStart = scores.snapshot();
     let lastScores = 0;
 
     const item = () => items[q];
     const mult = () => (q === items.length - 1 ? 2 : 1);
-    const base = () => ({ n: q + 1, total: items.length, mult: mult(), question: item().question, answers: item().answers });
+    const base = () => ({ n: q + 1, total: items.length, mult: mult(), question: item().question, answers: item().answers, by: item().by ?? null });
     const doneCount = () => ids.filter((id) => own.has(id) && guess.has(id)).length;
 
     function intro() {
@@ -52,12 +59,43 @@ export default {
         q--;
         return showScores(false);
       }
+      if (PQ && q % 2 === 1) return startAuthor();
+      startVote();
+    }
+
+    function startVote() {
       own = new Map();
       guess = new Map();
       phase = 'vote';
       timer = ctx.timer(T.vote * tf, reveal);
       hostVote();
       ids.forEach(voteView);
+    }
+
+    /* ---------- Spieler-Frage schreiben ---------- */
+
+    function startAuthor() {
+      // nächste verbundene Person in der Reihe
+      for (let k = 0; k < authorOrder.length; k++) {
+        author = authorOrder[authorTurn++ % authorOrder.length];
+        if (ctx.player(author)?.connected) break;
+      }
+      phase = 'author';
+      timer = ctx.timer(T.author, startVote);
+      ctx.setHostView({ screen: 'author', n: q + 1, total: items.length, author, deadline: timer.deadline, duration: timer.duration });
+      for (const id of ids) {
+        if (id === author) ctx.setPlayerView(id, { screen: 'author', input: true, deadline: timer.deadline, duration: timer.duration });
+        else ctx.setPlayerView(id, { screen: 'authorWait', author });
+      }
+    }
+
+    function acceptQuestion(raw: { question?: unknown; answers?: unknown }) {
+      const question = cleanText(raw.question, 100);
+      const list = Array.isArray(raw.answers) ? raw.answers.map((a) => cleanText(a, 40)).filter(Boolean) : [];
+      const answers = [...new Set(list)].slice(0, 4);
+      if (question.length < 5 || answers.length < 2) return false;
+      items[q] = { id: `own-${q}`, question, answers, by: author };
+      return true;
     }
 
     function hostVote() {
@@ -127,6 +165,12 @@ export default {
     return {
       start: intro,
       onAction(id, action) {
+        if (phase === 'author' && id === author && action?.type === 'authorQuestion') {
+          if (!acceptQuestion(action)) return ctx.setPlayerView(id, { screen: 'author', input: true, error: true, deadline: timer!.deadline, duration: timer!.duration });
+          timer?.cancel();
+          startVote();
+          return;
+        }
         if (phase !== 'vote' || !action || !ids.includes(id)) return;
         const i = Number(action.answer);
         if (!Number.isInteger(i) || i < 0 || i >= item().answers.length) return;
@@ -138,6 +182,10 @@ export default {
         if (ids.every((p) => (own.has(p) && guess.has(p)) || !ctx.player(p)?.connected)) hurry();
       },
       bot(_id, view) {
+        if (view.screen === 'author' && !view.error) {
+          const de = ctx.lang === 'de';
+          return { type: 'authorQuestion', question: de ? 'Lieber Berge oder Meer?' : 'Mountains or sea?', answers: de ? ['Berge', 'Meer', 'Beides'] : ['Mountains', 'Sea', 'Both'] };
+        }
         if (view.screen !== 'vote') return null;
         const n = (view.answers as string[]).length;
         // Bots haben eine leichte Vorliebe für die erste Antwort – so entstehen echte Mehrheiten

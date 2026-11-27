@@ -26,5 +26,16 @@
   "lookAtTv": "Look at the TV.",
   "reveal.phaseGuesses": "Where do you think the majority is?",
   "reveal.phaseVotes": "And this is how you really answered:",
-  "reveal.guessLabel": "Guesses"
+  "reveal.guessLabel": "Guesses",
+  "vote.by": "Question by {name}",
+  "author.tv": "{name} is coming up with a question …",
+  "author.tvText": "Then you all vote on it.",
+  "author.phone": "Your turn: ask the group a question!",
+  "author.hint": "One question and 2 to 4 answers – e.g. “Best breakfast?” with toast, cereal, eggs.",
+  "author.question": "Your question",
+  "author.answer": "Answer",
+  "author.optional": "Answer (optional)",
+  "author.error": "Please enter a question (at least 5 characters) and at least 2 different answers.",
+  "author.send": "Ask",
+  "author.wait": "{name} is writing a question …"
 }

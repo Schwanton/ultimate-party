@@ -51,5 +51,14 @@
   "unit.t": "Bio.",
   "word.m": "Millionen",
   "word.b": "Milliarden",
-  "word.t": "Billionen"
+  "word.t": "Billionen",
+  "bet.title": "Worauf setzt ihr?",
+  "bet.count": "{n} von {total} haben gesetzt",
+  "bet.phone": "Welche Schätzung liegt am nächsten?",
+  "bet.hint": "Setz auf eine – auch deine eigene. Richtig: +{n}",
+  "bet.mine": "deine",
+  "bet.winners": "Richtig gewettet: +{n}",
+  "bet.none": "Niemand hat richtig gewettet",
+  "bet.won": "Wette gewonnen! +{n}",
+  "bet.lost": "Wette verloren"
 }

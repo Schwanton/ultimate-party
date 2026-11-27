@@ -51,5 +51,14 @@
   "unit.t": "T",
   "word.m": "million",
   "word.b": "billion",
-  "word.t": "trillion"
+  "word.t": "trillion",
+  "bet.title": "Place your bets!",
+  "bet.count": "{n} of {total} have bet",
+  "bet.phone": "Which guess is closest?",
+  "bet.hint": "Bet on one – your own is fine too. Right: +{n}",
+  "bet.mine": "yours",
+  "bet.winners": "Right bets: +{n}",
+  "bet.none": "Nobody bet right",
+  "bet.won": "Bet won! +{n}",
+  "bet.lost": "Bet lost"
 }

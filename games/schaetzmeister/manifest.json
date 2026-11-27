@@ -13,7 +13,7 @@
   "tags": ["guess", "quick"],
   "sdkVersion": 1,
   "contentFields": ["question"],
-  "version": "1.4.1",
+  "version": "1.5.0",
   "author": "UP!",
   "options": [
     { "id": "rounds", "label": { "de": "Fragen", "en": "Questions" }, "default": 8, "min": 3, "max": 15 },
@@ -45,6 +45,14 @@
       "choices": [
         { "value": "normal", "label": { "de": "Normal (10-mal daneben = 0)", "en": "Normal (10× off = 0)" } },
         { "value": "loose", "label": { "de": "Locker (100-mal daneben = 0)", "en": "Relaxed (100× off = 0)" } }
+      ]
+    },
+    {
+      "id": "bets", "label": { "de": "Wetten", "en": "Bets" }, "default": "off",
+      "help": { "de": "Nach dem Schätzen sieht jeder alle Schätzungen und setzt auf die, die am nächsten liegt (auch die eigene). Richtig: +300 (letzte Frage ×2). So kann auch gewinnen, wer keine Ahnung hat.", "en": "After guessing, everyone sees all guesses and bets on the closest one (their own is fine). Right: +300 (last question ×2). So even players with no clue can win." },
+      "choices": [
+        { "value": "off", "label": { "de": "Aus", "en": "Off" } },
+        { "value": "on", "label": { "de": "An", "en": "On" } }
       ]
     }
   ]

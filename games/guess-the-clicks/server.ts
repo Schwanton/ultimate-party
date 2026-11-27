@@ -19,6 +19,11 @@ export default {
     const LOOSE = ctx.options.strictness === 'loose';
     const THEME: Theme = THEMES.includes(ctx.options.theme as Theme) ? (ctx.options.theme as Theme) : 'all';
     const KNOWN = ctx.options.views === 'known';
+    /** Spielart „Höher oder tiefer“: Video A mit Aufrufen ist bekannt, hat Video B mehr oder weniger? (B wird zum nächsten A) */
+    const HL = ctx.options.game === 'higherlower';
+    const NEED = ROUNDS + (HL ? 1 : 0);
+    const HL_POINTS = 500;
+    let picks = new Map<string, 'more' | 'less'>();
     /** Bei „Nur der Nächste“ reicht das Finale wie bisher; sonst kommen am Ende alle mit Punkten zurück. */
     const PLAN: PlanOptions = { log: true, showAll: MODE !== 'best' };
     const ids = ctx.players.map((p) => p.id);
@@ -70,14 +75,14 @@ export default {
       const seen = new Set<string>();
       try {
         if (fake) {
-          for (let i = 0; i < ROUNDS; i++) videos.push(fakeVideo(i));
+          for (let i = 0; i < NEED; i++) videos.push(fakeVideo(i));
           loadingDone = true;
         } else {
           // erstes Video sofort, die anderen im Hintergrund
           videos.push(await randomVideo(key!, topics, ctx.lang, seen, { theme: THEME, known: KNOWN }));
           seen.add(videos[0].id);
           void (async () => {
-            while (videos.length < ROUNDS && !disposed) {
+            while (videos.length < NEED && !disposed) {
               try {
                 const v = await randomVideo(key!, topics, ctx.lang, seen, { theme: THEME, known: KNOWN });
                 seen.add(v.id);
@@ -97,13 +102,13 @@ export default {
         return;
       }
       if (disposed) return;
-      ctx.setHostView({ screen: 'intro', mode: MODE, loose: LOOSE });
+      ctx.setHostView({ screen: 'intro', mode: MODE, loose: LOOSE, hl: HL });
       ctx.after(6, next);
     }
 
     function next() {
       round++;
-      if (round >= videos.length) {
+      if (round + (HL ? 1 : 0) >= videos.length) {
         // Video wird noch geladen? Kurz warten, sonst mit den vorhandenen Videos beenden.
         if (!loadingDone && waited++ < 15) {
           round--;
@@ -117,7 +122,53 @@ export default {
       ctx.setHostView({ screen: 'countdown', n: round + 1, total: ROUNDS, key: Math.random() });
       ctx.setAllPlayerViews(() => ({ screen: 'countdown' }));
       ctx.setAudienceView({ screen: 'countdown' });
-      ctx.after(3, startGuess);
+      ctx.after(3, HL ? startHL : startGuess);
+    }
+
+    /* ---------- Höher oder tiefer ---------- */
+
+    const hlA = () => videos[round];
+    const hlB = () => videos[round + 1];
+    const hlMult = () => (round === ROUNDS - 1 && ROUNDS > 1 ? 2 : 1);
+
+    function startHL() {
+      phase = 'guess';
+      picks = new Map();
+      timer = ctx.timer(Math.min(GUESS_TIME, 30), revealHL);
+      sendHL();
+    }
+
+    function sendHL() {
+      const a = hlA(), b = hlB();
+      ctx.setHostView({
+        screen: 'hlGuess', n: round + 1, total: ROUNDS, mult: hlMult(),
+        a: { id: a.id, title: a.title, channel: a.channel, views: a.views }, b: { id: b.id, title: b.title, channel: b.channel },
+        picked: [...picks.keys()].filter(isPlayer).length, players: ids.length, deadline: timer!.deadline, duration: timer!.duration,
+      });
+      for (const id of members()) {
+        ctx.setPlayerView(id, { screen: 'hlGuess', input: !picks.has(id), aTitle: a.title, aViews: a.views, aId: a.id, bTitle: b.title, bId: b.id, pick: picks.get(id) ?? null, deadline: timer!.deadline, duration: timer!.duration });
+      }
+    }
+
+    function revealHL() {
+      timer?.cancel();
+      phase = 'reveal';
+      const a = hlA(), b = hlB();
+      // gleich viele Aufrufe: beide Antworten richtig
+      const right: ('more' | 'less')[] = b.views > a.views ? ['more'] : b.views < a.views ? ['less'] : ['more', 'less'];
+      const pts = HL_POINTS * hlMult();
+      const winners = [...picks].filter(([id, p]) => isPlayer(id) && right.includes(p)).map(([id]) => id);
+      winners.forEach((id) => scores.add(id, pts));
+      ctx.setHostView({
+        screen: 'hlReveal', n: round + 1, total: ROUNDS, a: { id: a.id, title: a.title, views: a.views }, b: { id: b.id, title: b.title, views: b.views },
+        more: [...picks].filter(([id, p]) => isPlayer(id) && p === 'more').map(([id]) => id), less: [...picks].filter(([id, p]) => isPlayer(id) && p === 'less').map(([id]) => id),
+        right, points: pts, startAt: Date.now() + 300,
+      });
+      for (const id of members()) {
+        const p = picks.get(id) ?? null;
+        ctx.setPlayerView(id, { screen: 'hlResult', pick: p, right: p ? right.includes(p) : null, views: b.views, aViews: a.views, points: p && right.includes(p) && isPlayer(id) ? pts : 0, doneAt: Date.now() + 3300 });
+      }
+      ctx.after(9, next);
     }
 
     function startGuess() {
@@ -219,6 +270,16 @@ export default {
         if (phase === 'setup') void load();
       },
       onAction(id, action) {
+        if (HL && phase === 'guess' && action?.type === 'hl' && (action.pick === 'more' || action.pick === 'less') && members().includes(id)) {
+          picks.set(id, action.pick);
+          sendHL();
+          if (ids.every((p) => picks.has(p) || !ctx.player(p)?.connected) && timer && timer.deadline - Date.now() > LAST_CHANCE * 1200) {
+            timer.cancel();
+            timer = ctx.timer(LAST_CHANCE, revealHL);
+            sendHL();
+          }
+          return;
+        }
         if (phase === 'guess' && action?.type === 'extend' && isPlayer(id)) {
           if (action.on === false) extendVotes.delete(id);
           else extendVotes.add(id);
@@ -254,10 +315,12 @@ export default {
         if (ids.every((p) => guesses.has(p) || !ctx.player(p)?.connected)) hurry();
       },
       onAudienceJoin(id) {
-        if (phase === 'guess') guessView(id);
+        if (phase === 'guess' && HL) sendHL();
+        else if (phase === 'guess') guessView(id);
         else ctx.setPlayerView(id, { screen: 'audienceWait' });
       },
       bot(_id, view) {
+        if (view.screen === 'hlGuess' && view.pick == null) return { type: 'hl', pick: Math.random() < 0.5 ? 'more' : 'less' };
         if (view.screen === 'guess' && view.guess == null) return { type: 'guess', value: Math.round(10 ** (1 + Math.random() * 8)) };
         return null;
       },

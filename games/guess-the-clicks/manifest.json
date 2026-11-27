@@ -23,7 +23,7 @@
   "contentFields": [
     "query"
   ],
-  "version": "1.3.0",
+  "version": "1.4.0",
   "author": "UP!",
   "secrets": [
     {
@@ -40,6 +40,15 @@
     }
   ],
   "options": [
+    {
+      "id": "game",
+      "label": { "de": "Spielart", "en": "Game type" },
+      "default": "guess",
+      "choices": [
+        { "value": "guess", "label": { "de": "Aufrufe schätzen", "en": "Guess the views" } },
+        { "value": "higherlower", "label": { "de": "Höher oder tiefer", "en": "Higher or lower" } }
+      ]
+    },
     {
       "id": "videos",
       "label": {
@@ -90,6 +99,7 @@
     },
     {
       "id": "scoring",
+      "showIf": { "id": "game", "value": "guess" },
       "label": {
         "de": "Wertung",
         "en": "Scoring"
@@ -132,6 +142,7 @@
     },
     {
       "id": "strictness",
+      "showIf": { "id": "game", "value": "guess" },
       "label": {
         "de": "Strenge",
         "en": "Strictness"

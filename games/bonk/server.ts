@@ -57,6 +57,11 @@ export default {
     const scores = new Scores(ids);
     const total = Number(ctx.options.rounds) || 5;
     const baseLives = [1, 3, 5].includes(Number(ctx.options.lives)) ? Number(ctx.options.lives) : 3;
+    // Teams (Einstellung): zwei Teams, eigene Leute kann man nicht treffen
+    const teamMode = ctx.options.teams === 'on' && ctx.players.length >= 3;
+    const teamOf = new Map<string, number>();
+    if (teamMode) shuffle(ctx.players.map((p) => p.id)).forEach((id, i) => teamOf.set(id, (i % 2) + 1));
+    const mates = (a: { id: string }, b: { id: string }) => teamMode && a.id !== b.id && teamOf.get(a.id) === teamOf.get(b.id);
     const controls = ctx.options.controls === 'gesten' ? 'gesten' : 'tasten';
     const weapons = new Map<string, WeaponId | null>(ids.map((id) => [id, null]));
     const fighters = new Map<string, Fighter>();
@@ -124,7 +129,7 @@ export default {
     /* ---------- Ablauf ---------- */
 
     function intro() {
-      ctx.setHostView({ screen: 'intro', controls, lives: baseLives });
+      ctx.setHostView({ screen: 'intro', controls, lives: baseLives, teams: teamMode });
       ctx.setAllPlayerViews(() => ({ screen: 'intro' }));
       ctx.after(T.intro, chooseWeapons);
     }
@@ -198,7 +203,7 @@ export default {
 
     function hostView(extra: object = {}) {
       ctx.setHostView({
-        screen: 'arena', phase, round, total, ids, baseLives,
+        screen: 'arena', phase, round, total, ids, baseLives, teams: teamMode ? Object.fromEntries(teamOf) : null,
         weapons: Object.fromEntries(ids.map((id) => [id, fighters.get(id)?.weapon ?? weapons.get(id)])),
         arena: { cols: arena.cols, rows: arena.rows, grid: arena.grid, walls: arena.walls, bumpers: arena.bumpers, pads: arena.pads, teleports: arena.teleports, ring: arena.ring, ringMax: arena.ringMax, center: arena.center, seed: arena.seed },
         fireStart, fireDur, cell: CELL, radius: PHY.radius,
@@ -385,6 +390,8 @@ export default {
       sendPlayerViews(false);
       stream();
       const left = withLives();
+      const teamsLeft = new Set(left.map((id) => teamOf.get(id)));
+      if (teamMode && teamsLeft.size <= 1) return endRound();
       if ((N > 1 && left.length <= 1) || (N === 1 && left.length === 0) || t >= fireStart + fireDur + 35) endRound();
     }
 
@@ -467,6 +474,7 @@ export default {
 
     function hit(v: Fighter, by: Fighter, dmg: number, base: number, dx: number, dy: number, counter = false) {
       if (v.state !== 'alive' || t < v.invulnUntil) return;
+      if (mates(v, by)) return;
       if (by !== v && blocks(v, dx, dy)) {
         events.push(['block', Math.round(v.x + v.fx * 18), Math.round(v.y + v.fy * 18)]);
         if (n(v, 'konter') && t - v.blockStart < 0.3 && !counter) hit(by, v, 3, 320, -dx, -dy, true);
@@ -964,7 +972,7 @@ export default {
       if (f.state !== 'alive') return;
       let target: Fighter | null = null, best = Infinity;
       for (const o of fighters.values()) {
-        if (o === f || o.state !== 'alive') continue;
+        if (o === f || o.state !== 'alive' || mates(o, f)) continue;
         const d = Math.hypot(o.x - f.x, o.y - f.y);
         if (d < best) { best = d; target = o; }
       }
@@ -1053,7 +1061,7 @@ export default {
       const f = fighters.get(id)!;
       return {
         screen: 'play', live: phase === 'fight', startAt, round, total, weapon: f.weapon, controls,
-        dmg: Math.floor(f.dmg), lives: f.lives, baseLives, state: f.state, place: f.place,
+        dmg: Math.floor(f.dmg), lives: f.lives, baseLives, team: teamOf.get(id) ?? null, state: f.state, place: f.place,
         respawnAt: f.state === 'gone' ? Date.now() + (f.respawnAt - t) * 1000 : undefined,
         kos: f.kos, color: ctx.player(id)?.color,
         weapon2: f.weapon2, special: n(f, 'spezial') ? Math.floor(f.special) : null,
@@ -1083,7 +1091,15 @@ export default {
       // Wer noch Leben hat: nach Leben, dann nach wenig Schaden sortiert
       const left = withLives().map((id) => fighters.get(id)!).sort((a, b) => b.lives - a.lives || a.dmg - b.dmg);
       left.forEach((f, i) => (f.place = i + 1));
-      const winners = left.filter((f) => f.place === 1).map((f) => f.id);
+      let winners = left.filter((f) => f.place === 1).map((f) => f.id);
+      if (teamMode) {
+        // Team mit den meisten übrigen Leben gewinnt, alle im Team bekommen den Siegerbonus
+        const sum = (tm: number) => left.filter((f) => teamOf.get(f.id) === tm).reduce((s2, f) => s2 + f.lives, 0);
+        const a = sum(1), b = sum(2);
+        const won = a > b ? 1 : b > a ? 2 : 0;
+        winners = won ? ids.filter((id) => teamOf.get(id) === won) : [];
+        for (const f of fighters.values()) f.place = winners.includes(f.id) ? 1 : 0;
+      }
       for (const f of fighters.values()) {
         const pts = (f.place >= 1 && f.place <= 3 && (f.place === 1 || N >= f.place + 1) ? POINTS.place[f.place - 1] : 0) * (lastRound() ? 2 : 1);
         if (pts) { scores.add(f.id, pts); gains[f.id] = (gains[f.id] ?? 0) + pts; }

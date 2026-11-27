@@ -20,6 +20,8 @@ interface Item {
 }
 
 const T = { intro: 7, lastChance: 5, afterReveal: 7 };
+/** Wetten (Einstellung): auf die Schätzung setzen, die am nächsten liegt */
+const BET = { time: 15, hurry: 3, points: 300 };
 
 /** Jahreszahl-Frage: ohne Einheit, „Jahr“/„year“ in der Frage, Antwort eine plausible Jahreszahl */
 function isYear(it: Item, now: number) {
@@ -44,7 +46,10 @@ export default {
     /** eingetippt, aber nicht abgeschickt – der neueste Stand zählt bei Zeitablauf */
     let drafts = new Map<string, number>();
     let timer: { cancel(): void; deadline: number; duration: number } | null = null;
-    let phase: 'intro' | 'guess' | 'reveal' | 'scores' = 'intro';
+    let phase: 'intro' | 'guess' | 'bet' | 'reveal' | 'scores' = 'intro';
+    const BETS = ctx.options.bets === 'on';
+    let bets = new Map<string, number>();
+    let betOptions: { v: number; by: string[] }[] = [];
     let roundStart = scores.snapshot();
     let lastScores = 0;
 
@@ -69,7 +74,7 @@ export default {
       guesses = new Map();
       drafts = new Map();
       phase = 'guess';
-      timer = ctx.timer(guessTime, reveal, { grace: INPUT_GRACE });
+      timer = ctx.timer(guessTime, afterGuess, { grace: INPUT_GRACE });
       hostGuess();
       ids.forEach(guessView);
     }
@@ -85,14 +90,42 @@ export default {
     function hurry() {
       if (!timer || timer.deadline - Date.now() <= T.lastChance * 1200) return;
       timer.cancel();
-      timer = ctx.timer(T.lastChance, reveal, { grace: INPUT_GRACE });
+      timer = ctx.timer(T.lastChance, afterGuess, { grace: INPUT_GRACE });
       hostGuess();
       ids.forEach(guessView);
     }
 
-    function reveal() {
+    function afterGuess() {
       timer?.cancel();
       for (const [id, n] of drafts) guesses.set(id, n);
+      drafts = new Map();
+      if (BETS && new Set(guesses.values()).size >= 2) startBet();
+      else reveal();
+    }
+
+    /* ---------- Wetten: alle Schätzungen sortiert, jeder setzt auf eine ---------- */
+
+    function startBet() {
+      phase = 'bet';
+      bets = new Map();
+      const byValue = new Map<number, string[]>();
+      for (const [id, v] of guesses) byValue.set(v, [...(byValue.get(v) ?? []), id]);
+      betOptions = [...byValue].sort((a, b) => a[0] - b[0]).map(([v, by]) => ({ v, by }));
+      timer = ctx.timer(BET.time, reveal);
+      hostBet();
+      ids.forEach(betView);
+    }
+
+    function hostBet() {
+      ctx.setHostView({ screen: 'bet', ...base(), options: betOptions, done: [...bets.keys()], players: ids, deadline: timer!.deadline, duration: timer!.duration });
+    }
+
+    function betView(id: string) {
+      ctx.setPlayerView(id, { screen: 'bet', input: true, ...base(), options: betOptions, selected: bets.get(id) ?? null, points: BET.points * mult(), deadline: timer!.deadline, duration: timer!.duration });
+    }
+
+    function reveal() {
+      timer?.cancel();
       phase = 'reveal';
       const truth = Number(item().answer);
       const m = mult();
@@ -100,12 +133,17 @@ export default {
       const placed = scoreRound([...guesses].map(([playerId, guess]) => ({ playerId, guess })), truth, MODE, LOOSE, opts)
         .map((e) => ({ ...e, points: e.points * m }));
       placed.forEach((e) => { if (e.points) scores.add(e.playerId, e.points); });
+      // Wetten: richtig, wenn die gewählte Schätzung am nächsten lag (bei Gleichstand alle gleich nahen)
+      const winVals = new Set(placed.filter((e) => e.place === 1).map((e) => e.guess));
+      const betPoints = BET.points * m;
+      const betWinners = BETS ? [...bets].filter(([, v]) => winVals.has(v)).map(([id]) => id) : [];
+      betWinners.forEach((id) => scores.add(id, betPoints));
       // Gemischt schicken: Die Reihenfolge auf dem Strahl darf nichts verraten
       const shown = shuffle(placed.map(({ playerId, guess, place, points, exact }) => ({ playerId, guess, place, points, exact })));
       const startAt = Date.now() + 300;
       const ride = revealSeconds(truth, shown, opts);
       const doneAt = startAt + answerSeconds(truth, shown, opts) * 1000;
-      ctx.setHostView({ screen: 'reveal', ...base(), answer: truth, source: item().source ?? null, note: item().note ?? null, entries: shown, mode: MODE, plan: opts, startAt });
+      ctx.setHostView({ screen: 'reveal', ...base(), answer: truth, source: item().source ?? null, note: item().note ?? null, entries: shown, mode: MODE, plan: opts, startAt, bets: BETS && bets.size ? { winners: betWinners, points: betPoints } : null });
       ctx.setAllPlayerViews((p) => {
         const mine = placed.find((e) => e.playerId === p.id);
         const g = mine?.guess ?? null;
@@ -113,6 +151,7 @@ export default {
           screen: 'result', doneAt, answer: truth, unit: item().unit ?? '', note: item().note ?? null, guess: g, place: mine?.place ?? null, of: placed.length,
           points: mine?.points ?? 0, exact: mine?.exact ?? false, mode: MODE, year: !!opts.yearNow,
           factor: g == null || opts.yearNow ? null : factor(g, truth), high: g != null && g > truth,
+          bet: BETS && bets.has(p.id) ? { won: betWinners.includes(p.id), points: betPoints } : null,
         };
       });
       ctx.after(ride + (opts.showAll ? 5 : T.afterReveal), next);
@@ -131,6 +170,20 @@ export default {
     return {
       start: intro,
       onAction(id, action) {
+        if (phase === 'bet' && action?.type === 'bet' && ids.includes(id)) {
+          const v = Number(action.value);
+          if (!betOptions.some((o) => o.v === v)) return;
+          bets.set(id, v);
+          betView(id);
+          hostBet();
+          if (ids.every((p) => bets.has(p) || !ctx.player(p)?.connected) && timer && timer.deadline - Date.now() > BET.hurry * 1000) {
+            timer.cancel();
+            timer = ctx.timer(BET.hurry, reveal);
+            hostBet();
+            ids.forEach(betView);
+          }
+          return;
+        }
         if (phase === 'guess' && action?.type === 'guessDraft' && ids.includes(id)) {
           const d = Math.round(Number(action.value));
           if (action.value == null) drafts.delete(id);
@@ -147,6 +200,7 @@ export default {
         if (ids.every((p) => guesses.has(p) || !ctx.player(p)?.connected)) hurry();
       },
       bot(_id, view) {
+        if (view.screen === 'bet' && view.selected == null) return { type: 'bet', value: (view.options as { v: number }[])[Math.floor(Math.random() * view.options.length)].v };
         if (view.screen !== 'guess' || view.guess != null) return null;
         // Bots schätzen in der richtigen Größenordnung, mal drunter, mal drüber
         const truth = Number(item().answer);

@@ -16,7 +16,7 @@ import {
 import { PALETTE, PATTERNS, contrast, nearestFree, validDesign, type Design } from './muster';
 
 const T = { werkstatt: 45, intro: 12, build: 40, reveal: 2.2, revealPer: 0.45, flight: 16, result: 15, umbau: 5, raceMin: 70, afterFirst: 25, raceMax: 120 };
-const POINTS = { perPlace: 10, first: 100, trap: 20, trapMax: 100 };
+const POINTS = { perPlace: 10, first: 100, trap: 20, trapMax: 100, bet: 100 };
 const ITEMS: ItemKind[] = ['turbo', 'feder', 'magnet', 'schild', 'kleber', 'schranke', 'gegenfeder', 'falltuer', 'wind', 'bremse', 'farbweiche', 'umleitung', 'wurmloch', 'kanone'];
 const EVENTS: CardKind[] = ['beben', 'oel', 'riese', 'tausch'];
 const STRONG: CardKind[] = ['turbo', 'kanone', 'schranke', 'farbweiche', 'magnet', 'falltuer'];
@@ -78,6 +78,8 @@ export default {
         designs.set(id, { c, c2: contrast(c), p: 'uni' });
       }
     }
+    const BETS = ctx.options.bets !== 'off' && ids.length >= 2;
+    let bets = new Map<string, string>();
     const designOf = () => Object.fromEntries(ids.map((id) => [id, designs.get(id)!]));
     const colorOf = (id: string) => PALETTE[designs.get(id)!.c];
 
@@ -344,9 +346,16 @@ export default {
     /** Kamerafahrt über die ganze Bahn, neue Teile leuchten auf */
     function flight() {
       phase = 'flight';
+      bets = new Map();
       ctx.setHostView({ screen: 'flight', round, total, geo: geo(track), trackV, items: publicItems(), fresh: fresh.filter((f) => f.id > 0).map((f) => f.id), dur: T.flight, players: ids, designs: designOf() });
-      ctx.setAllPlayerViews((p) => ({ screen: 'watch', color: colorOf(p.id), design: designs.get(p.id), key: 'phone.flight' }));
+      if (BETS) ids.forEach(betView);
+      else ctx.setAllPlayerViews((p) => ({ screen: 'watch', color: colorOf(p.id), design: designs.get(p.id), key: 'phone.flight' }));
       ctx.after(T.flight, startRace);
+    }
+
+    /** Wetten (Einstellung): Während der Kamerafahrt tippt jeder, wessen Murmel als erste ins Ziel kommt (nicht die eigene) */
+    function betView(id: string) {
+      ctx.setPlayerView(id, { screen: 'bet', color: colorOf(id), design: designs.get(id), options: ids.filter((x) => x !== id), designs: designOf(), selected: bets.get(id) ?? null, points: POINTS.bet * (lastRound() ? 2 : 1) });
     }
 
     /* ---------- Rennen ---------- */
@@ -474,11 +483,14 @@ export default {
         trapPts[id] = Math.min(POINTS.trapMax, traps[id] * POINTS.trap) * mult;
         points[id] += trapPts[id];
       }
+      const betWinners = BETS && firstPid ? [...bets].filter(([, target]) => target === firstPid).map(([id]) => id) : [];
+      const betPts = POINTS.bet * mult;
+      for (const id of betWinners) points[id] += betPts;
       for (const id of ids) scores.add(id, points[id]);
       const rowTime = r.rowTime;
-      ctx.setHostView({ screen: 'result', round, total, last: lastRound(), players: ids, points, finished, traps, trapPts, marbles, firstPid, before: raceStart, after: scores.snapshot(), perPlayer, mult, designs: designOf() });
+      ctx.setHostView({ screen: 'result', round, total, last: lastRound(), players: ids, points, finished, traps, trapPts, marbles, firstPid, betWinners, betPts, before: raceStart, after: scores.snapshot(), perPlayer, mult, designs: designOf() });
       const rank = scores.ranking();
-      ctx.setAllPlayerViews((p) => ({ screen: 'result', color: colorOf(p.id), design: designs.get(p.id), points: points[p.id] ?? 0, finished: finished[p.id] ?? 0, of: perPlayer, traps: traps[p.id] ?? 0, score: scores.get(p.id), place: rank.findIndex((x) => x.playerId === p.id) + 1, players: N }));
+      ctx.setAllPlayerViews((p) => ({ screen: 'result', color: colorOf(p.id), design: designs.get(p.id), points: points[p.id] ?? 0, finished: finished[p.id] ?? 0, of: perPlayer, traps: traps[p.id] ?? 0, score: scores.get(p.id), place: rank.findIndex((x) => x.playerId === p.id) + 1, players: N, bet: BETS && bets.has(p.id) ? { won: betWinners.includes(p.id), points: betPts } : null }));
       race = null;
       if (lastRound()) return ctx.after(T.result, final);
       ctx.after(T.result, () => umbau(rowTime));
@@ -544,6 +556,11 @@ export default {
           else if (a.type === 'place') place(id, Number(a.card), Number(a.socket));
           else if (a.type === 'unplace') unplace(id, Number(a.card));
           else if (a.type === 'ready') setReady(id, a.on !== false);
+        } else if (phase === 'flight' && a.type === 'bet' && BETS) {
+          const target = String(a.target);
+          if (target === id || !idx.has(target)) return;
+          bets.set(id, target);
+          betView(id);
         } else if (phase === 'race' && a.type === 'toggle' && race) {
           if (race.toggle(Number(a.item), idx.get(id)!)) phoneRace();
         }
@@ -553,6 +570,7 @@ export default {
         if (phase === 'werkstatt') playerWerkstatt(id);
       },
       bot(id, view) {
+        if (view?.screen === 'bet' && !view.selected && view.options?.length) return { type: 'bet', target: view.options[Math.floor(Math.random() * view.options.length)] };
         if (view?.screen === 'werkstatt') {
           if (view.ready) return null;
           const d = designs.get(id)!;

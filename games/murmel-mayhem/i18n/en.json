@@ -180,5 +180,11 @@
   "track.drehkreuz": "TURNSTILE",
   "track.lotterie": "LOTTERY DRUM",
   "end.lotterie": "lottery drum",
-  "race.list": "FINISH"
+  "race.list": "FINISH",
+  "bet.phone": "Who wins the race?",
+  "bet.hint": "Guess whose marble crosses the line first. Right: +{n}",
+  "bet.done": "Bet placed – you can still change it.",
+  "bet.won": "Right guess! +{n}",
+  "bet.lost": "Wrong guess",
+  "result.betChip": "Bet"
 }

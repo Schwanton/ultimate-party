@@ -26,5 +26,16 @@
   "lookAtTv": "Schau auf den Fernseher.",
   "reveal.phaseGuesses": "Wo glaubt ihr, ist die Mehrheit?",
   "reveal.phaseVotes": "Und so habt ihr wirklich geantwortet:",
-  "reveal.guessLabel": "Tipps"
+  "reveal.guessLabel": "Tipps",
+  "vote.by": "Frage von {name}",
+  "author.tv": "{name} denkt sich eine Frage aus …",
+  "author.tvText": "Gleich stimmt ihr über die eigene Frage ab.",
+  "author.phone": "Du bist dran: Stell der Gruppe eine Frage!",
+  "author.hint": "Eine Frage und 2 bis 4 Antworten – z. B. „Bestes Frühstück?“ mit Brötchen, Müsli, Rührei.",
+  "author.question": "Deine Frage",
+  "author.answer": "Antwort",
+  "author.optional": "Antwort (freiwillig)",
+  "author.error": "Bitte eine Frage (mind. 5 Zeichen) und mindestens 2 verschiedene Antworten eingeben.",
+  "author.send": "Frage stellen",
+  "author.wait": "{name} schreibt eine Frage …"
 }

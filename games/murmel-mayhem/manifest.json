@@ -12,7 +12,7 @@
   "color": "#E9C46A",
   "tags": ["action"],
   "sdkVersion": 1,
-  "version": "0.7.0",
+  "version": "0.8.0",
   "author": "UP!",
   "options": [
     {
@@ -38,6 +38,16 @@
         { "value": "tuerme", "label": { "de": "Drei Türme", "en": "Three Towers" } },
         { "value": "treppenhaus", "label": { "de": "Treppenhaus", "en": "Staircase" } },
         { "value": "querbahn", "label": { "de": "Querbahn", "en": "Crossway" } }
+      ]
+    },
+    {
+      "id": "bets",
+      "label": { "de": "Tipp aufs Rennen", "en": "Race bets" },
+      "help": { "de": "Während der Kamerafahrt tippt jeder, wessen Murmel als erste ins Ziel kommt (nicht die eigene). Richtig: +100 (letzte Runde ×2).", "en": "During the camera flight everyone guesses whose marble finishes first (not their own). Right: +100 (last round ×2)." },
+      "default": "on",
+      "choices": [
+        { "value": "on", "label": { "de": "An", "en": "On" } },
+        { "value": "off", "label": { "de": "Aus", "en": "Off" } }
       ]
     }
   ]

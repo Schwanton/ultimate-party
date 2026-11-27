@@ -43,12 +43,25 @@ function Host(props: HostViewProps) {
           <p className="muted anim-up" style={{ fontSize: 22, animationDelay: '.8s' }}>{t('intro.points')}</p>
         </div>
       );
+    case 'author': {
+      const a = props.player(view.author);
+      return (
+        <>
+          <HostHeader title={t('title')} color={ORANGE} info={info(view, t)} right={<HostTimer deadline={view.deadline} duration={view.duration} />} />
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 24, textAlign: 'center' }}>
+            {a && <span style={{ animation: 'upFloat 3s ease-in-out infinite' }}><Avatar player={a} size={140} /></span>}
+            <h1 className="anim-pop" style={{ fontSize: 52 }}>{t('author.tv', { name: a?.name ?? '?' })}</h1>
+            <p className="muted" style={{ fontSize: 22 }}>{t('author.tvText')}</p>
+          </div>
+        </>
+      );
+    }
     case 'vote': {
       const n = view.answers.length;
       return (
         <>
           <HostHeader title={t('title')} color={ORANGE} info={info(view, t)} right={<HostTimer deadline={view.deadline} duration={view.duration} />} />
-          <HostPrompt label={t('vote.label')}>{view.question}</HostPrompt>
+          <HostPrompt label={view.by ? t('vote.by', { name: props.player(view.by)?.name ?? '?' }) : t('vote.label')}>{view.question}</HostPrompt>
           <div style={{ flex: 1, display: 'grid', gridTemplateColumns: `repeat(${n}, minmax(0, 1fr))`, gap: 20, alignItems: 'center' }}>
             {view.answers.map((a: string, i: number) => (
               <div key={i} style={{ background: COLORS[i], color: '#110D24', borderRadius: 26, padding: '28px 24px', minHeight: 170, display: 'flex', flexDirection: 'column', gap: 12, boxShadow: `0 8px 0 ${DARK[i]}`, animation: `upPop .45s ease-out ${(i * 0.12).toFixed(2)}s both` }}>
@@ -208,9 +221,35 @@ function Options({ answers, selected, onPick, label }: { answers: string[]; sele
   );
 }
 
-function Controller({ view, t, send, me }: ControllerViewProps) {
+function AuthorForm({ view, t, send }: ControllerViewProps) {
+  const [q, setQ] = useState('');
+  const [answers, setAnswers] = useState(['', '', '', '']);
+  const filled = answers.map((a) => a.trim()).filter(Boolean);
+  const ok = q.trim().length >= 5 && filled.length >= 2 && new Set(filled).size === filled.length;
+  return (
+    <>
+      <PhoneTimer deadline={view.deadline} duration={view.duration} hurryText={t('timer.hurry')} />
+      <h1 style={{ fontSize: 22 }}>{t('author.phone')}</h1>
+      <p className="muted" style={{ fontSize: 14 }}>{t('author.hint')}</p>
+      <input className="up-input" value={q} maxLength={100} placeholder={t('author.question')} autoCorrect="on" spellCheck onChange={(e) => setQ(e.target.value)} />
+      {answers.map((a, i) => (
+        <input key={i} className="up-input" value={a} maxLength={40} placeholder={`${LETTERS[i]}: ${i < 2 ? t('author.answer') : t('author.optional')}`} autoCorrect="on" spellCheck
+          onChange={(e) => setAnswers(answers.map((x, k) => (k === i ? e.target.value : x)))} style={{ borderLeft: `6px solid ${COLORS[i]}` }} />
+      ))}
+      {view.error && <p className="up-error" style={{ fontSize: 14 }}>{t('author.error')}</p>}
+      <button className="up-btn big full" disabled={!ok} onClick={() => send({ type: 'authorQuestion', question: q, answers: filled })} style={{ marginTop: 'auto' }}>{t('author.send')}</button>
+    </>
+  );
+}
+
+function Controller(props: ControllerViewProps) {
+  const { view, t, send, me, player } = props;
   const now = useServerNow(250);
   switch (view.screen) {
+    case 'author':
+      return <AuthorForm {...props} />;
+    case 'authorWait':
+      return <PhoneWait title={t('author.wait', { name: player(view.author)?.name ?? '?' })} text={t('lookAtTv')} emoji={<span style={{ fontSize: 64 }}>✍️</span>} />;
     case 'intro':
       return <PhoneWait title={t('title')} text={t('lookAtTv')} emoji={<Avatar player={me} size={96} />} />;
     case 'vote': {

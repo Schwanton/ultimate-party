@@ -166,5 +166,10 @@
   "shop.weapon": "Second weapon",
   "shop.weaponText": "Gets its own button, you keep the roll.",
   "shop.weaponShield": "You get the shield on its own button.",
-  "shop.weaponSwap": "Replaces your second weapon ({name})."
+  "shop.weaponSwap": "Replaces your second weapon ({name}).",
+  "teamWin1": "Team Red wins the round!",
+  "teamWin2": "Team Blue wins the round!",
+  "intro.teams": "Team Red vs Team Blue – you can't hit your own teammates.",
+  "phone.teamRed": "Team Red",
+  "phone.teamBlue": "Team Blue"
 }

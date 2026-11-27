@@ -34,6 +34,7 @@ function Host(props: HostViewProps) {
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 26, textAlign: 'center' }}>
           <span className="display anim-pop" style={{ fontSize: 150, fontWeight: 800, color: '#FFD447', transform: 'rotate(-4deg)', textShadow: '0 0 30px #FFD447, 0 0 60px #FF4FB8' }}>{t('title')}</span>
           <p className="anim-up" style={{ fontSize: 27, maxWidth: 980, lineHeight: 1.35, animationDelay: '.4s' }}>{t('intro.text', { lives: (view.lives as number) ?? 3 })}</p>
+          {view.teams && <p className="anim-up" style={{ fontSize: 24, color: 'var(--yellow)', animationDelay: '.6s' }}>{t('intro.teams')}</p>}
           <p className="anim-up" style={{ fontSize: 21, color: '#36D6F5', animationDelay: '.7s' }}>{t('intro.controls', { alt: t(view.controls === 'gesten' ? 'intro.altGesture' : 'intro.altButton') })}</p>
           <p className="muted anim-up" style={{ fontSize: 20, animationDelay: '1s' }}>{t('intro.points')}</p>
         </div>
@@ -392,6 +393,9 @@ function HostArena({ view, t, player }: HostViewProps) {
           g.strokeStyle = color + '88'; g.lineWidth = 3;
           for (let k = 1; k <= 3; k++) { g.beginPath(); g.moveTo(x - Math.cos(ang) * (R + k * 8), y - Math.sin(ang) * (R + k * 8) - 6 + k * 3); g.lineTo(x - Math.cos(ang) * (R + k * 8 + 10), y - Math.sin(ang) * (R + k * 8 + 10) - 6 + k * 3); g.stroke(); }
         }
+        // Teams: farbiger Ring am Boden (Rot / Blau)
+        const tm = view.teams?.[ids[i]];
+        if (tm) { g.strokeStyle = tm === 1 ? '#FF4B4B' : '#3EC8FF'; g.lineWidth = 4; g.beginPath(); g.arc(x, y, R + 6, 0, Math.PI * 2); g.stroke(); }
         drawWeapon(g, weapons[i], x, y, ang, R, color, flags & FLAG.charge ? p[6] : -1, !!(flags & FLAG.block));
         drawFigure(g, x, y, R * sc, color, ang, !!(flags & FLAG.stun));
         g.globalAlpha = 1;
@@ -520,7 +524,13 @@ function HostArena({ view, t, player }: HostViewProps) {
           <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <div className="up-card anim-pop" style={{ padding: '26px 40px', borderRadius: 30, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, boxShadow: '0 0 40px #FF4FB866' }}>
               <Confetti silent />
-              {winners.length === 1 ? (
+              {view.teams && winners.length >= 1 ? (
+                <>
+                  <div style={{ display: 'flex', gap: 10 }}>{winners.map((p) => <Avatar key={p.id} player={p} size={64} />)}</div>
+                  <h1 style={{ fontSize: 40, color: view.teams[winners[0].id] === 1 ? '#FF4B4B' : '#3EC8FF' }}>{t(view.teams[winners[0].id] === 1 ? 'teamWin1' : 'teamWin2')}</h1>
+                  <b className="display" style={{ fontSize: 30, color: 'var(--yellow)' }}>+300</b>
+                </>
+              ) : winners.length === 1 ? (
                 <>
                   <span style={{ position: 'relative' }}><Avatar player={winners[0]} size={110} /><Crown size={50} style={{ position: 'absolute', top: -34, left: 30 }} /></span>
                   <h1 style={{ fontSize: 40 }}>{t('win', { name: winners[0].name })}</h1>
@@ -540,7 +550,7 @@ function HostArena({ view, t, player }: HostViewProps) {
           const base = (view.baseLives as number) ?? 3;
           const lives = st?.[5] ?? base;
           return (
-            <div key={id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: ids.length > 6 ? '3px 10px' : '6px 10px', borderRadius: 14, background: '#110D24', border: `2px solid ${p.color}`, boxShadow: `0 0 10px ${p.color}55`, opacity: out ? 0.35 : 1 }}>
+            <div key={id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: ids.length > 6 ? '3px 10px' : '6px 10px', borderRadius: 14, background: '#110D24', border: `2px solid ${view.teams?.[id] ? (view.teams[id] === 1 ? '#FF4B4B' : '#3EC8FF') : p.color}`, boxShadow: `0 0 10px ${p.color}55`, opacity: out ? 0.35 : 1 }}>
               <WeaponIcon weapon={(view.weapons?.[id] as string) ?? 'hammer'} size={ids.length > 6 ? 18 : 24} color={p.color} />
               <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, flex: 1, lineHeight: 1.15 }}>
                 <b style={{ fontSize: ids.length > 6 ? 12 : 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</b>
