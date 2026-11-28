@@ -2,6 +2,12 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.62.0
+
+- Werwolf: Neues Ende im Werwolf-Look. Zuerst siehst du die Teams nebeneinander – Sieger mit goldenem Rahmen, Verlierer in Rot – mit Rolle und Schicksal jedes Spielers. Gewinnen die Werwölfe, steht ein blutroter Mond am Himmel
+- Werwolf: Statt Siegertreppchen gibt es nach dem Rückblick eine Wertung nach Teams – bei jedem Spieler steht, wofür er seine Punkte bekommen hat, dazu die Auszeichnungen
+- Werwolf: Auf dem Handy zeigt das Ende das eigene Team, die eigene Rolle, die Punkte Zeile für Zeile und den Platz
+
 ## 0.61.3
 
 - Werwolf: Der VIP kann den Rückblick am Ende auf dem Handy überspringen

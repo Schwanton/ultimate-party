@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import type { ControllerViewProps, GameClientModule, HostViewProps, PlayerInfo, Translate } from '@up/sdk';
-import { Avatar, Podium, useServerNow, vibrate } from '@up/ui';
+import { Avatar, useServerNow, vibrate } from '@up/ui';
 import { heartbeatIfClose, play, speak, startNightAmbience, stopAmbience } from './sounds';
 
 /* ================= Farben, Schrift, Rollen ================= */
@@ -95,10 +95,10 @@ const WINDOWS = [[196, 225], [452, 215], [560, 240], [782, 232], [905, 238], [11
 /** Gassen zwischen den Häusern, in denen nachts Augen aufleuchten */
 const ALLEYS = [[262, 262], [700, 268], [958, 262]];
 
-function Moon({ size }: { size: number }) {
+function Moon({ size, blood }: { size: number; blood?: boolean }) {
   const k = size / 150;
   return (
-    <div style={{ width: size, height: size, borderRadius: '50%', background: CREAM, boxShadow: `0 0 ${60 * k}px ${16 * k}px rgba(243,231,196,0.28)`, position: 'relative', overflow: 'hidden' }}>
+    <div style={{ width: size, height: size, borderRadius: '50%', background: blood ? '#e8a07a' : CREAM, boxShadow: `0 0 ${60 * k}px ${16 * k}px ${blood ? 'rgba(220,90,60,0.4)' : 'rgba(243,231,196,0.28)'}`, position: 'relative', overflow: 'hidden', transition: 'background 2s, box-shadow 2s' }}>
       {[[34, 30, 34, 0.13], [88, 52, 20, 0.11], [56, 92, 42, 0.09], [108, 98, 14, 0.12], [24, 80, 12, 0.1]].map(([x, y, d, o], i) => (
         <span key={i} style={{ position: 'absolute', left: x * k, top: y * k, width: d * k, height: d * k, borderRadius: '50%', background: `rgba(120,100,70,${o})` }} />
       ))}
@@ -135,7 +135,7 @@ function Arc({ angle, children }: { angle: number; children: ReactNode }) {
  * Himmel: Tagsüber wandert die Sonne passend zu Diskussion und Abstimmung, kurz vor Schluss Abendröte.
  * Nachts wandert der Mond, gegen Ende Morgenröte. Sterne funkeln, Fenster leuchten, Augen in den Gassen.
  */
-function Sky({ sky, eyes }: { sky: { mode: 'dusk' | 'night' | 'day'; from: number; to: number }; eyes?: boolean }) {
+function Sky({ sky, eyes, blood }: { sky: { mode: 'dusk' | 'night' | 'day'; from: number; to: number }; eyes?: boolean; blood?: boolean }) {
   const now = useServerNow(250);
   const span = Math.max(1, sky.to - sky.from);
   const f = sky.mode === 'dusk' ? 0.96 : clamp((now - sky.from) / span);
@@ -168,7 +168,7 @@ function Sky({ sky, eyes }: { sky: { mode: 'dusk' | 'night' | 'day'; from: numbe
         ))}
       </div>
       <Arc angle={sunAngle}><div style={{ width: 110, height: 110, borderRadius: '50%', background: '#ffd27a', boxShadow: '0 0 70px 24px rgba(255,200,110,0.55)' }} /></Arc>
-      <Arc angle={moonAngle}><Moon size={120} /></Arc>
+      <Arc angle={moonAngle}><Moon size={120} blood={blood} /></Arc>
       <svg width="1280" height="300" viewBox="0 0 1280 300" style={{ position: 'absolute', left: 0, bottom: 0 }}>
         <path fill="#070a14" d={TOWN} />
         <path fill="#070a14" d={TOWERS} />
@@ -274,7 +274,7 @@ function Host(props: HostViewProps) {
   return (
     <div style={{ position: 'absolute', inset: 0, fontFamily: BODY, color: CREAM, overflow: 'hidden' }}>
       <style>{KEYFRAMES}</style>
-      <Sky sky={sky} eyes={view.screen === 'night' && view.section === 'A'} />
+      <Sky sky={sky} eyes={view.screen === 'night' && view.section === 'A'} blood={['end', 'recap', 'final'].includes(view.screen) && view.winner === 'wolves'} />
       <div style={{ position: 'absolute', inset: 0, zIndex: 1, padding: '40px 56px', display: 'flex', flexDirection: 'column', gap: 18 }}>
         <HostScreen {...props} />
       </div>
@@ -778,21 +778,70 @@ function Cast({ cast, t, player, cols = 2 }: { cast: any[]; t: Translate; player
   );
 }
 
+/** Spieler-Karte am Ende: Avatar, Name, Rolle, Schicksal */
+function EndCard({ c, t, player, wolfTeam }: { c: any; t: Translate; player: Player; wolfTeam?: boolean }) {
+  const p = player(c.id);
+  const fate = c.alive ? t('cast.alive') : c.death?.cause === 'vote' ? t('fate.vote', { n: c.death.day }) : t(`fate.${c.death?.cause ?? 'wolves'}`, { n: c.death?.day ?? '?' });
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '7px 10px', borderRadius: 12, background: wolfTeam ? '#2a1820' : CARD, minWidth: 0 }}>
+      <span style={{ filter: c.alive ? undefined : 'grayscale(1) brightness(.6)', display: 'inline-flex', flex: 'none' }}><Avatar player={p} size={40} flat /></span>
+      <span style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
+        <b style={{ fontSize: 16, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p?.name}{c.mayor ? <span style={{ color: AMBER }}> ★</span> : null}{c.lover ? <span style={{ color: '#e07a9b' }}> ♥</span> : null}</b>
+        <span style={{ fontSize: 14, color: c.role === 'wolf' ? WOLF : SOFT }}>{t(`role.${c.role}`)}</span>
+      </span>
+      <span style={{ fontSize: 13, whiteSpace: 'nowrap', color: c.alive ? '#8fe0a8' : MUTED }}>{fate}</span>
+    </div>
+  );
+}
+
+function TeamBox({ g, t, children, wide }: { g: any; t: Translate; children: ReactNode; wide?: boolean }) {
+  const wolf = g.key === 'wolves';
+  const color = g.won ? AMBER : wolf ? WOLF_D : LINE;
+  return (
+    <div style={{ flex: wide ? 1 : 'none', width: wide ? undefined : 380, boxSizing: 'border-box', padding: '14px 16px', borderRadius: 20, background: g.won ? 'rgba(13,19,40,0.86)' : 'rgba(13,19,40,0.74)', border: `2px solid ${color}`, display: 'flex', flexDirection: 'column', gap: 10, minWidth: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <span style={{ padding: '3px 11px', borderRadius: 9, fontWeight: 700, fontSize: 13, letterSpacing: 2, background: g.won ? AMBER : '#3a1d24', color: g.won ? NAVY : WOLF }}>{g.won ? t('team.won') : t('team.lost')}</span>
+        <span style={{ fontFamily: FELL, fontSize: 26, color: wolf && !g.won ? WOLF : CREAM }}>{t(`team.${g.key}`)}</span>
+      </div>
+      {children}
+    </div>
+  );
+}
+
 function HostEnd({ view, t, player }: HostViewProps) {
   useEffect(() => {
     play(view.winner === 'wolves' ? 'howl' : 'fanfare');
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const cast: Record<string, any> = Object.fromEntries((view.cast as any[]).map((c) => [c.id, c]));
+  const groups = view.groups as { key: string; won: boolean; ids: string[] }[];
+  const count = (g: { ids: string[] }) => g.ids.filter((id) => cast[id].alive).length;
   return (
     <>
-      <TopLine view={view} t={t} player={player} />
-      <div style={{ display: 'flex', gap: 36, flex: 1, minHeight: 0 }}>
-        <div style={{ width: 440, display: 'flex', flexDirection: 'column', gap: 18, justifyContent: 'center' }}>
-          <Kicker>{t('end.kicker')}</Kicker>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 20 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <Kicker>{t('end.kicker2', { n: view.nights })}</Kicker>
           <Title size={64} style={{ animation: 'wwPop .8s both', color: view.winner === 'wolves' ? WOLF : CREAM }}>{t(`end.${view.winner}`)}</Title>
-          <p style={{ ...panel, fontSize: 19 }}>{t(`end.${view.winner}Text`)}</p>
+          <div style={{ fontSize: 20, textShadow: '0 1px 8px rgba(0,0,0,.6)' }}>{t(`end.${view.winner}Text`)}</div>
         </div>
-        <div style={{ flex: 1, alignSelf: 'center' }}><Cast cast={view.cast} t={t} player={player} /></div>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+          {groups.map((g) => (
+            <span key={g.key} style={{ ...panel, padding: '8px 14px', fontSize: 16, color: g.key === 'wolves' ? WOLF : CREAM }}>{t(`team.${g.key}`)}: <b>{g.ids.length}</b> · {t('end.alive', { n: count(g) })}</span>
+          ))}
+        </div>
       </div>
+      <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start', minHeight: 0, animation: 'wwRise .6s .5s both' }}>
+        {groups.map((g, i) => {
+          const wide = i === 0 && g.ids.length > 3;
+          return (
+            <TeamBox key={g.key} g={g} t={t} wide={wide}>
+              <div style={{ display: 'grid', gridTemplateColumns: wide ? `repeat(${g.ids.length > 6 ? 2 : 1}, minmax(0, 1fr))` : '1fr', gap: 7 }}>
+                {g.ids.map((id) => <EndCard key={id} c={cast[id]} t={t} player={player} wolfTeam={g.key === 'wolves'} />)}
+              </div>
+            </TeamBox>
+          );
+        })}
+      </div>
+      <div style={{ marginTop: 'auto', paddingLeft: 70, fontSize: 18, textShadow: '0 1px 8px rgba(0,0,0,.6)' }}>{t('end.next')}</div>
     </>
   );
 }
@@ -863,23 +912,57 @@ function HostRecap({ view, t, player }: HostViewProps) {
   );
 }
 
+function partLabel(p: { key: string; count: number; pts: number }, t: Translate) {
+  return t(`part.${p.key}`, { c: p.count, n: p.pts });
+}
+
 function HostFinal({ view, t, player }: HostViewProps) {
   const awards = view.awards as { key: string; id: string; n: number }[];
+  const table = view.table as any[];
+  const many = view.players > 12;
+  useEffect(() => {
+    play('bell');
+  }, []);
   return (
     <>
-      <TopLine view={view} t={t} player={player} />
-      <div style={{ flex: 1, display: 'flex', gap: 24, minHeight: 0 }}>
-        <div style={{ flex: 1, ...panel, display: 'flex', flexDirection: 'column' }}>
-          <Podium ranking={view.ranking} player={player} pointsLabel={t('points')} />
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16, paddingRight: 440 }}>
+        <Title size={48}>{t('final.title')}</Title>
+        <span style={{ ...panel, padding: '6px 14px', fontSize: 16 }}>{t(`end.${view.winner}`)} · {t('final.sub')}</span>
+      </div>
+      <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start', flex: 1, minHeight: 0 }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12, minWidth: 0 }}>
+          {table.map((g) => (
+            <TeamBox key={g.key} g={g} t={t} wide>
+              <div style={{ display: 'grid', gridTemplateColumns: many && g.players.length > 6 ? 'repeat(2, minmax(0, 1fr))' : '1fr', gap: 5 }}>
+                {g.players.map((p: any, i: number) => (
+                  <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 9, minHeight: many ? 36 : 42, padding: '2px 10px', borderRadius: 10, background: g.key === 'wolves' ? '#2a1820' : CARD, animation: `wwRise .35s ${0.1 * i}s both` }}>
+                    <b style={{ width: 24, textAlign: 'center', color: MUTED, fontSize: 17 }}>{p.rank}</b>
+                    <span style={{ filter: p.alive ? undefined : 'grayscale(1) brightness(.6)', display: 'inline-flex', flex: 'none' }}><Avatar player={player(p.id)} size={many ? 28 : 34} flat /></span>
+                    <span style={{ width: 140, display: 'flex', flexDirection: 'column', flex: 'none', minWidth: 0 }}>
+                      <b style={{ fontSize: 15, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{player(p.id)?.name}</b>
+                      <span style={{ fontSize: 12, color: p.role === 'wolf' ? WOLF : MUTED }}>{t(`role.${p.role}`)}{p.mayor ? ` · ${t('role.mayor')}` : ''}</span>
+                    </span>
+                    {!many && (
+                      <span style={{ flex: 1, display: 'flex', flexWrap: 'wrap', gap: 5, minWidth: 0 }}>
+                        {p.parts.map((x: any) => <span key={x.key} style={{ padding: '2px 8px', borderRadius: 8, background: '#2a3360', fontSize: 12, color: SOFT, whiteSpace: 'nowrap' }}>{partLabel(x, t)}</span>)}
+                      </span>
+                    )}
+                    <b style={{ marginLeft: 'auto', fontSize: 20, minWidth: 56, textAlign: 'right' }}>{p.total}</b>
+                  </div>
+                ))}
+              </div>
+            </TeamBox>
+          ))}
         </div>
         {awards.length > 0 && (
-          <div style={{ width: 320, display: 'flex', flexDirection: 'column', gap: 12, justifyContent: 'center' }}>
+          <div style={{ width: 330, display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <Title size={26}>{t('final.awards')}</Title>
             {awards.map((a, i) => (
-              <div key={a.key} style={{ ...panel, display: 'flex', alignItems: 'center', gap: 12, animation: `wwRise .5s ${2 + i * 0.5}s both` }}>
-                <Avatar player={player(a.id)} size={48} flat />
+              <div key={a.key} style={{ ...panel, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 12, animation: `wwRise .5s ${1 + i * 0.4}s both` }}>
+                <Avatar player={player(a.id)} size={44} flat />
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <b style={{ fontFamily: FELL, fontSize: 22, color: a.key === 'sheep' ? WOLF : CREAM }}>{t(`award.${a.key}`)}</b>
-                  <span style={{ fontSize: 14, color: SOFT }}>{player(a.id)?.name} · {t(`award.${a.key}Text`, { n: a.n })}</span>
+                  <b style={{ fontFamily: FELL, fontSize: 21, color: a.key === 'sheep' ? WOLF : CREAM }}>{t(`award.${a.key}`)}</b>
+                  <span style={{ fontSize: 13, color: SOFT }}>{player(a.id)?.name} · {t(`award.${a.key}Text`, { n: a.n })}</span>
                 </div>
               </div>
             ))}
@@ -1125,6 +1208,51 @@ function PickScreen({ view, t, send, player, title, text, nobody }: ControllerVi
   );
 }
 
+function PhoneEnd({ view, t, me: mePlayer, send }: ControllerViewProps) {
+  const role = view.me.role as Role | null;
+  const banner: CSSProperties = view.won
+    ? { background: AMBER, color: NAVY }
+    : { background: '#3a1d24', color: WOLF, border: `1px solid ${WOLF_D}` };
+  const fate = !role ? '' : view.me.alive ? t('cast.alive') : view.death?.cause === 'vote' ? t('fate.vote', { n: view.death.day }) : t(`fate.${view.death?.cause ?? 'wolves'}`, { n: view.death?.day ?? '?' });
+  return (
+    <PhoneFrame>
+      <div style={{ ...banner, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, padding: '18px 12px', borderRadius: 20, textAlign: 'center' }}>
+        <span style={{ fontSize: 13, letterSpacing: 3, textTransform: 'uppercase' }}>{view.team ? t(`team.${view.team}`) : t('title')}</span>
+        <span style={{ fontFamily: FELL, fontSize: 40, lineHeight: 1 }}>{!role ? t(`end.${view.winner}`) : view.won ? t('end.youWon') : t('end.youLost')}</span>
+        <span style={{ fontSize: 15 }}>{t(`end.${view.winner}Text`)}</span>
+      </div>
+      {role && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderRadius: 16, background: CARD }}>
+          <span style={{ filter: view.me.alive ? undefined : 'grayscale(1) brightness(.7)', display: 'inline-flex' }}><Avatar player={mePlayer} size={52} flat /></span>
+          <span style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+            <b style={{ fontSize: 17 }}>{mePlayer.name}</b>
+            <span style={{ fontSize: 14, color: role === 'wolf' ? WOLF : SOFT }}>{t(`role.${role}`)}</span>
+          </span>
+          <span style={{ fontSize: 14, color: MUTED }}>{fate}</span>
+        </div>
+      )}
+      {role && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, padding: '12px 14px', borderRadius: 16, background: NAVY2 }}>
+          {(view.parts as any[]).map((p) => (
+            <div key={p.key} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 15, color: SOFT }}><span>{t(`partLong.${p.key}`, { c: p.count })}</span><b style={{ color: CREAM }}>+{p.pts}</b></div>
+          ))}
+          {!(view.parts as any[]).length && <div style={{ fontSize: 15, color: MUTED }}>{t('phone.noPoints')}</div>}
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 19, paddingTop: 8, borderTop: `1px solid ${LINE}` }}><b>{t('phone.total')}</b><b>{view.score}</b></div>
+        </div>
+      )}
+      {role && view.rank > 0 && <div style={{ textAlign: 'center', fontSize: 15, color: MUTED }}>{t('phone.rank', { n: view.rank, of: view.of })}</div>}
+      {(view.awards as string[]).map((a) => (
+        <div key={a} style={{ padding: '10px 14px', borderRadius: 14, background: '#2a3360', textAlign: 'center' }}>
+          <div style={{ fontSize: 12, letterSpacing: 2, color: MUTED }}>{t('phone.award')}</div>
+          <div style={{ fontFamily: FELL, fontSize: 24 }}>{t(`award.${a}`)}</div>
+        </div>
+      ))}
+      <div style={{ flex: 1 }} />
+      {view.skip && <button type="button" className="up-btn full" onClick={() => send({ type: 'skipRecap' })} style={{ background: CREAM, color: NAVY, boxShadow: 'none' }}>{t('phone.skipRecap')}</button>}
+    </PhoneFrame>
+  );
+}
+
 function Controller(props: ControllerViewProps) {
   const { view, t, me: mePlayer, player, send } = props;
   useFonts();
@@ -1188,27 +1316,8 @@ function Controller(props: ControllerViewProps) {
     case 'ghostDay':
       return tvWait(t('phone.ghostTitle'), t('phone.ghostDay'));
     case 'end':
-      return (
-        <PhoneFrame>
-          <Center>
-            <Avatar player={mePlayer} size={100} />
-            <div style={{ fontFamily: FELL, fontSize: 34 }}>{view.won ? t('end.youWon') : view.me.role ? t('end.youLost') : t(`end.${view.winner}`)}</div>
-            {view.me.role && <RoleLabel info={{ role: view.me.role, side: null }} t={t} />}
-            {view.score !== null && <p style={{ color: SOFT }}>{t('phone.score', { n: view.score })}</p>}
-          </Center>
-          {view.skip && <button type="button" className="up-btn full" onClick={() => send({ type: 'skipRecap' })} style={{ background: CREAM, color: NAVY, boxShadow: 'none' }}>{t('phone.skipRecap')}</button>}
-        </PhoneFrame>
-      );
     case 'final':
-      return (
-        <PhoneFrame>
-          <Center>
-            <Avatar player={mePlayer} size={100} />
-            <div style={{ fontFamily: FELL, fontSize: 30 }}>{t('phone.score', { n: view.score })}</div>
-            {(view.awards as string[]).map((a) => <span key={a} style={{ padding: '8px 14px', borderRadius: 12, background: CARD, fontFamily: FELL, fontSize: 22 }}>{t(`award.${a}`)}</span>)}
-          </Center>
-        </PhoneFrame>
-      );
+      return <PhoneEnd {...props} />;
     case 'wait':
     case 'tv':
     default:

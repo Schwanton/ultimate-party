@@ -44,6 +44,20 @@ export default {
   create(ctx: GameContext) {
     const ids = ctx.players.map((p) => p.id);
     const scores = new Scores(ids);
+    /** Punkte nach Art (für die Aufteilung am Ende) */
+    const pts = new Map<string, Map<string, { count: number; pts: number }>>();
+    const PART_ORDER = ['win', 'lovers', 'alive', 'goodVote', 'wolfDay', 'gut', 'ghost'];
+    function addPts(id: string, key: string, n: number) {
+      scores.add(id, n);
+      const m = pts.get(id) ?? new Map();
+      const cur = m.get(key) ?? { count: 0, pts: 0 };
+      m.set(key, { count: cur.count + 1, pts: cur.pts + n });
+      pts.set(id, m);
+    }
+    function partsOf(id: string) {
+      const m = pts.get(id);
+      return m ? PART_ORDER.filter((k) => m.has(k)).map((k) => ({ key: k, ...m.get(k)! })) : [];
+    }
     const stored = ctx.store.get<Partial<Setup>>(SETTINGS_KEY) ?? {};
     let setup: Setup = { ...defaultSetup(ids.length), ...pickSettings(stored) };
     setup = fitSetup(setup, ids.length);
@@ -301,9 +315,9 @@ export default {
       lastBauch = Object.entries(gut.counts).map(([id, count]) => ({ id, count, total: gutPicks.length })).sort((a, b) => b.count - a.count).slice(0, 4);
       for (const [p, t] of pickA) if (taskA(p) === 'suspect' && t[0] && isWolf(roles.get(t[0]))) {
         gutHits.set(p, (gutHits.get(p) ?? 0) + 1);
-        scores.add(p, POINTS.gutTip);
+        addPts(p, 'gut', POINTS.gutTip);
       }
-      for (const [g, t] of ghostTips) if (isWolf(roles.get(t)) && ids.includes(g)) scores.add(g, POINTS.ghostTip);
+      for (const [g, t] of ghostTips) if (isWolf(roles.get(t)) && ids.includes(g)) addPts(g, 'ghost', POINTS.ghostTip);
       const quote = wolfFeed.length ? pick(wolfFeed) : null;
       nights.push({
         n: night, wolves: wolvesAlive(), victim, quote: quote ? { from: quote.from, msg: quote.msg } : null,
@@ -587,10 +601,10 @@ export default {
         votesReceived.set(t, (votesReceived.get(t) ?? 0) + 1);
         if (isWolf(roles.get(t)) && !isWolf(roles.get(v))) {
           goodVotes.set(v, (goodVotes.get(v) ?? 0) + 1);
-          scores.add(v, POINTS.goodVote);
+          addPts(v, 'goodVote', POINTS.goodVote);
         }
       }
-      if (out && !isWolf(roles.get(out))) for (const w of ids) if (isWolf(roles.get(w))) scores.add(w, POINTS.wolfDay);
+      if (out && !isWolf(roles.get(out))) for (const w of ids) if (isWolf(roles.get(w))) addPts(w, 'wolfDay', POINTS.wolfDay);
       showTally(list, counts, out, false, () => {
         if (out) {
           kill({ id: out, cause: 'vote', day });
@@ -629,24 +643,48 @@ export default {
       timer?.cancel();
       for (const id of ids) {
         if (!wins(id, w, roles, lovers)) continue;
-        scores.add(id, w === 'lovers' ? POINTS.lovers : POINTS.win);
-        if (alive.has(id)) scores.add(id, POINTS.alive);
+        addPts(id, w === 'lovers' ? 'lovers' : 'win', w === 'lovers' ? POINTS.lovers : POINTS.win);
+        if (alive.has(id)) addPts(id, 'alive', POINTS.alive);
       }
       speak(`end${w[0].toUpperCase()}${w.slice(1)}`);
-      sky = { mode: w === 'wolves' ? 'night' : 'day', from: Date.now(), to: Date.now() + 600_000 };
-      const cast = ids.map((id) => ({ id, role: role(id), alive: alive.has(id), lover: !!lovers?.includes(id), death: deaths.find((d) => d.id === id) ?? null }));
-      ctx.setHostView({ screen: 'end', ...base(), winner: w, cast });
+      // Himmel bleibt stehen: Mond bzw. Sonne hoch am Himmel
+      sky = { mode: w === 'wolves' ? 'night' : 'day', from: Date.now() - 360_000_000, to: Date.now() + 600_000_000 };
+      const cast = ids.map((id) => ({ id, role: role(id), alive: alive.has(id), lover: !!lovers?.includes(id), mayor: mayor === id, death: deaths.find((d) => d.id === id) ?? null }));
+      ctx.setHostView({ screen: 'end', ...base(), winner: w, cast, groups: groups(w), nights: night });
       endWinner = w;
       endViews(false);
-      audienceView(() => ({ screen: 'end', me: me(''), winner: w, won: false, score: null }));
+      audienceView(() => ({ screen: 'end', me: me(''), winner: w, won: false, score: null, parts: [], awards: [], rank: 0, of: ids.length, team: null, death: null }));
       ctx.after(T.end, () => recap(w, cast));
     }
 
     let endWinner: Winner = 'nobody';
+
+    /** Teams am Ende: Sieger zuerst. Ein gemischtes Liebespaar ist ein eigenes Team. */
+    function groups(w: Winner) {
+      const mixed = !!lovers && isWolf(roles.get(lovers[0])) !== isWolf(roles.get(lovers[1]));
+      const inLove = (id: string) => mixed && lovers!.includes(id);
+      const list = [
+        { key: 'village', won: w === 'village', ids: ids.filter((id) => !isWolf(roles.get(id)) && !inLove(id)) },
+        { key: 'wolves', won: w === 'wolves', ids: ids.filter((id) => isWolf(roles.get(id)) && !inLove(id)) },
+        ...(mixed ? [{ key: 'lovers', won: w === 'lovers', ids: [...lovers!] }] : []),
+      ].filter((g) => g.ids.length);
+      return [...list.filter((g) => g.won), ...list.filter((g) => !g.won)];
+    }
+
+    /** Was ein Handy am Ende über sich selbst zeigt */
+    function personal(id: string, w: Winner) {
+      const ranking = scores.ranking();
+      const g = groups(w).find((x) => x.ids.includes(id));
+      return {
+        me: me(id), winner: w, won: wins(id, w, roles, lovers), team: g?.key ?? null, score: scores.get(id), parts: partsOf(id),
+        rank: ranking.findIndex((r) => r.playerId === id) + 1, of: ids.length, death: deaths.find((d) => d.id === id) ?? null,
+        awards: awards().filter((a) => a.id === id).map((a) => a.key),
+      };
+    }
     /** Handys am Ende; während des Rückblicks hat der VIP „Überspringen“ */
     function endViews(recapRunning: boolean) {
       const w = endWinner;
-      ctx.setAllPlayerViews((p) => ({ screen: 'end', me: me(p.id), winner: w, won: wins(p.id, w, roles, lovers), score: scores.get(p.id), skip: recapRunning && p.id === vip() }));
+      ctx.setAllPlayerViews((p) => ({ screen: 'end', ...personal(p.id, w), skip: recapRunning && p.id === vip() }));
     }
 
     function recapSteps() {
@@ -696,8 +734,13 @@ export default {
     function final(w: Winner) {
       phase = 'final';
       const ranking = scores.ranking();
-      ctx.setHostView({ screen: 'final', ...base(), winner: w, ranking, awards: awards() });
-      ctx.setAllPlayerViews((p) => ({ screen: 'final', me: me(p.id), score: scores.get(p.id), awards: awards().filter((a) => a.id === p.id).map((a) => a.key) }));
+      const rank = (id: string) => ranking.findIndex((r) => r.playerId === id) + 1;
+      const table = groups(w).map((g) => ({
+        ...g,
+        players: [...g.ids].sort((a, b) => scores.get(b) - scores.get(a)).map((id) => ({ id, role: role(id), alive: alive.has(id), mayor: mayor === id, total: scores.get(id), rank: rank(id), parts: partsOf(id) })),
+      }));
+      ctx.setHostView({ screen: 'final', ...base(), winner: w, ranking, table, awards: awards(), players: ids.length });
+      ctx.setAllPlayerViews((p) => ({ screen: 'end', ...personal(p.id, w), skip: false }));
       ctx.after(T.final, () => ctx.finish(ranking));
     }
 
