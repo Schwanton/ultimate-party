@@ -1,5 +1,5 @@
 /**
- * Werwolf-Klänge (nur auf dem TV). Erst wird eine Sound-Datei aus games/werwolf/sounds/ versucht,
+ * Werwolf-Klänge (nur auf dem TV). Erst wird eine Sound-Datei aus games/werwolf/klaenge/ versucht,
  * fehlt sie, gibt es einen selbst erzeugten Ersatzklang.
  */
 
@@ -47,7 +47,7 @@ function load(name: string): Promise<AudioBuffer | null> | AudioBuffer | null {
   if (!file) return null;
   const hit = cache.get(name);
   if (hit !== undefined) return hit;
-  const p = sfx.loadSample(`/game/werwolf/sounds/${file}.mp3`).then((b) => {
+  const p = sfx.loadSample(`/game/werwolf/klaenge/${file}.mp3`).then((b) => {
     cache.set(name, b);
     return b;
   });
@@ -80,11 +80,16 @@ export function startNightAmbience() {
   let k = 0;
   const tick = () => {
     k++;
-    if (k % 2 === 1) play('crickets', 0.5);
-    if (k % 5 === 3) play('owl', 0.6);
+    play('crickets', 0.45);
+    if (k % 3 === 2) play('owl', 0.6);
   };
   tick();
-  ambience = setInterval(tick, 4000);
+  ambience = setInterval(tick, 5200);
+}
+
+/** Herzschlag in den letzten 15 Sekunden (Diskussion und Abstimmung) */
+export function heartbeatIfClose(left: number) {
+  if (left > 0 && left <= 15000) play('heartbeat', left <= 6000 ? 0.9 : 0.6);
 }
 
 export function stopAmbience() {

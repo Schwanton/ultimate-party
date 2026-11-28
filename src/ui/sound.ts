@@ -1,6 +1,6 @@
 /**
  * UP! Sounds – live im Browser erzeugt (Web Audio); Spiele können zusätzlich eigene Sound-Dateien
- * laden (sfx.loadSample / sfx.playSample), z. B. aus games/<spiel>/sounds/.
+ * laden (sfx.loadSample / sfx.playSample), z. B. aus games/<spiel>/klaenge/.
  * Sounds spielen nur auf dem TV. Lautstärke wird pro Gerät gespeichert.
  *
  *   import { sfx } from '@up/ui';
@@ -166,7 +166,7 @@ class Sfx {
   }
 
   /**
-   * Sound-Datei laden (z. B. aus games/<spiel>/sounds/). Liefert null, wenn die Datei fehlt
+   * Sound-Datei laden (z. B. aus games/<spiel>/klaenge/). Liefert null, wenn die Datei fehlt
    * oder nicht gelesen werden kann – dann kann das Spiel einen eigenen Ersatzklang spielen.
    */
   async loadSample(url: string): Promise<AudioBuffer | null> {

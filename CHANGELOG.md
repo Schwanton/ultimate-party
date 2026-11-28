@@ -2,6 +2,10 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.61.1
+
+- Werwolf: Echte Geräusche – Grillen und Eule in der Nacht, Hahn am Morgen, Kirchenglocke zur Abstimmung, Wolfsgeheul, Trommelwirbel beim Aufdecken der Rolle und ein Herzschlag in den letzten 15 Sekunden der Diskussion und Abstimmung
+
 ## 0.61.0
 
 - Neues Spiel: **Werwolf** (6–16 Spieler) – das klassische Werwolf ohne Spielleiter. Der Fernseher erzählt, das Handy ist Rollenkarte und Stimmzettel

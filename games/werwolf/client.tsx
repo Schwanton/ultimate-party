@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import type { ControllerViewProps, GameClientModule, HostViewProps, PlayerInfo, Translate } from '@up/sdk';
 import { Avatar, Podium, useServerNow, vibrate } from '@up/ui';
-import { play, startNightAmbience, stopAmbience } from './sounds';
+import { heartbeatIfClose, play, startNightAmbience, stopAmbience } from './sounds';
 
 /* ================= Farben, Schrift, Rollen ================= */
 
@@ -618,7 +618,18 @@ function Chronicle({ view, t, player }: { view: any; t: Translate; player: Playe
   );
 }
 
+/** Herzschlag kurz vor Ablauf der Zeit */
+function useHeartbeat(deadline?: number) {
+  const now = useServerNow(250);
+  const left = deadline ? deadline - now : 0;
+  const beat = left > 0 && left <= 15000 ? Math.floor(left / (left <= 6000 ? 650 : 1000)) : -1;
+  useEffect(() => {
+    if (beat >= 0) heartbeatIfClose(left);
+  }, [beat]); // eslint-disable-line react-hooks/exhaustive-deps
+}
+
 function HostDiscuss({ view, t, player }: HostViewProps) {
+  useHeartbeat(view.deadline);
   const ids = view.alive as string[];
   const pos = circle(ids, 380, 300, 300, 215);
   const count: Record<string, number> = {};
@@ -658,6 +669,7 @@ function Clock({ deadline }: { deadline: number }) {
 }
 
 function HostVote({ view, t, player }: HostViewProps) {
+  useHeartbeat(view.deadline);
   const prev = useRef(0);
   useEffect(() => {
     if (!prev.current) play('bell');
