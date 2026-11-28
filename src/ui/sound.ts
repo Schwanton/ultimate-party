@@ -1,5 +1,6 @@
 /**
- * UP! Sounds – alles wird live im Browser erzeugt (Web Audio), keine Audiodateien, keine Lizenzen.
+ * UP! Sounds – live im Browser erzeugt (Web Audio); Spiele können zusätzlich eigene Sound-Dateien
+ * laden (sfx.loadSample / sfx.playSample), z. B. aus games/<spiel>/sounds/.
  * Sounds spielen nur auf dem TV. Lautstärke wird pro Gerät gespeichert.
  *
  *   import { sfx } from '@up/ui';
@@ -161,6 +162,39 @@ class Sfx {
     if (!this.ctx || this.ctx.state !== 'running') return;
     try {
       this.compose(name);
+    } catch { /* egal */ }
+  }
+
+  /**
+   * Sound-Datei laden (z. B. aus games/<spiel>/sounds/). Liefert null, wenn die Datei fehlt
+   * oder nicht gelesen werden kann – dann kann das Spiel einen eigenen Ersatzklang spielen.
+   */
+  async loadSample(url: string): Promise<AudioBuffer | null> {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) return null;
+      const data = await res.arrayBuffer();
+      const AC = window.AudioContext ?? (window as any).webkitAudioContext;
+      const ctx: BaseAudioContext = this.ctx ?? new OfflineAudioContext(1, 1, 44100);
+      if (!AC && !this.ctx) return null;
+      return await ctx.decodeAudioData(data);
+    } catch {
+      return null;
+    }
+  }
+
+  /** Geladene Sound-Datei abspielen (nur auf dem TV, stumm in der Pause). vol = 0–1 */
+  playSample(buffer: AudioBuffer, vol = 1) {
+    if (!this.enabledOnDevice || this.paused) return;
+    this.unlock();
+    if (!this.ctx || this.ctx.state !== 'running') return;
+    try {
+      const src = this.ctx.createBufferSource();
+      src.buffer = buffer;
+      const g = this.ctx.createGain();
+      g.gain.value = vol;
+      src.connect(g).connect(this.fxGain!);
+      src.start();
     } catch { /* egal */ }
   }
 

@@ -2,6 +2,15 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.61.0
+
+- Neues Spiel: **Werwolf** (6–16 Spieler) – das klassische Werwolf ohne Spielleiter. Der Fernseher erzählt, das Handy ist Rollenkarte und Stimmzettel
+- Nachts tippen alle gleichzeitig auf ihr Handy und alle Handys sehen gleich aus – so verrät sich niemand, und niemand muss die Augen schließen
+- Rollen: Werwolf, Dorfbewohner, Seherin, Hexe, Jäger, Amor, Beschützer und ein gewählter Bürgermeister. Vor dem Start stellt der VIP die Mischung um, alle können die Rollen am Handy nachlesen
+- Der Himmel ist die Spieluhr: Tagsüber wandert die Sonne, kurz vor Ende der Diskussion färbt sich der Himmel rot. Nachts zieht der Vollmond, die Sterne funkeln, am Ende kommt die Morgenröte
+- Bauchgefühl des Dorfes, Verdachts-Pfeile, Letzte Worte, Stimmen offen oder geheim, spannender Rückblick Nacht für Nacht und Auszeichnungen am Ende
+- Wer ausgeschieden ist, tippt als Geist auf die Wölfe und sammelt weiter Punkte
+
 ## 0.60.0
 
 - Bonk!: Neue Einstellung „Teams“ – ab 3 Spielern Team Rot gegen Team Blau. Eigene Leute kann man nicht treffen, gewinnt ein Team die Runde, bekommen alle im Team +300

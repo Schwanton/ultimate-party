@@ -1,0 +1,19 @@
+{
+  "id": "werwolf",
+  "name": { "de": "Werwolf", "en": "Werewolf" },
+  "description": {
+    "de": "Werwölfe verstecken sich im Dorf. Nachts jagen sie heimlich, tagsüber diskutiert ihr und schickt Verdächtige raus.",
+    "en": "Werewolves hide in the village. At night they hunt in secret, by day you argue and vote suspects out."
+  },
+  "minPlayers": 6,
+  "maxPlayers": 16,
+  "audience": true,
+  "minutes": 30,
+  "color": "#C8463B",
+  "tags": ["deceive", "strategy"],
+  "sdkVersion": 1,
+  "autoSounds": false,
+  "noDeck": true,
+  "version": "1.0.0",
+  "author": "UP!"
+}
