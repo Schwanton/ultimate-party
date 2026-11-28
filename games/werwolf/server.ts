@@ -636,9 +636,17 @@ export default {
       sky = { mode: w === 'wolves' ? 'night' : 'day', from: Date.now(), to: Date.now() + 600_000 };
       const cast = ids.map((id) => ({ id, role: role(id), alive: alive.has(id), lover: !!lovers?.includes(id), death: deaths.find((d) => d.id === id) ?? null }));
       ctx.setHostView({ screen: 'end', ...base(), winner: w, cast });
-      ctx.setAllPlayerViews((p) => ({ screen: 'end', me: me(p.id), winner: w, won: wins(p.id, w, roles, lovers), score: scores.get(p.id) }));
+      endWinner = w;
+      endViews(false);
       audienceView(() => ({ screen: 'end', me: me(''), winner: w, won: false, score: null }));
       ctx.after(T.end, () => recap(w, cast));
+    }
+
+    let endWinner: Winner = 'nobody';
+    /** Handys am Ende; während des Rückblicks hat der VIP „Überspringen“ */
+    function endViews(recapRunning: boolean) {
+      const w = endWinner;
+      ctx.setAllPlayerViews((p) => ({ screen: 'end', me: me(p.id), winner: w, won: wins(p.id, w, roles, lovers), score: scores.get(p.id), skip: recapRunning && p.id === vip() }));
     }
 
     function recapSteps() {
@@ -660,7 +668,8 @@ export default {
       speak('recap');
       const seconds = 1.5 + steps.length * T.recapStep;
       ctx.setHostView({ screen: 'recap', ...base(), winner: w, cast, steps, step: T.recapStep, startAt: Date.now() });
-      ctx.after(seconds, () => final(w));
+      timer = ctx.timer(seconds, () => final(w));
+      endViews(true);
     }
 
     function awards() {
@@ -786,6 +795,10 @@ export default {
         if (!a || typeof a !== 'object') return;
         const isAudience = !ids.includes(id);
         if (phase === 'lobby') return isAudience ? undefined : lobbyAction(id, a);
+        if (phase === 'recap' && a.type === 'skipRecap' && id === vip()) {
+          timer?.cancel();
+          return final(endWinner);
+        }
         if (phase === 'night') {
           return nightAction(id, a, isAudience);
         }
@@ -845,6 +858,7 @@ export default {
           }
           return { type: 'begin' };
         }
+        if (view.screen === 'end' && view.skip && Math.random() < 0.5) return { type: 'skipRecap' };
         if (view.screen === 'night') {
           if ((view.pick as string[]).length >= (view.multi ?? 1) || (view.task === 'witch' && view.chip)) return null;
           if (view.task === 'witch') {

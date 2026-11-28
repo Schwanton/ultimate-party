@@ -2,6 +2,12 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.61.3
+
+- Werwolf: Der VIP kann den Rückblick am Ende auf dem Handy überspringen
+- Werwolf: Sonne und Mond laufen nur noch von links nach rechts – wer dran ist, geht links auf, der andere geht rechts unter
+- Werwolf: Der Wolfsschatten über den Dächern ist entfernt
+
 ## 0.61.2
 
 - Werwolf: Neue Erzählerstimme – ein düsterer Märchenerzähler spricht 35 Sätze (Nacht, Morgen, Abstimmung, Aufdecken, Ende), passend zum Text auf dem Fernseher. Kündigt außerdem die Abendröte an, wenn die Zeit knapp wird. Standardmäßig an, abschaltbar in der Rollen-Lobby; nur auf Deutsch

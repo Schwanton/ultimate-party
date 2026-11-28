@@ -56,7 +56,6 @@ const KEYFRAMES = `
 @keyframes wwTwinkle{0%,100%{opacity:.25;transform:scale(.7)}50%{opacity:1;transform:scale(1.15)}}
 @keyframes wwBlink{0%,8%,100%{transform:scaleY(1)}4%{transform:scaleY(.1)}}
 @keyframes wwEyes{0%,30%,100%{opacity:0}36%,58%{opacity:1}64%{opacity:0}}
-@keyframes wwRun{0%{transform:translateX(-160px)}100%{transform:translateX(1440px)}}
 @keyframes wwRise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 @keyframes wwPop{0%{opacity:0;transform:scale(.6)}60%{opacity:1;transform:scale(1.08)}100%{transform:scale(1)}}
 @keyframes wwFlip{0%{transform:rotateY(180deg)}100%{transform:rotateY(0deg)}}
@@ -95,7 +94,6 @@ const TOWERS = 'M1000 300V150l22-40 22 40v150zM1080 300V170l18-35 18 35v130zM120
 const WINDOWS = [[196, 225], [452, 215], [560, 240], [782, 232], [905, 238], [1180, 245], [330, 238], [640, 230]];
 /** Gassen zwischen den Häusern, in denen nachts Augen aufleuchten */
 const ALLEYS = [[262, 262], [700, 268], [958, 262]];
-const WOLF_RUN = 'M0 18c6-6 14-8 22-6l10-6 4 4-4 4c8 2 14 6 16 12l-6 2-6-6-12 2-6 8-6-2 4-8-10-2-6 6-4-2 4-8z';
 
 function Moon({ size }: { size: number }) {
   const k = size / 150;
@@ -104,6 +102,31 @@ function Moon({ size }: { size: number }) {
       {[[34, 30, 34, 0.13], [88, 52, 20, 0.11], [56, 92, 42, 0.09], [108, 98, 14, 0.12], [24, 80, 12, 0.1]].map(([x, y, d, o], i) => (
         <span key={i} style={{ position: 'absolute', left: x * k, top: y * k, width: d * k, height: d * k, borderRadius: '50%', background: `rgba(120,100,70,${o})` }} />
       ))}
+    </div>
+  );
+}
+
+/**
+ * Himmelskörper auf einem Bogen um einen Punkt unter dem Horizont.
+ * Läuft nur vorwärts (links → rechts); springt der Winkel zurück, geschieht das ohne Animation unter dem Horizont.
+ */
+function Arc({ angle, children }: { angle: number; children: ReactNode }) {
+  const [a, setA] = useState(angle);
+  const [animate, setAnimate] = useState(true);
+  const prev = useRef(angle);
+  useEffect(() => {
+    if (angle < prev.current - 0.5) {
+      setAnimate(false);
+      setA(angle);
+    } else {
+      setAnimate(true);
+      setA(angle);
+    }
+    prev.current = angle;
+  }, [angle]);
+  return (
+    <div style={{ position: 'absolute', left: 640, top: 760, width: 0, height: 0, transform: `rotate(${a}deg)`, transition: animate ? 'transform 1.4s linear' : 'none' }}>
+      <div style={{ position: 'absolute', left: -60, top: -660 }}>{children}</div>
     </div>
   );
 }
@@ -131,8 +154,10 @@ function Sky({ sky, eyes }: { sky: { mode: 'dusk' | 'night' | 'day'; from: numbe
     color = mix(mix('#8fb6cc', '#d98a6a', dawn), '#a8463a', dusk);
   }
   const lights = night || dusk > 0.6 ? 1 : 0;
-  const angle = -80 + 160 * f;
-  const body = night ? <Moon size={120} /> : <div style={{ width: 110, height: 110, borderRadius: '50%', background: '#ffd27a', boxShadow: '0 0 70px 24px rgba(255,200,110,0.55)' }} />;
+  // Sonne und Mond: steigen links auf, gehen rechts unter; wer gerade nicht dran ist, versinkt rechts
+  const arc = -92 + 172 * f;
+  const sunAngle = night ? 100 : arc;
+  const moonAngle = night ? arc : 100;
   return (
     <div aria-hidden="true" style={{ position: 'absolute', inset: 0, overflow: 'hidden', background: css(color), transition: 'background 1.2s linear', zIndex: 0 }}>
       <div style={{ position: 'absolute', inset: 0, opacity: dusk, transition: 'opacity 1s', background: 'linear-gradient(to top, rgba(214,70,48,0.95) 0%, rgba(236,130,70,0.55) 30%, rgba(120,40,60,0) 70%)' }} />
@@ -142,14 +167,8 @@ function Sky({ sky, eyes }: { sky: { mode: 'dusk' | 'night' | 'day'; from: numbe
           <span key={i} style={{ position: 'absolute', left: s.x, top: s.y, width: s.s, height: s.s, borderRadius: '50%', background: '#fff6dc', boxShadow: '0 0 6px rgba(255,246,220,0.8)', animation: `wwTwinkle ${s.d}s ease-in-out ${s.delay}s infinite` }} />
         ))}
       </div>
-      <div style={{ position: 'absolute', left: 640, top: 760, width: 0, height: 0, transform: `rotate(${angle}deg)`, transition: 'transform 1s linear' }}>
-        <div style={{ position: 'absolute', left: -60, top: -660 }}>{body}</div>
-      </div>
-      {night && (
-        <svg width="160" height="40" viewBox="0 0 60 30" style={{ position: 'absolute', top: 488, left: 0, animation: 'wwRun 3.2s linear 6s infinite', animationDelay: '7s', opacity: 0.95 }}>
-          <path d={WOLF_RUN} fill="#05080f" />
-        </svg>
-      )}
+      <Arc angle={sunAngle}><div style={{ width: 110, height: 110, borderRadius: '50%', background: '#ffd27a', boxShadow: '0 0 70px 24px rgba(255,200,110,0.55)' }} /></Arc>
+      <Arc angle={moonAngle}><Moon size={120} /></Arc>
       <svg width="1280" height="300" viewBox="0 0 1280 300" style={{ position: 'absolute', left: 0, bottom: 0 }}>
         <path fill="#070a14" d={TOWN} />
         <path fill="#070a14" d={TOWERS} />
@@ -1177,6 +1196,7 @@ function Controller(props: ControllerViewProps) {
             {view.me.role && <RoleLabel info={{ role: view.me.role, side: null }} t={t} />}
             {view.score !== null && <p style={{ color: SOFT }}>{t('phone.score', { n: view.score })}</p>}
           </Center>
+          {view.skip && <button type="button" className="up-btn full" onClick={() => send({ type: 'skipRecap' })} style={{ background: CREAM, color: NAVY, boxShadow: 'none' }}>{t('phone.skipRecap')}</button>}
         </PhoneFrame>
       );
     case 'final':

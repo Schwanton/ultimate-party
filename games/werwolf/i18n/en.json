@@ -254,6 +254,7 @@
   "phone.diedText": "As a ghost you don't talk anymore, but at night you guess the wolves and collect points.",
   "phone.ghostTitle": "You're a ghost",
   "phone.ghostDay": "Shh! Ghosts don't talk. At night you can guess who's a werewolf.",
+  "phone.skipRecap": "Skip the recap",
   "phone.score": "{n} points",
 
   "q.wolf": "Who are you taking tonight?",
