@@ -22,7 +22,7 @@ const T = {
 const POINTS = { win: 1000, lovers: 1500, alive: 300, goodVote: 100, wolfDay: 100, ghostTip: 100, gutTip: 50 };
 const NOBODY = 'nobody';
 const WOLF_MSGS = ['take', 'not', 'danger', 'any', 'distract'];
-const SETTINGS_KEY = 'settings';
+const SETTINGS_KEY = 'settings-v2'; // v2: Erzählerstimme jetzt standardmäßig an
 
 type DeathCause = 'wolves' | 'poison' | 'love' | 'hunter' | 'vote';
 interface Death { id: string; cause: DeathCause; day: number }
@@ -129,7 +129,7 @@ export default {
 
     function base() {
       return {
-        day, night, alive: aliveList(), mayor, sky, say: setup.voice ? say : null,
+        day, night, alive: aliveList(), mayor, sky, say: setup.voice ? say : null, voice: setup.voice,
         dead: deaths.map(deadInfo), arrowsOn: setup.arrows,
       };
     }
@@ -200,7 +200,7 @@ export default {
       victim = null;
       seerResult = null;
       ghostTips.clear();
-      speak('nightA', { n: String(night) });
+      speak(`nightA${((night + day) % 4) + 1}`);
       timer = ctx.timer(T.nightA, endSectionA);
       sky = { mode: 'night', from: Date.now(), to: timer.deadline + T.nightB * timer.duration / T.nightA };
       nightViews();
@@ -312,7 +312,7 @@ export default {
         cupid: cupidLog, gut: lastBauch[0] ? { ...lastBauch[0] } : null, deaths: [],
       });
       section = 'B';
-      speak('nightB');
+      speak(`nightB${((night + day) % 3) + 1}`);
       timer = ctx.timer(T.nightB, () => endNight(protTarget));
       nightViews();
     }
@@ -339,7 +339,7 @@ export default {
       phase = 'morning';
       for (const d of list) kill(d);
       sky = { mode: 'day', from: Date.now(), to: Date.now() + 600_000 };
-      speak(list.length ? 'morningDeath' : 'morningNone', { names: list.map((d) => name(d.id)).join(', ') });
+      speak(list.length > 1 ? 'morningTwo' : list.length ? `morningDeath${(day % 3) + 1}` : `morningNone${(day % 2) + 1}`);
       ctx.setHostView({ screen: 'morning', ...base(), died: list.map((d) => d.id), gut: lastBauch, lovers: night === 1 && lovers ? true : false });
       ctx.setAllPlayerViews((p) => ({ screen: 'morning', me: me(p.id), died: list.map((d) => d.id), newLover: night === 1 && lovers?.includes(p.id) ? me(p.id).lover : null }));
       audienceView(() => ({ screen: 'morning', me: me(''), died: list.map((d) => d.id) }));
@@ -495,7 +495,7 @@ export default {
     function discuss() {
       phase = 'discuss';
       suspects = new Map();
-      speak('discuss');
+      speak(`discuss${(day % 2) + 1}`);
       timer = ctx.timer(setup.discuss, startVote);
       const to = timer.deadline + T.vote * 1000 * (timer.duration / (setup.discuss * 1000));
       // Sonne steht schon über den Dächern (keine zweite Morgenröte)
@@ -632,7 +632,7 @@ export default {
         scores.add(id, w === 'lovers' ? POINTS.lovers : POINTS.win);
         if (alive.has(id)) scores.add(id, POINTS.alive);
       }
-      speak(`end.${w}`);
+      speak(`end${w[0].toUpperCase()}${w.slice(1)}`);
       sky = { mode: w === 'wolves' ? 'night' : 'day', from: Date.now(), to: Date.now() + 600_000 };
       const cast = ids.map((id) => ({ id, role: role(id), alive: alive.has(id), lover: !!lovers?.includes(id), death: deaths.find((d) => d.id === id) ?? null }));
       ctx.setHostView({ screen: 'end', ...base(), winner: w, cast });
@@ -657,6 +657,7 @@ export default {
     function recap(w: Winner, cast: object[]) {
       phase = 'recap';
       const steps = recapSteps();
+      speak('recap');
       const seconds = 1.5 + steps.length * T.recapStep;
       ctx.setHostView({ screen: 'recap', ...base(), winner: w, cast, steps, step: T.recapStep, startAt: Date.now() });
       ctx.after(seconds, () => final(w));

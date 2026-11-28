@@ -52,7 +52,7 @@ export function defaultSetup(n: number): Setup {
   if (n >= 10) specials.push('protector');
   return {
     wolves: Math.min(defaultWolves(n), maxWolves(n)), specials, mayor: true, discuss: 180, reveal: 'role',
-    arrows: true, votes: 'reveal', lastWords: false, quietFirstNight: false, voice: false,
+    arrows: true, votes: 'reveal', lastWords: false, quietFirstNight: false, voice: true,
   };
 }
 

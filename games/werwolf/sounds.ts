@@ -55,6 +55,21 @@ function load(name: string): Promise<AudioBuffer | null> | AudioBuffer | null {
   return p;
 }
 
+/** Erzählerstimme: vorab aufgenommene Sätze klaenge/s-<key>.mp3 (nur Deutsch, ohne Ersatzklang) */
+export function speak(key: string) {
+  const name = `s-${key}`;
+  let hit = cache.get(name);
+  if (hit === undefined) {
+    hit = sfx.loadSample(`/game/werwolf/klaenge/${name}.mp3`).then((b) => {
+      cache.set(name, b);
+      return b;
+    });
+    cache.set(name, hit);
+  }
+  if (hit instanceof Promise) void hit.then((b) => b && sfx.playSample(b, 1));
+  else if (hit) sfx.playSample(hit, 1);
+}
+
 export function play(name: string, vol = 1) {
   if (name === 'pop' || name === 'fanfare') return sfx.play(name, { always: true });
   const b = load(name);

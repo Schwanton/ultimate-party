@@ -23,3 +23,5 @@ Sie wurden gekürzt und in der Lautstärke angeglichen. Dank an die Aufnehmenden
 - trommelwirbel.mp3 – „drumroll.wav“ von adriann: https://freesound.org/s/191718/
 - herzschlag.mp3 – „heart beat.mp3“ von greyseraphim: https://freesound.org/s/21409/
 - seite.mp3 – „Page Turn“ von davidbain: https://freesound.org/s/136778/
+
+Die Erzählerstimme (`games/werwolf/klaenge/s-*.mp3`) wurde für UP! mit der OpenAI-Sprach-KI (gpt-4o-mini-tts, Stimme „Ash“) erzeugt; Texte: UP!.

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import type { ControllerViewProps, GameClientModule, HostViewProps, PlayerInfo, Translate } from '@up/sdk';
 import { Avatar, Podium, useServerNow, vibrate } from '@up/ui';
-import { heartbeatIfClose, play, startNightAmbience, stopAmbience } from './sounds';
+import { heartbeatIfClose, play, speak, startNightAmbience, stopAmbience } from './sounds';
 
 /* ================= Farben, Schrift, Rollen ================= */
 
@@ -229,21 +229,13 @@ function RoleLabel({ info, t, size = 22 }: { info: { role: Role | null; side: 'w
 
 /* ================= Stimme ================= */
 
-function useVoice(say: { key: string; vars?: Record<string, string>; n: number } | null, t: Translate, lang: string) {
+/** Erzählerstimme: vorab aufgenommene Sätze (nur Deutsch) */
+function useVoice(say: { key: string; n: number } | null, lang: string) {
   const last = useRef(0);
   useEffect(() => {
     if (!say || say.n === last.current) return;
     last.current = say.n;
-    try {
-      const synth = window.speechSynthesis;
-      if (!synth) return;
-      synth.cancel();
-      const u = new SpeechSynthesisUtterance(variant(t(`say.${say.key}`, say.vars), say.n));
-      u.lang = lang === 'de' ? 'de-DE' : 'en-US';
-      u.rate = 0.92;
-      u.pitch = 0.85;
-      synth.speak(u);
-    } catch { /* keine Stimme */ }
+    if (lang === 'de') speak(say.key);
   }, [say?.n]); // eslint-disable-line react-hooks/exhaustive-deps
 }
 
@@ -252,7 +244,7 @@ function useVoice(say: { key: string; vars?: Record<string, string>; n: number }
 function Host(props: HostViewProps) {
   const { view, t, room } = props;
   useFonts();
-  useVoice(view.say ?? null, t, room.lang);
+  useVoice(view.say ?? null, room.lang);
   useEffect(() => () => stopAmbience(), []);
   // Nachtgeräusche
   useEffect(() => {
@@ -488,7 +480,7 @@ function HostMorning({ view, t, player }: HostViewProps) {
   );
 }
 
-function HostFlip({ view, t, player }: HostViewProps) {
+function HostFlip({ view, t, player, room }: HostViewProps) {
   const p = player(view.who);
   const [open, setOpen] = useState(false);
   useEffect(() => {
@@ -497,6 +489,7 @@ function HostFlip({ view, t, player }: HostViewProps) {
     const id = setTimeout(() => {
       setOpen(true);
       play(view.info.side === 'wolves' ? 'howl' : 'bell');
+      if (view.voice && room.lang === 'de' && view.info.side) setTimeout(() => speak(view.info.side === 'wolves' ? 'flipWolf' : 'flipVillage'), 700);
     }, 1600);
     return () => clearTimeout(id);
   }, [view.who]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -628,8 +621,16 @@ function useHeartbeat(deadline?: number) {
   }, [beat]); // eslint-disable-line react-hooks/exhaustive-deps
 }
 
-function HostDiscuss({ view, t, player }: HostViewProps) {
+function HostDiscuss({ view, t, player, room }: HostViewProps) {
   useHeartbeat(view.deadline);
+  const now = useServerNow(500);
+  const duskSaid = useRef(false);
+  useEffect(() => {
+    if (!duskSaid.current && view.deadline - now <= 20000 && view.deadline - now > 3000) {
+      duskSaid.current = true;
+      if (view.voice && room.lang === 'de') speak('dusk');
+    }
+  }, [now]); // eslint-disable-line react-hooks/exhaustive-deps
   const ids = view.alive as string[];
   const pos = circle(ids, 380, 300, 300, 215);
   const count: Record<string, number> = {};

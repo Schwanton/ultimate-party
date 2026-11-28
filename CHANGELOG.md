@@ -2,6 +2,11 @@
 
 Neue Versionen werden in der TV-Lobby angezeigt und lassen sich mit einem Klick installieren.
 
+## 0.61.2
+
+- Werwolf: Neue Erzählerstimme – ein düsterer Märchenerzähler spricht 35 Sätze (Nacht, Morgen, Abstimmung, Aufdecken, Ende), passend zum Text auf dem Fernseher. Kündigt außerdem die Abendröte an, wenn die Zeit knapp wird. Standardmäßig an, abschaltbar in der Rollen-Lobby; nur auf Deutsch
+- Die alte Computer-Vorlesestimme des Browsers ist entfernt
+
 ## 0.61.1
 
 - Werwolf: Echte Geräusche – Grillen und Eule in der Nacht, Hahn am Morgen, Kirchenglocke zur Abstimmung, Wolfsgeheul, Trommelwirbel beim Aufdecken der Rolle und ein Herzschlag in den letzten 15 Sekunden der Diskussion und Abstimmung
